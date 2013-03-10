@@ -41,7 +41,7 @@
 
 #include "ofxHTTPBaseTypes.h"
 #include "ofxHTTPServerExchange.h"
-#include "ofxHttpUtils.h"
+#include "ofxHTTPUtils.h"
 #include "ofxMediaTypes.h"
 
 using std::string;

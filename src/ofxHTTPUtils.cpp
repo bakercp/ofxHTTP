@@ -1,4 +1,4 @@
-#include "ofxHttpUtils.h"
+#include "ofxHTTPUtils.h"
 
 //------------------------------------------------------------------------------
 NameValueCollection ofGetQueryMap(const URI& uri) {
