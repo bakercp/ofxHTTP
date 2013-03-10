@@ -1,13 +1,20 @@
-# Compiled Object files
-*.slo
-*.lo
-*.o
+*.mode1v3
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
+# xcode
+*.pbxuser
+*.perspectivev3
+xcuserdata
+build
+*.app
+#*.a
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
+# OSX
+.DS_Store
+
+# codeblocks
+*.layout
+example/obj
+
+# Win
+*.exe
+*.dll
