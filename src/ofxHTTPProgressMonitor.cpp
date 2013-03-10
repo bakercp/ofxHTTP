@@ -31,22 +31,22 @@ void ofxHTTPProgressMonitor::update(streamsize _totalBytesTransferred,
 
 //------------------------------------------------------------------------------
 streamsize ofxHTTPProgressMonitor::getTotalBytesTranferred() {
-
+    return 0;
 }
 
 //------------------------------------------------------------------------------
 streamsize ofxHTTPProgressMonitor::getTotalBytes() {
-    
+    return 0;
 }
 
 //------------------------------------------------------------------------------
 float ofxHTTPProgressMonitor::getPercentageTransferred() {
-    
+    return 0;
 }
 
 //------------------------------------------------------------------------------
 size_t ofxHTTPProgressMonitor::getTransferBufferSize() {
-    
+    return 0;
 }
 
 //------------------------------------------------------------------------------
