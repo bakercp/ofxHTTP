@@ -65,8 +65,8 @@ void ofxWebSocketRouteHandler::handleExchange(ofxHTTPServerExchange& exchange) {
 
         int flags = 0;
         int numBytesReceived = 0;
-        int numBytesSent = 0;
-                
+//        int numBytesSent = 0;
+        
         do {
             if(ws.poll(settings.pollTimeout, Socket::SELECT_READ)) {
                 numBytesReceived = ws.receiveFrame(buffer, sizeof(buffer), flags);

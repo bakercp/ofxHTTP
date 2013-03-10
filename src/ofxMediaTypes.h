@@ -1640,7 +1640,7 @@ static map<string,string> createMimeMap(const string& unparsedMimeTypes) {
         string line = buffer.getNextLine();
         if(line.empty() || line[0] == '#') continue;
         
-        int i = tabEater.subst(line, "\t"); // collapse tabs
+        tabEater.subst(line, "\t"); // collapse tabs
         
         vector<string> tokens = ofSplitString(line,"\t");
         

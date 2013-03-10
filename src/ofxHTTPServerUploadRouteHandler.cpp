@@ -56,7 +56,7 @@ void ofxHTTPServerUploadRouteHandler::handleRequest(HTTPServerRequest& request, 
 
 //------------------------------------------------------------------------------
 void ofxHTTPServerUploadRouteHandler::handlePart(const MessageHeader& header, std::istream& stream) {
-    NameValueCollection::ConstIterator iter = header.begin();
+    //NameValueCollection::ConstIterator iter = header.begin();
     
     //        while(iter != header.end()) {
     //            cout << (*iter).first << "=" << (*iter).second << endl;
@@ -89,6 +89,8 @@ void ofxHTTPServerUploadRouteHandler::handlePart(const MessageHeader& header, st
                 cout << file.getAbsolutePath() << endl;
                 
                 streamsize sz = StreamCopier::copyStream(stream,file,settings.writeBufferSize);
+                
+                cout << sz << endl;
                 
                 // The section below is from StreamCopier::copyStream,
                 // and can be used for upload progress feedback
