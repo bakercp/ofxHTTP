@@ -26,7 +26,7 @@
 
 #include "ofImage.h"
 
-#include "ofxWebsocketEvents.h"
+#include "ofxWebSocketEvents.h"
 #include "ofxWebSocketFrame.h"
 
 class ofxBaseWebSocketRouteHandler : public ofxHTTPServerRouteHandler {
