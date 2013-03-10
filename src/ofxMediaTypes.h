@@ -1646,7 +1646,7 @@ static map<string,string> createMimeMap(const string& unparsedMimeTypes) {
         
         if(tokens.size() == 2 && !tokens[0].empty() && !tokens[1].empty()) {
             string mimeType = tokens[0];
-            int i = spaceEater.subst(tokens[1], " "); // collapse spaces
+//            int i = spaceEater.subst(tokens[1], " "); // collapse spaces
             vector<string> fileEndings = ofSplitString(tokens[1], " ");
             vector<string>::iterator iter = fileEndings.begin();
             while(iter != fileEndings.end()) {
@@ -1681,7 +1681,7 @@ static map<string, vector<string> > createFileTypeMap(const string& unparsedMime
         
         if(tokens.size() == 2 && !tokens[0].empty() && !tokens[1].empty()) {
             string mimeType = tokens[0];
-            int i = spaceEater.subst(tokens[1], " "); // collapse spaces
+            spaceEater.subst(tokens[1], " "); // collapse spaces
             m[mimeType] = ofSplitString(tokens[1], " ");
         } else {
             ofLogWarning("ofxHTTPServer::loadDefaultMimeTypes") << "Unknown line format: " << line << ". Skipping.";
