@@ -44,7 +44,7 @@ public:
     bool canHandleRequest(const HTTPServerRequest& request, bool bIsSecurePort);
     HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request);
 
-    static Ptr Instance(const Settings& settings = Settings::Settings()) {
+    static Ptr Instance(const Settings& settings = Settings()) {
         return Ptr(new ofxWebSocketRoute(settings));
     }
     
