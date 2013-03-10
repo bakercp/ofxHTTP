@@ -84,6 +84,7 @@ public:
             }
             ++iter;
         }
+        return outputString;
     }
     
 private:
