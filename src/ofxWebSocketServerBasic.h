@@ -65,10 +65,10 @@ public:
     bool sendFrame(ofxWebSocketRouteHandler* handler, const ofxWebSocketFrame& frame) {
         if(websocket == NULL) {
             ofLogError("ofxWebSocketServerBasic::sendFrame") << "call loadSettings first.";
-            return;
+            return false;
         }
         
-        websocket->sendFrame(handler,frame);
+        return websocket->sendFrame(handler,frame);
     }
     
     void disconnect(ofxWebSocketRouteHandler* handler) {
@@ -90,7 +90,7 @@ public:
     size_t getNumClientsConnected() {
         if(websocket == NULL) {
             ofLogError("ofxWebSocketServerBasic::getNumClientsConnected") << "call loadSettings first.";
-            return;
+            return -1;
         }
         return websocket->getNumClientsConnected();
     }

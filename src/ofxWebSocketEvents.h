@@ -68,7 +68,7 @@ public:
     bool hasError() const { return error != WS_ERR_NONE; }
     ofxWebSocketError getError() const { return error; }
     void setError(ofxWebSocketError _error) { error = _error; }
-    void getConnectionRef() { return connection; }
+    ofxWebSocketRouteHandler& getConnectionRef() { return connection; }
     
     ofxWebSocketError error;
     ofxWebSocketRouteHandler& connection;
