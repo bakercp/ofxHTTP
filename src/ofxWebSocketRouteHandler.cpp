@@ -21,10 +21,10 @@ ofxWebSocketRouteHandler::Settings::Settings() {
 //------------------------------------------------------------------------------
 ofxWebSocketRouteHandler::ofxWebSocketRouteHandler(ofxBaseWebSocketSessionManager& _manager, const Settings& _settings)
 :
-manager(_manager),
 settings(_settings),
-bIsConnected(false),
-subprotocol("")
+manager(_manager),
+subprotocol(""),
+bIsConnected(false)
 {
     manager.registerRouteHandler(this);
 }

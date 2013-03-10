@@ -70,8 +70,8 @@ public:
     void setError(ofxWebSocketError _error) { error = _error; }
     ofxWebSocketRouteHandler& getConnectionRef() { return connection; }
     
-    ofxWebSocketError error;
     ofxWebSocketRouteHandler& connection;
+    ofxWebSocketError error;
 };
 
 class ofxWebSocketFrameEventArgs : public ofxWebSocketEventArgs {
