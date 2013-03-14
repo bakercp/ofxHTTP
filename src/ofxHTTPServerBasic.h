@@ -33,31 +33,26 @@ public:
     typedef ofxHTTPServer::Settings             ServerSettings;
     typedef ofxHTTPServerDefaultRoute::Settings RouteSettings;
     
-    struct Settings;
+    struct BasicServerSettings;
     
     ofxHTTPServerBasic() { }
 
     virtual ~ofxHTTPServerBasic() { }
 
-    void loadSettings(Settings _settings = Settings()) {
+    void loadSettings(BasicServerSettings _settings = BasicServerSettings()) {
         settings = _settings.server;
         defaultRoute = ofxHTTPServerDefaultRoute::Instance(_settings.route);
         addRoute(defaultRoute);
         bSettingsLoaded = true;
     }
     
-    struct Settings {
+    struct BasicServerSettings {
         ServerSettings server;
         RouteSettings  route;
         
-        Settings();
+        BasicServerSettings();
     };
     
     ofPtr<ofxHTTPServerDefaultRoute> defaultRoute;
 };
-
-ofxHTTPServerBasic::Settings::Settings() {
-    server = ServerSettings();
-    route  = RouteSettings();
-}
 

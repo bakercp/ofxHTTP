@@ -144,7 +144,7 @@ string ofxHTTPCookie::toString() const {
 }
 
 //------------------------------------------------------------------------------
-bool endsWith(string const& fullString, string const& ending) {
+bool ofxHTTPCookie::endsWith(string const& fullString, string const& ending) {
     if (fullString.length() >= ending.length()) {
         return (0 == fullString.compare(fullString.length() - ending.length(),
                                         ending.length(),

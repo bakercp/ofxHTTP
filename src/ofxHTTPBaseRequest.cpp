@@ -23,9 +23,9 @@ httpVersion(_httpVersion)
 //------------------------------------------------------------------------------
 ofxHTTPBaseRequest::ofxHTTPBaseRequest(const string& _httpMethod, const URI& _uri, const string& _httpVersion) :
 httpMethod(_httpMethod),
+httpVersion(_httpVersion),
 bHasValidURI(true),
-uri(_uri),
-httpVersion(_httpVersion)
+uri(_uri)
 {
     setFormFieldsFromURI(uri);
 }
@@ -154,7 +154,7 @@ bool ofxHTTPBaseRequest::hasHeaders() const {
 
 //------------------------------------------------------------------------------
 bool ofxHTTPBaseRequest::hasHeader(const string& name) const {
-    headers.has(name);
+    return headers.has(name);
 }
 
 //------------------------------------------------------------------------------

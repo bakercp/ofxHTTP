@@ -94,13 +94,13 @@ string ofxHTTPSessionSettings::getUserAgent() {
 }
 
 //------------------------------------------------------------------------------
-void ofxHTTPSessionSettings::setMaxRedirects(size_t _maxRedirects) {
+void ofxHTTPSessionSettings::setMaxRedirects(int _maxRedirects) {
     ofScopedLock lock(mutex);
     maxRedirects = _maxRedirects;
 }
 
 //------------------------------------------------------------------------------
-size_t ofxHTTPSessionSettings::getMaxRedirects() {
+int ofxHTTPSessionSettings::getMaxRedirects() {
     ofScopedLock lock(mutex);
     return maxRedirects;
 }

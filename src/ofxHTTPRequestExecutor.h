@@ -52,8 +52,8 @@ public:
     void setPriority(const Thread::Priority& _priority) { priority = _priority; }
 
 protected:
-    Thread::Priority priority;
     string name;
+    Thread::Priority priority;
 };
 
 enum ofxHTTPRequestExecutorState {

@@ -14,13 +14,22 @@ ofxHTTPCookieStore& ofxHTTPCookieStore::operator = (ofxHTTPCookieStore& that) {
     ofScopedLock thisLock(mutex);
     ofScopedLock thatLock(that.mutex);
     cookies = that.cookies;
+    return *this;
 }
 
 //------------------------------------------------------------------------------
 ofxHTTPCookieStore::ofxHTTPCookieStore(const ofxHTTPCookieStore& that) { }
 
 //------------------------------------------------------------------------------
-ofxHTTPCookieStore& ofxHTTPCookieStore::operator = (const ofxHTTPCookieStore& that) { }
+ofxHTTPCookieStore& ofxHTTPCookieStore::operator = (const ofxHTTPCookieStore& that) { 
+    /* can't do this b/c no const copy for mutex */
+    /* 
+    ofScopedLock thisLock(mutex);
+    ofScopedLock thatLock(that.mutex);
+    cookies = that.cookies;
+    return *this;
+    */;
+}
 
 //------------------------------------------------------------------------------
 ofxHTTPCookieStore::~ofxHTTPCookieStore() { }
@@ -79,13 +88,14 @@ void ofxHTTPCookieStore::addCookie(const ofxHTTPCookie& cookie) {
 //------------------------------------------------------------------------------
 void ofxHTTPCookieStore::addCookieWithExistingLock(const ofxHTTPCookie& cookie) {
     if(cookie.isExpired()) return;
-    
-    bool didClear = false;
+   
+    // did clear needed? 
+    //bool didClear = false; 
     vector<ofxHTTPCookie>::iterator iter = cookies.begin();
     while(iter != cookies.end()) {
         if((*iter).matches(cookie)) {
             iter = cookies.erase(iter);
-            didClear = true;
+            //didClear = true;
         } else {
             ++iter;
         }

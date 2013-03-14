@@ -58,8 +58,8 @@ public:
     void setUserAgent(const string& _userAgent);
     string getUserAgent();
         
-    void setMaxRedirects(size_t _maxRedirects);
-    size_t getMaxRedirects();
+    void setMaxRedirects(int _maxRedirects);
+    int getMaxRedirects();
 
     NameValueCollection getDefaultHeaders();
     void addDefaultHeader(const string& name, const string& value = "");
@@ -96,7 +96,7 @@ public:
     
 private:
     ofxHTTPSessionSettings(const ofxHTTPSessionSettings& that);
-	ofxHTTPSessionSettings& operator = (const ofxHTTPSessionSettings& that);
+    ofxHTTPSessionSettings& operator = (const ofxHTTPSessionSettings& that);
 
     ofMutex mutex;
     
@@ -105,7 +105,7 @@ private:
 
     string userAgent;
 
-    size_t maxRedirects;
+    int maxRedirects;
     
     NameValueCollection defaultHeaders;
 
