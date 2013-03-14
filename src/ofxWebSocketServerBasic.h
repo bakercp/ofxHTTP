@@ -62,6 +62,16 @@ public:
         websocket->broadcast(frame);
     }
     
+    
+    void broadcast(ofPixelsRef pixels) {
+        if(websocket == NULL) {
+            ofLogError("ofxWebSocketServerBasic::broadcast") << "call loadSettings first.";
+            return;
+        }
+        
+        websocket->broadcast(pixels);
+    }
+    
     bool sendFrame(ofxWebSocketRouteHandler* handler, const ofxWebSocketFrame& frame) {
         if(websocket == NULL) {
             ofLogError("ofxWebSocketServerBasic::sendFrame") << "call loadSettings first.";
@@ -104,6 +114,12 @@ public:
         }
         websocket->registerWebSocketEvents(listener);
     }
+
+//    template<class ListenerClass>
+//    void registerWebSocketEvents(const ListenerClass& listener) {
+//        websocket->registerWebSocketEvents(&listener);
+//    }
+
     
     template<class ListenerClass>
     void unregisterWebSocketEvents(ListenerClass * listener) {
@@ -113,7 +129,12 @@ public:
         }
         websocket->unregisterWebSocketEvents(listener);
     }
-    
+
+//    template<class ListenerClass>
+//    void unregisterWebSocketEvents(const ListenerClass& listener) {
+//        websocket->unregisterWebSocketEvents(&listener);
+//    }
+
     struct Settings {
         ServerSettings    server;
         RouteSettings     route;

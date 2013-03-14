@@ -33,6 +33,7 @@ using Poco::Net::WebSocket;
 class ofxWebSocketFrame : public ofBuffer {
 public:
     ofxWebSocketFrame(const ofBuffer& _buffer, int _flags = WebSocket::FRAME_TEXT);
+    ofxWebSocketFrame(const string& _text, int _flags = WebSocket::FRAME_TEXT);
     ofxWebSocketFrame(const char* _buffer, unsigned int _size, int _flags = WebSocket::FRAME_TEXT);
     ofxWebSocketFrame(const unsigned char* _buffer, unsigned int _size, int _flags = WebSocket::FRAME_TEXT);
     

@@ -88,6 +88,32 @@ public:
         return sendFrame(handler,ofxWebSocketFrame(data,size,WebSocket::FRAME_BINARY));
     }
     
+    void broadcast(ofPixelsRef pixels) {
+        ofScopedLock lock(mutex);
+        set<ofxBaseWebSocketRouteHandler*>::iterator iter = handlers.begin();
+        
+        int numChannels = pixels.getNumChannels();
+        int width       = pixels.getWidth();
+        int height      = pixels.getHeight();
+        
+        while(iter != handlers.end()) {
+            
+            
+            
+            
+            ofPixels pixels;
+            
+            //sendFrame(*iter,frame);
+            
+            ++iter;
+        }
+    }
+    
+    void broadcast(const string& text) {
+        broadcast(ofxWebSocketFrame(text));
+    }
+
+    
     void broadcast(const ofxWebSocketFrame& frame) {
         ofScopedLock lock(mutex);
         set<ofxBaseWebSocketRouteHandler*>::iterator iter = handlers.begin();

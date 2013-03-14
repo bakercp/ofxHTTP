@@ -5,6 +5,10 @@ ofxWebSocketFrame::ofxWebSocketFrame(const ofBuffer& _buffer, int _flags)
 : flags(_flags) { set(_buffer); }
 
 //------------------------------------------------------------------------------
+ofxWebSocketFrame::ofxWebSocketFrame(const string& _text, int _flags)
+: flags(_flags) { set(_text); }
+
+//------------------------------------------------------------------------------
 ofxWebSocketFrame::ofxWebSocketFrame(const unsigned char* _buffer, unsigned int _size, int _flags)
 : flags(_flags) { set(reinterpret_cast<const char*>(_buffer),_size); }
 
