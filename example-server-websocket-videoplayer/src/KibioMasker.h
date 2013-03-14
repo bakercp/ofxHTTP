@@ -1,14 +1,36 @@
-//
-//  KibioMasker.h
-//  example-server-websocket-videoplayer
-//
-//  Created by Christopher P. Baker on 3/12/13.
-//
-//
+#pragma once
 
-#ifndef __example_server_websocket_videoplayer__KibioMasker__
-#define __example_server_websocket_videoplayer__KibioMasker__
+#include <vector>
 
-#include <iostream>
+#include "ofPolyline.h"
 
-#endif /* defined(__example_server_websocket_videoplayer__KibioMasker__) */
+using std::vector;
+
+class KibioBaseMask {
+public:
+    KibioBaseMask();
+    virtual ~KibioBaseMask();
+    
+    
+};
+
+
+class KibioMasker {
+public:
+    enum MaskType {
+        IMAGE,
+        POLYGONS
+    };
+    
+    
+    KibioMasker();
+    virtual ~KibioMasker();
+    
+    
+protected:
+    
+    MaskType maskType;
+    
+    vector<ofPolyline> polylines;
+    
+};
