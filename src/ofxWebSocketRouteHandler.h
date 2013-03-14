@@ -73,6 +73,9 @@ public:
     virtual void frameSent(const ofxWebSocketFrame& _frame, int _nBytesSent);
     virtual void socketClosed();
     
+    void broadcast(const ofxWebSocketFrame& _frame) {
+        manager.broadcast(_frame);
+    }
     
     bool isConnected();
     string getSubprotocol();
@@ -99,6 +102,7 @@ public:
         
         Settings();
     };
+    
         
 protected:
     void setIsConnected(bool _bIsConnected);
