@@ -24,15 +24,16 @@
 
 #pragma once
 
-#include "ofxHTTPServerBaseRoute.h"
+#include "ofxHTTPServerDefaultRoute.h"
 #include "ofxHTTPServerUploadRouteHandler.h"
 
-typedef ofxHTTPServerUploadRouteHandler::Settings Settings; // to keep the lines shorter.
-
 //------------------------------------------------------------------------------
-class ofxHTTPServerUploadRoute : public ofxHTTPServerBaseRoute {
+class ofxHTTPServerUploadRoute : public ofxHTTPServerDefaultRoute {
 public:
-
+    
+    typedef ofxHTTPServerUploadRouteHandler::Settings Settings;
+    typedef ofPtr<ofxHTTPServerUploadRoute> Ptr;
+    
     ofxHTTPServerUploadRoute(const Settings& _settings) : settings(_settings) {
         ofDirectory uploadsDirectory(settings.uploadFolder);
         if(!uploadsDirectory.exists()) {
@@ -43,11 +44,7 @@ public:
     virtual ~ofxHTTPServerUploadRoute() { }
     
     HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request) {
-        if(ofxHTTPServerUploadRouteHandler::matchRoute(URI(request.getURI()), settings.route)) {
-            return new ofxHTTPServerUploadRouteHandler(settings);
-        } else {
-            return NULL;
-        }
+        return new ofxHTTPServerUploadRouteHandler(settings);
     }
     
     static ofPtr<ofxHTTPServerUploadRoute> Instance(const Settings& settings = Settings::Settings()) {
@@ -55,7 +52,7 @@ public:
     }
 
 protected:
-    Settings::Settings settings;
+    Settings settings;
     
 };
 

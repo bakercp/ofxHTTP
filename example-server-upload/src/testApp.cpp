@@ -10,12 +10,16 @@ void testApp::exit() {
 void testApp::setup() {
     ofSetFrameRate(30);
     ofSetLogLevel(OF_LOG_VERBOSE);
-
-    logo.loadImage("DocumentRoot/img/openFrameworks.png");
     
-    server = new ofxWebServerBasic(8989,"DocumentRoot");
-    server->start();
+    server = new ofxHTTPServerBasic();
+    server->loadSettings();
+    
+    uploadRoute = ofxHTTPServerUploadRoute::Instance();
+    
+    server->addRoute(uploadRoute);
 
+    server->start();
+    
     ofLaunchBrowser(server->getURL());
 }
 
@@ -23,7 +27,6 @@ void testApp::setup() {
 void testApp::draw() {
     ofBackground(255);
     ofSetColor(255);
-    logo.draw(0,0,114,60);
 }
 
 

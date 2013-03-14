@@ -537,6 +537,28 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
+			<key>c274081e54988350621de807dc388af6</key>
+			<dict>
+				<key>fileRef</key>
+				<string>38a3cf297f59e79d3fe482126245b635</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>38a3cf297f59e79d3fe482126245b635</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>ofxHTTPServerBasic.cpp</string>
+				<key>path</key>
+				<string>../../../addons/ofxHTTP/src/ofxHTTPServerBasic.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
 			<key>cbd3553390a505117330a515870d1d57</key>
 			<dict>
 				<key>explicitFileType</key>
@@ -1214,6 +1236,7 @@
 					<string>049ab4c0256ff4738e7ad5b432d0770e</string>
 					<string>c0e2f6782dc18a2e8a36abb3f7eb4b62</string>
 					<string>cbd3553390a505117330a515870d1d57</string>
+					<string>38a3cf297f59e79d3fe482126245b635</string>
 					<string>ee2269ee31772cb469c042815b23849e</string>
 					<string>d09d29260bb26f5b0a149debf8fe37cd</string>
 					<string>bd60a514db0f3b8296e336912660e6ad</string>
@@ -1823,6 +1846,7 @@
 					<string>e8cb67f98400c786d69127256b2ceeba</string>
 					<string>81a5616a39dc966f821187680965d582</string>
 					<string>e5b9927808a0a0f7c69b8cc36f0f28e1</string>
+					<string>c274081e54988350621de807dc388af6</string>
 					<string>e367801842bb7334f80e24b8cbac81bd</string>
 					<string>d82a1d3750915e6152ec0d84a4d67e91</string>
 					<string>64dd1f42b36a95243499a9719b3cdef3</string>

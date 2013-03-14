@@ -25,7 +25,9 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxWebServerBasic.h"
+
+#include "ofxHTTPServerBasic.h"
+#include "ofxHTTPServerUploadRoute.h"
 
 class testApp : public ofBaseApp {
 
@@ -34,8 +36,8 @@ public:
     void draw();
     void exit();
     
-    ofImage logo;
-    
-    ofxWebServerBasic* server;
+    ofxHTTPServerBasic* server;
 
+    ofxHTTPServerUploadRoute::Ptr uploadRoute;
+    
 };
