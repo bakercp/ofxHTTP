@@ -20,7 +20,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  
- ==============================================================================*/
+ =============================================================================*/
 
 #pragma once
 
@@ -28,13 +28,15 @@
 #include "ofxHTTPServerUploadRouteHandler.h"
 
 //------------------------------------------------------------------------------
-class ofxHTTPServerUploadRoute : public ofxHTTPServerDefaultRoute {
+class ofxHTTPServerUploadRoute : public ofxBaseHTTPServerRoute {
 public:
     
     typedef ofxHTTPServerUploadRouteHandler::Settings Settings;
     typedef ofPtr<ofxHTTPServerUploadRoute> Ptr;
     
-    ofxHTTPServerUploadRoute(const Settings& _settings) : settings(_settings) {
+    ofxHTTPServerUploadRoute(const Settings& _settings) :
+    settings(_settings)
+    {
         ofDirectory uploadsDirectory(settings.uploadFolder);
         if(!uploadsDirectory.exists()) {
             uploadsDirectory.create();
@@ -43,11 +45,33 @@ public:
 
     virtual ~ofxHTTPServerUploadRoute() { }
     
+    bool canHandleRequest(const HTTPServerRequest& request, bool bIsSecurePort) {
+        // require HTTP_POST
+        if(request.getMethod() != HTTPRequest::HTTP_POST) return false;
+        
+        // require a valid path
+        URI uri;
+        try {
+            uri = URI(request.getURI());
+        } catch(const SyntaxException& exc) {
+            ofLogError("ofxHTTPServerUploadRoute::canHandleRequest") << exc.what();
+            return false;
+        }
+        
+        // just get the path
+        string path = uri.getPath();
+        // make paths absolute
+        if(path.empty()) { path = "/"; }
+        
+        return RegularExpression(settings.getRoute()).match(path);
+    }
+
+    
     HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request) {
         return new ofxHTTPServerUploadRouteHandler(settings);
     }
     
-    static ofPtr<ofxHTTPServerUploadRoute> Instance(const Settings& settings = Settings::Settings()) {
+    static ofPtr<ofxHTTPServerUploadRoute> Instance(const Settings& settings = Settings()) {
         return ofPtr<ofxHTTPServerUploadRoute>(new ofxHTTPServerUploadRoute(settings));
     }
 

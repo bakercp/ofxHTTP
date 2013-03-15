@@ -20,7 +20,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  
- ==============================================================================*/
+ =============================================================================*/
 
 #pragma once
 
@@ -39,7 +39,7 @@ using Poco::Net::HTTPRequestHandlerFactory;
 class ofxHTTPServerRouteManager : public HTTPRequestHandlerFactory {
 public:
     
-    ofxHTTPServerRouteManager(vector<ofxBaseHTTPServerRoutePtr>& _factories,
+    ofxHTTPServerRouteManager(vector<ofxBaseHTTPServerRoute::Ptr>& _factories,
                               bool _bIsSecurePort)
     : factories(_factories), bIsSecurePort(_bIsSecurePort) { }
     
@@ -49,17 +49,17 @@ public:
         // We start with the last factory that was added.
         // Thus, factories with overlapping routes should be
         // carefully ordered.
-        vector<ofxBaseHTTPServerRoutePtr>::reverse_iterator iter = factories.rbegin();
+        vector<ofxBaseHTTPServerRoute::Ptr>::reverse_iterator iter = factories.rbegin();
         while(iter != factories.rend()) {
             if((*iter)->canHandleRequest(request,bIsSecurePort)) {
                 return (*iter)->createRequestHandler(request);
             }
             ++iter;
         }
-        return new ofxHTTPServerRouteHandler(); // if we get to this point, we didn't find a matching route
+        return new ofxHTTPServerRouteHandler(ofxHTTPBaseRouteSettings("/.*")); // if we get to this point, we didn't find a matching route
     }
     
 protected:
-    vector<ofxBaseHTTPServerRoutePtr>& factories;
+    vector<ofxBaseHTTPServerRoute::Ptr>& factories;
     bool bIsSecurePort; // TODO can we get this from teh HTTPServerRequest somehow?
 };

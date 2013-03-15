@@ -20,22 +20,24 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  
- ==============================================================================*/
+ =============================================================================*/
 
 #pragma once
 
 #include "ofxHTTPBaseTypes.h"
 #include "ofxHTTPServerDefaultRouteHandler.h"
 
-//------------------------------------------------------------------------------
 class ofxHTTPServerDefaultRoute : public ofxBaseHTTPServerRoute {
 public:
-    typedef ofxHTTPServerDefaultRouteHandler::Settings Settings;
+    typedef ofxHTTPServerDefaultRouteSettings Settings;
     typedef ofPtr<ofxHTTPServerDefaultRoute> Ptr;
 
-    ofxHTTPServerDefaultRoute(const Settings& _settings = Settings()) : settings(_settings) {
-        ofDirectory documentRootDirectory(settings.documentRoot);
-        if(settings.bAutoCreateDocumentRoot &&
+    ofxHTTPServerDefaultRoute(const Settings& _settings = Settings()) :
+    settings(_settings) {
+        
+        ofDirectory documentRootDirectory(_settings.documentRoot);
+        
+        if(_settings.bAutoCreateDocumentRoot &&
            !documentRootDirectory.exists()) {
             documentRootDirectory.create();
         }
@@ -61,7 +63,7 @@ public:
         // make paths absolute
         if(path.empty()) { path = "/"; }
         
-        return RegularExpression(settings.route).match(path);
+        return RegularExpression(settings.getRoute()).match(path);
     }
 
     HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request) {
@@ -73,6 +75,7 @@ public:
     }
     
 protected:
+    
     Settings settings;
     
 };

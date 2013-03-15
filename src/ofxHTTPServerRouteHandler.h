@@ -20,7 +20,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  
- ==============================================================================*/
+ =============================================================================*/
 
 #pragma once
 
@@ -60,22 +60,19 @@ using Poco::Net::NameValueCollection;
 
 //------------------------------------------------------------------------------
 class ofxHTTPServerRouteHandler : public ofxBaseHTTPRequestHandler {
-public:    
-    ofxHTTPServerRouteHandler();
+public:
+    ofxHTTPServerRouteHandler(const ofxHTTPBaseRouteSettings& _settings);
     virtual ~ofxHTTPServerRouteHandler();
     
     // overriden from HTTPRequestHandler
     void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response);
 
 protected:
-
     // authenticate is expected to check authentication and also
     // set any response headers if authentication has failed.
     virtual ofxHTTPAuthStatus authenticate(ofxHTTPServerExchange& exchange) { return OK; }
     virtual void updateSession(ofxHTTPServerExchange& exchange) { };
-    
     virtual void handleExchange(ofxHTTPServerExchange& exchange);
-    
     virtual void sendErrorResponse(HTTPServerResponse& response);
 
 };

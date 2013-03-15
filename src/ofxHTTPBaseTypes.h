@@ -20,7 +20,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  
- ==============================================================================*/
+ =============================================================================*/
 
 #pragma once
 
@@ -49,6 +49,17 @@ using Poco::Net::HTTPServerRequest;
 using Poco::Net::HTTPServerResponse;
 using Poco::Net::NotAuthenticatedException;
 
+class ofxHTTPBaseRouteSettings {
+public:
+    ofxHTTPBaseRouteSettings(const string& _route) : route(_route) { }
+    virtual ~ofxHTTPBaseRouteSettings() { }
+    virtual string getRoute() const { return route; };
+    virtual void setRoute(const string& _route) { route = _route; }
+    
+protected:
+    string route;
+};
+
 class ofxBaseHTTPServerRoute : public HTTPRequestHandlerFactory {
 public:
     typedef ofPtr<ofxBaseHTTPServerRoute> Ptr;
@@ -58,9 +69,11 @@ public:
     
     virtual bool canHandleRequest(const HTTPServerRequest& request, bool bIsSecurePort) = 0;
     
+//    virtual string getRoute() const = 0;
+    
 };
 
-typedef ofPtr<ofxBaseHTTPServerRoute> ofxBaseHTTPServerRoutePtr;
+//typedef ofPtr<ofxBaseHTTPServerRoute> ofxBaseHTTPServerRoutePtr;
 
 class ofxBaseHTTPRequestHandler : public HTTPRequestHandler {
 public:

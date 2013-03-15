@@ -41,7 +41,7 @@ bool ofxWebSocketRoute::canHandleRequest(const HTTPServerRequest& request, bool 
     // make paths absolute
     if(path.empty()) { path = "/"; }
     
-    return RegularExpression(settings.route).match(path);
+    return RegularExpression(settings.getRoute()).match(path);
 }
                                  
 //------------------------------------------------------------------------------

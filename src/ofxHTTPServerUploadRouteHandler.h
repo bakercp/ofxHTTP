@@ -20,7 +20,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  
- ==============================================================================*/
+ =============================================================================*/
 
 #pragma once
 
@@ -53,13 +53,33 @@ using Poco::Net::MessageHeader;
 using Poco::Net::NameValueCollection;
 using Poco::Net::PartHandler;
 
+class ofxHTTPServerUploadRouteSettings : public ofxHTTPBaseRouteSettings {
+public:
+    ofxHTTPServerUploadRouteSettings(const string& _route = "/upload") :
+    ofxHTTPBaseRouteSettings(_route),
+    bRequireUploadFolderInDataFolder(true),
+    uploadFolder("uploads"),
+    bAutoCreateUploadFolder(false),
+    uploadRedirect("uploaded.html"),
+    writeBufferSize(8192)
+    { }
+    
+    virtual ~ofxHTTPServerUploadRouteSettings() { }
+    
+    bool bRequireUploadFolderInDataFolder;
+    string uploadFolder;
+    bool bAutoCreateUploadFolder;
+    string uploadRedirect;
+    size_t writeBufferSize;
+};
+
 //------------------------------------------------------------------------------
 class ofxHTTPServerUploadRouteHandler : public ofxHTTPServerRouteHandler, public PartHandler {
 public:
     
-    struct Settings;
+    typedef ofxHTTPServerUploadRouteSettings Settings;
     
-    ofxHTTPServerUploadRouteHandler(const Settings& _settings = Settings());
+    ofxHTTPServerUploadRouteHandler(const Settings& _settings);
     virtual ~ofxHTTPServerUploadRouteHandler();
     
     void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response);
@@ -67,22 +87,8 @@ public:
 
     virtual bool isContentTypeValid(const string& contentType) const;
     
-    struct Settings {
-        
-        bool bRequireUploadFolderInDataFolder;
-        string uploadFolder;
-        bool bAutoCreateUploadFolder;
-        
-        string uploadRedirect;
-        
-        size_t writeBufferSize;
-        
-        Settings();
-    };
-
 protected:
     Settings settings;
-    
     
 };
 

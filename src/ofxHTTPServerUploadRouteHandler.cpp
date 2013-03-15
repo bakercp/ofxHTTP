@@ -1,19 +1,8 @@
 #include "ofxHTTPServerUploadRouteHandler.h"
 
 //------------------------------------------------------------------------------
-ofxHTTPServerUploadRouteHandler::Settings::Settings() {
-    bRequireUploadFolderInDataFolder = true;
-    uploadFolder = "uploads";
-    bAutoCreateUploadFolder = false;
-    
-    uploadRedirect = "uploaded.html";
-    
-    writeBufferSize = 8192;
-};
-
-//------------------------------------------------------------------------------
-ofxHTTPServerUploadRouteHandler::ofxHTTPServerUploadRouteHandler(const Settings& _settings)
-:
+ofxHTTPServerUploadRouteHandler::ofxHTTPServerUploadRouteHandler(const Settings& _settings) :
+ofxHTTPServerRouteHandler(_settings),
 settings(_settings)
 { }
 

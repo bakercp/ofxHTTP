@@ -20,7 +20,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  
- ==============================================================================*/
+ =============================================================================*/
 
 #pragma once
 
@@ -33,30 +33,49 @@
 #include "ofxHTTPCompression.h"
 #include "ofxHTTPServerRouteHandler.h"
 
+class ofxHTTPServerDefaultRouteSettings : public ofxHTTPBaseRouteSettings {
+public:
+    ofxHTTPServerDefaultRouteSettings(const string& _route = "/.*") :
+    ofxHTTPBaseRouteSettings(_route),
+    defaultIndex("index.html"),
+    documentRoot("DocumentRoot/"),
+    bRequireDocumentRootInDataFolder(true),
+    bAutoCreateDocumentRoot(false)
+    { }
+
+    virtual ~ofxHTTPServerDefaultRouteSettings() { }
+    
+    // TODO:
+    // e.g. http://httpd.apache.org/docs/2.2/mod/mod_deflate.html
+    // or the reverse? compression type as key?
+    //    ofxHTTPCompressorEntry html(MediaType("text/html"));
+    //    html.addCompressionType(GZIP);
+    //    html.addCompressionType(DEFLATE);
+    //
+    //    ofxHTTPCompressorEntry plain(MediaType("text/plain"));
+    //    html.addCompressionType(GZIP);
+    //    html.addCompressionType(DEFLATE);
+    
+    string defaultIndex;
+    string documentRoot;
+
+    map<MediaType,ofxHTTPCompressorEntry> contentEncoding;
+
+    bool bAutoCreateDocumentRoot;
+    bool bRequireDocumentRootInDataFolder;
+
+};
+
 //------------------------------------------------------------------------------
 class ofxHTTPServerDefaultRouteHandler : public ofxHTTPServerRouteHandler {
 public:
-    struct Settings;
     
-    ofxHTTPServerDefaultRouteHandler(const Settings& _settings);
+    ofxHTTPServerDefaultRouteHandler(const ofxHTTPServerDefaultRouteSettings& _settings);
     virtual ~ofxHTTPServerDefaultRouteHandler();
         
-    struct Settings {
-        string route;
-        
-        string defaultIndex;
-        string documentRoot;
-        
-        map<MediaType,ofxHTTPCompressorEntry> contentEncoding;
-        
-        bool bAutoCreateDocumentRoot;
-        bool bRequireDocumentRootInDataFolder;
-        
-        Settings();
-    };
-
 protected:
-    Settings settings;
+
+    ofxHTTPServerDefaultRouteSettings settings;
     
     void handleExchange(ofxHTTPServerExchange& exchange);
     void sendErrorResponse(HTTPServerResponse& response);

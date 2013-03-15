@@ -20,38 +20,33 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  
- ==============================================================================*/
+ =============================================================================*/
 
 #pragma once
 
 #include "ofxHTTPServerBasic.h"
-#include "ofxHTTPServerDefaultRoute.h"
 #include "ofxWebSocketRoute.h"
 
+class ofxWebSocketServerBasicSettings :
+public ofxHTTPServerBasic::Settings,
+public ofxWebSocketRoute::Settings
+{ };
+
 //------------------------------------------------------------------------------
-class ofxWebSocketServerBasic : public ofxHTTPServer {
+class ofxWebSocketServerBasic : public ofxHTTPServerBasic {
 public:
-    typedef ofxHTTPServer::Settings             ServerSettings;
-    typedef ofxHTTPServerDefaultRoute::Settings RouteSettings;
-    typedef ofxWebSocketRoute::Settings         WebSocketSettings;
-    
-    struct Settings;
-    
-    ofxWebSocketServerBasic() { }
-    virtual ~ofxWebSocketServerBasic() { }
-    
-    void loadSettings(Settings _settings = Settings()) {
-        settings = _settings.server;
-        
-        defaultRoute = ofxHTTPServerDefaultRoute::Instance(_settings.route);
-        websocket    = ofxWebSocketRoute::Instance(_settings.websocket);
-        
-        addRoute(defaultRoute);
+    typedef ofxWebSocketServerBasicSettings Settings;
+    typedef ofPtr<ofxWebSocketServerBasic> Ptr;
+
+    ofxWebSocketServerBasic(const Settings& _settings = Settings()) :
+    ofxHTTPServerBasic(_settings),
+    settings(_settings)
+    {
+        websocket = ofxWebSocketRoute::Instance(_settings);
         addRoute(websocket);
-        
-        bSettingsLoaded = true;
     }
     
+    virtual ~ofxWebSocketServerBasic() { }
     
     void broadcast(const ofxWebSocketFrame& frame) {
         if(websocket == NULL) {
@@ -135,22 +130,13 @@ public:
 //        websocket->unregisterWebSocketEvents(&listener);
 //    }
 
-    struct Settings {
-        ServerSettings    server;
-        RouteSettings     route;
-        WebSocketSettings websocket;
-        
-        Settings();
-    };
     
-    
-    ofPtr<ofxHTTPServerDefaultRoute> defaultRoute;
     ofPtr<ofxWebSocketRoute>         websocket;
 
-};
+    static Ptr instance(const Settings& _settings = Settings()) {
+        return Ptr(new ofxWebSocketServerBasic(_settings));
+    }
+protected:
+    Settings settings;
 
-inline ofxWebSocketServerBasic::Settings::Settings() {
-    server    = ServerSettings();
-    route     = RouteSettings();
-    websocket = WebSocketSettings();
-}
+};

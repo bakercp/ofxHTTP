@@ -1,32 +1,8 @@
 #include "ofxHTTPServer.h"
 
 //------------------------------------------------------------------------------
-ofxHTTPServer::Settings::Settings() {
-    
-    host   = "http://127.0.0.1";
-    port   = 8080;
-#ifdef SSL_ENABLED
-    bUseSSL = true;
-#endif
-    
-    maxQueued            = 64;
-    maxThreads           = 64;
-    bKeepAlive           = true;
-    maxKeepAliveRequests = 0; // 0 is unlimited
-    keepAliveTimeout     = Timespan(10*Timespan::SECONDS); // 10 seconds
-    name                 = ""; // empty, will be auto generated
-    softwareVersion      = "ofxHTTPServer/1.0";
-    timeout              = Timespan(60*Timespan::SECONDS); // 60 seconds
-    threadIdleTime       = Timespan(10*Timespan::SECONDS);
-    threadPriority       = Thread::PRIO_NORMAL;
-    
-}
-
-//------------------------------------------------------------------------------
-ofxHTTPServer::ofxHTTPServer(ThreadPool& _threadPool) : threadPool(_threadPool) {
+ofxHTTPServer::ofxHTTPServer(const Settings& _settings) : server(NULL), settings(_settings){
     ofAddListener(ofEvents().exit,this,&ofxHTTPServer::exit);
-    server = NULL;
-    bSettingsLoaded = false;
     
 #ifdef SSL_ENABLED
     Poco::Net::initializeSSL();
@@ -62,19 +38,8 @@ void ofxHTTPServer::exit(ofEventArgs& args) {
 }
 
 //------------------------------------------------------------------------------
-void ofxHTTPServer::loadSettings(Settings _settings) {
-    settings = _settings;
-    bSettingsLoaded = true;
-}
-
-//------------------------------------------------------------------------------
 void ofxHTTPServer::start(){
-    if(!bSettingsLoaded) {
-        ofLogError("ofxHTTPServer::start") << "Settings not loaded.  Call loadSettings().";
-        return;
-    }
-    
-    if(server != NULL) {
+    if(isRunning()) {
         ofLogWarning("ofxHTTPServer::start") << "Server is already running.  Call stop() to stop.";
         return;
     }
@@ -125,14 +90,14 @@ void ofxHTTPServer::start(){
     } else {
         // we use the default thread pool
         server = new HTTPServer(new ofxHTTPServerRouteManager(routes,false),
-                                threadPool,
+                                settings.threadPool,
                                 ServerSocket(settings.port),
                                 serverParams);
     }
 #else
     // we use the default thread pool
     server = new HTTPServer(new ofxHTTPServerRouteManager(routes,false),
-                            threadPool,
+                            settings.threadPool,
                             ServerSocket(settings.port),
                             serverParams);
 #endif
@@ -147,7 +112,7 @@ void ofxHTTPServer::start(){
 
 //------------------------------------------------------------------------------
 void ofxHTTPServer::stop() {
-    if(server == NULL) {
+    if(!isRunning()) {
         ofLogWarning("ofxHTTPServer::stop") << "Server is not running.  Call start() to start.";
         return;
     }
@@ -201,3 +166,9 @@ void ofxHTTPServer::removeRoute(ofxBaseHTTPServerRoute::Ptr route) {
         }
     }
 }
+
+//------------------------------------------------------------------------------
+bool ofxHTTPServer::isRunning() const {
+    return server != NULL;
+}
+

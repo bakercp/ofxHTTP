@@ -20,7 +20,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  
- ==============================================================================*/
+ =============================================================================*/
 
 #pragma once
 
@@ -73,18 +73,59 @@ using Poco::Net::SecureServerSocket;
 //using Poco::Net::SSLManager;
 #endif
 
+class ofxHTTPServerSettings {
+public:
+    ofxHTTPServerSettings(ThreadPool& _threadPool = ThreadPool::defaultPool()) :
+    host("http://127.0.0.1"),
+    port(8080),
+#ifdef SSL_ENABLED
+    bUseSSL(true),
+#endif
+    maxQueued(64),
+    maxThreads(64),
+    bKeepAlive(true),
+    maxKeepAliveRequests(0), // 0 is unlimited
+    keepAliveTimeout(Timespan(10*Timespan::SECONDS)), // 10 seconds
+    name(""), // empty, will be auto generated
+    softwareVersion("ofxHTTPServer/1.0"),
+    timeout(Timespan(60*Timespan::SECONDS)), // 60 seconds
+    threadIdleTime(Timespan(10*Timespan::SECONDS)),
+    threadPriority(Thread::PRIO_NORMAL),
+    threadPool(_threadPool)
+    { }
+
+    virtual ~ofxHTTPServerSettings() { }
+    
+    string           host;
+    unsigned short   port;
+#ifdef SSL_ENABLED
+    bool             bUseSSL;
+#endif
+    int              maxQueued;
+    int              maxThreads;
+    bool             bKeepAlive;
+    int              maxKeepAliveRequests;
+    Timespan         keepAliveTimeout;
+    string           name;
+    Timespan         timeout;
+    Timespan         threadIdleTime;
+    Thread::Priority threadPriority;
+    string           softwareVersion;
+
+    ThreadPool& threadPool;
+};
+
 
 //------------------------------------------------------------------------------
 class ofxHTTPServer {
 public:
-    struct Settings;
+    typedef ofxHTTPServerSettings Settings;
+    typedef ofPtr<ofxHTTPServer> Ptr;
 
-    ofxHTTPServer(ThreadPool& _threadPool = ThreadPool::defaultPool());
+    ofxHTTPServer(const Settings& _settings);
     
     virtual ~ofxHTTPServer();
-    
-    virtual void loadSettings(Settings settings = Settings());
-    
+        
     void start();
     void stop();
     void threadedFunction();
@@ -99,33 +140,16 @@ public:
     void addRoute(ofxBaseHTTPServerRoute::Ptr route);
     void removeRoute(ofxBaseHTTPServerRoute::Ptr route);
     
-	struct Settings {
-
-        string           host;
-        unsigned short   port;
-#ifdef SSL_ENABLED
-        bool             bUseSSL;
-#endif
-        int              maxQueued;
-        int              maxThreads;
-        bool             bKeepAlive;
-        int              maxKeepAliveRequests;
-        Timespan         keepAliveTimeout;
-        string           name;
-        Timespan         timeout;
-        Timespan         threadIdleTime;
-        Thread::Priority threadPriority;
-        string           softwareVersion;
-                
-		Settings();
-	};
+    bool isRunning() const;
+    
+    static Ptr instance(const Settings& _settings) {
+        return Ptr(new ofxHTTPServer(_settings));
+    }
     
 protected:
-    ThreadPool& threadPool;
-    
+
     HTTPServer* server;
     
-    bool bSettingsLoaded;
     Settings settings;
 
     vector<ofxBaseHTTPServerRoute::Ptr> routes;

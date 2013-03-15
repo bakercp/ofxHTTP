@@ -1,29 +1,8 @@
 #include "ofxHTTPServerDefaultRouteHandler.h"
 
 //------------------------------------------------------------------------------
-ofxHTTPServerDefaultRouteHandler::Settings::Settings() {
-    route        = "/.*";
-    
-    defaultIndex = "index.html";
-    documentRoot = "DocumentRoot";
- 
-    // TODO:
-    // e.g. http://httpd.apache.org/docs/2.2/mod/mod_deflate.html
-    // or the reverse? compression type as key?
-//    ofxHTTPCompressorEntry html(MediaType("text/html"));
-//    html.addCompressionType(GZIP);
-//    html.addCompressionType(DEFLATE);
-//
-//    ofxHTTPCompressorEntry plain(MediaType("text/plain"));
-//    html.addCompressionType(GZIP);
-//    html.addCompressionType(DEFLATE);
-
-    bRequireDocumentRootInDataFolder = true;
-    bAutoCreateDocumentRoot = false;
-}
-
-//------------------------------------------------------------------------------
-ofxHTTPServerDefaultRouteHandler::ofxHTTPServerDefaultRouteHandler(const Settings& _settings) :
+ofxHTTPServerDefaultRouteHandler::ofxHTTPServerDefaultRouteHandler(const ofxHTTPServerDefaultRouteSettings& _settings) :
+ofxHTTPServerRouteHandler(_settings),
 settings(_settings)
 { }
 

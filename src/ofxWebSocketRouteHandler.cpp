@@ -1,29 +1,11 @@
 #include "ofxWebSocketRouteHandler.h"
 
 //------------------------------------------------------------------------------
-ofxWebSocketRouteHandler::Settings::Settings() {
-    route = "/";
-    bAutoPingPongResponse = true;
-    bKeepAlive = true;
-    
-    bAllowEmptySubprotocol = false;
-    bAllowCrossOriginConnections = false;
-    
-    bIsBinary = false;
-    
-    receiveTimeout = Timespan(60 * Timespan::SECONDS); // 60 second default
-    sendTimeout    = Timespan(60 * Timespan::SECONDS); // 60 second default
-    pollTimeout    = Timespan(10 * Timespan::MILLISECONDS); // brief pause to check the socket
-    
-    bufferSize = 1024;
-};
-
-//------------------------------------------------------------------------------
 ofxWebSocketRouteHandler::ofxWebSocketRouteHandler(ofxBaseWebSocketSessionManager& _manager, const Settings& _settings)
 :
+ofxBaseWebSocketRouteHandler(_settings),
 settings(_settings),
 manager(_manager),
-subprotocol(""),
 bIsConnected(false)
 {
     manager.registerRouteHandler(this);
@@ -229,7 +211,7 @@ void ofxWebSocketRouteHandler::setIsConnected(bool _bIsConnected) {
 //------------------------------------------------------------------------------
 string ofxWebSocketRouteHandler::getSubprotocol() {
     ofScopedLock lock(mutex);
-    return subprotocol;
+    return settings.subprotocol;
 }
 
 //------------------------------------------------------------------------------
@@ -240,13 +222,13 @@ void ofxWebSocketRouteHandler::handleOrigin(ofxHTTPServerExchange &exchange) {
 //------------------------------------------------------------------------------
 void ofxWebSocketRouteHandler::handleSubprotocols(ofxHTTPServerExchange& exchange) {
     
-    bool validProtocol = manager.selectSubprotocol(ofSplitString(exchange.request.get("Sec-WebSocket-Protocol",""),",",true,true),subprotocol);
+    bool validProtocol = manager.selectSubprotocol(ofSplitString(exchange.request.get("Sec-WebSocket-Protocol",""),",",true,true),settings.subprotocol);
     
     // if we don't support the protocol, we don't send a Sec-WebSocket-Protocol header with the response.
     // in doing so, we leave the decision up to the client.  most clients should terminate the connection.
     // http://stackoverflow.com/questions/13545453/http-response-code-when-requested-websocket-subprotocol-isnt-supported-recogniz
-    if(validProtocol && !subprotocol.empty()) {
-        exchange.response.set("Sec-WebSocket-Protocol", subprotocol);
+    if(validProtocol && !settings.subprotocol.empty()) {
+        exchange.response.set("Sec-WebSocket-Protocol", settings.subprotocol);
     } else {
         // we don't send anything, which is equiv to null according to the spec
         // exchange.response.set("Sec-WebSocket-Protocol", "null");

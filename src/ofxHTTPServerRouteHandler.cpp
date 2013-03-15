@@ -1,7 +1,9 @@
 #include "ofxHTTPServerRouteHandler.h"
 
 //------------------------------------------------------------------------------
-ofxHTTPServerRouteHandler::ofxHTTPServerRouteHandler() { }
+ofxHTTPServerRouteHandler::ofxHTTPServerRouteHandler(const ofxHTTPBaseRouteSettings& _settings) {
+    //route = _settings.getRoute();
+}
 
 //------------------------------------------------------------------------------
 ofxHTTPServerRouteHandler::~ofxHTTPServerRouteHandler() { }
@@ -26,6 +28,10 @@ void ofxHTTPServerRouteHandler::handleRequest(HTTPServerRequest& request, HTTPSe
     }
 }
 
+////------------------------------------------------------------------------------
+//string ofxHTTPServerRouteHandler::getRoute() const {
+//    return route;
+//}
 
 ////------------------------------------------------------------------------------
 //bool ofxHTTPServerDefaultRouteHandler::isValidRequest(HTTPServerRequest& request,

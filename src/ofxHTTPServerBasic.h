@@ -20,39 +20,36 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  
- ==============================================================================*/
+ =============================================================================*/
 
 #pragma once
 
 #include "ofxHTTPServer.h"
 #include "ofxHTTPServerDefaultRoute.h"
 
+class ofxHTTPServerBasicSettings :
+public ofxHTTPServer::Settings,
+public ofxHTTPServerDefaultRoute::Settings
+{ };
+
 //------------------------------------------------------------------------------
 class ofxHTTPServerBasic : public ofxHTTPServer {
 public:
-    typedef ofxHTTPServer::Settings             ServerSettings;
-    typedef ofxHTTPServerDefaultRoute::Settings RouteSettings;
     
-    struct BasicServerSettings;
+    typedef ofxHTTPServerBasicSettings Settings;
+    typedef ofPtr<ofxHTTPServerBasic> Ptr;
     
-    ofxHTTPServerBasic() { }
+    ofxHTTPServerBasic(const Settings& _settings = Settings()) :
+    ofxHTTPServer(_settings) {
+        defaultRoute = ofxHTTPServerDefaultRoute::Instance(_settings);
+        addRoute(defaultRoute);
+    }
 
     virtual ~ofxHTTPServerBasic() { }
 
-    void loadSettings(BasicServerSettings _settings = BasicServerSettings()) {
-        settings = _settings.server;
-        defaultRoute = ofxHTTPServerDefaultRoute::Instance(_settings.route);
-        addRoute(defaultRoute);
-        bSettingsLoaded = true;
+    static Ptr instance(const Settings& _settings = Settings()) {
+        return Ptr(new ofxHTTPServerBasic(_settings));
     }
-    
-    struct BasicServerSettings {
-        ServerSettings server;
-        RouteSettings  route;
-        
-        BasicServerSettings();
-    };
-    
+
     ofPtr<ofxHTTPServerDefaultRoute> defaultRoute;
 };
-

@@ -20,7 +20,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  
- ==============================================================================*/
+ =============================================================================*/
 
 #pragma once
 
@@ -55,11 +55,55 @@ using Poco::Net::NetException;
 using Poco::Net::WebSocket;
 using Poco::Net::WebSocketException;
 
+class ofxWebSocketRouteSettings : public ofxHTTPBaseRouteSettings {
+public:
+    ofxWebSocketRouteSettings(const string& _route = "/") : ofxHTTPBaseRouteSettings(_route) {
+        
+    }
+    
+    virtual ~ofxWebSocketRouteSettings() { }
+    
+    string subprotocol;
+
+    bool bAllowEmptySubprotocol;
+    bool bAllowCrossOriginConnections;
+    
+    bool bIsBinary;
+    
+    bool bAutoPingPongResponse; // automatically return pong frames if true
+    bool bKeepAlive;
+    
+    Timespan receiveTimeout; // remember that timespan uses microseconds
+    Timespan sendTimeout;    // remember that timespan uses microseconds
+    Timespan pollTimeout;    //
+    
+    size_t bufferSize;
+
+//    
+//    route = "/";
+//    bAutoPingPongResponse = true;
+//    bKeepAlive = true;
+//    
+//    bAllowEmptySubprotocol = false;
+//    bAllowCrossOriginConnections = false;
+//    
+//    bIsBinary = false;
+//    
+//    receiveTimeout = Timespan(60 * Timespan::SECONDS); // 60 second default
+//    sendTimeout    = Timespan(60 * Timespan::SECONDS); // 60 second default
+//    pollTimeout    = Timespan(10 * Timespan::MILLISECONDS); // brief pause to check the socket
+//    
+//    bufferSize = 1024;
+
+    
+};
+
+
 //------------------------------------------------------------------------------
 class ofxWebSocketRouteHandler : public ofxBaseWebSocketRouteHandler {
 public:
-    
-    struct Settings;
+
+    typedef ofxWebSocketRouteSettings Settings;
     
     ofxWebSocketRouteHandler(ofxBaseWebSocketSessionManager& _manager, const Settings& _settings);
     virtual ~ofxWebSocketRouteHandler();
@@ -83,27 +127,6 @@ public:
     size_t getSendQueueSize();
     void   clearSendQueue();
     
-    struct Settings {
-        string route;
-
-        bool bAllowEmptySubprotocol;
-        bool bAllowCrossOriginConnections;
-        
-        bool bIsBinary;
-        
-        bool bAutoPingPongResponse; // automatically return pong frames if true
-        bool bKeepAlive;
-        
-        Timespan receiveTimeout; // remember that timespan uses microseconds
-        Timespan sendTimeout;    // remember that timespan uses microseconds
-        Timespan pollTimeout;    // 
-        
-        size_t bufferSize;
-        
-        Settings();
-    };
-    
-        
 protected:
     void setIsConnected(bool _bIsConnected);
     
@@ -137,9 +160,7 @@ private:
             }
         }
     }
-    
-    string subprotocol;
-    
+        
     bool bIsConnected;
     
     ofMutex mutex;

@@ -20,7 +20,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  
- ==============================================================================*/
+ =============================================================================*/
 
 #pragma once
 
@@ -31,6 +31,9 @@
 #include "ofxWebSocketRouteHandler.h"
 
 #include "ofxWebSocketEvents.h"
+
+
+
 
 //------------------------------------------------------------------------------
 class ofxWebSocketRoute : public ofxBaseHTTPServerRoute, public ofxBaseWebSocketSessionManager {
@@ -44,6 +47,8 @@ public:
     bool canHandleRequest(const HTTPServerRequest& request, bool bIsSecurePort);
     HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request);
 
+    virtual string getRoute() const { return settings.getRoute(); }
+    
     static Ptr Instance(const Settings& settings = Settings()) {
         return Ptr(new ofxWebSocketRoute(settings));
     }

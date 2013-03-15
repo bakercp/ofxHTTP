@@ -20,7 +20,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  
- ==============================================================================*/
+ =============================================================================*/
 
 #pragma once
 
@@ -31,7 +31,7 @@
 
 class ofxBaseWebSocketRouteHandler : public ofxHTTPServerRouteHandler {
 public:
-    ofxBaseWebSocketRouteHandler() { }
+    ofxBaseWebSocketRouteHandler(const ofxHTTPBaseRouteSettings& _settings) : ofxHTTPServerRouteHandler(_settings) { }
     virtual ~ofxBaseWebSocketRouteHandler() { }
     
     virtual bool sendFrame(const ofxWebSocketFrame& _frame) = 0;
@@ -41,7 +41,10 @@ public:
 class ofxBaseWebSocketSessionManager {
 public:
     
-    ofxBaseWebSocketSessionManager() { }
+    ofxBaseWebSocketSessionManager() {
+    
+    }
+    
     virtual ~ofxBaseWebSocketSessionManager() { }
 
     //virtual void getSessionData(ofxWebSocketRouteHandler* handler) = 0;
