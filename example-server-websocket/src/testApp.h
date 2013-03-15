@@ -71,6 +71,6 @@ public:
     ofImage logo;
 //    ofxWebSocketRoute::Ptr wsRoute;
     
-    ofxWebSocketServerBasic server;
+    ofxWebSocketServerBasic::Ptr server;
 
 };
