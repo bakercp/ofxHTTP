@@ -34,10 +34,8 @@ class testApp : public ofBaseApp {
 public:
     void setup();
     void draw();
-    void exit();
     
-    ofxHTTPServerBasic* server;
-
+    ofxHTTPServerBasic::Ptr       server;
     ofxHTTPServerUploadRoute::Ptr uploadRoute;
     
 };
