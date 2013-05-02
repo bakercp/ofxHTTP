@@ -11,7 +11,6 @@ public:
     KibioBaseMask();
     virtual ~KibioBaseMask();
     
-    
 };
 
 

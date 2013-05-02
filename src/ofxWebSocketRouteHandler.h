@@ -26,8 +26,6 @@
 
 #include <queue>
 
-#include "ofLog.h"
-
 #include "Poco/Exception.h"
 #include "Poco/Timespan.h"
 #include "Poco/Net/Socket.h"
@@ -35,6 +33,7 @@
 #include "Poco/Net/NetException.h"
 
 #include "ofFileUtils.h"
+#include "ofLog.h"
 
 #include "ofxHTTPBaseTypes.h"
 #include "ofxHTTPServerDefaultRouteHandler.h"
@@ -57,9 +56,19 @@ using Poco::Net::WebSocketException;
 
 class ofxWebSocketRouteSettings : public ofxHTTPBaseRouteSettings {
 public:
-    ofxWebSocketRouteSettings(const string& _route = "/") : ofxHTTPBaseRouteSettings(_route) {
-        
-    }
+    ofxWebSocketRouteSettings(const string& _route = "/") :
+    ofxHTTPBaseRouteSettings(_route),
+    subprotocol(""),
+    bAutoPingPongResponse(true),
+    bKeepAlive(true),
+    bAllowEmptySubprotocol(false),
+    bAllowCrossOriginConnections(false),
+    bIsBinary(false),
+    receiveTimeout(Timespan(60 * Timespan::SECONDS)),
+    sendTimeout(Timespan(60 * Timespan::SECONDS)),
+    pollTimeout(Timespan(10 * Timespan::MILLISECONDS)),
+    bufferSize(1024)
+    { }
     
     virtual ~ofxWebSocketRouteSettings() { }
     
@@ -75,26 +84,9 @@ public:
     
     Timespan receiveTimeout; // remember that timespan uses microseconds
     Timespan sendTimeout;    // remember that timespan uses microseconds
-    Timespan pollTimeout;    //
+    Timespan pollTimeout;    // remember that timespan uses microseconds
     
     size_t bufferSize;
-
-//    
-//    route = "/";
-//    bAutoPingPongResponse = true;
-//    bKeepAlive = true;
-//    
-//    bAllowEmptySubprotocol = false;
-//    bAllowCrossOriginConnections = false;
-//    
-//    bIsBinary = false;
-//    
-//    receiveTimeout = Timespan(60 * Timespan::SECONDS); // 60 second default
-//    sendTimeout    = Timespan(60 * Timespan::SECONDS); // 60 second default
-//    pollTimeout    = Timespan(10 * Timespan::MILLISECONDS); // brief pause to check the socket
-//    
-//    bufferSize = 1024;
-
     
 };
 

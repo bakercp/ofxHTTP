@@ -65,21 +65,16 @@ public:
         
         return RegularExpression(settings.getRoute()).match(path);
     }
-
     
     HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request) {
         return new ofxHTTPServerUploadRouteHandler(settings);
     }
     
-    static ofPtr<ofxHTTPServerUploadRoute> Instance(const Settings& settings = Settings()) {
-        return ofPtr<ofxHTTPServerUploadRoute>(new ofxHTTPServerUploadRoute(settings));
+    static Ptr Instance(const Settings& settings = Settings()) {
+        return Ptr(new ofxHTTPServerUploadRoute(settings));
     }
 
 protected:
     Settings settings;
     
 };
-
-
-
-

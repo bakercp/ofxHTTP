@@ -25,11 +25,15 @@
 #pragma once
 
 #include <map>
+#include <set>
 
 #include "Poco/RegularExpression.h"
 #include "Poco/Net/MediaType.h"
 
+#include "ofUtils.h"
+
 using std::map;
+using std::set;
 
 using Poco::RegularExpression;
 using Poco::Net::MediaType;
@@ -1721,3 +1725,26 @@ inline vector<string> ofxHTTPGetFileExtensionsForMimeType(const MediaType& mimeT
     }
     return fileExtensions;
 }
+
+inline set<string> ofxHTTPGetFileExtensionsForMimeType(const string& primary) {
+    set<string> fileExtensions;
+    
+    map<string,vector<string> >::iterator iter = fileTypeMap.begin();
+    while(iter != fileTypeMap.end()) {
+        MediaType mediaType((*iter).first);
+        
+        if(mediaType.matchesRange(primary)) {
+            vector<string>::iterator fIter = (*iter).second.begin();
+            while(fIter != (*iter).second.end()) {
+                fileExtensions.insert(*fIter);
+                ++fIter;
+            }
+        }
+        
+        ++iter;
+    }
+
+    return fileExtensions;
+}
+
+

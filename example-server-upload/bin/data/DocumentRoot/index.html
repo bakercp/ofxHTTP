@@ -1,14 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Bootstrap 101 Template</title>
+    <title>ofxHTTPServer Upload Demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
   </head>
   <body>
-    <h1>Hello, world!</h1>
-    <script src="http://code.jquery.com/jquery.js"></script>
-    <script src="js/bootstrap.min.js"></script>
+    <div class="container">
+      <div class="navbar">
+        <div class="navbar-inner">
+          <a class="brand" href="#">ofxHTTPServer Upload Demo</a>
+        </div>
+      </div>
+        <input id="fileupload" type="file" name="files[]" data-url="upload" multiple>
+        
+ 
+
+
+
+    </div>
+
+    <script src="js/jquery-1.9.1.min.js"></script> <!-- jQuery, because it's awesome. -->
+    <script src="js/bootstrap.min.js"></script>    <!-- Twitter Bootstrap because it's awesome. -->
+
+    <script src="js/vendor/jquery.ui.widget.js"></script>
+    <script src="js/jquery.iframe-transport.js"></script>
+    <script src="js/jquery.fileupload.js"></script>
+
+
+    <script src="js/main.js"></script>             <!-- our main js file because we need it to define our program -->
+
+
+    <script>
+        $(function () {
+        $('#fileupload').fileupload({
+            dataType: 'json',
+            done: function (e, data) {
+                $.each(data.result.files, function (index, file) {
+                    $('<p/>').text(file.name).appendTo(document.body);
+                });
+            }
+        });
+    });
+
+  </script>
   </body>
 </html>
+
+
