@@ -29,13 +29,16 @@
 
 #include "ofTypes.h"
 
-#include "ofxHTTPBaseRequest.h"
-#include "ofxHTTPConstants.h"
-#include "ofxHTTPClientContext.h"
-#include "ofxHTTPResponseStream.h"
+#include "BaseRequest.h"
+#include "ClientContext.h"
+#include "ResponseStream.h"
 
 using Poco::Thread;
 using Poco::Runnable;
+
+using ofx::HTTP::Request::BaseRequest;
+using ofx::HTTP::ClientContext;
+using ofx::HTTP::ResponseStream;
 
 class ofxThreadSettings {
 public:
@@ -63,7 +66,7 @@ enum ofxHTTPRequestExecutorState {
 class ofxHTTPRequestExecutor : public Runnable {
 public:
     
-    ofxHTTPRequestExecutor(const ofxHTTPBaseRequest& _request,
+    ofxHTTPRequestExecutor(const BaseRequest& _request,
                            
                            const ofxThreadSettings& _threadSettings = ofxThreadSettings());
         
@@ -72,21 +75,21 @@ public:
     ofxThreadSettings getThreadSettings() const;
     
     
-    static ofxHTTPResponseStream* execute(const ofxHTTPBaseRequest& _request,
+    static ofx::HTTP::ResponseStream* execute(const BaseRequest& _request,
                                           //ofxHTTPBaseResponseStreamConsumer* _streamConsumer,
-                                          ofxHTTPClientContextPtr context = ofxHTTPClientContext::defaultClientContext());
+                                          ClientContext::Ptr context = ClientContext::defaultClientContext());
     
     bool isDone() const;
     
-    ofxHTTPResponseStream* getResponseStream();
+    ofx::HTTP::ResponseStream* getResponseStream();
     
 private:
     bool bIsDone;
     //Exception exception; // exceptions are passed with the ofxHTTPResponseStream
     
-    ofxHTTPBaseRequest* request;
+    BaseRequest* request;
     
-    ofxHTTPResponseStream* responseStream;
+    ResponseStream* responseStream;
 
 //    ofMutex mutex;
 

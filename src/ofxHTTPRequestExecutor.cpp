@@ -2,7 +2,7 @@
 
 
 //------------------------------------------------------------------------------
-ofxHTTPRequestExecutor::ofxHTTPRequestExecutor(const ofxHTTPBaseRequest& _request,
+ofxHTTPRequestExecutor::ofxHTTPRequestExecutor(const BaseRequest& _request,
 //                                               ofxHTTPBaseResponseStreamConsumer* _streamConsumer,
                                                const ofxThreadSettings& _threadSettings) :
 

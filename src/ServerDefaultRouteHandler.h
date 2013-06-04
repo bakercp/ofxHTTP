@@ -1,0 +1,90 @@
+/*==============================================================================
+ 
+ Copyright (c) 2013 - Christopher Baker <http://christopherbaker.net>
+ 
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ 
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+ 
+ =============================================================================*/
+
+#pragma once
+
+#include <string>
+
+#include "ofLog.h"
+#include "ofUtils.h"
+
+#include "MediaTypeMap.h"
+#include "Compression.h"
+#include "ServerRouteHandler.h"
+
+
+namespace ofx {
+namespace HTTP {
+        
+
+class ServerDefaultRouteSettings : public BaseRouteSettings {
+public:
+    ServerDefaultRouteSettings(const string& _route = "/.*") :
+    BaseRouteSettings(_route),
+    defaultIndex("index.html"),
+    documentRoot("DocumentRoot/"),
+    bRequireDocumentRootInDataFolder(true),
+    bAutoCreateDocumentRoot(false)
+    { }
+
+    virtual ~ServerDefaultRouteSettings() { }
+    
+    // TODO:
+    // e.g. http://httpd.apache.org/docs/2.2/mod/mod_deflate.html
+    // or the reverse? compression type as key?
+    //    ofxHTTPCompressorEntry html(MediaType("text/html"));
+    //    html.addCompressionType(GZIP);
+    //    html.addCompressionType(DEFLATE);
+    //
+    //    ofxHTTPCompressorEntry plain(MediaType("text/plain"));
+    //    html.addCompressionType(GZIP);
+    //    html.addCompressionType(DEFLATE);
+    
+    string defaultIndex;
+    string documentRoot;
+
+    map<Poco::Net::MediaType,ofxHTTPCompressorEntry> contentEncoding;
+
+    bool bAutoCreateDocumentRoot;
+    bool bRequireDocumentRootInDataFolder;
+
+};
+
+//------------------------------------------------------------------------------
+class ServerDefaultRouteHandler : public ServerRouteHandler {
+public:
+    
+    ServerDefaultRouteHandler(const ServerDefaultRouteSettings& _settings);
+    virtual ~ServerDefaultRouteHandler();
+        
+protected:
+
+    ServerDefaultRouteSettings settings;
+    
+    void handleExchange(ServerExchange& exchange);
+    void sendErrorResponse(Poco::Net::HTTPServerResponse& response);
+
+};
+
+} }
