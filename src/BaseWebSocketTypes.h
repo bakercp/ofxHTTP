@@ -39,12 +39,10 @@ public:
     BaseWebSocketRouteHandler(const BaseRouteSettings& settings)
     : BaseServerRouteHandler(settings)
     {
-
     }
 
     virtual ~BaseWebSocketRouteHandler()
     {
-
     }
     
     virtual bool sendFrame(const WebSocketFrame& _frame) = 0;
@@ -57,12 +55,10 @@ public:
     
     BaseWebSocketSessionManager()
     {
-    
     }
     
     virtual ~BaseWebSocketSessionManager()
     {
-
     }
 
     //virtual void getSessionData(ofxWebSocketRouteHandler* handler) = 0;
@@ -239,8 +235,6 @@ protected:
     BaseWebSocketSessionManager(const BaseWebSocketSessionManager& that);
 	BaseWebSocketSessionManager& operator = (const BaseWebSocketSessionManager& that);
 
-    mutable Poco::FastMutex mutex; // locks the handlers set
-
     typedef std::set<BaseWebSocketRouteHandler*>            HandlerSet;
     typedef std::set<BaseWebSocketRouteHandler*>::iterator  HandlerSetIter;
     typedef std::map<std::string,WebsocketEvents>           EventMap;
@@ -249,6 +243,8 @@ protected:
     HandlerSet handlers;
     
     EventMap eventMap;
+
+    mutable Poco::FastMutex mutex; // locks the handlers set
 
 };
 
