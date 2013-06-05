@@ -35,17 +35,17 @@ const unsigned short ProxySettings::DEFAULT_PROXY_PORT = 8909;
 
 
 //------------------------------------------------------------------------------
-ProxySettings::ProxySettings()
-: _host(DEFAULT_PROXY_HOST)
-, _port(DEFAULT_PROXY_PORT)
+ProxySettings::ProxySettings() :
+    _host(DEFAULT_PROXY_HOST),
+    _port(DEFAULT_PROXY_PORT)
 {
 }
 
 //------------------------------------------------------------------------------
 ProxySettings::ProxySettings(const std::string& host,
-                             unsigned short port)
-: _host(host)
-, _port(port)
+                             unsigned short port) :
+    _host(host),
+    _port(port)
 {
 }
 
@@ -53,10 +53,10 @@ ProxySettings::ProxySettings(const std::string& host,
 ProxySettings::ProxySettings(const std::string& username,
                              const std::string& password,
                              const std::string& host,
-                             unsigned short port)
-: Credentials(username,password)
-, _host(host)
-, _port(port)
+                             unsigned short port) :
+    Credentials(username,password),
+    _host(host),
+    _port(port)
 {
 }
 
