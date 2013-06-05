@@ -44,14 +44,6 @@ ResponseStream* Client::openResponseStream(const Request::BaseRequest& request,
     
     Poco::Net::HTTPResponse pResponse;
     
-    if(!request.hasValidURI()) {
-        ofLogVerbose("Client::open") << "Invalid URI.";
-        return new ResponseStream(pResponse,
-                                  NULL,
-                                  new Poco::SyntaxException("Invalid URI", request._invalidURI)
-                                  );
-    }
-    
     // ofLogVerbose("Client::open") << "Beginning redirect loop. Max redirects = " << requestSettings.maxRedirects ;
     
     try {
