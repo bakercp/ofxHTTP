@@ -48,7 +48,7 @@ ResponseStream* Client::openResponseStream(const Request::BaseRequest& request,
         ofLogVerbose("Client::open") << "Invalid URI.";
         return new ResponseStream(pResponse,
                                   NULL,
-                                  new Poco::SyntaxException("Invalid URI", request.invalidURI)
+                                  new Poco::SyntaxException("Invalid URI", request._invalidURI)
                                   );
     }
     
