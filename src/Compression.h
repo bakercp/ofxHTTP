@@ -52,52 +52,24 @@ public:
 
 class CompressorEntry {
 public:
-    CompressorEntry(const Poco::Net::MediaType& _mediaType) : mediaType(_mediaType) { }
-    virtual ~CompressorEntry() { }
+    CompressorEntry(const Poco::Net::MediaType& _mediaType);
+    virtual ~CompressorEntry();
 
-    void addCompressionType(Compression::Type compressionType) {
-        removeCompressionType(compressionType);
-        validCompressionTypes.push_back(compressionType);
-    }
+    void addCompressionType(Compression::Type compressionType);
+
+    void removeCompressionType(Compression::Type compressionType);
+
+    void clearCompressionTypes();
     
-    void removeCompressionType(Compression::Type compressionType) {
-        remove(validCompressionTypes.begin(),validCompressionTypes.end(),compressionType);
-    }
-    
-    void clearCompressionTypes() {
-        validCompressionTypes.clear();
-    }
-    
-    Poco::Net::MediaType getMediaType() const { return mediaType; }
-    vector<Compression::Type> getValidCompressionTypes() const { return validCompressionTypes; }
-    
-    string getValidCompressionTypesAsCSV() const {
-        string outputString;
-        vector<string> compressionTypes;
-        vector<Compression::Type>::const_iterator iter = validCompressionTypes.begin();
-        while(iter != validCompressionTypes.end()) {
-            switch(*iter) {
-                case Compression::DEFLATE:
-                    outputString += "deflate";
-                    break;
-                case Compression::GZIP:
-                    outputString += "gzip";
-                    break;
-                default:
-                    break;
-            }
-            
-            if(iter + 1 != validCompressionTypes.end()) {
-                outputString += ", ";
-            }
-            ++iter;
-        }
-        return outputString;
-    }
-    
+    Poco::Net::MediaType getMediaType() const;
+
+    std::vector<Compression::Type> getValidCompressionTypes() const;
+
+    std::string getValidCompressionTypesAsCSV() const;
+
 private:
-    Poco::Net::MediaType mediaType;
-    std::vector<Compression::Type> validCompressionTypes;
+    Poco::Net::MediaType _mediaType;
+    std::vector<Compression::Type> _validCompressionTypes;
 };
 
 

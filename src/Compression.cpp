@@ -29,4 +29,76 @@
 namespace ofx {
 namespace HTTP {
 
+
+//------------------------------------------------------------------------------
+CompressorEntry::CompressorEntry(const Poco::Net::MediaType& mediaType) :
+    _mediaType(mediaType)
+{
+}
+
+//------------------------------------------------------------------------------
+CompressorEntry::~CompressorEntry()
+{
+}
+
+//------------------------------------------------------------------------------
+void CompressorEntry::addCompressionType(Compression::Type compressionType)
+{
+    removeCompressionType(compressionType);
+    _validCompressionTypes.push_back(compressionType);
+}
+
+//------------------------------------------------------------------------------
+void CompressorEntry::removeCompressionType(Compression::Type compressionType)
+{
+    remove(_validCompressionTypes.begin(),
+           _validCompressionTypes.end(),
+           compressionType);
+}
+
+//------------------------------------------------------------------------------
+void CompressorEntry::clearCompressionTypes()
+{
+    _validCompressionTypes.clear();
+}
+
+//------------------------------------------------------------------------------
+Poco::Net::MediaType CompressorEntry::getMediaType() const
+{
+    return _mediaType;
+}
+
+//------------------------------------------------------------------------------
+std::vector<Compression::Type> CompressorEntry::getValidCompressionTypes() const
+{
+    return _validCompressionTypes;
+}
+
+//------------------------------------------------------------------------------
+std::string CompressorEntry::getValidCompressionTypesAsCSV() const
+{
+    std::string outputString;
+    std::vector<std::string> compressionTypes;
+    std::vector<Compression::Type>::const_iterator iter = _validCompressionTypes.begin();
+    while(iter != _validCompressionTypes.end()) {
+        switch(*iter) {
+            case Compression::DEFLATE:
+                outputString += "deflate";
+                break;
+            case Compression::GZIP:
+                outputString += "gzip";
+                break;
+            default:
+                break;
+        }
+
+        if(iter + 1 != _validCompressionTypes.end()) {
+            outputString += ", ";
+        }
+        ++iter;
+    }
+    return outputString;
+}
+
+
 } }
