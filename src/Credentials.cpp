@@ -30,18 +30,19 @@ namespace ofx {
 namespace HTTP {        
         
 
-//------------------------------------------------------------------------------
-Credentials::Credentials(const std::string& username, const std::string& password)
-: _username(username)
-, _password(password)
-{
-
-}
 
 //------------------------------------------------------------------------------
 Credentials::Credentials()
 : _username("")
 , _password("")
+{
+    
+}
+
+//------------------------------------------------------------------------------
+Credentials::Credentials(const std::string& username, const std::string& password)
+: _username(username)
+, _password(password)
 {
 
 }
