@@ -40,8 +40,8 @@ public:
     typedef DefaultServerRouteSettings Settings;
     typedef ofPtr<DefaultServerRoute> Ptr;
 
-    DefaultServerRoute(const Settings& settings = Settings())
-    : _settings(settings)
+    DefaultServerRoute(const Settings& settings = Settings()) :
+        _settings(settings)
     {
         
         ofDirectory documentRootDirectory(_settings.documentRoot);
@@ -54,11 +54,11 @@ public:
     
     virtual ~DefaultServerRoute()
     {
-
     }
 
-    bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
-                          bool bIsSecurePort) {
+    bool canHandleRequest(const HTTPServerRequest& request,
+                          bool bIsSecurePort)
+    {
 
         // require HTTP_GET
         if(request.getMethod() != Poco::Net::HTTPRequest::HTTP_GET) {
@@ -86,7 +86,7 @@ public:
         return Poco::RegularExpression(_settings.getRoute()).match(path);
     }
 
-    Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+    HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request)
     {
         return new DefaultServerRouteHandler(_settings);
     }
