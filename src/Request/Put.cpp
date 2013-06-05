@@ -32,15 +32,15 @@ namespace Request {
 
 
 //------------------------------------------------------------------------------
-Put::Put(const std::string& _url, const std::string& _httpVersion)
-: BaseRequest(Poco::Net::HTTPRequest::HTTP_PUT,_url,_httpVersion)
+Put::Put(const std::string& url, const std::string& httpVersion)
+: BaseRequest(Poco::Net::HTTPRequest::HTTP_PUT,url,httpVersion)
 {
 
 }
 
 //------------------------------------------------------------------------------
-Put::Put(const Poco::URI& _uri, const std::string& _httpVersion)
-: BaseRequest(Poco::Net::HTTPRequest::HTTP_PUT,_uri,_httpVersion)
+Put::Put(const Poco::URI& uri, const std::string& httpVersion)
+: BaseRequest(Poco::Net::HTTPRequest::HTTP_PUT,uri,httpVersion)
 {
 
 }

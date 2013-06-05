@@ -37,15 +37,18 @@ namespace Request {
 class Post : public BaseRequest {
 public:
     
-    Post(const string& _url, const string& _httpVersion = Poco::Net::HTTPRequest::HTTP_1_1);
-    Post(const Poco::URI& _uri,    const string& _httpVersion = Poco::Net::HTTPRequest::HTTP_1_1);
+    Post(const std::string& url,
+         const std::string& httpVersion = Poco::Net::HTTPRequest::HTTP_1_1);
+
+    Post(const Poco::URI& uri,
+         const std::string& httpVersion = Poco::Net::HTTPRequest::HTTP_1_1);
     
     virtual ~Post();
     
-    void addFormFile(const string& fieldName, const string& filePath);
-    void addFormFiles(const Poco::Net::NameValueCollection& nvc);
-    void addFormFiles(const map<string,string>&  nvc);
-    void addFormFiles(const multimap<string,string>&  nvc);
+    void addFormFile(const std::string& fieldName, const std::string& filePath);
+    void addFormFiles(const Poco::Net::NameValueCollection& nameValueMap);
+    void addFormFiles(const std::map<std::string,std::string>&  nameValueMap);
+    void addFormFiles(const std::multimap<std::string,std::string>&  nameValueMap);
 
     bool hasFormFiles() const;
 
@@ -54,12 +57,13 @@ public:
     const Poco::Net::NameValueCollection& getFormFiles() const;
 
 protected:
-    
     virtual void prepareRequest(Poco::Net::HTTPClientSession& session,
                                 Poco::Net::HTTPRequest& request,
                                 Poco::Net::HTTPResponse& response);
 
-    Poco::Net::NameValueCollection formFiles;
+    Poco::Net::NameValueCollection _formFiles;
+
+    friend class Client;
 
 };
 

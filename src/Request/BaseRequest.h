@@ -35,7 +35,6 @@
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/NameValueCollection.h"
-#include "ofLog.h"
 #include "ofUtils.h"
 #include "Cookie.h"
 
@@ -54,13 +53,13 @@ namespace Request {
 class BaseRequest {
 public:
     
-    BaseRequest(const std::string& _httpMethod,
-                const std::string& _url,
-                const std::string& _httpVersion);
+    BaseRequest(const std::string& httpMethod,
+                const std::string& url,
+                const std::string& httpVersion);
 
-    BaseRequest(const std::string& _httpMethod,
-                const Poco::URI& _uri,
-                const std::string& _httpVersion);
+    BaseRequest(const std::string& httpMethod,
+                const Poco::URI&   uri,
+                const std::string& httpVersion);
 
     virtual ~BaseRequest();
     
@@ -76,7 +75,7 @@ public:
                    bool isValueEscaped = false);
     void addCookie(const Poco::Net::HTTPCookie& cookie);
     void addCookie(const Cookie& cookie);
-    void addCookies(const vector<Cookie>& _cookies);
+    void addCookies(const std::vector<Cookie>& cookies);
     void clearCookies();
     
     void addFormField(const std::string& name, const std::string& value = "");
@@ -94,23 +93,25 @@ public:
     void clearHeaders();
 
 protected:
-    
     void setFormFieldsFromURI(const Poco::URI& uri);
     
     virtual void prepareRequest(Poco::Net::HTTPRequest& request) const = 0;
-    virtual void sendRequestBody(ostream& requestStream) const { }; // optional for POST, PUT, etc.
-    
-    bool bHasValidURI;
-    std::string invalidURI;
-    Poco::URI uri;
-    
-    std::string  httpMethod;
-    std::string  httpVersion;
+    virtual void sendRequestBody(ostream& requestStream) const
+    {
+        // optional for POST, PUT, etc.
+    };
 
-    vector<Cookie> cookies;
+    bool _bHasValidURI;
+    std::string _invalidURI;
+    Poco::URI _uri;
     
-    Poco::Net::NameValueCollection form;
-    Poco::Net::NameValueCollection headers;
+    std::string _httpMethod;
+    std::string _httpVersion;
+
+    std::vector<Cookie> _cookies;
+    
+    Poco::Net::NameValueCollection _form;
+    Poco::Net::NameValueCollection _headers;
 
     friend class Client;
     

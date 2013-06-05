@@ -32,15 +32,15 @@ namespace Request {
 
 
 //------------------------------------------------------------------------------
-Post::Post(const string& _url, const string& _httpVersion)
-: BaseRequest(Poco::Net::HTTPRequest::HTTP_POST,_url,_httpVersion)
+Post::Post(const std::string& url, const std::string& httpVersion)
+: BaseRequest(Poco::Net::HTTPRequest::HTTP_POST,_url,httpVersion)
 {
 
 }
 
 //------------------------------------------------------------------------------
-Post::Post(const Poco::URI& _uri, const string& _httpVersion)
-: BaseRequest(Poco::Net::HTTPRequest::HTTP_POST,_uri,_httpVersion)
+Post::Post(const Poco::URI& uri, const std::string& httpVersion)
+: BaseRequest(Poco::Net::HTTPRequest::HTTP_POST,uri,httpVersion)
 {
 
 }
@@ -52,14 +52,26 @@ Post::~Post()
 }
 
 //------------------------------------------------------------------------------
-void Post::addFormFile(const string& fieldName, const string& filePath)
+void Post::addFormFile(const std::string& fieldName, std::const string& filePath)
 {
-    formFiles.add(fieldName, ofToDataPath(filePath));
+    _formFiles.add(fieldName, ofToDataPath(filePath));
 }
 
 //------------------------------------------------------------------------------
-void Post::addFormFiles(const Poco::Net::NameValueCollection& nvc) {
-    Poco::Net::NameValueCollection::ConstIterator iter = nvc.begin();
+void Post::addFormFiles(const Poco::Net::NameValueCollection& nameValueMap)
+{
+    Poco::Net::NameValueCollection::ConstIterator iter = nameValueMap.begin();
+    while(iter != nameValueMap.end()) {
+        addFormFile((*iter).first,(*iter).second);
+        ++iter;
+    }
+}
+
+//------------------------------------------------------------------------------
+void Post::addFormFiles(const std::map<std::string,std::string>& nameValueMap)
+{
+    std::map<std::string,std::string>::const_iterator iter = nameValueMap.begin();
+
     while(iter != nvc.end()) {
         addFormFile((*iter).first,(*iter).second);
         ++iter;
@@ -67,8 +79,10 @@ void Post::addFormFiles(const Poco::Net::NameValueCollection& nvc) {
 }
 
 //------------------------------------------------------------------------------
-void Post::addFormFiles(const map<string,string>& nvc) {
-    map<string,string>::const_iterator iter = nvc.begin();
+void Post::addFormFiles(const multimap<string,string>&  nameValueMap)
+{
+    std::multimap<std::string,std::string>::const_iterator iter = nameValueMap.begin();
+
     while(iter != nvc.end()) {
         addFormFile((*iter).first,(*iter).second);
         ++iter;
@@ -76,33 +90,28 @@ void Post::addFormFiles(const map<string,string>& nvc) {
 }
 
 //------------------------------------------------------------------------------
-void Post::addFormFiles(const multimap<string,string>&  nvc) {
-    multimap<string,string>::const_iterator iter = nvc.begin();
-    while(iter != nvc.end()) {
-        addFormFile((*iter).first,(*iter).second);
-        ++iter;
-    }
-}
-
-//------------------------------------------------------------------------------
-bool Post::hasFormFiles() const {
+bool Post::hasFormFiles() const
+{
     return !formFiles.empty();
 }
 
 //------------------------------------------------------------------------------
-void Post::clearFormFiles() {
+void Post::clearFormFiles()
+{
     formFiles.clear();
 }
 
 //------------------------------------------------------------------------------
-const Poco::Net::NameValueCollection& Post::getFormFiles() const {
+const Poco::Net::NameValueCollection& Post::getFormFiles() const
+{
     return formFiles;
 }
 
 //------------------------------------------------------------------------------
 void Post::prepareRequest(Poco::Net::HTTPClientSession& session,
-                                 Poco::Net::HTTPRequest& request,
-                                 Poco::Net::HTTPResponse& response) {
+                          Poco::Net::HTTPRequest& request,
+                          Poco::Net::HTTPResponse& response)
+{
     
 }
 

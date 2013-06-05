@@ -24,6 +24,7 @@
 
 #pragma once
 
+
 #include "BaseRequest.h"
 
 
@@ -34,21 +35,21 @@ namespace Request {
 class Put : public BaseRequest {
 public:
     
-    Put(const std::string& _url,
-        const std::string& _httpVersion = Poco::Net::HTTPRequest::HTTP_1_1);
-    Put(const Poco::URI& _uri,
-        const std::string& _httpVersion = Poco::Net::HTTPRequest::HTTP_1_1);
+    Put(const std::string& url,
+        const std::string& httpVersion = Poco::Net::HTTPRequest::HTTP_1_1);
+    Put(const Poco::URI& uri,
+        const std::string& httpVersion = Poco::Net::HTTPRequest::HTTP_1_1);
     
     virtual ~Put();
     
     void addFile(const std::string& filename);
     
-    void setContentRange(size_t startByte, size_t endByte = std::numeric_limits<size_t>::max());
+    void setContentRange(size_t startByte,
+                         size_t endByte = std::numeric_limits<size_t>::max());
+
     void setContentType(const std::string& contentType);
     
 protected:
-    
-    //------------------------------------------------------------------------------
     virtual void prepareRequest(Poco::Net::HTTPRequest& request) const;
 
     size_t startByte;
@@ -57,7 +58,9 @@ protected:
     std::string contentType;
     
     ofFile file;
-    
+
+    friend class Client;
+
 };
 
     

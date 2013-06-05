@@ -54,7 +54,7 @@ Get::~Get()
 //------------------------------------------------------------------------------
 void Get::prepareRequest(Poco::Net::HTTPRequest& request) const
 {
-    cout << "prepping" << endl;
+
 }
 
 
