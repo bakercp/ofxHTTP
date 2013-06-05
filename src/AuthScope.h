@@ -38,20 +38,25 @@ namespace HTTP {
 
 class AuthScope {
 public:
-    
     AuthScope();
-    
+
     AuthScope(const std::string& host);
+
     AuthScope(const std::string& host, unsigned short port);
-    AuthScope(const std::string& host, Authentication::Type authType);
+
+    AuthScope(const std::string& host,
+              Authentication::Type authType);
+
     AuthScope(const std::string& host,
               unsigned short port,
               Authentication::Type authType);
+
     AuthScope(const std::string& scheme,
               const std::string& host,
               unsigned short port,
               const std::string& realm,
               Authentication::Type authType);
+
     AuthScope(const Poco::URI& uri);
     
     bool isSchemeSet() const;

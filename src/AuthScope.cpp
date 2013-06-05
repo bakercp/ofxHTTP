@@ -31,85 +31,80 @@ namespace HTTP {
         
 
 //------------------------------------------------------------------------------
-AuthScope::AuthScope()
-: _bIsSchemeSet(false)
-, _scheme("")
-, _bIsHostSet(false)
-, _host("")
-, _bIsPortSet(false)
-, _port(0)
-, _bIsRealmSet(false)
-, _realm("")
-, _bIsAuthTypeSet(false)
-, _authType(Authentication::BASIC)
+AuthScope::AuthScope() :
+    _bIsSchemeSet(false),
+    _scheme(""),
+    _bIsHostSet(false),
+    _host(""),
+    _bIsPortSet(false),
+    _port(0),
+    _bIsRealmSet(false),
+    _realm(""),
+    _bIsAuthTypeSet(false),
+    _authType(Authentication::BASIC)
 {
-
 }
 
 //------------------------------------------------------------------------------
-AuthScope::AuthScope(const std::string& host)
-: _bIsSchemeSet(false)
-, _scheme("")
-, _bIsHostSet(true)
-, _host(host)
-, _bIsPortSet(false)
-, _port(0)
-, _bIsRealmSet(false)
-, _realm("")
-, _bIsAuthTypeSet(false)
-, _authType(Authentication::BASIC)
+AuthScope::AuthScope(const std::string& host) :
+    _bIsSchemeSet(false),
+    _scheme(""),
+    _bIsHostSet(true),
+    _host(host),
+    _bIsPortSet(false),
+    _port(0),
+    _bIsRealmSet(false),
+    _realm(""),
+    _bIsAuthTypeSet(false),
+    _authType(Authentication::BASIC)
 {
-    
 }
     
 //------------------------------------------------------------------------------
-AuthScope::AuthScope(const std::string& host, unsigned short port)
-: _bIsSchemeSet(false)
-, _scheme("")
-, _bIsHostSet(true)
-, _host(host)
-, _bIsPortSet(true)
-, _port(port)
-, _bIsRealmSet(false)
-, _realm("")
-, _bIsAuthTypeSet(false)
-, _authType(Authentication::BASIC)
+AuthScope::AuthScope(const std::string& host, unsigned short port) :
+    _bIsSchemeSet(false),
+    _scheme(""),
+    _bIsHostSet(true),
+    _host(host),
+    _bIsPortSet(true),
+    _port(port),
+    _bIsRealmSet(false),
+    _realm(""),
+    _bIsAuthTypeSet(false),
+    _authType(Authentication::BASIC)
 {
-
 }
 
     //------------------------------------------------------------------------------
-AuthScope::AuthScope(const std::string& host, Authentication::Type authType)
-: _bIsSchemeSet(false)
-, _scheme("")
-, _bIsHostSet(true)
-, _host(host)
-, _bIsPortSet(false)
-, _port(0)
-, _bIsRealmSet(false)
-, _realm("")
-, _bIsAuthTypeSet(true)
-, _authType(authType)
+AuthScope::AuthScope(const std::string& host, Authentication::Type authType) :
+    _bIsSchemeSet(false),
+    _scheme(""),
+    _bIsHostSet(true),
+    _host(host),
+    _bIsPortSet(false),
+    _port(0),
+    _bIsRealmSet(false),
+    _realm(""),
+    _bIsAuthTypeSet(true),
+    _authType(authType)
 {
-
 }
 
 //------------------------------------------------------------------------------
 AuthScope::AuthScope(const std::string& host,
                      unsigned short port,
-                     Authentication::Type authType)
-: _bIsSchemeSet(false)
-, _scheme("")
-, _bIsHostSet(true)
-, _host(host)
-, _bIsPortSet(true)
-, _port(port)
-, _bIsRealmSet(false)
-, _realm("")
-, _bIsAuthTypeSet(true)
-, _authType(authType)
+                     Authentication::Type authType) :
+    _bIsSchemeSet(false),
+    _scheme(""),
+    _bIsHostSet(true),
+    _host(host),
+    _bIsPortSet(true),
+    _port(port),
+    _bIsRealmSet(false),
+    _realm(""),
+    _bIsAuthTypeSet(true),
+    _authType(authType)
 {
-
 }
 
 //------------------------------------------------------------------------------
@@ -117,33 +112,32 @@ AuthScope::AuthScope(const std::string& scheme,
                      const std::string& host,
                      unsigned short port,
                      const std::string& realm,
-                     Authentication::Type authType)
-: _bIsSchemeSet(true)
-, _scheme(scheme)
-, _bIsHostSet(true)
-, _host(host)
-, _bIsPortSet(true)
-, _port(port)
-, _bIsRealmSet(true)
-, _realm(realm)
-, _bIsAuthTypeSet(true)
-, _authType(authType)
+                     Authentication::Type authType) :
+    _bIsSchemeSet(true),
+    _scheme(scheme),
+    _bIsHostSet(true),
+    _host(host),
+    _bIsPortSet(true),
+    _port(port),
+    _bIsRealmSet(true),
+    _realm(realm),
+    _bIsAuthTypeSet(true),
+    _authType(authType)
 {
-    
 }
 
 //------------------------------------------------------------------------------
-AuthScope::AuthScope(const Poco::URI& uri)
-: _bIsSchemeSet(false)
-, _scheme("")
-, _bIsHostSet(false)
-, _host("")
-, _bIsPortSet(false)
-, _port(0)
-, _bIsRealmSet(false)
-, _realm("")
-, _bIsAuthTypeSet(false)
-, _authType(Authentication::BASIC)
+AuthScope::AuthScope(const Poco::URI& uri) :
+    _bIsSchemeSet(false),
+    _scheme(""),
+    _bIsHostSet(false),
+    _host(""),
+    _bIsPortSet(false),
+    _port(0),
+    _bIsRealmSet(false),
+    _realm(""),
+    _bIsAuthTypeSet(false),
+    _authType(Authentication::BASIC)
 {
     if(!uri.getScheme().empty()) setScheme(uri.getScheme());
     if(!uri.getHost().empty())   setHost(uri.getHost());
@@ -370,28 +364,17 @@ std::string AuthScope::toString() const
     std::stringstream ss;
 
     ss << "Scheme: " << (_bIsSchemeSet ? getScheme() : "Any");
-
     ss << " Host: " << (_bIsHostSet ? getHost() : "Any");
-
     ss << " Port: ";
-    
-    if(_bIsPortSet)
-    {
+    if(_bIsPortSet) {
         ss << getPort();
-    }
-    else
-    {
+    } else {
         ss << "Any";
     }
-
     ss << " Realm: " << (_bIsRealmSet ? getRealm() : "Any");
-    
     ss << " AuthType: ";
-
-    if(_bIsAuthTypeSet)
-    {
-        switch(getAuthType())
-        {
+    if(_bIsAuthTypeSet) {
+        switch(getAuthType()) {
             case Authentication::BASIC:
                 ss << "BASIC";
                 break;
@@ -401,9 +384,7 @@ std::string AuthScope::toString() const
             default:
                 ss << "UNKNOWN";
         }
-    }
-    else
-    {
+    } else {
         ss << "Any";
     }
     
