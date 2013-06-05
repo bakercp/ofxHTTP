@@ -44,7 +44,7 @@
 		FD018D40175F04D4004CC4B6 /* ResponseStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D0F175F04D4004CC4B6 /* ResponseStream.cpp */; };
 		FD018D42175F04D4004CC4B6 /* Server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D13175F04D4004CC4B6 /* Server.cpp */; };
 		FD018D43175F04D4004CC4B6 /* BasicServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D15175F04D4004CC4B6 /* BasicServer.cpp */; };
-		FD018D44175F04D4004CC4B6 /* ServerDefaultRouteHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D1A175F04D4004CC4B6 /* ServerDefaultRouteHandler.cpp */; };
+		FD018D44175F04D4004CC4B6 /* DefaulServertRouteHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D1A175F04D4004CC4B6 /* DefaulServertRouteHandler.cpp */; };
 		FD018D45175F04D4004CC4B6 /* ServerRouteHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D1E175F04D4004CC4B6 /* ServerRouteHandler.cpp */; };
 		FD018D46175F04D4004CC4B6 /* ServerUploadRouteHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D22175F04D4004CC4B6 /* ServerUploadRouteHandler.cpp */; };
 		FD018D47175F04D4004CC4B6 /* SessionSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D24175F04D4004CC4B6 /* SessionSettings.cpp */; };
@@ -154,11 +154,11 @@
 		FD018D14175F04D4004CC4B6 /* Server.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Server.h; sourceTree = "<group>"; };
 		FD018D15175F04D4004CC4B6 /* BasicServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BasicServer.cpp; sourceTree = "<group>"; };
 		FD018D16175F04D4004CC4B6 /* BasicServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasicServer.h; sourceTree = "<group>"; };
-		FD018D17175F04D4004CC4B6 /* ServerBasicAuthenticator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerBasicAuthenticator.h; sourceTree = "<group>"; };
-		FD018D18175F04D4004CC4B6 /* ServerDefaultAuthenticationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerDefaultAuthenticationManager.h; sourceTree = "<group>"; };
-		FD018D19175F04D4004CC4B6 /* ServerDefaultRoute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerDefaultRoute.h; sourceTree = "<group>"; };
-		FD018D1A175F04D4004CC4B6 /* ServerDefaultRouteHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ServerDefaultRouteHandler.cpp; sourceTree = "<group>"; };
-		FD018D1B175F04D4004CC4B6 /* ServerDefaultRouteHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerDefaultRouteHandler.h; sourceTree = "<group>"; };
+		FD018D17175F04D4004CC4B6 /* BasicServerAuthenticator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasicServerAuthenticator.h; sourceTree = "<group>"; };
+		FD018D18175F04D4004CC4B6 /* DefaulServertAuthenticationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DefaulServertAuthenticationManager.h; sourceTree = "<group>"; };
+		FD018D19175F04D4004CC4B6 /* DefaultServerRoute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DefaultServerRoute.h; sourceTree = "<group>"; };
+		FD018D1A175F04D4004CC4B6 /* DefaulServertRouteHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DefaulServertRouteHandler.cpp; sourceTree = "<group>"; };
+		FD018D1B175F04D4004CC4B6 /* DefaultServerRouteHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DefaultServerRouteHandler.h; sourceTree = "<group>"; };
 		FD018D1C175F04D4004CC4B6 /* ServerDefaultSessionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerDefaultSessionManager.h; sourceTree = "<group>"; };
 		FD018D1D175F04D4004CC4B6 /* ServerExchange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerExchange.h; sourceTree = "<group>"; };
 		FD018D1E175F04D4004CC4B6 /* ServerRouteHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ServerRouteHandler.cpp; sourceTree = "<group>"; };
@@ -351,11 +351,11 @@
 				FD018D14175F04D4004CC4B6 /* Server.h */,
 				FD018D15175F04D4004CC4B6 /* BasicServer.cpp */,
 				FD018D16175F04D4004CC4B6 /* BasicServer.h */,
-				FD018D17175F04D4004CC4B6 /* ServerBasicAuthenticator.h */,
-				FD018D18175F04D4004CC4B6 /* ServerDefaultAuthenticationManager.h */,
-				FD018D19175F04D4004CC4B6 /* ServerDefaultRoute.h */,
-				FD018D1A175F04D4004CC4B6 /* ServerDefaultRouteHandler.cpp */,
-				FD018D1B175F04D4004CC4B6 /* ServerDefaultRouteHandler.h */,
+				FD018D17175F04D4004CC4B6 /* BasicServerAuthenticator.h */,
+				FD018D18175F04D4004CC4B6 /* DefaulServertAuthenticationManager.h */,
+				FD018D19175F04D4004CC4B6 /* DefaultServerRoute.h */,
+				FD018D1A175F04D4004CC4B6 /* DefaulServertRouteHandler.cpp */,
+				FD018D1B175F04D4004CC4B6 /* DefaultServerRouteHandler.h */,
 				FD018D1C175F04D4004CC4B6 /* ServerDefaultSessionManager.h */,
 				FD018D1D175F04D4004CC4B6 /* ServerExchange.h */,
 				FD018D1E175F04D4004CC4B6 /* ServerRouteHandler.cpp */,
@@ -523,7 +523,7 @@
 				FD018D40175F04D4004CC4B6 /* ResponseStream.cpp in Sources */,
 				FD018D42175F04D4004CC4B6 /* Server.cpp in Sources */,
 				FD018D43175F04D4004CC4B6 /* BasicServer.cpp in Sources */,
-				FD018D44175F04D4004CC4B6 /* ServerDefaultRouteHandler.cpp in Sources */,
+				FD018D44175F04D4004CC4B6 /* DefaulServertRouteHandler.cpp in Sources */,
 				FD018D45175F04D4004CC4B6 /* ServerRouteHandler.cpp in Sources */,
 				FD018D46175F04D4004CC4B6 /* ServerUploadRouteHandler.cpp in Sources */,
 				FD018D47175F04D4004CC4B6 /* SessionSettings.cpp in Sources */,

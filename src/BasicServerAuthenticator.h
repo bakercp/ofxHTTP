@@ -31,7 +31,7 @@
 
 using std::vector;
 
-class ServerBasicAuthenticator : public ofxBaseHTTPServerAuthenticationEngine {
+class BasicServerAuthenticator : public ofxBaseHTTPServerAuthenticationEngine {
 public:
     struct Settings;
     

@@ -35,7 +35,7 @@
 #include "ofFileUtils.h"
 #include "ofLog.h"
 #include "BaseTypes.h"
-#include "ServerDefaultRouteHandler.h"
+#include "DefaultServerRouteHandler.h"
 #include "BaseWebSocketTypes.h"
 #include "WebSocketEvents.h"
 #include "WebSocketFrame.h"

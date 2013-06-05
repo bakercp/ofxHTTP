@@ -95,6 +95,21 @@ public:
     
 };
 
+class BaseServerSessionData {
+public:
+    BaseServerSessionData()
+    {
+    }
+
+    virtual ~BaseServerSessionData()
+    {
+    }
+
+    virtual bool update(HTTPServerRequest& request,
+                        HTTPServerResponse& response) = 0;
+    
+};
+
 class BaseServerAuthenticationManager {
 public:
     BaseServerAuthenticationManager()

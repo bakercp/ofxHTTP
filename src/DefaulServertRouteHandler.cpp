@@ -1,4 +1,29 @@
-#include "ServerDefaultRouteHandler.h"
+/*==============================================================================
+
+ Copyright (c) 2013 - Christopher Baker <http://christopherbaker.net>
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+
+ =============================================================================*/
+
+
+#include "DefaultServerRouteHandler.h"
 
 
 namespace ofx {
@@ -6,17 +31,19 @@ namespace HTTP {
         
 
 //------------------------------------------------------------------------------
-DefaultServerRouteHandler::DefaultServerRouteHandler(const DefaultServerRouteSettings& _settings)
-: BaseServerRouteHandler(_settings)
+DefaultServerRouteHandler::DefaultServerRouteHandler(const DefaultServerRouteSettings& _settings) :
+    BaseServerRouteHandler(_settings)
 {
-
 }
 
 //------------------------------------------------------------------------------
-DefaultServerRouteHandler::~DefaultServerRouteHandler() { }
+DefaultServerRouteHandler::~DefaultServerRouteHandler()
+{
+}
 
 //------------------------------------------------------------------------------
-void DefaultServerRouteHandler::handleExchange(ServerExchange& exchange) {
+void DefaultServerRouteHandler::handleExchange(ServerExchange& exchange)
+{
 
     Poco::Path dataFolder(ofToDataPath("",true));
     Poco::Path documentRoot(ofToDataPath(settings.documentRoot,true));
@@ -37,10 +64,12 @@ void DefaultServerRouteHandler::handleExchange(ServerExchange& exchange) {
     // check path
     
     Poco::URI uri(exchange.request.getURI());
-    string path = uri.getPath(); // just get the path
+    std::string path = uri.getPath(); // just get the path
 
     // make paths absolute
-    if(path.empty()) { path = "/"; }
+    if(path.empty()) {
+        path = "/";
+    }
     
     Poco::Path requestPath = documentRoot.append(path).makeAbsolute();
     
@@ -49,7 +78,7 @@ void DefaultServerRouteHandler::handleExchange(ServerExchange& exchange) {
         requestPath.append(settings.defaultIndex).makeAbsolute();
     }
     
-    string requestPathString = requestPath.toString();
+    std::string requestPathString = requestPath.toString();
     
     // double check path safety (not needed?)
     if((requestPathString.length() < documentRootString.length() ||
@@ -63,21 +92,18 @@ void DefaultServerRouteHandler::handleExchange(ServerExchange& exchange) {
     ofFile file(requestPathString); // use it to parse file name parts
     
     try {
-
         ofx::Media::MediaTypeMap mediaMap;
-
         Poco::Net::MediaType mediaType = mediaMap.getMediaTypeForSuffix(file.getExtension());
-
         exchange.response.sendFile(file.getAbsolutePath(), mediaType.toString()); // will throw exceptions
-    } catch (const Poco::FileNotFoundException& ex) {
+    } catch(const Poco::FileNotFoundException& ex) {
         ofLogError("ServerDefaultRouteHandler::handleRequest") << ex.displayText();
         exchange.response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
         sendErrorResponse(exchange.response);
-    } catch (const Poco::OpenFileException& ex) {
+    } catch(const Poco::OpenFileException& ex) {
         ofLogError("ServerDefaultRouteHandler::handleRequest") << ex.displayText();
         exchange.response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         sendErrorResponse(exchange.response);
-    } catch (const exception& ex) {
+    } catch(const exception& ex) {
         ofLogError("ServerDefaultRouteHandler::handleRequest") << "Unknown server error: " << ex.what();
         exchange.response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         sendErrorResponse(exchange.response);

@@ -37,11 +37,11 @@
 
 using std::string;
 using std::map;
-
 using Poco::DigestOutputStream;
 using Poco::DigestEngine;
 using Poco::MD5Engine;
 using Poco::Net::HTTPServerRequest;
+
 
 template<class T, class B>
 struct DerivedFrom {
@@ -49,13 +49,12 @@ struct DerivedFrom {
     DerivedFrom() { void(*p)(T*) = constraints; }
 };
 
-class ofxBaseHTTPServerSessionData {
-public:
-    ofxBaseHTTPServerSessionData() { }
-    virtual ~ofxBaseHTTPServerSessionData() { }
-    
-    virtual bool update(HTTPServerRequest& request, HTTPServerResponse& response) = 0;
-};
+
+namespace ofx {
+    namespace HTTP {
+}
+}
+
 
 //class ofxDefaultHTTPServerSession {
 //public:
@@ -77,25 +76,27 @@ public:
 //};
 
 template<typename SessionDataType>
-class ServerDefaultSessionManager : public ofxBaseHTTPServerSessionManager {
+class ServerDefaultSessionManager : public BaseServerSessionManager {
 public:
     ServerDefaultSessionManager(const string& _sessionKeyName = "session_key");
     virtual ~ServerDefaultSessionManager();
     
     bool update(HTTPServerRequest& request, HTTPServerResponse& response);
 
-    void hasSessionData(const string& sessionKey);
-    void setSessionData(const string& sessionKey, const SessionDataType& sessionData);
-    SessionDataType getSessionData(const string& sessionKey);
+    void hasSessionData(const std::string& sessionKey);
+    void setSessionData(const std::string& sessionKey,
+                        const SessionDataType& sessionData);
+
+    SessionDataType getSessionData(const std::string& sessionKey);
     
     string getSessionKey(const HTTPServerRequest& request);
 
 protected:
-    ofMutex mutex;
+    mutable ofMutex _mutex;
     
-    string sessionKeyName;
+    std::string sessionKeyName;
     
-    map<string,SessionDataType> sessions;
+    std::map<std::string,SessionDataType> _sessions;
     
 };
 
