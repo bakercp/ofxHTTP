@@ -24,12 +24,13 @@ WebSocketRouteHandler::~WebSocketRouteHandler()
 }
 
 //------------------------------------------------------------------------------
-void WebSocketRouteHandler::handleExchange(ServerExchange& exchange) {
+void WebSocketRouteHandler::handleExchange(ServerExchange& exchange)
+{
 
     try {
         applyFirefoxHack(exchange.request); // TODO: fix when poco is upgraded
 
-        ofDumpRequestHeaders(exchange);
+        Utils::dumpRequestHeaders(exchange);
         
         handleOrigin(exchange);
         handleSubprotocols(exchange);
@@ -163,16 +164,18 @@ void WebSocketRouteHandler::handleExchange(ServerExchange& exchange) {
 }
 
 //------------------------------------------------------------------------------
-void WebSocketRouteHandler::frameReceived(const WebSocketFrame& _frame) {
-    WebSocketFrame frame(_frame);
+void WebSocketRouteHandler::frameReceived(const WebSocketFrame& frame)
+{
+    WebSocketFrame _frame(frame);
     sendFrame(_frame); // echo
 }
 
 //------------------------------------------------------------------------------
-bool WebSocketRouteHandler::sendFrame(const WebSocketFrame& _frame) {
-    ofScopedLock lock(mutex);
+bool WebSocketRouteHandler::sendFrame(const WebSocketFrame& frame)
+{
+    ofScopedLock lock(_mutex);
     if(_bIsConnected) {
-        frameQueue.push(_frame);
+        _frameQueue.push(frame);
         return true;
     } else {
         return false;
@@ -180,62 +183,70 @@ bool WebSocketRouteHandler::sendFrame(const WebSocketFrame& _frame) {
 }
 
 //------------------------------------------------------------------------------
-void WebSocketRouteHandler::frameSent(const WebSocketFrame& _frame, int _nBytesSent) {
-    ofLogVerbose("ServerWebSocketRouteHandler::frameSent") << _frame.toString() << " nBytesSent=" << _nBytesSent;
+void WebSocketRouteHandler::frameSent(const WebSocketFrame& frame,
+                                      int nBytesSent)
+{
+    ofLogVerbose("ServerWebSocketRouteHandler::frameSent") << frame.toString() << " nBytesSent=" << nBytesSent;
 }
 
 //------------------------------------------------------------------------------
-void WebSocketRouteHandler::socketClosed() {
+void WebSocketRouteHandler::socketClosed()
+{
     ofLogVerbose("ServerWebSocketRouteHandler::frameSent") << "Socket closed.";
 }
 
 //------------------------------------------------------------------------------
 size_t WebSocketRouteHandler::getSendQueueSize() const
 {
-    ofScopedLock lock(mutex);
-    return frameQueue.size();
+    ofScopedLock lock(_mutex);
+    return _frameQueue.size();
 }
 
 //------------------------------------------------------------------------------
-void WebSocketRouteHandler::clearSendQueue() {
-    ofScopedLock lock(mutex);
+void WebSocketRouteHandler::clearSendQueue()
+{
+    ofScopedLock lock(_mutex);
     queue<WebSocketFrame> empty; // a way to clear queues.
-    swap( frameQueue, empty );
+    swap( _frameQueue, empty );
 }
 
 //------------------------------------------------------------------------------
-void WebSocketRouteHandler::disconnect() {
+void WebSocketRouteHandler::disconnect()
+{
     setIsConnected(false);
 }
 
 //------------------------------------------------------------------------------
 bool WebSocketRouteHandler::isConnected() const
 {
-    ofScopedLock lock(mutex);
+    ofScopedLock lock(_mutex);
     return _bIsConnected;
 }
 
 //------------------------------------------------------------------------------
-void WebSocketRouteHandler::setIsConnected(bool bIsConnected) {
-    ofScopedLock lock(mutex);
+void WebSocketRouteHandler::setIsConnected(bool bIsConnected)
+{
+    ofScopedLock lock(_mutex);
     _bIsConnected = bIsConnected;
 }
 
 
 //------------------------------------------------------------------------------
-string WebSocketRouteHandler::getSubprotocol() const {
-    ofScopedLock lock(mutex);
+string WebSocketRouteHandler::getSubprotocol() const
+{
+    ofScopedLock lock(_mutex);
     return settings.subprotocol;
 }
 
 //------------------------------------------------------------------------------
-void WebSocketRouteHandler::handleOrigin(ServerExchange &exchange) {
+void WebSocketRouteHandler::handleOrigin(ServerExchange &exchange)
+{
     ofLogError("ofxWebSocketRouteHandler::handleOrigin") << "TODO: handle/check origin";
 }
 
 //------------------------------------------------------------------------------
-void WebSocketRouteHandler::handleSubprotocols(ServerExchange& exchange) {
-    
+void WebSocketRouteHandler::handleSubprotocols(ServerExchange& exchange)
+{   
     bool validProtocol = _manager.selectSubprotocol(ofSplitString(exchange.request.get("Sec-WebSocket-Protocol",""),",",true,true),settings.subprotocol);
     
     // if we don't support the protocol, we don't send a Sec-WebSocket-Protocol header with the response.
@@ -250,8 +261,8 @@ void WebSocketRouteHandler::handleSubprotocols(ServerExchange& exchange) {
 }
 
 //------------------------------------------------------------------------------
-void WebSocketRouteHandler::handleExtensions(ServerExchange& exchange) {
-
+void WebSocketRouteHandler::handleExtensions(ServerExchange& exchange)
+{
     if(exchange.request.has("Sec-WebSocket-Extensions")) {
         // TODO: support these
         // http://tools.ietf.org/html/draft-tyoshino-hybi-websocket-perframe-deflate-05
@@ -259,13 +270,15 @@ void WebSocketRouteHandler::handleExtensions(ServerExchange& exchange) {
     }
 }
 
-void WebSocketRouteHandler::processFrameQueue(Poco::Net::WebSocket& ws) {
+//------------------------------------------------------------------------------
+void WebSocketRouteHandler::processFrameQueue(Poco::Net::WebSocket& ws)
+{
     int numBytesSent = 0;
     
-    ofScopedLock lock(mutex);
-    while(!frameQueue.empty()) {
-        WebSocketFrame frame = frameQueue.front();
-        frameQueue.pop();
+    ofScopedLock lock(_mutex);
+    while(!_frameQueue.empty()) {
+        WebSocketFrame frame = _frameQueue.front();
+        _frameQueue.pop();
         
         if(frame.size() > 0) {
             if(ws.poll(settings.pollTimeout, Poco::Net::Socket::SELECT_WRITE)) {
@@ -293,5 +306,26 @@ void WebSocketRouteHandler::processFrameQueue(Poco::Net::WebSocket& ws) {
     }
 }
 
+//------------------------------------------------------------------------------
+void WebSocketRouteHandler::applyFirefoxHack(Poco::Net::HTTPServerRequest& request)
+{
+    // HACK FOR FIREFOX
+    // require websocket upgrade headers
+    std::string connectionHeader = Poco::toLower(request.get("Connection", ""));
+    if(Poco::icompare(connectionHeader, "Upgrade") != 0) {
+        std::string userAgent = Poco::toLower(request.get("User-Agent",""));
+        if(!userAgent.empty() &&
+           !connectionHeader.empty() &&
+           ofIsStringInString(userAgent,"firefox") &&
+           ofIsStringInString(connectionHeader,"upgrade")) {
+            // this request is coming from firefox, which is known to send things that look like:
+            // Connection:keep-alive, Upgrade
+            // thus failing the standard Poco upgrade test.
+            // we can't do this here, but will do a similar hack in the handler
+            request.set("Connection","Upgrade");
+        }
+    }
+}
 
-} } 
+
+} }

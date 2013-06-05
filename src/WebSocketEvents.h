@@ -68,11 +68,10 @@ enum WebSocketError {
 class WebSocketEventArgs {
 public:
     WebSocketEventArgs(WebSocketRouteHandler& connection,
-                       WebSocketError error = WS_ERR_NONE)
-    : _connection(connection)
-    , _error(error)
+                       WebSocketError error = WS_ERR_NONE) :
+    _connection(connection),
+    _error(error)
     {
-
     }
     
     bool hasError() const
@@ -105,11 +104,10 @@ class WebSocketFrameEventArgs : public WebSocketEventArgs {
 public:
     WebSocketFrameEventArgs(WebSocketRouteHandler& connection,
                             WebSocketFrame& frame,
-                            WebSocketError error = WS_ERR_NONE)
-    : WebSocketEventArgs(connection,error)
-    , _frame(frame)
+                            WebSocketError error = WS_ERR_NONE) :
+    WebSocketEventArgs(connection,error),
+    _frame(frame)
     {
-
     }
 
     WebSocketFrame& getFrameRef()

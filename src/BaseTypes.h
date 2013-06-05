@@ -44,6 +44,12 @@ namespace ofx {
 namespace HTTP {
 
 
+using Poco::Net::HTTPRequestHandlerFactory;
+using Poco::Net::HTTPRequestHandler;
+using Poco::Net::HTTPServerRequest;
+using Poco::Net::HTTPServerResponse;
+
+
 class BaseRouteSettings {
 public:
     BaseRouteSettings(const std::string& route) : _route(route)
@@ -70,7 +76,7 @@ protected:
 };
 
 
-class BaseServerRoute : public Poco::Net::HTTPRequestHandlerFactory {
+class BaseServerRoute : public HTTPRequestHandlerFactory {
 public:
     typedef ofPtr<BaseServerRoute> Ptr;
     
@@ -82,7 +88,7 @@ public:
     {
     }
     
-    virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
+    virtual bool canHandleRequest(const HTTPServerRequest& request,
                                   bool bIsSecurePort) = 0;
     
 //    virtual string getRoute() const = 0;
@@ -99,17 +105,17 @@ public:
     {
     }
     
-    // checkes the request for the correct authentication headers
-    virtual Authentication::Status authenticate(Poco::Net::HTTPServerRequest& request) = 0;
+    // checks the request for the correct authentication headers
+    virtual Authentication::Status authenticate(HTTPServerRequest& request) = 0;
     
     // writes the required authentication headers to the response
-    virtual void setAuthenticationRequiredHeaders(Poco::Net::HTTPServerResponse& response)   = 0;
+    virtual void setAuthenticationRequiredHeaders(HTTPServerResponse& response)   = 0;
     
 };
 
 class BaseServerBasicAuthenticationManager : public BaseServerAuthenticationManager {
 public:
-    BaseServerBasicAuthenticationManager(const string& realm) : _realm(realm)
+    BaseServerBasicAuthenticationManager(const std::string& realm) : _realm(realm)
     {
     }
 
@@ -117,7 +123,7 @@ public:
     {
     }
     
-    Authentication::Status authenticate(Poco::Net::HTTPServerRequest& request)
+    Authentication::Status authenticate(HTTPServerRequest& request)
     {
         if(request.hasCredentials()) {
             if(Poco::Net::HTTPCredentials::hasBasicCredentials(request)) {
@@ -160,7 +166,7 @@ protected:
 
     virtual bool checkCredentials(const Credentials& credentials) = 0;
     
-    void setAuthenticationRequiredHeaders(Poco::Net::HTTPServerResponse& response) {
+    void setAuthenticationRequiredHeaders(HTTPServerResponse& response) {
         // similar to response.requireAuthentication(realm),
         // but we want to send our own content after the
         // headers have been sent.
@@ -181,8 +187,8 @@ public:
     {
     }
 
-    virtual bool update(Poco::Net::HTTPServerRequest& request,
-                        Poco::Net::HTTPServerResponse& response) = 0;
+    virtual bool update(HTTPServerRequest& request,
+                        HTTPServerResponse& response) = 0;
 };
 
 class BaseResponseStreamConsumer {

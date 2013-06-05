@@ -38,9 +38,9 @@ namespace HTTP {
 
 
 //------------------------------------------------------------------------------
-class WebSocketRoute
-: public BaseServerRoute
-, public BaseWebSocketSessionManager
+class WebSocketRoute :
+    public BaseServerRoute,
+    public BaseWebSocketSessionManager
 {
 public:
     typedef WebSocketRouteHandler::Settings Settings;
@@ -50,10 +50,10 @@ public:
 
     virtual ~WebSocketRoute();
 
-    bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
+    bool canHandleRequest(const HTTPServerRequest& request,
                           bool bIsSecurePort);
 
-    Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
+    HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request);
 
     virtual std::string getRoute() const
     {

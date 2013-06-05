@@ -31,6 +31,9 @@
 #include "ServerRouteHandler.h"
 
 
+using Poco::Net::HTTPServerRequest;
+using Poco::Net::HTTPRequestHandler;
+
 namespace ofx {
 namespace HTTP {
 
@@ -38,41 +41,16 @@ namespace HTTP {
 //------------------------------------------------------------------------------
 class ServerRouteManager : public Poco::Net::HTTPRequestHandlerFactory {
 public:
+    typedef std::vector<BaseServerRoute::Ptr> RouteFactories;
     
-    ServerRouteManager(std::vector<BaseServerRoute::Ptr>& factories,
-                       bool bIsSecurePort)
-    : _factories(factories)
-    , _bIsSecurePort(bIsSecurePort)
-    {
+    ServerRouteManager(RouteFactories& factories, bool bIsSecurePort);
 
-    }
-    
-    virtual ~ServerRouteManager()
-    {
+    virtual ~ServerRouteManager();
 
-    }
-
-    Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request) {
-
-        // We start with the last factory that was added.
-        // Thus, factories with overlapping routes should be
-        // carefully ordered.
-        
-        std::vector<BaseServerRoute::Ptr>::reverse_iterator iter = _factories.rbegin();
-
-        while(iter != _factories.rend()) {
-            if((*iter)->canHandleRequest(request,_bIsSecurePort)) {
-                return (*iter)->createRequestHandler(request);
-            }
-            ++iter;
-        }
-
-        // if we get to this point, we didn't find a matching route
-        return new BaseServerRouteHandler(BaseRouteSettings("/.*"));
-    }
+    HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request);
     
 protected:
-    std::vector<BaseServerRoute::Ptr>& _factories;
+    RouteFactories& _factories;
     bool _bIsSecurePort; // TODO: can we get this from the HTTPServerRequest somehow?
 
 };

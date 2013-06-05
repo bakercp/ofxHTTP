@@ -48,12 +48,11 @@ namespace HTTP {
 
 class ResponseStream : public Poco::RefCountedObject {
 public:
-        
     typedef Poco::AutoPtr<ResponseStream> Ptr;
     
-    ResponseStream(Poco::Net::HTTPResponse& _pResponse,
-                   Poco::Net::HTTPResponseStream* _responseStream,
-                   Poco::Exception* _exception = NULL);
+    ResponseStream(Poco::Net::HTTPResponse& pResponse,
+                   Poco::Net::HTTPResponseStream* responseStream,
+                   Poco::Exception* exception = NULL);
 
     virtual ~ResponseStream();
 
@@ -80,28 +79,27 @@ public:
     int getFieldLimit() const;
     
 protected:
+    Poco::Exception* _exception;
     
-    Poco::Exception* exception;
+    Poco::Net::HTTPResponseStream* _httpResponseStream;
+    std::streamsize _contentLength;
     
-    Poco::Net::HTTPResponseStream* httpResponseStream;
-    std::streamsize contentLength;
+    std::string _version;
+    Poco::Net::HTTPResponse::HTTPStatus _status;
+    std::string _reason;
     
-    std::string version;
-    Poco::Net::HTTPResponse::HTTPStatus status;
-    std::string reason;
+    std::vector<Poco::Net::HTTPCookie> _cookies;
     
-    std::vector<Poco::Net::HTTPCookie> cookies;
+    Poco::Timestamp _date;
     
-    Poco::Timestamp date;
+    bool _bIsKeepAlive;
     
-    bool bIsKeepAlive;
+    std::string _contentType;
+    std::string _transferEncoding;
+    bool        _bChunkedTransferEncoding;
     
-    std::string contentType;
-    std::string transferEncoding;
-    bool   bChunkedTransferEncoding;
-    
-    Poco::Net::NameValueCollection headers;
-    int fieldLimit;
+    Poco::Net::NameValueCollection _headers;
+    int _fieldLimit;
 
 };
 

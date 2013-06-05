@@ -31,103 +31,116 @@ namespace HTTP {
         
 
 //------------------------------------------------------------------------------
-ResponseStream::ResponseStream(Poco::Net::HTTPResponse& _pResponse,
-                               Poco::Net::HTTPResponseStream* _responseStream,
-                               Poco::Exception* _exception)
-: httpResponseStream(_responseStream)
-, contentLength(_pResponse.getContentLength())
-, version(_pResponse.getVersion())
-, status(_pResponse.getStatus())
-, reason(_pResponse.getReason())
-, bIsKeepAlive(_pResponse.getKeepAlive())
-, contentType(_pResponse.getContentType())
-, transferEncoding(_pResponse.getTransferEncoding())
-, bChunkedTransferEncoding(_pResponse.getChunkedTransferEncoding())
-, headers(_pResponse)
-, fieldLimit(_pResponse.getFieldLimit())
-, exception(_exception)
+ResponseStream::ResponseStream(Poco::Net::HTTPResponse&       pResponse,
+                               Poco::Net::HTTPResponseStream* responseStream,
+                               Poco::Exception*               exception) :
+    _httpResponseStream(responseStream),
+    _contentLength(pResponse.getContentLength()),
+    _version(pResponse.getVersion()),
+    _status(pResponse.getStatus()),
+    _reason(pResponse.getReason()),
+    _bIsKeepAlive(pResponse.getKeepAlive()),
+    _contentType(pResponse.getContentType()),
+    _transferEncoding(pResponse.getTransferEncoding()),
+    _bChunkedTransferEncoding(pResponse.getChunkedTransferEncoding()),
+    _headers(pResponse),
+    _fieldLimit(pResponse.getFieldLimit()),
+    _exception(exception)
 {
-    _pResponse.getCookies(cookies);
-    
+    // fill cookies
+    pResponse.getCookies(_cookies);
     // date(_pResponse.getDate()),
-
-    
 }
 
 //------------------------------------------------------------------------------
-ResponseStream::~ResponseStream() {
+ResponseStream::~ResponseStream()
+{
     // deleting a null pointer is a noop
-    delete httpResponseStream; // cleans up the stream and the backing session
-    delete exception;
+    delete _httpResponseStream; // cleans up the stream and the backing session
+    delete _exception;
 }
 
 //------------------------------------------------------------------------------
-Poco::Net::HTTPResponse::HTTPStatus ResponseStream::getStatus() const {
-    return status;
+Poco::Net::HTTPResponse::HTTPStatus ResponseStream::getStatus() const
+{
+    return _status;
 }
 
 //------------------------------------------------------------------------------
-string ResponseStream::getReasonForStatus() const {
-    return reason;
+std::string ResponseStream::getReasonForStatus() const
+{
+    return _reason;
 }
 
 //------------------------------------------------------------------------------
-vector<Poco::Net::HTTPCookie> ResponseStream::getCookies() const {
-    return cookies;
+vector<Poco::Net::HTTPCookie> ResponseStream::getCookies() const
+{
+    return _cookies;
 }
 
 //------------------------------------------------------------------------------
-string ResponseStream::getVersion() const {
-    return version;
+std::string ResponseStream::getVersion() const
+{
+    return _version;
 }
 
 //------------------------------------------------------------------------------
 bool ResponseStream::getKeepAlive() const {
-    return bIsKeepAlive;
+    return _bIsKeepAlive;
 }
 
 //------------------------------------------------------------------------------
-string ResponseStream::getContentType() const {
-    return contentType;
-}
-//------------------------------------------------------------------------------
-string ResponseStream::getTransferEncoding() const {
-    return transferEncoding;
-}
-
-//------------------------------------------------------------------------------
-bool ResponseStream::getChunkedTransferEncoding() const {
-    return bChunkedTransferEncoding;
-}
-
-//------------------------------------------------------------------------------
-bool ResponseStream::hasResponseStream() const {
-    return httpResponseStream != NULL;
-}
-
-//------------------------------------------------------------------------------
-bool ResponseStream::hasException() const {
-    return exception != NULL;
-}
-
-//------------------------------------------------------------------------------
-Poco::Exception* ResponseStream::getException() const {
-    return exception;
-}
-
-//------------------------------------------------------------------------------
-istream* ResponseStream::getResponseStream() const {
-    return httpResponseStream;
-}
-
-//------------------------------------------------------------------------------
-Poco::Net::NameValueCollection ResponseStream::getHeaders() const {
-    return headers;
+std::string ResponseStream::getContentType() const
+{
+    return _contentType;
 }
     
 //------------------------------------------------------------------------------
-int ResponseStream::getFieldLimit() const {
-    return fieldLimit;
+std::string ResponseStream::getTransferEncoding() const
+{
+    return _transferEncoding;
+}
+
+//------------------------------------------------------------------------------
+bool ResponseStream::getChunkedTransferEncoding() const
+{
+    return _bChunkedTransferEncoding;
+}
+
+//------------------------------------------------------------------------------
+bool ResponseStream::hasResponseStream() const
+{
+    return _httpResponseStream != NULL;
+}
+
+//------------------------------------------------------------------------------
+bool ResponseStream::hasException() const
+{
+    return _exception != NULL;
+}
+
+//------------------------------------------------------------------------------
+Poco::Exception* ResponseStream::getException() const
+{
+    return _exception;
+}
+
+//------------------------------------------------------------------------------
+std::istream* ResponseStream::getResponseStream() const
+{
+    return _httpResponseStream;
+}
+
+//------------------------------------------------------------------------------
+Poco::Net::NameValueCollection ResponseStream::getHeaders() const
+{
+    return _headers;
+}
+    
+//------------------------------------------------------------------------------
+int ResponseStream::getFieldLimit() const
+{
+    return _fieldLimit;
 }
 
     

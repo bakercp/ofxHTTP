@@ -33,7 +33,6 @@ namespace HTTP {
 //------------------------------------------------------------------------------
 CookieStore::CookieStore()
 {
-
 }
 
 //------------------------------------------------------------------------------
@@ -55,24 +54,23 @@ CookieStore& CookieStore::operator = (CookieStore& that)
 //------------------------------------------------------------------------------
 CookieStore::~CookieStore()
 {
-
 }
 
 //------------------------------------------------------------------------------
-vector<Cookie> CookieStore::getCookesForURI(const Poco::URI& uri,
-                                            bool matchSessionCookes)
+std::vector<Cookie> CookieStore::getCookesForURI(const Poco::URI& uri,
+                                                 bool bMatchSessionCookes) const
 {
     // TODO: this needs to be a bit more sophisticated
     // http://stackoverflow.com/questions/4056306/how-to-handle-multiple-cookies-with-the-same-name
     
     ofScopedLock lock(mutex);
     
-    vector<Cookie> matchingCookies;
+    std::vector<Cookie> matchingCookies;
     
-    vector<Cookie>::const_iterator iter = cookies.begin();
+    std::vector<Cookie>::const_iterator iter = cookies.begin();
     while(iter != cookies.end()) {
         Cookie cookie = (*iter);
-        if(cookie.matchesURI(uri,matchSessionCookes)) {
+        if(cookie.matchesURI(uri,bMatchSessionCookes)) {
             matchingCookies.push_back(cookie);
         }
         ++iter;
@@ -98,12 +96,12 @@ void CookieStore::store(const Poco::Net::HTTPResponse& response)
 
 //------------------------------------------------------------------------------
 void CookieStore::addCookie(const std::string& name,
-                                   const string& value,
-                                   bool isValueEscaped)
+                            const std::string& value,
+                            bool bIsValueEscaped)
 {
     std::string escapedValue = value;
     
-    if(!isValueEscaped) {
+    if(!bIsValueEscaped) {
         escapedValue = Poco::Net::HTTPCookie::escape(value);
     }
 
@@ -130,7 +128,7 @@ void CookieStore::addCookieWithExistingLock(const Cookie& cookie)
    
     // did clear needed? 
     //bool didClear = false; 
-    vector<Cookie>::iterator iter = cookies.begin();
+    std::vector<Cookie>::iterator iter = cookies.begin();
     while(iter != cookies.end()) {
         if((*iter).matches(cookie)) {
             iter = cookies.erase(iter);
@@ -151,7 +149,7 @@ bool CookieStore::clearExpired(unsigned long long expiredAt)
     ofScopedLock lock(mutex);
 
     bool didClear = false;
-    vector<Cookie>::iterator iter = cookies.begin();
+    std::vector<Cookie>::iterator iter = cookies.begin();
     while(iter != cookies.end()) {
         Cookie cookie = (*iter);
         if(cookie.isExpired(expiredAt)) {
@@ -170,7 +168,7 @@ bool CookieStore::clearCookiesWithName(const string& name)
     ofScopedLock lock(mutex);
     
     bool didClear = false;
-    vector<Cookie>::iterator iter = cookies.begin();
+    std::vector<Cookie>::iterator iter = cookies.begin();
     while(iter != cookies.end()) {
         Cookie cookie = (*iter);
         if(cookie.getCookie().getName() == name) {
@@ -189,7 +187,7 @@ bool CookieStore::clearCookiesWithDomain(const string& domain)
     ofScopedLock lock(mutex);
     
     bool didClear = false;
-    vector<Cookie>::iterator iter = cookies.begin();
+    std::vector<Cookie>::iterator iter = cookies.begin();
     while(iter != cookies.end()) {
         Cookie cookie = (*iter);
         if(cookie.getCookie().getDomain() == domain) {
@@ -208,7 +206,7 @@ bool CookieStore::clearCookiesWithPath(const string& path)
     ofScopedLock lock(mutex);
     
     bool didClear = false;
-    vector<Cookie>::iterator iter = cookies.begin();
+    std::vector<Cookie>::iterator iter = cookies.begin();
     while(iter != cookies.end()) {
         Cookie cookie = (*iter);
         if(cookie.getCookie().getPath() == path) {
@@ -224,7 +222,6 @@ bool CookieStore::clearCookiesWithPath(const string& path)
 //------------------------------------------------------------------------------
 void CookieStore::clear() {
     ofScopedLock lock(mutex);
-
     cookies.clear();
 }
 

@@ -48,20 +48,18 @@ namespace HTTP {
 
 class ServerUploadRouteSettings : public BaseRouteSettings {
 public:
-    ServerUploadRouteSettings(const string& route = "/upload")
-    : BaseRouteSettings(route)
-    , bRequireUploadFolderInDataFolder(true)
-    , uploadFolder("uploads")
-    , bAutoCreateUploadFolder(false)
-    , uploadRedirect("uploaded.html")
-    , writeBufferSize(8192)
+    ServerUploadRouteSettings(const string& route = "/upload") :
+        BaseRouteSettings(route),
+        bRequireUploadFolderInDataFolder(true),
+        uploadFolder("uploads"),
+        bAutoCreateUploadFolder(false),
+        uploadRedirect("uploaded.html"),
+        writeBufferSize(8192)
     {
-
     }
 
     virtual ~ServerUploadRouteSettings()
     {
-
     }
     
     bool        bRequireUploadFolderInDataFolder;
@@ -73,15 +71,14 @@ public:
 };
 
 //------------------------------------------------------------------------------
-class ServerUploadRouteHandler
-: public BaseServerRouteHandler
-, public Poco::Net::PartHandler
-{
+class ServerUploadRouteHandler :
+    public BaseServerRouteHandler,
+    public Poco::Net::PartHandler {
 public:
     
     typedef ServerUploadRouteSettings Settings;
     
-    ServerUploadRouteHandler(const Settings& _settings);
+    ServerUploadRouteHandler(const Settings& settings);
     virtual ~ServerUploadRouteHandler();
     
     void handleRequest(Poco::Net::HTTPServerRequest& request,
@@ -90,10 +87,10 @@ public:
     void handlePart(const Poco::Net::MessageHeader& header,
                     std::istream& stream);
 
-    virtual bool isContentTypeValid(const string& contentType) const;
-    
+    virtual bool isContentTypeValid(const std::string& contentType) const;
+
 protected:
-    Settings settings;
+    Settings _settings;
     
 };
 

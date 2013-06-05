@@ -54,20 +54,30 @@ public:
 
     virtual ~CookieStore();
     
-    std::vector<Cookie> getCookesForURI(const Poco::URI& uri, bool matchSessionCookes = true);
+    std::vector<Cookie> getCookesForURI(const Poco::URI& uri,
+                                        bool matchSessionCookes = true) const;
     
     void store(const Poco::Net::HTTPResponse& response);
 
-    void addCookie(const string& name, const string& value = "", bool isValueEscaped = false);
+    void addCookie(const string& name,
+                   const string& value = "",
+                   bool bIsValueEscaped = false);
+
     void addCookie(const Poco::Net::HTTPCookie& cookie);
+
     void addCookie(const Cookie& cookie);
     
     void addCookies(const std::vector<Poco::Net::HTTPCookie>& cookies);
 
+
     bool clearCookiesWithName(const std::string& name);
+
     bool clearCookiesWithDomain(const std::string& domain);
+
     bool clearCookiesWithPath(const std::string& path);
+
     bool clearExpired(unsigned long long expiredAt = ofGetSystemTime());
+
     void clear();
 
     void dump();
@@ -79,7 +89,7 @@ private:
     CookieStore(const CookieStore& that);
 	CookieStore& operator = (const CookieStore& that);
 
-    Poco::FastMutex mutex;
+    mutable Poco::FastMutex mutex;
     
     std::vector<Cookie> cookies;
     

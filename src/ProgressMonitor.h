@@ -36,33 +36,32 @@ namespace HTTP {
 
 class ProgressMonitor {
 public:
-    
     ProgressMonitor();
     virtual ~ProgressMonitor();
     
-    void update(std::streamsize _totalBytesTransferred,
-                std::streamsize _totalBytes,
-                size_t _transferBufferSize,
-                unsigned long long _lastUpdate);
+    void update(std::streamsize totalBytesTransferred,
+                std::streamsize totalBytes,
+                size_t transferBufferSize,
+                unsigned long long lastUpdate);
 
-    std::streamsize getTotalBytesTranferred();
-    std::streamsize getTotalBytes();
+    std::streamsize getTotalBytesTranferred() const;
+    std::streamsize getTotalBytes() const;
     
-    float getPercentageTransferred();
+    float getPercentageTransferred() const;
     
-    size_t getTransferBufferSize();
+    size_t getTransferBufferSize() const;
 
     void reset();
     
 private:
-    std::streamsize totalBytesTransferred;
-    std::streamsize totalBytes;
-    size_t transferBufferSize;
+    std::streamsize _totalBytesTransferred;
+    std::streamsize _totalBytes;
+    size_t _transferBufferSize;
 
-    unsigned long long lastUpdateTime;
-    float bytesPerSecond;
+    unsigned long long _lastUpdateTime;
+    float _bytesPerSecond;
 
-    Poco::FastMutex mutex;
+    mutable Poco::FastMutex _mutex;
 
 };
 

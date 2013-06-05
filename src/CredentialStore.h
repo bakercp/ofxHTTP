@@ -61,9 +61,12 @@ public:
 
     virtual ~CredentialStore();
 
-    bool hasCredentials(const AuthScope& targetScope);
+    bool hasCredentials(const AuthScope& targetScope) const;
     
-    bool getCredentials(const AuthScope& targetScope, AuthScope& matchingScope, Credentials& matchingCredentials);
+    bool getCredentials(const AuthScope& targetScope,
+                        AuthScope& matchingScope,
+                        Credentials& matchingCredentials) const;
+
     void setCredentials(const AuthScope& scope, const Credentials& credentials);
     
     void setCredentialsFromURI(const Poco::URI& uri);
@@ -75,6 +78,7 @@ public:
     
     bool authenticate(const Poco::Net::HTTPClientSession& pSession,
                       Poco::Net::HTTPRequest& pRequest);
+    
     bool authenticate(const Poco::Net::HTTPClientSession& pSession,
                       Poco::Net::HTTPRequest& pRequest,
                       Poco::Net::HTTPResponse& pResponse);
@@ -82,9 +86,12 @@ public:
     void clear();
 
 protected:
-    bool authenticateWithCache(const AuthScope& scope, Poco::Net::HTTPRequest& pRequest);
+    bool authenticateWithCache(const AuthScope& scope,
+                               Poco::Net::HTTPRequest& pRequest);
     // get credentials, with mutex already locked
-    bool getCredentialsWithExistingLock(const AuthScope& targetScope, AuthScope& matchingScope, Credentials& matchingCredentials);
+    bool getCredentialsWithExistingLock(const AuthScope& targetScope,
+                                        AuthScope& matchingScope,
+                                        Credentials& matchingCredentials) const;
     
 private:
     CredentialStore(const CredentialStore& c);
@@ -94,15 +101,15 @@ private:
     typedef map<AuthScope, HTTPBasicCredentialsPtr>  BasicCredentialCacheMap;
     typedef map<AuthScope, HTTPDigestCredentialsPtr> DigestCredentialCacheMap;
 
-    typedef CredentialMap::const_iterator      ofxHTTPCredentialMapIter;
-    typedef BasicCredentialCacheMap::iterator  ofxHTTPBasicCredentialCacheMapIter;
-    typedef DigestCredentialCacheMap::iterator ofxHTTPDigestCredentialCacheMapIter;
+    typedef CredentialMap::const_iterator      HTTPCredentialMapIter;
+    typedef BasicCredentialCacheMap::iterator  HTTPBasicCredentialCacheMapIter;
+    typedef DigestCredentialCacheMap::iterator HTTPDigestCredentialCacheMapIter;
 
     CredentialMap            credentialMap;
     BasicCredentialCacheMap  basicCredentialCacheMap;
     DigestCredentialCacheMap digestCredentialCacheMap;
 
-    ofMutex mutex;
+    mutable ofMutex mutex;
     
 };
 

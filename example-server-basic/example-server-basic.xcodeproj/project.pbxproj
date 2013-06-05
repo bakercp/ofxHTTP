@@ -42,7 +42,6 @@
 		FD018D3E175F04D4004CC4B6 /* Post.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D0B175F04D4004CC4B6 /* Post.cpp */; };
 		FD018D3F175F04D4004CC4B6 /* Put.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D0D175F04D4004CC4B6 /* Put.cpp */; };
 		FD018D40175F04D4004CC4B6 /* ResponseStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D0F175F04D4004CC4B6 /* ResponseStream.cpp */; };
-		FD018D41175F04D4004CC4B6 /* Route.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D11175F04D4004CC4B6 /* Route.cpp */; };
 		FD018D42175F04D4004CC4B6 /* Server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D13175F04D4004CC4B6 /* Server.cpp */; };
 		FD018D43175F04D4004CC4B6 /* BasicServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D15175F04D4004CC4B6 /* BasicServer.cpp */; };
 		FD018D44175F04D4004CC4B6 /* ServerDefaultRouteHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D1A175F04D4004CC4B6 /* ServerDefaultRouteHandler.cpp */; };
@@ -56,6 +55,8 @@
 		FD018D4C175F04D4004CC4B6 /* WebSocketRouteHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D2F175F04D4004CC4B6 /* WebSocketRouteHandler.cpp */; };
 		FD018D53175F052F004CC4B6 /* MediaTypeMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D51175F052F004CC4B6 /* MediaTypeMap.cpp */; };
 		FD018D55175F8CD1004CC4B6 /* ProxySettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D54175F8CD0004CC4B6 /* ProxySettings.cpp */; };
+		FD018D57175FC914004CC4B6 /* ServerRouteManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D56175FC90F004CC4B6 /* ServerRouteManager.cpp */; };
+		FD018D59175FCA9A004CC4B6 /* ServerUploadRoute.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D58175FCA95004CC4B6 /* ServerUploadRoute.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -149,8 +150,6 @@
 		FD018D0E175F04D4004CC4B6 /* Put.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Put.h; sourceTree = "<group>"; };
 		FD018D0F175F04D4004CC4B6 /* ResponseStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ResponseStream.cpp; sourceTree = "<group>"; };
 		FD018D10175F04D4004CC4B6 /* ResponseStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResponseStream.h; sourceTree = "<group>"; };
-		FD018D11175F04D4004CC4B6 /* Route.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Route.cpp; sourceTree = "<group>"; };
-		FD018D12175F04D4004CC4B6 /* Route.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Route.h; sourceTree = "<group>"; };
 		FD018D13175F04D4004CC4B6 /* Server.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Server.cpp; sourceTree = "<group>"; };
 		FD018D14175F04D4004CC4B6 /* Server.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Server.h; sourceTree = "<group>"; };
 		FD018D15175F04D4004CC4B6 /* BasicServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BasicServer.cpp; sourceTree = "<group>"; };
@@ -187,6 +186,8 @@
 		FD018D51175F052F004CC4B6 /* MediaTypeMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MediaTypeMap.cpp; sourceTree = "<group>"; };
 		FD018D52175F052F004CC4B6 /* MediaTypeMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaTypeMap.h; sourceTree = "<group>"; };
 		FD018D54175F8CD0004CC4B6 /* ProxySettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ProxySettings.cpp; sourceTree = "<group>"; };
+		FD018D56175FC90F004CC4B6 /* ServerRouteManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ServerRouteManager.cpp; sourceTree = "<group>"; };
+		FD018D58175FCA95004CC4B6 /* ServerUploadRoute.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ServerUploadRoute.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -346,8 +347,6 @@
 				FD018D06175F04D4004CC4B6 /* Request */,
 				FD018D0F175F04D4004CC4B6 /* ResponseStream.cpp */,
 				FD018D10175F04D4004CC4B6 /* ResponseStream.h */,
-				FD018D11175F04D4004CC4B6 /* Route.cpp */,
-				FD018D12175F04D4004CC4B6 /* Route.h */,
 				FD018D13175F04D4004CC4B6 /* Server.cpp */,
 				FD018D14175F04D4004CC4B6 /* Server.h */,
 				FD018D15175F04D4004CC4B6 /* BasicServer.cpp */,
@@ -362,7 +361,9 @@
 				FD018D1E175F04D4004CC4B6 /* ServerRouteHandler.cpp */,
 				FD018D1F175F04D4004CC4B6 /* ServerRouteHandler.h */,
 				FD018D20175F04D4004CC4B6 /* ServerRouteManager.h */,
+				FD018D56175FC90F004CC4B6 /* ServerRouteManager.cpp */,
 				FD018D21175F04D4004CC4B6 /* ServerUploadRoute.h */,
+				FD018D58175FCA95004CC4B6 /* ServerUploadRoute.cpp */,
 				FD018D22175F04D4004CC4B6 /* ServerUploadRouteHandler.cpp */,
 				FD018D23175F04D4004CC4B6 /* ServerUploadRouteHandler.h */,
 				FD018D24175F04D4004CC4B6 /* SessionSettings.cpp */,
@@ -520,7 +521,6 @@
 				FD018D3E175F04D4004CC4B6 /* Post.cpp in Sources */,
 				FD018D3F175F04D4004CC4B6 /* Put.cpp in Sources */,
 				FD018D40175F04D4004CC4B6 /* ResponseStream.cpp in Sources */,
-				FD018D41175F04D4004CC4B6 /* Route.cpp in Sources */,
 				FD018D42175F04D4004CC4B6 /* Server.cpp in Sources */,
 				FD018D43175F04D4004CC4B6 /* BasicServer.cpp in Sources */,
 				FD018D44175F04D4004CC4B6 /* ServerDefaultRouteHandler.cpp in Sources */,
@@ -534,6 +534,8 @@
 				FD018D4C175F04D4004CC4B6 /* WebSocketRouteHandler.cpp in Sources */,
 				FD018D53175F052F004CC4B6 /* MediaTypeMap.cpp in Sources */,
 				FD018D55175F8CD1004CC4B6 /* ProxySettings.cpp in Sources */,
+				FD018D57175FC914004CC4B6 /* ServerRouteManager.cpp in Sources */,
+				FD018D59175FCA9A004CC4B6 /* ServerUploadRoute.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

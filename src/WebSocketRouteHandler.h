@@ -47,25 +47,23 @@ namespace HTTP {
 
 class WebSocketRouteSettings : public BaseRouteSettings {
 public:
-    WebSocketRouteSettings(const std::string& _route = "/")
-    : BaseRouteSettings(_route)
-    , subprotocol("")
-    , bAutoPingPongResponse(true)
-    , bKeepAlive(true)
-    , bAllowEmptySubprotocol(false)
-    , bAllowCrossOriginConnections(false)
-    , bIsBinary(false)
-    , receiveTimeout(Poco::Timespan(60 * Poco::Timespan::SECONDS))
-    , sendTimeout(Poco::Timespan(60 * Poco::Timespan::SECONDS))
-    , pollTimeout(Poco::Timespan(10 * Poco::Timespan::MILLISECONDS))
-    , bufferSize(1024)
+    WebSocketRouteSettings(const std::string& _route = "/") :
+        BaseRouteSettings(_route),
+        subprotocol(""),
+        bAutoPingPongResponse(true),
+        bKeepAlive(true),
+        bAllowEmptySubprotocol(false),
+        bAllowCrossOriginConnections(false),
+        bIsBinary(false),
+        receiveTimeout(Poco::Timespan(60 * Poco::Timespan::SECONDS)),
+        sendTimeout(Poco::Timespan(60 * Poco::Timespan::SECONDS)),
+        pollTimeout(Poco::Timespan(10 * Poco::Timespan::MILLISECONDS)),
+        bufferSize(1024)
     {
-
     }
     
     virtual ~WebSocketRouteSettings()
     {
-
     }
     
     std::string subprotocol;
@@ -78,9 +76,9 @@ public:
     bool bAutoPingPongResponse; // automatically return pong frames if true
     bool bKeepAlive;
     
-    Poco::Timespan receiveTimeout; // remember that timespan uses microseconds
-    Poco::Timespan sendTimeout;    // remember that timespan uses microseconds
-    Poco::Timespan pollTimeout;    // remember that timespan uses microseconds
+    Poco::Timespan receiveTimeout;
+    Poco::Timespan sendTimeout;
+    Poco::Timespan pollTimeout;
     
     size_t bufferSize;
     
@@ -100,7 +98,7 @@ public:
 
     virtual void handleExchange(ServerExchange& exchange);
     
-    bool sendFrame(const WebSocketFrame& _frame); // returns false if frame not queued
+    bool sendFrame(const WebSocketFrame& frame); // returns false if frame not queued
     void disconnect();
 
     virtual void frameReceived(const WebSocketFrame& frame);
@@ -116,7 +114,7 @@ public:
     void   clearSendQueue();
     
 protected:
-    void setIsConnected(bool _bIsConnected);
+    void setIsConnected(bool bIsConnected);
     
     Settings settings;
 
@@ -130,31 +128,12 @@ private:
     void processFrameQueue(Poco::Net::WebSocket& ws);
     
     // this is all fixed in Poco 1.4.6 and 1.5.+
-    void applyFirefoxHack(Poco::Net::HTTPServerRequest& _request) {
-        // HACK FOR FIREFOX
-        // require websocket upgrade headers
-        std::string connectionHeader = Poco::toLower(_request.get("Connection", ""));
-        if(Poco::icompare(connectionHeader, "Upgrade") != 0) {
-            std::string userAgent = Poco::toLower(_request.get("User-Agent",""));
-            if(!userAgent.empty() &&
-               !connectionHeader.empty() &&
-               ofIsStringInString(userAgent,"firefox") &&
-               ofIsStringInString(connectionHeader,"upgrade")) {
-                // this request is coming from firefox, which is known to send things that look like:
-                // Connection:keep-alive, Upgrade
-                // thus failing the standard Poco upgrade test.
-                // we can't do this here, but will do a similar hack in the handler
-                _request.set("Connection","Upgrade");
-            }
-        }
-    }
+    void applyFirefoxHack(Poco::Net::HTTPServerRequest& _request);
 
-
-    mutable ofMutex mutex;
+    mutable ofMutex _mutex;
     bool _bIsConnected;
-    std::queue<WebSocketFrame> frameQueue;
-    
-    
+    std::queue<WebSocketFrame> _frameQueue;
+
 };
 
 

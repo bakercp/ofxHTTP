@@ -35,16 +35,28 @@ namespace HTTP {
 
 class StreamUtils {
 public:
+    static std::streamsize consume(ResponseStream* responseStream,
+                                   size_t bufferSize = 8192);
+
+    static std::streamsize consume(std::istream& istr,
+                                   size_t bufferSize = 8192);
     
-    static std::streamsize consume(ResponseStream* responseStream, size_t bufferSize = 8192);
-    static std::streamsize consume(istream& istr, size_t bufferSize = 8192);
+    static std::streamsize copyToString(ResponseStream* responseStream,
+                                        std::string& str,
+                                        size_t bufferSize = 8192);
+
+    static std::streamsize copyToString(std::istream& istr,
+                                        std::string& str,
+                                        size_t bufferSize = 8192);
     
-    static std::streamsize copyToString(ResponseStream* responseStream, string& str, size_t bufferSize = 8192);
-    static std::streamsize copyToString(istream& istr, string& str, size_t bufferSize = 8192);
-    
-    static std::streamsize copyTo(ResponseStream* responseStream, ostream& ostr, size_t bufferSize = 8192);
-    static std::streamsize copyTo(istream& istr, ostream& ostr, size_t bufferSize = 8192);
-    
+    static std::streamsize copyTo(ResponseStream* responseStream,
+                                  std::ostream& ostr,
+                                  size_t bufferSize = 8192);
+
+    static std::streamsize copyTo(std::istream& istr,
+                                  std::ostream& ostr,
+                                  size_t bufferSize = 8192);
+
 };
 
     

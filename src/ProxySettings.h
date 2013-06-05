@@ -35,7 +35,6 @@ namespace HTTP {
 
 class ProxySettings : public Credentials {
 public:
-    
     ProxySettings();
 
     ProxySettings(const std::string& host,

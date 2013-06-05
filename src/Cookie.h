@@ -40,8 +40,7 @@ class Cookie {
 public:
     Cookie(const Poco::Net::HTTPCookie& cookie);
 
-    Cookie(const Poco::Net::HTTPCookie& cookie,
-           unsigned long long createdAt);
+    Cookie(const Poco::Net::HTTPCookie& cookie, unsigned long long createdAt);
 
     ~Cookie();
 

@@ -35,7 +35,6 @@ namespace HTTP {
 
 class Credentials {
 public:
-
     enum Type {
         BASIC,
         DIGEST

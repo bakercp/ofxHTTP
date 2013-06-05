@@ -6,24 +6,31 @@ namespace HTTP {
         
 
 //------------------------------------------------------------------------------
-BaseServerRouteHandler::BaseServerRouteHandler(const BaseRouteSettings& _settings) {
+BaseServerRouteHandler::BaseServerRouteHandler(const BaseRouteSettings& settings)
+{
     //route = _settings.getRoute();
+
+    // TODO: what is being done with _settings?
 }
 
 //------------------------------------------------------------------------------
-BaseServerRouteHandler::~BaseServerRouteHandler() { }
+BaseServerRouteHandler::~BaseServerRouteHandler()
+{
+}
 
 //------------------------------------------------------------------------------
 void BaseServerRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
-                                       Poco::Net::HTTPServerResponse& response)
+                                           Poco::Net::HTTPServerResponse& response)
 {
     ServerExchange exchange(request,response);
     Authentication::Status authStatus = authenticate(exchange);
+    
     if(authStatus == Authentication::OK) {
         updateSession(exchange);
         handleExchange(exchange);
         return;
-    } else if(authStatus == Authentication::UNAUTHORIZED || authStatus == Authentication::NO_CREDENTIALS) {
+    } else if(authStatus == Authentication::UNAUTHORIZED ||
+              authStatus == Authentication::NO_CREDENTIALS) {
         response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED);
         sendErrorResponse(response);
         return;
@@ -93,24 +100,26 @@ void BaseServerRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request
 //}
 
 //------------------------------------------------------------------------------
-void BaseServerRouteHandler::handleExchange(ServerExchange& exchange) {
+void BaseServerRouteHandler::handleExchange(ServerExchange& exchange)
+{
     exchange.response.setStatus(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     exchange.response.setReason("No Matching Routes Found.");
     sendErrorResponse(exchange.response);
 }
 
 //------------------------------------------------------------------------------
-void BaseServerRouteHandler::sendErrorResponse(Poco::Net::HTTPServerResponse& response) {
+void BaseServerRouteHandler::sendErrorResponse(Poco::Net::HTTPServerResponse& response)
+{
     // we will assume that the sender has set the status and
     // reason appropriately before calling the sendErrorResponse()
 
     // watch out for situations when the response socket has been closed
     try {
         Poco::Net::HTTPResponse::HTTPStatus status = response.getStatus();
-        string reason = response.getReason();
+        std::string reason = response.getReason();
         response.setChunkedTransferEncoding(true);
         response.setContentType("text/html");
-        ostream& ostr = response.send(); // get output stream
+        std::ostream& ostr = response.send(); // get output stream
         ostr << "<html>";
         ostr << "<head><title>" << status << " - " << reason << "</title></head>";
         ostr << "<body>";

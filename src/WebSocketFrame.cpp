@@ -31,15 +31,15 @@ namespace HTTP {
 
 
 //------------------------------------------------------------------------------
-WebSocketFrame::WebSocketFrame(const ofBuffer& buffer, int flags)
-: _flags(flags)
+WebSocketFrame::WebSocketFrame(const ofBuffer& buffer, int flags) :
+    _flags(flags)
 {
     set(buffer);
 }
 
 //------------------------------------------------------------------------------
-WebSocketFrame::WebSocketFrame(const std::string& text, int flags)
-: _flags(flags)
+WebSocketFrame::WebSocketFrame(const std::string& text, int flags) :
+    _flags(flags)
 {
     set(text);
 }
@@ -47,8 +47,8 @@ WebSocketFrame::WebSocketFrame(const std::string& text, int flags)
 //------------------------------------------------------------------------------
 WebSocketFrame::WebSocketFrame(const unsigned char* buffer,
                                unsigned int size,
-                               int flags)
-: _flags(flags)
+                               int flags) :
+    _flags(flags)
 {
     set(reinterpret_cast<const char*>(buffer),size);
 }
@@ -56,8 +56,8 @@ WebSocketFrame::WebSocketFrame(const unsigned char* buffer,
 //------------------------------------------------------------------------------
 WebSocketFrame::WebSocketFrame(const char* buffer,
                                unsigned int size,
-                               int flags)
-: _flags(flags)
+                               int flags) :
+    _flags(flags)
 {
     set(buffer,size);
 }
@@ -65,7 +65,6 @@ WebSocketFrame::WebSocketFrame(const char* buffer,
 //------------------------------------------------------------------------------
 WebSocketFrame::~WebSocketFrame()
 {
-
 }
 
 //------------------------------------------------------------------------------

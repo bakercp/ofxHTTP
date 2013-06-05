@@ -43,7 +43,7 @@ WebSocketRoute::~WebSocketRoute() {
 }
     
 //------------------------------------------------------------------------------
-bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
+bool WebSocketRoute::canHandleRequest(const HTTPServerRequest& request,
                                       bool bIsSecurePort)
 {
     // require HTTP_GET
@@ -88,7 +88,7 @@ bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& reques
 }
                                  
 //------------------------------------------------------------------------------
-Poco::Net::HTTPRequestHandler* WebSocketRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+HTTPRequestHandler* WebSocketRoute::createRequestHandler(const HTTPServerRequest& request)
 {
     return new WebSocketRouteHandler(*this,_settings);
 }

@@ -37,15 +37,19 @@ namespace HTTP {
 class ServerExchange {
 public:
     ServerExchange(Poco::Net::HTTPServerRequest& _request,
-                   Poco::Net::HTTPServerResponse& _response)
-    : request(_request)
-    , response(_response)
-    { }
+                   Poco::Net::HTTPServerResponse& _response) :
+        request(_request),
+        response(_response)
+    {
+    }
     
-    virtual ~ServerExchange() { }
+    virtual ~ServerExchange()
+    {
+    }
     
     Poco::Net::HTTPServerRequest&  request;
     Poco::Net::HTTPServerResponse& response;
 };
+    
 
 } }

@@ -72,7 +72,7 @@ public:
     std::string toString() const;
 
 protected:
-    int      _flags;
+    int _flags;
     
 };
 

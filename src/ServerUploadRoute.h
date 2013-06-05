@@ -24,57 +24,35 @@
 
 #pragma once
 
+#include "BaseTypes.h"
 #include "ServerDefaultRoute.h"
 #include "ServerUploadRouteHandler.h"
 
-//------------------------------------------------------------------------------
-class ServerUploadRoute : public ofxBaseHTTPServerRoute {
+
+namespace ofx {
+namespace HTTP {
+
+
+class ServerUploadRoute : public BaseServerRoute {
 public:
-    
     typedef ServerUploadRouteHandler::Settings Settings;
     typedef ofPtr<ServerUploadRoute> Ptr;
     
-    ServerUploadRoute(const Settings& _settings) :
-    settings(_settings)
+    ServerUploadRoute(const Settings& settings);
+    virtual ~ServerUploadRoute();
+    
+    bool canHandleRequest(const HTTPServerRequest& request, bool bIsSecurePort);
+    HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request);
+    
+    static Ptr Instance(const Settings& settings = Settings())
     {
-        ofDirectory uploadsDirectory(settings.uploadFolder);
-        if(!uploadsDirectory.exists()) {
-            uploadsDirectory.create();
-        }
-    }
-
-    virtual ~ServerUploadRoute() { }
-    
-    bool canHandleRequest(const HTTPServerRequest& request, bool bIsSecurePort) {
-        // require HTTP_POST
-        if(request.getMethod() != HTTPRequest::HTTP_POST) return false;
-        
-        // require a valid path
-        URI uri;
-        try {
-            uri = URI(request.getURI());
-        } catch(const SyntaxException& exc) {
-            ofLogError("ServerUploadRoute::canHandleRequest") << exc.what();
-            return false;
-        }
-        
-        // just get the path
-        string path = uri.getPath();
-        // make paths absolute
-        if(path.empty()) { path = "/"; }
-        
-        return RegularExpression(settings.getRoute()).match(path);
-    }
-    
-    HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request) {
-        return new ServerUploadRouteHandler(settings);
-    }
-    
-    static Ptr Instance(const Settings& settings = Settings()) {
         return Ptr(new ServerUploadRoute(settings));
     }
 
 protected:
-    Settings settings;
+    Settings _settings;
     
 };
+
+
+} }

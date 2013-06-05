@@ -40,9 +40,17 @@ namespace ofx {
 namespace HTTP {
 
 
-Poco::Net::NameValueCollection ofGetQueryMap(const Poco::URI& uri);
+class Utils {
+public:
+    static Poco::Net::NameValueCollection getQueryMap(const Poco::URI& uri);
 
-void ofDumpRequestHeaders(const ServerExchange& exchange, ofLogLevel logLevel = OF_LOG_VERBOSE);
-void ofDumpReponseHeaders(const ServerExchange& exchange, ofLogLevel logLevel = OF_LOG_VERBOSE);
+    static void dumpRequestHeaders(const ServerExchange& exchange,
+                                   ofLogLevel logLevel = OF_LOG_VERBOSE);
+
+    static void dumpReponseHeaders(const ServerExchange& exchange,
+                                   ofLogLevel logLevel = OF_LOG_VERBOSE);
+
+};
+
 
 } }

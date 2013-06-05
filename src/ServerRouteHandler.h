@@ -49,11 +49,11 @@ namespace ofx {
 namespace HTTP {
         
         
-
 //------------------------------------------------------------------------------
 class BaseServerRouteHandler : public Poco::Net::HTTPRequestHandler {
 public:
-    BaseServerRouteHandler(const BaseRouteSettings& _settings);
+    BaseServerRouteHandler(const BaseRouteSettings& settings);
+
     virtual ~BaseServerRouteHandler();
     
     // overriden from HTTPRequestHandler
@@ -63,9 +63,17 @@ public:
 protected:
     // authenticate is expected to check authentication and also
     // set any response headers if authentication has failed.
-    virtual Authentication::Status authenticate(ServerExchange& exchange) { return Authentication::OK; }
-    virtual void updateSession(ServerExchange& exchange) { };
+    virtual Authentication::Status authenticate(ServerExchange& exchange)
+    {
+        return Authentication::OK;
+    }
+
+    virtual void updateSession(ServerExchange& exchange)
+    {
+    }
+
     virtual void handleExchange(ServerExchange& exchange);
+
     virtual void sendErrorResponse(Poco::Net::HTTPServerResponse& response);
 
 };

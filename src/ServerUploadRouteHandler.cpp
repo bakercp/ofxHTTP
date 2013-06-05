@@ -68,7 +68,7 @@ void ServerUploadRouteHandler::handlePart(const Poco::Net::MessageHeader& header
     //
     
     if(header.has("Content-Type")) {
-        string contentType = header["Content-Type"];
+        std::string contentType = header["Content-Type"];
         if(!isContentTypeValid(contentType)) {
             ofLogError("ServerUploadRouteHandler::handlePart") << "Invalid content type: " << contentType;
             return; // reject
@@ -86,13 +86,13 @@ void ServerUploadRouteHandler::handlePart(const Poco::Net::MessageHeader& header
         Poco::Net::MessageHeader::splitParameters(contentDisposition.begin(),contentDisposition.end(),parameters);
         
         if(parameters.has("filename")) {
+
             try {
-            
-                ofFile file(settings.uploadFolder + "/" + parameters["filename"], ofFile::WriteOnly);
+                ofFile file(_settings.uploadFolder + "/" + parameters["filename"], ofFile::WriteOnly);
 
                 cout << file.getAbsolutePath() << endl;
                 
-                std::streamsize sz = Poco::StreamCopier::copyStream(stream,file,settings.writeBufferSize);
+                std::streamsize sz = Poco::StreamCopier::copyStream(stream,file,_settings.writeBufferSize);
                 
                 cout << sz << endl;
                 
@@ -132,7 +132,7 @@ void ServerUploadRouteHandler::handlePart(const Poco::Net::MessageHeader& header
 }
 
 //------------------------------------------------------------------------------
-bool ServerUploadRouteHandler::isContentTypeValid(const string& contentType) const {
+bool ServerUploadRouteHandler::isContentTypeValid(const std::string& contentType) const {
     // default true
     return true;
 }

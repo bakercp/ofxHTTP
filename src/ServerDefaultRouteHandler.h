@@ -32,7 +32,6 @@
 #include "MediaTypeMap.h"
 #include "Compression.h"
 #include "ServerRouteHandler.h"
-#include "Route.h"
 
 
 namespace ofx {

@@ -33,7 +33,6 @@ namespace HTTP {
 //------------------------------------------------------------------------------
 CredentialStore::CredentialStore()
 {
-
 }
 
 //------------------------------------------------------------------------------
@@ -56,7 +55,6 @@ CredentialStore& CredentialStore::operator = (CredentialStore& that)
 //------------------------------------------------------------------------------
 CredentialStore::~CredentialStore()
 {
-
 }
 
 //------------------------------------------------------------------------------
@@ -77,29 +75,29 @@ void CredentialStore::setCredentials(const AuthScope& scope,
 //------------------------------------------------------------------------------
 void CredentialStore::setCredentialsFromURI(const Poco::URI& uri)
 {
-    string username;
-    string password;
+    std::string username;
+    std::string password;
     
-    string userInfo = uri.getUserInfo();
+    std::string userInfo = uri.getUserInfo();
     
     const std::string::size_type p = userInfo.find(':');
     
 	if (p != string::npos) {
 		username.assign(userInfo, 0, p);
-		password.assign(userInfo, p + 1, string::npos);
+		password.assign(userInfo, p + 1, std::string::npos);
 	} else {
 		username.assign(userInfo);
 		password.clear();
 	}
 
-    setCredentials(uri,username,password);
+    setCredentials(uri, username, password);
 }
 
 //------------------------------------------------------------------------------
 void CredentialStore::setCredentials(const Poco::URI& uri,
                                      const Credentials& credentials)
 {
-    setCredentials(AuthScope(uri),credentials);
+    setCredentials(AuthScope(uri), credentials);
 }
 
 //------------------------------------------------------------------------------
@@ -107,51 +105,46 @@ void CredentialStore::setCredentials(const Poco::URI& uri,
                                      const string& username,
                                      const string& password)
 {
-    setCredentials(AuthScope(uri),Credentials(username,password));
+    setCredentials(AuthScope(uri), Credentials(username, password));
 }
 
 //------------------------------------------------------------------------------
-bool CredentialStore::hasCredentials(const AuthScope& targetScope)
+bool CredentialStore::hasCredentials(const AuthScope& targetScope) const
 {
     Credentials matchingCredentials;
     AuthScope   matchingScope;
-    return getCredentials(targetScope,matchingScope,matchingCredentials);
+    return getCredentials(targetScope, matchingScope, matchingCredentials);
 }
 
 //------------------------------------------------------------------------------
 bool CredentialStore::getCredentials(const AuthScope& targetScope,
                                      AuthScope& matchingScope,
-                                     Credentials& matchingCredentials)
+                                     Credentials& matchingCredentials) const
 {
     ofScopedLock lock(mutex);
-    return getCredentialsWithExistingLock(targetScope,matchingScope,matchingCredentials);
+    return getCredentialsWithExistingLock(targetScope, matchingScope, matchingCredentials);
 }
 
 //------------------------------------------------------------------------------
 bool CredentialStore::getCredentialsWithExistingLock(const AuthScope& targetScope,
                                                      AuthScope& matchingScope,
-                                                     Credentials& matchingCredentials)
+                                                     Credentials& matchingCredentials) const
 {
     // calls to this function are expected to be locked!
-    ofxHTTPCredentialMapIter iter = credentialMap.find(targetScope);
+    HTTPCredentialMapIter iter = credentialMap.find(targetScope);
     
     cout << "TARGET Scope = " << targetScope.toString() << endl;
     cout << "TARGET CREDZ = " << targetScope.toString() << endl;
 
     
-    
-    if(iter != credentialMap.end()) {
-        cout << "FOUND DIRECT MATCH" << endl;
-        
-        cout << "scope = " << (*iter).first.toString() << endl;
-        cout << "credz = " << (*iter).second.toString() << endl;
 
+    if(iter != credentialMap.end()) {
         matchingScope       = (*iter).first;
         matchingCredentials = (*iter).second;
         return true;
     } else {
         int bestMatchFactor  = -1;
-        ofxHTTPCredentialMapIter bestMatch = credentialMap.end();
+        HTTPCredentialMapIter bestMatch = credentialMap.end();
         iter = credentialMap.begin();
         while(iter != credentialMap.end()) {
             int factor = (*iter).first.match(targetScope);
@@ -164,16 +157,10 @@ bool CredentialStore::getCredentialsWithExistingLock(const AuthScope& targetScop
         }
         
         if(bestMatch != credentialMap.end()) {
-            cout << "best match scope = " << (*bestMatch).first.toString() << endl;
-            cout << "best match credz = " << (*bestMatch).second.toString() << endl;
-            
             matchingScope       = (*bestMatch).first;
             matchingCredentials = (*bestMatch).second;
-            
-            cout << "best match factor=" << bestMatchFactor << endl;
             return true;
         } else {
-            cout << "best match factor=" << bestMatchFactor << endl;
             return false;
         }
     }
@@ -217,7 +204,7 @@ bool CredentialStore::authenticate(const Poco::Net::HTTPClientSession& pSession,
     if(getCredentialsWithExistingLock(targetScope,matchingScope,matchingCredentials)) {
         
         // first search our digest credentials to see if we have a matching scope (preferred)
-        ofxHTTPDigestCredentialCacheMapIter iterDigest = digestCredentialCacheMap.find(matchingScope);
+        HTTPDigestCredentialCacheMapIter iterDigest = digestCredentialCacheMap.find(matchingScope);
 
         if(iterDigest != digestCredentialCacheMap.end()) {
             (*iterDigest).second->updateAuthInfo(pRequest); // successfully updated auth info for matching scope
@@ -226,7 +213,7 @@ bool CredentialStore::authenticate(const Poco::Net::HTTPClientSession& pSession,
         
         // if there are no digest credentials, search for basic credentials
         
-        ofxHTTPBasicCredentialCacheMapIter iterBasic = basicCredentialCacheMap.find(matchingScope);
+        HTTPBasicCredentialCacheMapIter iterBasic = basicCredentialCacheMap.find(matchingScope);
         
         if(iterBasic != basicCredentialCacheMap.end()) {
             (*iterBasic).second->authenticate(pRequest); // successfully updated auth info for matching scope

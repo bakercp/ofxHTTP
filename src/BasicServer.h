@@ -38,7 +38,6 @@ class BasicServerSettings :
 public Server::Settings,
 public DefaultServerRoute::Settings
 {
-
 };
 
 //------------------------------------------------------------------------------
