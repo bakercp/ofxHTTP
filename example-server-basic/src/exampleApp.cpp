@@ -30,17 +30,22 @@
 void exampleApp::setup() {
     ofSetFrameRate(30);
 
-    server = BasicServer::Instance(); // get an instance.
-                                      // this will destroy itself on exit.
-    server->start(); // start the server
+    // Get an instance of a basic server.
+    // An instance is a shared pointer, which will ensure that the server
+    // will be shut down cleanly upon exit (i.e. when the shared pointer
+    // goes out of context.
+    server = BasicServer::Instance();
 
-    ofLaunchBrowser(server->getURL()); // show us!
+    // Start the server.
+    server->start();
+
+    // Launch a browser with the address of the server.
+    ofLaunchBrowser(server->getURL());
 }
 
 //------------------------------------------------------------------------------
 void exampleApp::draw() {
     ofBackground(255);
-    ofDrawBitmapStringHighlight("Look in " + ofToDataPath("DocumentRoot") + " for more.", 10, 16);
+    ofDrawBitmapStringHighlight("See " + server->getURL(), 10, 16);
 }
-
 
