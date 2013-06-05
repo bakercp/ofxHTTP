@@ -5,37 +5,24 @@ namespace ofx {
 namespace HTTP {
 namespace Request {
 
-    
+
 //------------------------------------------------------------------------------
 BaseRequest::BaseRequest(const std::string& httpMethod,
-                         const std::string& uri,
-                         const std::string& httpVersion)
-: _httpMethod(httpMethod)
-, _httpVersion(httpVersion)
+                         const Poco::URI& uri) :
+    _httpMethod(httpMethod),
+    _httpVersion(Poco::Net::HTTPRequest::HTTP_1_1),
+    _uri(uri)
 {
-    
-    // this is kind of a mess, but we want to create requests from string uris
-    try {
-        _uri = Poco::URI(uri);
-        _bHasValidURI = true;
-    } catch(const Poco::SyntaxException& exc) {
-        _invalidURI = uri;
-        _uri = Poco::URI("http://127.0.0.1");
-        _bHasValidURI = false;
-        ofLogError("ofxHTTPBaseRequest::ofxHTTPBaseRequest") << "Syntax exeption: " << exc.message() << " Setting uri to http://127.0.0.1";
-    }
-    
-    setFormFieldsFromURI(_uri);
+    setFormFieldsFromURI(uri);
 }
 
 //------------------------------------------------------------------------------
 BaseRequest::BaseRequest(const std::string& httpMethod,
                          const Poco::URI&   uri,
-                         const std::string& httpVersion)
-: _httpMethod(httpMethod)
-, _httpVersion(httpVersion)
-, _bHasValidURI(true)
-, _uri(uri)
+                         const std::string& httpVersion) :
+    _httpMethod(httpMethod),
+    _httpVersion(httpVersion),
+    _uri(uri)
 {
     setFormFieldsFromURI(uri);
 }
@@ -43,7 +30,6 @@ BaseRequest::BaseRequest(const std::string& httpMethod,
 //------------------------------------------------------------------------------
 BaseRequest::~BaseRequest()
 {
-
 }
 
 //------------------------------------------------------------------------------
@@ -59,12 +45,6 @@ std::string BaseRequest::getVersion() const
 }
 
 //------------------------------------------------------------------------------
-bool BaseRequest::hasValidURI() const
-{
-    return _bHasValidURI;
-}
-
-//------------------------------------------------------------------------------
 Poco::URI BaseRequest::getURI() const
 {
     return _uri;
@@ -73,11 +53,11 @@ Poco::URI BaseRequest::getURI() const
 //------------------------------------------------------------------------------
 void BaseRequest::addCookie(const std::string& name,
                             const std::string& value,
-                            bool isValueEscaped)
+                            bool bIsValueEscaped)
 {
     std::string escapedValue = value;
 
-    if(!isValueEscaped) {
+    if(!bIsValueEscaped) {
         escapedValue = Poco::Net::HTTPCookie::escape(value);
     }
 
@@ -95,7 +75,6 @@ void BaseRequest::addCookie(const Cookie& cookie)
 {
     // erase any matching cookies
     std::vector<Cookie>::iterator iter = _cookies.begin();
-
     while(iter != _cookies.end()) {
         if((*iter).matches(cookie)) {
             iter = _cookies.erase(iter);
@@ -113,7 +92,6 @@ void BaseRequest::addCookie(const Cookie& cookie)
 void BaseRequest::addCookies(const std::vector<Cookie>& cookies)
 {
     std::vector<Cookie>::const_iterator iter = cookies.begin();
-    
     while(iter != cookies.end()) {
         addCookie(*iter);
         ++iter;
@@ -137,7 +115,6 @@ void BaseRequest::addFormField(const std::string& name,
 void BaseRequest::addFormFields(const Poco::Net::NameValueCollection& formFields)
 {
     Poco::Net::NameValueCollection::ConstIterator iter = formFields.begin();
-    
     while(iter != formFields.end()) {
         addFormField((*iter).first,(*iter).second);
         ++iter;
@@ -178,7 +155,6 @@ void BaseRequest::addHeader(const std::string& name, const std::string& value)
 void BaseRequest::addHeaders(const Poco::Net::NameValueCollection& _headers)
 {
     Poco::Net::NameValueCollection::ConstIterator iter = _headers.begin();
-    
     while(iter != _headers.end()) {
         addHeader((*iter).first,(*iter).second);
         ++iter;
@@ -216,7 +192,6 @@ void BaseRequest::setFormFieldsFromURI(const Poco::URI& uri)
     std::vector<string> queryTokens = ofSplitString(uri.getQuery(),"&",true,true);
     
     std::vector<string>::const_iterator iter = queryTokens.begin();
-    
     while(iter != queryTokens.end()) {
         std::string queryToken = (*iter);
         size_t index = queryToken.find_first_of("=");
@@ -230,6 +205,11 @@ void BaseRequest::setFormFieldsFromURI(const Poco::URI& uri)
         }
         ++iter;
     }
+}
+
+//------------------------------------------------------------------------------
+void BaseRequest::sendRequestBody(ostream& requestStream) const
+{
 }
 
 

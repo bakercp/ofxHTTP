@@ -36,10 +36,8 @@ namespace Request {
     
 class Get : public BaseRequest {
 public:
-    Get(const std::string& _url,
-        const std::string& _httpVersion = Poco::Net::HTTPRequest::HTTP_1_1);
-    Get(const Poco::URI& _uri,
-        const std::string& _httpVersion = Poco::Net::HTTPRequest::HTTP_1_1);
+    Get(const Poco::URI& uri);
+    Get(const Poco::URI& uri, const std::string& httpVersion);
 
     virtual ~Get();
     

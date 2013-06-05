@@ -36,12 +36,8 @@ namespace Request {
 
 class Post : public BaseRequest {
 public:
-    
-    Post(const std::string& url,
-         const std::string& httpVersion = Poco::Net::HTTPRequest::HTTP_1_1);
-
-    Post(const Poco::URI& uri,
-         const std::string& httpVersion = Poco::Net::HTTPRequest::HTTP_1_1);
+    Post(const Poco::URI& uri);
+    Post(const Poco::URI& uri, const std::string& httpVersion);
     
     virtual ~Post();
     

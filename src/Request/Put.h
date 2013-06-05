@@ -34,11 +34,9 @@ namespace Request {
 
 class Put : public BaseRequest {
 public:
-    
-    Put(const std::string& url,
-        const std::string& httpVersion = Poco::Net::HTTPRequest::HTTP_1_1);
+    Put(const Poco::URI& uri);
     Put(const Poco::URI& uri,
-        const std::string& httpVersion = Poco::Net::HTTPRequest::HTTP_1_1);
+        const std::string& httpVersion);
     
     virtual ~Put();
     

@@ -52,10 +52,8 @@ namespace Request {
 
 class BaseRequest {
 public:
-    
     BaseRequest(const std::string& httpMethod,
-                const std::string& url,
-                const std::string& httpVersion);
+                const Poco::URI&   uri);
 
     BaseRequest(const std::string& httpMethod,
                 const Poco::URI&   uri,
@@ -65,14 +63,13 @@ public:
     
     std::string getMethod() const;
     std::string getVersion() const;
-    
-    bool hasValidURI() const;
-    Poco::URI  getURI() const;
+
+    Poco::URI getURI() const;
 
     // these cookies will replace any matching cookies provided by the client's cookie store
     void addCookie(const std::string& name,
                    const std::string& value = "",
-                   bool isValueEscaped = false);
+                   bool bIsValueEscaped = false);
     void addCookie(const Poco::Net::HTTPCookie& cookie);
     void addCookie(const Cookie& cookie);
     void addCookies(const std::vector<Cookie>& cookies);
@@ -96,13 +93,8 @@ protected:
     void setFormFieldsFromURI(const Poco::URI& uri);
     
     virtual void prepareRequest(Poco::Net::HTTPRequest& request) const = 0;
-    virtual void sendRequestBody(ostream& requestStream) const
-    {
-        // optional for POST, PUT, etc.
-    };
+    virtual void sendRequestBody(std::ostream& requestStream) const;
 
-    bool _bHasValidURI;
-    std::string _invalidURI;
     Poco::URI _uri;
     
     std::string _httpMethod;

@@ -30,25 +30,22 @@ namespace ofx {
 namespace HTTP {
 namespace Request {
 
-
+    
 //------------------------------------------------------------------------------
-Post::Post(const std::string& url, const std::string& httpVersion)
-: BaseRequest(Poco::Net::HTTPRequest::HTTP_POST,url,httpVersion)
+Post::Post(const Poco::URI& uri) :
+    BaseRequest(Poco::Net::HTTPRequest::HTTP_POST, uri)
 {
-
 }
 
 //------------------------------------------------------------------------------
-Post::Post(const Poco::URI& uri, const std::string& httpVersion)
-: BaseRequest(Poco::Net::HTTPRequest::HTTP_POST,uri,httpVersion)
+Post::Post(const Poco::URI& uri, const std::string& httpVersion) :
+    BaseRequest(Poco::Net::HTTPRequest::HTTP_POST, uri, httpVersion)
 {
-
 }
 
 //------------------------------------------------------------------------------
 Post::~Post()
 {
-
 }
 
 //------------------------------------------------------------------------------
@@ -71,7 +68,6 @@ void Post::addFormFiles(const Poco::Net::NameValueCollection& nameValueMap)
 void Post::addFormFiles(const std::map<std::string,std::string>& nameValueMap)
 {
     std::map<std::string,std::string>::const_iterator iter = nameValueMap.begin();
-
     while(iter != nameValueMap.end()) {
         addFormFile((*iter).first,(*iter).second);
         ++iter;
@@ -82,7 +78,6 @@ void Post::addFormFiles(const std::map<std::string,std::string>& nameValueMap)
 void Post::addFormFiles(const multimap<string,string>&  nameValueMap)
 {
     std::multimap<std::string,std::string>::const_iterator iter = nameValueMap.begin();
-
     while(iter != nameValueMap.end()) {
         addFormFile((*iter).first,(*iter).second);
         ++iter;
@@ -112,7 +107,6 @@ void Post::prepareRequest(Poco::Net::HTTPClientSession& session,
                           Poco::Net::HTTPRequest& request,
                           Poco::Net::HTTPResponse& response)
 {
-    
 }
 
 
