@@ -39,7 +39,7 @@ WebSocketRoute::WebSocketRoute(const Settings& settings)
     
 //------------------------------------------------------------------------------
 WebSocketRoute::~WebSocketRoute() {
-    cout << "closing down route!" << endl;
+    ofLogVerbose("WebSocketRoute::~WebSocketRoute") << "Closing down route: " << getRoute() << endl;
 }
     
 //------------------------------------------------------------------------------
@@ -47,13 +47,18 @@ bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& reques
                                       bool bIsSecurePort)
 {
     // require HTTP_GET
-    if(request.getMethod() != Poco::Net::HTTPRequest::HTTP_GET) return false;
+    if(request.getMethod() != Poco::Net::HTTPRequest::HTTP_GET) {
+        return false;
+    }
     
-    if(Poco::icompare(request.get("Upgrade", ""), "websocket")  != 0) return false;
+    if(Poco::icompare(request.get("Upgrade", ""), "websocket")  != 0) {
+        return false;
+    }
 
     // require websocket upgrade headers
     // this is all fixed in Poco 1.4.6 and 1.5.+
     std::string connectionHeader = Poco::toLower(request.get("Connection", ""));
+    
     if(Poco::icompare(connectionHeader, "Upgrade") != 0 &&
        !ofIsStringInString(connectionHeader,"upgrade")) {
        // this request is coming from firefox, which is known to send things that look like:
@@ -65,6 +70,7 @@ bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& reques
     
     // require a valid path
     Poco::URI uri;
+    
     try {
         uri = Poco::URI(request.getURI());
     } catch(const Poco::SyntaxException& exc) {
@@ -73,7 +79,8 @@ bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& reques
     }
     
     // just get the path
-    string path = uri.getPath();
+    std::string path = uri.getPath();
+
     // make paths absolute
     if(path.empty()) { path = "/"; }
     
@@ -88,4 +95,3 @@ Poco::Net::HTTPRequestHandler* WebSocketRoute::createRequestHandler(const Poco::
 
 
 } }
-

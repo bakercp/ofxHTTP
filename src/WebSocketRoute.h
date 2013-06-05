@@ -45,8 +45,9 @@ class WebSocketRoute
 public:
     typedef WebSocketRouteHandler::Settings Settings;
     typedef ofPtr<WebSocketRoute> Ptr;
-    
-    WebSocketRoute(const Settings& _settings);
+
+    WebSocketRoute(const Settings& settings);
+
     virtual ~WebSocketRoute();
 
     bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
