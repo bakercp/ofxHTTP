@@ -10,28 +10,27 @@ ClientContext::ClientContext()
 }
 
 //------------------------------------------------------------------------------
-ClientContext::ClientContext(SessionSettings& sessionSettings)
-: _sessionSettings(sessionSettings)
+ClientContext::ClientContext(SessionSettings& sessionSettings) :
+    _sessionSettings(sessionSettings)
 {
 }
 
 //------------------------------------------------------------------------------
 ClientContext::ClientContext(SessionSettings& sessionSettings,
-                             CredentialStore& credentialStore)
-: _sessionSettings(sessionSettings)
-, _credentialStore(credentialStore)
+                             CredentialStore& credentialStore) :
+    _sessionSettings(sessionSettings),
+    _credentialStore(credentialStore)
 {
 }
 
 //------------------------------------------------------------------------------
 ClientContext::ClientContext(SessionSettings& sessionSettings,
                              CredentialStore& credentialStore,
-                             CookieStore& cookieStore)
-: _sessionSettings(sessionSettings)
-, _credentialStore(credentialStore)
-, _cookieStore(cookieStore)
+                             CookieStore& cookieStore) :
+    _sessionSettings(sessionSettings),
+    _credentialStore(credentialStore),
+    _cookieStore(cookieStore)
 {
-
 }
 
 //------------------------------------------------------------------------------

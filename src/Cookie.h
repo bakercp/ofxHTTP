@@ -38,8 +38,11 @@ namespace HTTP {
 
 class Cookie {
 public:
+    Cookie(const Poco::Net::HTTPCookie& cookie);
 
-    Cookie(const Poco::Net::HTTPCookie& cookie, unsigned long long _createdAt = ofGetSystemTime());
+    Cookie(const Poco::Net::HTTPCookie& cookie,
+           unsigned long long createdAt);
+
     ~Cookie();
 
     unsigned long long getCreatedAt() const;
@@ -57,12 +60,12 @@ public:
     string toString() const;
     
 protected:
-    Poco::Net::HTTPCookie cookie;
-    unsigned long long createdAt;
+    Poco::Net::HTTPCookie _cookie;
+    unsigned long long _createdAt;
     
     const Poco::Net::HTTPCookie& getCookie() const;
 
-    bool static endsWith(string const& fullString, string const& ending);
+    bool static endsWith(const std::string& fullString, const std::string& ending);
 
     friend class CookieStore;
 };

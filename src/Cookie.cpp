@@ -31,30 +31,35 @@ namespace HTTP {
         
 
 //------------------------------------------------------------------------------
-Cookie::Cookie(const Poco::Net::HTTPCookie& _cookie,
-               unsigned long long _createdAt)
-: cookie(_cookie)
-, createdAt(_createdAt)
+Cookie::Cookie(const Poco::Net::HTTPCookie& cookie) :
+    _cookie(cookie),
+    _createdAt(ofGetSystemTime())
 {
-    
+}
+
+//------------------------------------------------------------------------------
+Cookie::Cookie(const Poco::Net::HTTPCookie& cookie,
+               unsigned long long createdAt) :
+    _cookie(cookie),
+    _createdAt(createdAt)
+{
 }
 
 //------------------------------------------------------------------------------
 Cookie::~Cookie()
 {
-
 }
 
 //------------------------------------------------------------------------------
 unsigned long long Cookie::getCreatedAt() const {
-    return createdAt;
+    return _createdAt;
 }
 
 //------------------------------------------------------------------------------
 bool Cookie::isExpired(unsigned long long expiredAt) const {
-    int maxAge = cookie.getMaxAge();
+    int maxAge = _cookie.getMaxAge();
 
-    return maxAge >= 0 && expiredAt > ( createdAt + ( maxAge / 1000 ) );
+    return maxAge >= 0 && expiredAt > ( _createdAt + ( maxAge / 1000 ) );
 }
 
 //------------------------------------------------------------------------------
@@ -63,7 +68,7 @@ bool Cookie::isSession() const {
     // if max age == -1, persistant, expiry not set, so a session cookie
     // if max age == 0, then it will be deleted immediately
     // if max age >  0, then it will expire sometime in the future
-    return cookie.getMaxAge() < 0;
+    return _cookie.getMaxAge() < 0;
 }
 
 //------------------------------------------------------------------------------
@@ -75,13 +80,13 @@ bool Cookie::matchesDomain(const Poco::URI& uri) const {
         return false;
     }
     
-    if(cookie.getDomain().empty()) {
+    if(_cookie.getDomain().empty()) {
         ofLogError("ofxCookieStore::matchCookieDomain") << "Cookie domain empty.";
         return false;
     }
     
-    string uriHost      = Poco::toLower(uri.getHost());
-    string cookieDomain = Poco::toLower(cookie.getDomain());
+    std::string uriHost      = Poco::toLower(uri.getHost());
+    std::string cookieDomain = Poco::toLower(_cookie.getDomain());
     
     // simple check
     if(!endsWith(uriHost,cookieDomain)) {
@@ -104,7 +109,7 @@ bool Cookie::matchesDomain(const Poco::URI& uri) const {
 
 //------------------------------------------------------------------------------
 bool Cookie::matchesPath(const Poco::URI& uri) const {
-    return uri.getPath().find(cookie.getPath()) == 0;
+    return uri.getPath().find(_cookie.getPath()) == 0;
 }
 
 //------------------------------------------------------------------------------
@@ -116,7 +121,7 @@ bool Cookie::matchesURI(const Poco::URI& uri, bool matchSessionCookies) const {
     }
     
     // check 
-    if(cookie.getSecure() && uri.getScheme() != "https") {
+    if(_cookie.getSecure() && uri.getScheme() != "https") {
         return false;
     }
     
@@ -141,19 +146,19 @@ bool Cookie::matchesURI(const Poco::URI& uri, bool matchSessionCookies) const {
 
 //------------------------------------------------------------------------------
 bool Cookie::matches(const Cookie& other) const {
-    bool isMatch = cookie.getName() == other.getCookie().getName();
+    bool isMatch = (_cookie.getName() == other.getCookie().getName());
         
     if (isMatch) {
         // do not differentiate empty and null domains
-        string thisDomain = cookie.getDomain();
+        std::string thisDomain = _cookie.getDomain();
         
-        if(thisDomain.find( "." ) == string::npos) {
+        if(thisDomain.find( "." ) == std::string::npos) {
             thisDomain += ".local";
         }
         
-        string thatDomain = other.cookie.getDomain();
+        std::string thatDomain = other._cookie.getDomain();
         
-        if(thatDomain.find( "." ) == string::npos) {
+        if(thatDomain.find( "." ) == std::string::npos) {
             thatDomain += ".local";
         }
         
@@ -161,7 +166,7 @@ bool Cookie::matches(const Cookie& other) const {
     }
     
     if (isMatch) {
-        isMatch = (cookie.getPath() == other.cookie.getPath());
+        isMatch = (_cookie.getPath() == other._cookie.getPath());
     }
     
     return isMatch;
@@ -171,18 +176,18 @@ bool Cookie::matches(const Cookie& other) const {
 
 //------------------------------------------------------------------------------
 const Poco::Net::HTTPCookie& Cookie::getCookie() const {
-    return cookie;
+    return _cookie;
 }
 
 //------------------------------------------------------------------------------
-string Cookie::toString() const {
-    stringstream ss;
-    ss << cookie.toString() << " Created @ " << createdAt;
+std::string Cookie::toString() const {
+    std::stringstream ss;
+    ss << _cookie.toString() << " Created @ " << _createdAt;
     return ss.str();
 }
 
 //------------------------------------------------------------------------------
-bool Cookie::endsWith(string const& fullString, string const& ending) {
+bool Cookie::endsWith(const std::string& fullString, const std::string& ending) {
     if (fullString.length() >= ending.length()) {
         return (0 == fullString.compare(fullString.length() - ending.length(),
                                         ending.length(),
