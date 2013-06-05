@@ -47,61 +47,61 @@ public:
 
     ~SessionSettings();
 
-    void setVirtualHost(const string& _virtualHost);
-    string getVirtualHost();
+    void setVirtualHost(const std::string& _virtualHost);
+    std::string getVirtualHost() const;
 
-    void setDefaultHost(const string& _defaultHost);
-    string getDefaultHost();
+    void setDefaultHost(const std::string& _defaultHost);
+    std::string getDefaultHost() const;
 
-    void setUserAgent(const string& _userAgent);
-    string getUserAgent();
+    void setUserAgent(const std::string& _userAgent);
+    std::string getUserAgent() const;
         
     void setMaxRedirects(int _maxRedirects);
-    int getMaxRedirects();
+    int getMaxRedirects() const;
 
-    Poco::Net::NameValueCollection getDefaultHeaders();
-    void addDefaultHeader(const string& name, const string& value = "");
+    Poco::Net::NameValueCollection getDefaultHeaders() const;
+    void addDefaultHeader(const std::string& name, const std::string& value = "");
     void addDefaultHeaders(const Poco::Net::NameValueCollection& _headers);
-    bool hasDefaultHeaders();
-    bool hasDefaultHeader(const string& name);
-    void removeDefaultHeader(const string& name);
+    bool hasDefaultHeaders() const;
+    bool hasDefaultHeader(const std::string& name);
+    void removeDefaultHeader(const std::string& name);
     void clearDefaultHeaders();
     
     void setKeepAliveTimeout(unsigned long long milliseconds);
-    unsigned long long getKeepAliveTimeout();
+    unsigned long long getKeepAliveTimeout() const;
     
-    void setProxyUsername(const string& username);
-    string getProxyUsername();
+    void setProxyUsername(const std::string& username);
+    std::string getProxyUsername() const;
 
-    void setProxyPassword(const string& password);
-    string getProxyPassword();
+    void setProxyPassword(const std::string& password);
+    std::string getProxyPassword() const;
 
-    void setProxyHost(const string& _host);
-    string getProxyHost();
+    void setProxyHost(const std::string& _host);
+    std::string getProxyHost() const;
     
     void setProxyPort(unsigned short _port);
-    unsigned short getProxyPort();
+    unsigned short getProxyPort() const;
     
-    bool hasProxyCredentials();
-    bool isProxyEnabled();
+    bool hasProxyCredentials() const;
+    bool isProxyEnabled() const;
     void clearProxy();
     
     void setUseCredentialStore(bool _bUseCredentialStore);
-    bool useCredentialStore();
+    bool useCredentialStore() const;
 
     void setUseCookielStore(bool _bUseCookieStore);
-    bool useCookieStore();
+    bool useCookieStore() const;
     
 private:
     SessionSettings(const SessionSettings& that);
     SessionSettings& operator = (const SessionSettings& that);
 
-    ofMutex mutex;
+    mutable ofMutex mutex;
     
-    string virtualHost;
-    string defaultHost;
+    std::string virtualHost;
+    std::string defaultHost;
 
-    string userAgent;
+    std::string userAgent;
 
     int maxRedirects;
     

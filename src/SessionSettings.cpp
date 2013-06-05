@@ -96,7 +96,7 @@ void SessionSettings::setVirtualHost(const string& _virtualHost) {
 }
 
 //------------------------------------------------------------------------------
-string SessionSettings::getVirtualHost() {
+string SessionSettings::getVirtualHost() const {
     ofScopedLock lock(mutex);
     return virtualHost;
 }
@@ -108,7 +108,7 @@ void SessionSettings::setDefaultHost(const string& _defaultHost) {
 }
 
 //------------------------------------------------------------------------------
-string SessionSettings::getDefaultHost() {
+string SessionSettings::getDefaultHost() const {
     ofScopedLock lock(mutex);
     return defaultHost;
 }
@@ -120,7 +120,7 @@ void SessionSettings::setUserAgent(const string& _userAgent) {
 }
 
 //------------------------------------------------------------------------------
-string SessionSettings::getUserAgent() {
+string SessionSettings::getUserAgent() const {
     ofScopedLock lock(mutex);
     return userAgent;
 }
@@ -132,13 +132,13 @@ void SessionSettings::setMaxRedirects(int _maxRedirects) {
 }
 
 //------------------------------------------------------------------------------
-int SessionSettings::getMaxRedirects() {
+int SessionSettings::getMaxRedirects() const {
     ofScopedLock lock(mutex);
     return maxRedirects;
 }
 
 //------------------------------------------------------------------------------
-Poco::Net::NameValueCollection SessionSettings::getDefaultHeaders() {
+Poco::Net::NameValueCollection SessionSettings::getDefaultHeaders() const {
     ofScopedLock lock(mutex);
     return defaultHeaders;
 }
@@ -160,7 +160,7 @@ void SessionSettings::addDefaultHeaders(const Poco::Net::NameValueCollection& _h
 }
 
 //------------------------------------------------------------------------------
-bool SessionSettings::hasDefaultHeaders() {
+bool SessionSettings::hasDefaultHeaders() const {
     ofScopedLock lock(mutex);
     return !defaultHeaders.empty();
 }
@@ -190,7 +190,7 @@ void SessionSettings::setKeepAliveTimeout(unsigned long long milliseconds) {
 }
 
 //------------------------------------------------------------------------------
-unsigned long long SessionSettings::getKeepAliveTimeout() {
+unsigned long long SessionSettings::getKeepAliveTimeout() const {
     ofScopedLock lock(mutex);
     return keepAliveTimeout;
 }
@@ -203,7 +203,7 @@ void SessionSettings::setProxyUsername(const string& username) {
 }
 
 //------------------------------------------------------------------------------
-string SessionSettings::getProxyUsername() {
+string SessionSettings::getProxyUsername() const {
     ofScopedLock lock(mutex);
     return proxy.getUsername();
 }
@@ -216,7 +216,7 @@ void SessionSettings::setProxyPassword(const string& password) {
 }
 
 //------------------------------------------------------------------------------
-string SessionSettings::getProxyPassword() {
+string SessionSettings::getProxyPassword() const {
     ofScopedLock lock(mutex);
     return proxy.getPassword();
 }
@@ -229,13 +229,13 @@ void SessionSettings::setProxyHost(const string& _host) {
 }
 
 //------------------------------------------------------------------------------
-string SessionSettings::getProxyHost() {
+string SessionSettings::getProxyHost() const {
     ofScopedLock lock(mutex);
     return proxy.getHost();
 }
 
 //------------------------------------------------------------------------------
-unsigned short SessionSettings::getProxyPort() {
+unsigned short SessionSettings::getProxyPort() const {
     ofScopedLock lock(mutex);
     return proxy.getPort();
 }
@@ -255,13 +255,13 @@ void SessionSettings::clearProxy() {
 }
 
 //------------------------------------------------------------------------------
-bool SessionSettings::isProxyEnabled() {
+bool SessionSettings::isProxyEnabled() const {
     ofScopedLock lock(mutex);
     return bUseProxy;
 }
 
 //------------------------------------------------------------------------------
-bool SessionSettings::hasProxyCredentials() {
+bool SessionSettings::hasProxyCredentials() const {
     ofScopedLock lock(mutex);
     return bUseProxy && proxy.hasCredentials();
 }
@@ -273,7 +273,7 @@ void SessionSettings::setUseCredentialStore(bool _bUseCredentialStore) {
 }
 
 //------------------------------------------------------------------------------
-bool SessionSettings::useCredentialStore() {
+bool SessionSettings::useCredentialStore() const {
     ofScopedLock lock(mutex);
     return bUseCredentialStore;
 }
@@ -285,7 +285,7 @@ void SessionSettings::setUseCookielStore(bool _bUseCookieStore) {
 }
 
 //------------------------------------------------------------------------------
-bool SessionSettings::useCookieStore() {
+bool SessionSettings::useCookieStore() const {
     ofScopedLock lock(mutex);
     return bUseCookieStore;
 }
