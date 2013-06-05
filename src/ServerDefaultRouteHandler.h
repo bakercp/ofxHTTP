@@ -41,14 +41,13 @@ namespace HTTP {
 
 class DefaultServerRouteSettings : public BaseRouteSettings {
 public:
-    DefaultServerRouteSettings(const std::string& route = "/.*")
-    : BaseRouteSettings(route)
-    , defaultIndex("index.html")
-    , documentRoot("DocumentRoot/")
-    , bAutoCreateDocumentRoot(false)
-    , bRequireDocumentRootInDataFolder(true)
+    DefaultServerRouteSettings(const std::string& route = "/.*") :
+        BaseRouteSettings(route),
+        defaultIndex("index.html"),
+        documentRoot("DocumentRoot/"),
+        bAutoCreateDocumentRoot(false),
+        bRequireDocumentRootInDataFolder(true)
     {
-
     }
 
     virtual ~DefaultServerRouteSettings() { }
@@ -77,7 +76,6 @@ public:
 //------------------------------------------------------------------------------
 class DefaultServerRouteHandler : public BaseServerRouteHandler {
 public:
-    
     DefaultServerRouteHandler(const DefaultServerRouteSettings& _settings);
     virtual ~DefaultServerRouteHandler();
         
