@@ -23,12 +23,21 @@
  =============================================================================*/
 
 
-#include "ofAppRunner.h"
-#include "exampleApp.h"
+#pragma once
 
 
-//------------------------------------------------------------------------------
-int main() {
-    ofSetupOpenGL(480,100, OF_WINDOW);
-    ofRunApp(new exampleApp());
-}
+#include "ofMain.h"
+#include "BasicServer.h"
+
+
+using ofx::HTTP::BasicServer;
+
+
+class exampleApp : public ofBaseApp {
+public:
+    void setup();
+    void draw();
+    
+    BasicServer::Ptr server;
+
+};

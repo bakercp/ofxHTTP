@@ -23,12 +23,24 @@
  =============================================================================*/
 
 
-#include "ofAppRunner.h"
 #include "exampleApp.h"
 
 
 //------------------------------------------------------------------------------
-int main() {
-    ofSetupOpenGL(480,100, OF_WINDOW);
-    ofRunApp(new exampleApp());
+void exampleApp::setup() {
+    ofSetFrameRate(30);
+
+    server = BasicServer::Instance(); // get an instance.
+                                      // this will destroy itself on exit.
+    server->start(); // start the server
+
+    ofLaunchBrowser(server->getURL()); // show us!
 }
+
+//------------------------------------------------------------------------------
+void exampleApp::draw() {
+    ofBackground(255);
+    ofDrawBitmapStringHighlight("Look in " + ofToDataPath("DocumentRoot") + " for more.", 10, 16);
+}
+
+
