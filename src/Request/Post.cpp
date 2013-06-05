@@ -33,7 +33,7 @@ namespace Request {
 
 //------------------------------------------------------------------------------
 Post::Post(const std::string& url, const std::string& httpVersion)
-: BaseRequest(Poco::Net::HTTPRequest::HTTP_POST,_url,httpVersion)
+: BaseRequest(Poco::Net::HTTPRequest::HTTP_POST,url,httpVersion)
 {
 
 }
@@ -52,7 +52,7 @@ Post::~Post()
 }
 
 //------------------------------------------------------------------------------
-void Post::addFormFile(const std::string& fieldName, std::const string& filePath)
+void Post::addFormFile(const std::string& fieldName, const std::string& filePath)
 {
     _formFiles.add(fieldName, ofToDataPath(filePath));
 }
@@ -72,7 +72,7 @@ void Post::addFormFiles(const std::map<std::string,std::string>& nameValueMap)
 {
     std::map<std::string,std::string>::const_iterator iter = nameValueMap.begin();
 
-    while(iter != nvc.end()) {
+    while(iter != nameValueMap.end()) {
         addFormFile((*iter).first,(*iter).second);
         ++iter;
     }
@@ -83,7 +83,7 @@ void Post::addFormFiles(const multimap<string,string>&  nameValueMap)
 {
     std::multimap<std::string,std::string>::const_iterator iter = nameValueMap.begin();
 
-    while(iter != nvc.end()) {
+    while(iter != nameValueMap.end()) {
         addFormFile((*iter).first,(*iter).second);
         ++iter;
     }
@@ -92,19 +92,19 @@ void Post::addFormFiles(const multimap<string,string>&  nameValueMap)
 //------------------------------------------------------------------------------
 bool Post::hasFormFiles() const
 {
-    return !formFiles.empty();
+    return !_formFiles.empty();
 }
 
 //------------------------------------------------------------------------------
 void Post::clearFormFiles()
 {
-    formFiles.clear();
+    _formFiles.clear();
 }
 
 //------------------------------------------------------------------------------
 const Poco::Net::NameValueCollection& Post::getFormFiles() const
 {
-    return formFiles;
+    return _formFiles;
 }
 
 //------------------------------------------------------------------------------
