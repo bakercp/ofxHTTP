@@ -36,31 +36,34 @@ namespace HTTP {
 class ProxySettings : public Credentials {
 public:
     
-    ProxySettings() :
-    host("127.0.0.1"),
-    port(8909) { }
+    ProxySettings();
 
-    ProxySettings(const string& _username, const string& _password) :
-    Credentials(_username, _password),
-    host("127.0.0.1"),
-    port(8909) { }
+    ProxySettings(const std::string& host,
+                  unsigned short port);
+
+    ProxySettings(const std::string& username,
+                  const std::string& password,
+                  const std::string& host,
+                  unsigned short port);
+
+    virtual ~ProxySettings();
     
-    virtual ~ProxySettings() { }
+    virtual void clear();
     
-    virtual void clear() {
-        Credentials::clear();
-        host = "127.0.0.1";
-        port = 8909;
-    }
-    
-    string getHost() const { return host; }
-    void setHost(const string& _host) { host = _host; }
-    unsigned short getPort() const { return port; }
-    void setPort(unsigned short _port) { port = _port; }
-    
+    std::string getHost() const;
+    void setHost(const std::string& host);
+
+    unsigned short getPort() const;
+    void setPort(unsigned short port);
+
+
 protected:
-    string host;
-    unsigned short port;
+    static const std::string    DEFAULT_PROXY_HOST;
+    static const unsigned short DEFAULT_PROXY_PORT;
+
+    std::string _host;
+    unsigned short _port;
+
 };
 
 } }
