@@ -208,7 +208,7 @@ void BaseRequest::setFormFieldsFromURI(const Poco::URI& uri)
 }
 
 //------------------------------------------------------------------------------
-void BaseRequest::sendRequestBody(ostream& requestStream) const
+void BaseRequest::sendRequestBody(std::ostream& requestStream) const
 {
 }
 
