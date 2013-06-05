@@ -47,7 +47,7 @@
 // TODO: OF_VERSION_MAJOR/MINOR check
 // TODO: undef the ssl stuff
 
-#define SSL_ENABLED 1
+//#define SSL_ENABLED 1
 
 #ifdef SSL_ENABLED
 //#include "Poco/Net/ConsoleCertificateHandler.h"
@@ -96,7 +96,7 @@ public:
 
     struct Settings {
 
-        string           host;
+        std::string      host;
         unsigned short   port;
 #ifdef SSL_ENABLED
         bool             bUseSSL;
@@ -110,10 +110,9 @@ public:
         Poco::Timespan   timeout;
         Poco::Timespan   threadIdleTime;
         Poco::Thread::Priority threadPriority;
-        string           softwareVersion;
+        std::string           softwareVersion;
         
         Poco::ThreadPool& threadPool;
-
 
         Settings(Poco::ThreadPool& _threadPool = Poco::ThreadPool::defaultPool());
     };
@@ -125,7 +124,7 @@ protected:
     
     Settings settings;
 
-    vector<BaseServerRoute::Ptr> routes;
+    std::vector<BaseServerRoute::Ptr> routes;
     
     ofThreadErrorHandler errorHandler;
     ErrorHandler* previousErrorHandler;
