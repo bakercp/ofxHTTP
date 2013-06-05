@@ -6,16 +6,17 @@ namespace HTTP {
         
 
 //------------------------------------------------------------------------------
-ServerDefaultRouteHandler::ServerDefaultRouteHandler(const ServerDefaultRouteSettings& _settings) :
-ServerRouteHandler(_settings),
-settings(_settings)
-{ }
+DefaultServerRouteHandler::DefaultServerRouteHandler(const DefaultServerRouteSettings& _settings)
+: BaseServerRouteHandler(_settings)
+{
+
+}
 
 //------------------------------------------------------------------------------
-ServerDefaultRouteHandler::~ServerDefaultRouteHandler() { }
+DefaultServerRouteHandler::~DefaultServerRouteHandler() { }
 
 //------------------------------------------------------------------------------
-void ServerDefaultRouteHandler::handleExchange(ServerExchange& exchange) {
+void DefaultServerRouteHandler::handleExchange(ServerExchange& exchange) {
 
     Poco::Path dataFolder(ofToDataPath("",true));
     Poco::Path documentRoot(ofToDataPath(settings.documentRoot,true));
@@ -84,7 +85,7 @@ void ServerDefaultRouteHandler::handleExchange(ServerExchange& exchange) {
 }
 
 //------------------------------------------------------------------------------
-void ServerDefaultRouteHandler::sendErrorResponse(Poco::Net::HTTPServerResponse& response) {
+void DefaultServerRouteHandler::sendErrorResponse(Poco::Net::HTTPServerResponse& response) {
     // now check to see if the status was set something other than 200 by an exception
     
     Poco::Net::HTTPResponse::HTTPStatus responseStatus = response.getStatus();
@@ -94,9 +95,9 @@ void ServerDefaultRouteHandler::sendErrorResponse(Poco::Net::HTTPServerResponse&
         try {
             response.sendFile(errorFile.getAbsolutePath(),"text/html");
         } catch(const Poco::FileNotFoundException& exc) {
-            ServerRouteHandler::sendErrorResponse(response);
+            BaseServerRouteHandler::sendErrorResponse(response);
         } catch(const Poco::OpenFileException& exc) {
-            ServerRouteHandler::sendErrorResponse(response);
+            BaseServerRouteHandler::sendErrorResponse(response);
         } catch (const Poco::Exception& exc) {
             ofLogError("ServerRouteHandler::sendErrorResponse") << "Exception: " << exc.code() << " " << exc.displayText();
         } catch (const std::exception& exc) {
@@ -106,8 +107,9 @@ void ServerDefaultRouteHandler::sendErrorResponse(Poco::Net::HTTPServerResponse&
         }
     } else {
         // we didn't have a corresponding error html in the DocumentRoot, so generate one
-        ServerRouteHandler::sendErrorResponse(response);
+        BaseServerRouteHandler::sendErrorResponse(response);
     }
 }
 
+    
 } }

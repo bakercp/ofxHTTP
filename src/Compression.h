@@ -50,10 +50,10 @@ public:
 };
 
 
-class ofxHTTPCompressorEntry {
+class CompressorEntry {
 public:
-    ofxHTTPCompressorEntry(const Poco::Net::MediaType& _mediaType) : mediaType(_mediaType) { }
-    virtual ~ofxHTTPCompressorEntry() { }
+    CompressorEntry(const Poco::Net::MediaType& _mediaType) : mediaType(_mediaType) { }
+    virtual ~CompressorEntry() { }
 
     void addCompressionType(Compression::Type compressionType) {
         removeCompressionType(compressionType);
@@ -97,7 +97,7 @@ public:
     
 private:
     Poco::Net::MediaType mediaType;
-    vector<Compression::Type> validCompressionTypes;
+    std::vector<Compression::Type> validCompressionTypes;
 };
 
 

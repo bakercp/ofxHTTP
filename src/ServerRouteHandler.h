@@ -51,10 +51,10 @@ namespace HTTP {
         
 
 //------------------------------------------------------------------------------
-class ServerRouteHandler : public BaseRequestHandler {
+class BaseServerRouteHandler : public Poco::Net::HTTPRequestHandler {
 public:
-    ServerRouteHandler(const BaseRouteSettings& _settings);
-    virtual ~ServerRouteHandler();
+    BaseServerRouteHandler(const BaseRouteSettings& _settings);
+    virtual ~BaseServerRouteHandler();
     
     // overriden from HTTPRequestHandler
     void handleRequest(Poco::Net::HTTPServerRequest& request,

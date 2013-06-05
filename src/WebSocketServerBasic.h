@@ -36,30 +36,32 @@ namespace HTTP {
 
 
 //------------------------------------------------------------------------------
-class ofxWebSocketServerBasicSettings
-: public ServerBasic::Settings
-, public ofxWebSocketRoute::Settings
+class BasicWebSocketServerSettings
+: public BasicServer::Settings
+, public WebSocketRoute::Settings
 {
 
 };
 
 //------------------------------------------------------------------------------
-class ofxWebSocketServerBasic : public ServerBasic {
+class BasicWebSocketServer : public BasicServer {
 public:
-    typedef ofxWebSocketServerBasicSettings Settings;
-    typedef ofPtr<ofxWebSocketServerBasic> Ptr;
+    typedef BasicWebSocketServerSettings Settings;
+    typedef ofPtr<BasicWebSocketServer> Ptr;
 
-    ofxWebSocketServerBasic(const Settings& _settings = Settings()) :
-    ServerBasic(_settings),
-    settings(_settings)
+    BasicWebSocketServer(const Settings& settings = Settings())
+    : BasicServer(settings)
     {
-        websocket = ofxWebSocketRoute::Instance(_settings);
+        websocket = WebSocketRoute::Instance(_settings);
         addRoute(websocket);
     }
     
-    virtual ~ofxWebSocketServerBasic() { }
+    virtual ~BasicWebSocketServer() \
+    {
+
+    }
     
-    void broadcast(const ofxWebSocketFrame& frame) {
+    void broadcast(const WebSocketFrame& frame) const {
         if(websocket == NULL) {
             ofLogError("ofxWebSocketServerBasic::broadcast") << "call loadSettings first.";
             return;
@@ -69,7 +71,7 @@ public:
     }
     
     
-    void broadcast(ofPixelsRef pixels) {
+    void broadcast(ofPixelsRef pixels) const {
         if(websocket == NULL) {
             ofLogError("ofxWebSocketServerBasic::broadcast") << "call loadSettings first.";
             return;
@@ -78,7 +80,9 @@ public:
         websocket->broadcast(pixels);
     }
     
-    bool sendFrame(ofxWebSocketRouteHandler* handler, const ofxWebSocketFrame& frame) {
+    bool sendFrame(WebSocketRouteHandler* handler,
+                   const WebSocketFrame& frame) const {
+
         if(websocket == NULL) {
             ofLogError("ofxWebSocketServerBasic::sendFrame") << "call loadSettings first.";
             return false;
@@ -87,7 +91,7 @@ public:
         return websocket->sendFrame(handler,frame);
     }
     
-    void disconnect(ofxWebSocketRouteHandler* handler) {
+    void disconnect(WebSocketRouteHandler* handler) {
         if(websocket == NULL) {
             ofLogError("ofxWebSocketServerBasic::disconnect") << "call loadSettings first.";
             return;
@@ -142,13 +146,14 @@ public:
 //    }
 
     
-    ofPtr<ofxWebSocketRoute>         websocket;
+    WebSocketRoute::Ptr websocket;
 
-    static Ptr instance(const Settings& _settings = Settings()) {
-        return Ptr(new ofxWebSocketServerBasic(_settings));
+    static Ptr Instance(const Settings& _settings = Settings()) {
+        return Ptr(new BasicWebSocketServer(_settings));
     }
+    
 protected:
-    Settings settings;
+    Settings _settings;
 
 };
 

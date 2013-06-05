@@ -22,62 +22,53 @@
  
  =============================================================================*/
 
+
 #pragma once
 
-#include <queue>
 
+#include <queue>
 #include "Poco/Exception.h"
 #include "Poco/Timespan.h"
 #include "Poco/Net/Socket.h"
 #include "Poco/Net/WebSocket.h"
 #include "Poco/Net/NetException.h"
-
 #include "ofFileUtils.h"
 #include "ofLog.h"
-
 #include "BaseTypes.h"
 #include "ServerDefaultRouteHandler.h"
-
 #include "BaseWebSocketTypes.h"
 #include "WebSocketEvents.h"
 #include "WebSocketFrame.h"
-
-using std::memset;
-using std::swap;
-using std::queue;
-
-using Poco::Timespan;
-using Poco::TimeoutException;
-using Poco::Net::HTTPException;
-using Poco::Net::Socket;
-using Poco::Net::NetException;
-using Poco::Net::WebSocket;
-using Poco::Net::WebSocketException;
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class ofxWebSocketRouteSettings : public BaseRouteSettings {
+class WebSocketRouteSettings : public BaseRouteSettings {
 public:
-    ofxWebSocketRouteSettings(const string& _route = "/") :
-    BaseRouteSettings(_route),
-    subprotocol(""),
-    bAutoPingPongResponse(true),
-    bKeepAlive(true),
-    bAllowEmptySubprotocol(false),
-    bAllowCrossOriginConnections(false),
-    bIsBinary(false),
-    receiveTimeout(Timespan(60 * Timespan::SECONDS)),
-    sendTimeout(Timespan(60 * Timespan::SECONDS)),
-    pollTimeout(Timespan(10 * Timespan::MILLISECONDS)),
-    bufferSize(1024)
-    { }
+    WebSocketRouteSettings(const std::string& _route = "/")
+    : BaseRouteSettings(_route)
+    , subprotocol("")
+    , bAutoPingPongResponse(true)
+    , bKeepAlive(true)
+    , bAllowEmptySubprotocol(false)
+    , bAllowCrossOriginConnections(false)
+    , bIsBinary(false)
+    , receiveTimeout(Poco::Timespan(60 * Poco::Timespan::SECONDS))
+    , sendTimeout(Poco::Timespan(60 * Poco::Timespan::SECONDS))
+    , pollTimeout(Poco::Timespan(10 * Poco::Timespan::MILLISECONDS))
+    , bufferSize(1024)
+    {
+
+    }
     
-    virtual ~ofxWebSocketRouteSettings() { }
+    virtual ~WebSocketRouteSettings()
+    {
+
+    }
     
-    string subprotocol;
+    std::string subprotocol;
 
     bool bAllowEmptySubprotocol;
     bool bAllowCrossOriginConnections;
@@ -87,9 +78,9 @@ public:
     bool bAutoPingPongResponse; // automatically return pong frames if true
     bool bKeepAlive;
     
-    Timespan receiveTimeout; // remember that timespan uses microseconds
-    Timespan sendTimeout;    // remember that timespan uses microseconds
-    Timespan pollTimeout;    // remember that timespan uses microseconds
+    Poco::Timespan receiveTimeout; // remember that timespan uses microseconds
+    Poco::Timespan sendTimeout;    // remember that timespan uses microseconds
+    Poco::Timespan pollTimeout;    // remember that timespan uses microseconds
     
     size_t bufferSize;
     
@@ -97,31 +88,31 @@ public:
 
 
 //------------------------------------------------------------------------------
-class ofxWebSocketRouteHandler : public ofxBaseWebSocketRouteHandler {
+class WebSocketRouteHandler : public BaseWebSocketRouteHandler {
 public:
 
-    typedef ofxWebSocketRouteSettings Settings;
+    typedef WebSocketRouteSettings Settings;
     
-    ofxWebSocketRouteHandler(ofxBaseWebSocketSessionManager& _manager, const Settings& _settings);
-    virtual ~ofxWebSocketRouteHandler();
+    WebSocketRouteHandler(BaseWebSocketSessionManager& manager,
+                          const Settings& settings);
     
+    virtual ~WebSocketRouteHandler();
+
     virtual void handleExchange(ServerExchange& exchange);
     
-    bool sendFrame(const ofxWebSocketFrame& _frame); // returns false if frame not queued
+    bool sendFrame(const WebSocketFrame& _frame); // returns false if frame not queued
     void disconnect();
 
-    virtual void frameReceived(const ofxWebSocketFrame& _frame);
-    virtual void frameSent(const ofxWebSocketFrame& _frame, int _nBytesSent);
+    virtual void frameReceived(const WebSocketFrame& frame);
+    virtual void frameSent(const WebSocketFrame& frame, int numBytesSent);
     virtual void socketClosed();
     
-    void broadcast(const ofxWebSocketFrame& _frame) {
-        manager.broadcast(_frame);
-    }
+    void broadcast(const WebSocketFrame& frame) const;
+
+    bool isConnected() const;
+    std::string getSubprotocol() const;
     
-    bool isConnected();
-    string getSubprotocol();
-    
-    size_t getSendQueueSize();
+    size_t getSendQueueSize() const;
     void   clearSendQueue();
     
 protected:
@@ -129,7 +120,7 @@ protected:
     
     Settings settings;
 
-    ofxBaseWebSocketSessionManager& manager;
+    BaseWebSocketSessionManager& _manager;
     
 private:
     void handleSubprotocols(ServerExchange& exchange);
@@ -157,11 +148,11 @@ private:
             }
         }
     }
-        
-    bool bIsConnected;
-    
-    ofMutex mutex;
-    queue<ofxWebSocketFrame> frameQueue;
+
+
+    mutable ofMutex mutex;
+    bool _bIsConnected;
+    std::queue<WebSocketFrame> frameQueue;
     
     
 };

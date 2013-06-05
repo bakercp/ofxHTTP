@@ -22,12 +22,11 @@
  
  =============================================================================*/
 
+
 #pragma once
 
+
 #include <istream>
-
-#include "ofLog.h"
-
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
 #include "Poco/StreamCopier.h"
@@ -38,20 +37,9 @@
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NameValueCollection.h"
 #include "Poco/Net/PartHandler.h"
-
+#include "ofLog.h"
 #include "BaseTypes.h"
 #include "ServerRouteHandler.h"
-
-using Poco::Buffer;
-using Poco::Exception;
-using Poco::StreamCopier;
-using Poco::Net::HTMLForm;
-using Poco::Net::HTTPResponse;
-using Poco::Net::HTTPServerRequest;
-using Poco::Net::HTTPServerResponse;
-using Poco::Net::MessageHeader;
-using Poco::Net::NameValueCollection;
-using Poco::Net::PartHandler;
 
 
 namespace ofx {
@@ -60,26 +48,35 @@ namespace HTTP {
 
 class ServerUploadRouteSettings : public BaseRouteSettings {
 public:
-    ServerUploadRouteSettings(const string& _route = "/upload") :
-    BaseRouteSettings(_route),
-    bRequireUploadFolderInDataFolder(true),
-    uploadFolder("uploads"),
-    bAutoCreateUploadFolder(false),
-    uploadRedirect("uploaded.html"),
-    writeBufferSize(8192)
-    { }
+    ServerUploadRouteSettings(const string& route = "/upload")
+    : BaseRouteSettings(route)
+    , bRequireUploadFolderInDataFolder(true)
+    , uploadFolder("uploads")
+    , bAutoCreateUploadFolder(false)
+    , uploadRedirect("uploaded.html")
+    , writeBufferSize(8192)
+    {
+
+    }
+
+    virtual ~ServerUploadRouteSettings()
+    {
+
+    }
     
-    virtual ~ServerUploadRouteSettings() { }
-    
-    bool bRequireUploadFolderInDataFolder;
-    string uploadFolder;
-    bool bAutoCreateUploadFolder;
-    string uploadRedirect;
-    size_t writeBufferSize;
+    bool        bRequireUploadFolderInDataFolder;
+    std::string uploadFolder;
+    bool        bAutoCreateUploadFolder;
+    std::string uploadRedirect;
+    size_t      writeBufferSize;
+
 };
 
 //------------------------------------------------------------------------------
-class ServerUploadRouteHandler : public ServerRouteHandler, public PartHandler {
+class ServerUploadRouteHandler
+: public BaseServerRouteHandler
+, public Poco::Net::PartHandler
+{
 public:
     
     typedef ServerUploadRouteSettings Settings;
@@ -87,8 +84,11 @@ public:
     ServerUploadRouteHandler(const Settings& _settings);
     virtual ~ServerUploadRouteHandler();
     
-    void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response);
-    void handlePart(const MessageHeader& header, istream& stream);
+    void handleRequest(Poco::Net::HTTPServerRequest& request,
+                       Poco::Net::HTTPServerResponse& response);
+
+    void handlePart(const Poco::Net::MessageHeader& header,
+                    std::istream& stream);
 
     virtual bool isContentTypeValid(const string& contentType) const;
     

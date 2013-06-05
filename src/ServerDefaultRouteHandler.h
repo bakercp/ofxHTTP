@@ -32,23 +32,26 @@
 #include "MediaTypeMap.h"
 #include "Compression.h"
 #include "ServerRouteHandler.h"
+#include "Route.h"
 
 
 namespace ofx {
 namespace HTTP {
         
 
-class ServerDefaultRouteSettings : public BaseRouteSettings {
+class DefaultServerRouteSettings : public BaseRouteSettings {
 public:
-    ServerDefaultRouteSettings(const string& _route = "/.*") :
-    BaseRouteSettings(_route),
-    defaultIndex("index.html"),
-    documentRoot("DocumentRoot/"),
-    bRequireDocumentRootInDataFolder(true),
-    bAutoCreateDocumentRoot(false)
-    { }
+    DefaultServerRouteSettings(const std::string& route = "/.*")
+    : BaseRouteSettings(route)
+    , defaultIndex("index.html")
+    , documentRoot("DocumentRoot/")
+    , bAutoCreateDocumentRoot(false)
+    , bRequireDocumentRootInDataFolder(true)
+    {
 
-    virtual ~ServerDefaultRouteSettings() { }
+    }
+
+    virtual ~DefaultServerRouteSettings() { }
     
     // TODO:
     // e.g. http://httpd.apache.org/docs/2.2/mod/mod_deflate.html
@@ -61,26 +64,26 @@ public:
     //    html.addCompressionType(GZIP);
     //    html.addCompressionType(DEFLATE);
     
-    string defaultIndex;
-    string documentRoot;
-
-    map<Poco::Net::MediaType,ofxHTTPCompressorEntry> contentEncoding;
+    std::string defaultIndex;
+    std::string documentRoot;
 
     bool bAutoCreateDocumentRoot;
     bool bRequireDocumentRootInDataFolder;
 
+    std::map<Poco::Net::MediaType,CompressorEntry> contentEncoding;
+
 };
 
 //------------------------------------------------------------------------------
-class ServerDefaultRouteHandler : public ServerRouteHandler {
+class DefaultServerRouteHandler : public BaseServerRouteHandler {
 public:
     
-    ServerDefaultRouteHandler(const ServerDefaultRouteSettings& _settings);
-    virtual ~ServerDefaultRouteHandler();
+    DefaultServerRouteHandler(const DefaultServerRouteSettings& _settings);
+    virtual ~DefaultServerRouteHandler();
         
 protected:
 
-    ServerDefaultRouteSettings settings;
+    DefaultServerRouteSettings settings;
     
     void handleExchange(ServerExchange& exchange);
     void sendErrorResponse(Poco::Net::HTTPServerResponse& response);

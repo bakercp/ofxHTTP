@@ -22,6 +22,7 @@
  
  =============================================================================*/
 
+
 #pragma once
 
 
@@ -29,18 +30,30 @@
 #include "ofFileUtils.h"
 
 
+using Poco::Net::WebSocket;
+
+
 namespace ofx {
 namespace HTTP {
 
 
-class ofxWebSocketFrame : public ofBuffer {
+class WebSocketFrame : public ofBuffer {
 public:
-    ofxWebSocketFrame(const ofBuffer& _buffer, int _flags = Poco::Net::WebSocket::FRAME_TEXT);
-    ofxWebSocketFrame(const string& _text, int _flags = Poco::Net::WebSocket::FRAME_TEXT);
-    ofxWebSocketFrame(const char* _buffer, unsigned int _size, int _flags = Poco::Net::WebSocket::FRAME_TEXT);
-    ofxWebSocketFrame(const unsigned char* _buffer, unsigned int _size, int _flags = Poco::Net::WebSocket::FRAME_TEXT);
+    WebSocketFrame(const ofBuffer& buffer,
+                   int flags = WebSocket::FRAME_TEXT);
+
+    WebSocketFrame(const std::string& text,
+                   int flags = WebSocket::FRAME_TEXT);
+
+    WebSocketFrame(const char* buffer,
+                   unsigned int size,
+                   int flags = WebSocket::FRAME_TEXT);
+
+    WebSocketFrame(const unsigned char* buffer,
+                   unsigned int size,
+                   int flags = WebSocket::FRAME_TEXT);
     
-    virtual ~ofxWebSocketFrame();
+    virtual ~WebSocketFrame();
     
     int getFlags() const;
     
@@ -56,10 +69,10 @@ public:
     bool isRSV2()  const;
     bool isRSV3()  const;
     
-    string toString() const;
+    std::string toString() const;
 
 protected:
-    int      flags;
+    int      _flags;
     
 };
 

@@ -6,15 +6,15 @@ namespace HTTP {
         
 
 //------------------------------------------------------------------------------
-ServerRouteHandler::ServerRouteHandler(const BaseRouteSettings& _settings) {
+BaseServerRouteHandler::BaseServerRouteHandler(const BaseRouteSettings& _settings) {
     //route = _settings.getRoute();
 }
 
 //------------------------------------------------------------------------------
-ServerRouteHandler::~ServerRouteHandler() { }
+BaseServerRouteHandler::~BaseServerRouteHandler() { }
 
 //------------------------------------------------------------------------------
-void ServerRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
+void BaseServerRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
                                        Poco::Net::HTTPServerResponse& response)
 {
     ServerExchange exchange(request,response);
@@ -93,14 +93,14 @@ void ServerRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
 //}
 
 //------------------------------------------------------------------------------
-void ServerRouteHandler::handleExchange(ServerExchange& exchange) {
+void BaseServerRouteHandler::handleExchange(ServerExchange& exchange) {
     exchange.response.setStatus(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     exchange.response.setReason("No Matching Routes Found.");
     sendErrorResponse(exchange.response);
 }
 
 //------------------------------------------------------------------------------
-void ServerRouteHandler::sendErrorResponse(Poco::Net::HTTPServerResponse& response) {
+void BaseServerRouteHandler::sendErrorResponse(Poco::Net::HTTPServerResponse& response) {
     // we will assume that the sender has set the status and
     // reason appropriately before calling the sendErrorResponse()
 

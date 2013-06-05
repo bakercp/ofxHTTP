@@ -31,11 +31,11 @@ namespace ofx {
 namespace HTTP {
 
 
-class ofxWebSocketFrame;
-class ofxWebSocketRouteHandler;
+class WebSocketFrame;
+class WebSocketRouteHandler;
 
 
-enum ofxWebSocketError {
+enum WebSocketError {
     WS_ERR_NONE                           = 0,
     
     WS_ERR_NO_HANDSHAKE                   = 1,
@@ -65,36 +65,70 @@ enum ofxWebSocketError {
     
 };
 
-class ofxWebSocketEventArgs {
+class WebSocketEventArgs {
 public:
-    ofxWebSocketEventArgs(ofxWebSocketRouteHandler& _connection, ofxWebSocketError _error = WS_ERR_NONE) : connection(_connection), error(_error) { }
+    WebSocketEventArgs(WebSocketRouteHandler& connection,
+                       WebSocketError error = WS_ERR_NONE)
+    : _connection(connection)
+    , _error(error)
+    {
+
+    }
     
-    bool hasError() const { return error != WS_ERR_NONE; }
-    ofxWebSocketError getError() const { return error; }
-    void setError(ofxWebSocketError _error) { error = _error; }
-    ofxWebSocketRouteHandler& getConnectionRef() { return connection; }
+    bool hasError() const
+    {
+        return _error != WS_ERR_NONE;
+    }
+
+    WebSocketError getError() const
+    {
+        return _error;
+    }
+
+    void setError(WebSocketError error)
+    {
+        _error = error;
+    }
+
+    WebSocketRouteHandler& getConnectionRef()
+    {
+        return _connection;
+    }
+
+private:
+    WebSocketRouteHandler& _connection;
+    WebSocketError _error;
     
-    ofxWebSocketRouteHandler& connection;
-    ofxWebSocketError error;
 };
 
-class ofxWebSocketFrameEventArgs : public ofxWebSocketEventArgs {
+class WebSocketFrameEventArgs : public WebSocketEventArgs {
 public:
-    ofxWebSocketFrameEventArgs(ofxWebSocketRouteHandler& _connection, ofxWebSocketFrame& _frame, ofxWebSocketError _error = WS_ERR_NONE)
-    : ofxWebSocketEventArgs(_connection,_error), frame(_frame) { }
+    WebSocketFrameEventArgs(WebSocketRouteHandler& connection,
+                            WebSocketFrame& frame,
+                            WebSocketError error = WS_ERR_NONE)
+    : WebSocketEventArgs(connection,error)
+    , _frame(frame)
+    {
 
-    ofxWebSocketFrame& getFrameRef() { return frame; }
-    
-    ofxWebSocketFrame& frame;
+    }
+
+    WebSocketFrame& getFrameRef()
+    {
+        return _frame;
+    }
+
+private:
+    WebSocketFrame& _frame;
+
 };
 
-class ofxWebsocketEvents {
+class WebsocketEvents {
 public:
-    ofEvent<ofxWebSocketEventArgs>      onOpenEvent;
-    ofEvent<ofxWebSocketEventArgs>      onCloseEvent;
-    ofEvent<ofxWebSocketFrameEventArgs> onFrameReceivedEvent;
-    ofEvent<ofxWebSocketFrameEventArgs> onFrameSentEvent;
-    ofEvent<ofxWebSocketEventArgs>      onErrorEvent;
+    ofEvent<WebSocketEventArgs>      onOpenEvent;
+    ofEvent<WebSocketEventArgs>      onCloseEvent;
+    ofEvent<WebSocketFrameEventArgs> onFrameReceivedEvent;
+    ofEvent<WebSocketFrameEventArgs> onFrameSentEvent;
+    ofEvent<WebSocketEventArgs>      onErrorEvent;
 };
 
     

@@ -32,14 +32,15 @@ namespace ofx {
 namespace HTTP {
         
 
-class ServerDefaultRoute : public BaseServerRoute
+class DefaultServerRoute : public BaseServerRoute
 {
 public:
-    typedef ServerDefaultRouteSettings Settings;
-    typedef ofPtr<ServerDefaultRoute> Ptr;
+    typedef DefaultServerRouteSettings Settings;
+    typedef ofPtr<DefaultServerRoute> Ptr;
 
-    ServerDefaultRoute(const Settings& settings = Settings()) :
-    _settings(settings) {
+    DefaultServerRoute(const Settings& settings = Settings())
+    : _settings(settings)
+    {
         
         ofDirectory documentRootDirectory(_settings.documentRoot);
         
@@ -49,7 +50,10 @@ public:
         }
     }
     
-    virtual ~ServerDefaultRoute() { }
+    virtual ~DefaultServerRoute()
+    {
+
+    }
 
     bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
                           bool bIsSecurePort) {
@@ -82,11 +86,11 @@ public:
 
     Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request)
     {
-        return new ServerDefaultRouteHandler(_settings);
+        return new DefaultServerRouteHandler(_settings);
     }
 
     static Ptr Instance(const Settings& settings = Settings()) {
-        return Ptr(new ServerDefaultRoute(settings));
+        return Ptr(new DefaultServerRoute(settings));
     }
     
 protected:

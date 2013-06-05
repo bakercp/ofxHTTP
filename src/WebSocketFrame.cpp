@@ -1,3 +1,28 @@
+/*==============================================================================
+
+ Copyright (c) 2013 - Christopher Baker <http://christopherbaker.net>
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+
+ =============================================================================*/
+
+
 #include "WebSocketFrame.h"
 
 
@@ -6,80 +31,113 @@ namespace HTTP {
 
 
 //------------------------------------------------------------------------------
-ofxWebSocketFrame::ofxWebSocketFrame(const ofBuffer& _buffer, int _flags)
-: flags(_flags) { set(_buffer); }
-
-//------------------------------------------------------------------------------
-ofxWebSocketFrame::ofxWebSocketFrame(const string& _text, int _flags)
-: flags(_flags) { set(_text); }
-
-//------------------------------------------------------------------------------
-ofxWebSocketFrame::ofxWebSocketFrame(const unsigned char* _buffer, unsigned int _size, int _flags)
-: flags(_flags) { set(reinterpret_cast<const char*>(_buffer),_size); }
-
-//------------------------------------------------------------------------------
-ofxWebSocketFrame::ofxWebSocketFrame(const char* _buffer, unsigned int _size, int _flags)
-: flags(_flags) { set(_buffer,_size); }
-
-//------------------------------------------------------------------------------
-ofxWebSocketFrame::~ofxWebSocketFrame() { }
-
-//------------------------------------------------------------------------------
-int ofxWebSocketFrame::getFlags() const { return flags; }
-
-//------------------------------------------------------------------------------
-bool ofxWebSocketFrame::isContinuation() const {
-    return (flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) == Poco::Net::WebSocket::FRAME_OP_CONT;
+WebSocketFrame::WebSocketFrame(const ofBuffer& buffer, int flags)
+: _flags(flags)
+{
+    set(buffer);
 }
 
 //------------------------------------------------------------------------------
-bool ofxWebSocketFrame::isText() const {
-    return (flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) == Poco::Net::WebSocket::FRAME_OP_TEXT;
+WebSocketFrame::WebSocketFrame(const std::string& text, int flags)
+: _flags(flags)
+{
+    set(text);
 }
 
 //------------------------------------------------------------------------------
-bool ofxWebSocketFrame::isBinary() const {
-    return (flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) == Poco::Net::WebSocket::FRAME_OP_BINARY;
+WebSocketFrame::WebSocketFrame(const unsigned char* buffer,
+                               unsigned int size,
+                               int flags)
+: _flags(flags)
+{
+    set(reinterpret_cast<const char*>(buffer),size);
 }
 
 //------------------------------------------------------------------------------
-bool ofxWebSocketFrame::isClose() const {
-    return (flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) == Poco::Net::WebSocket::FRAME_OP_CLOSE;
+WebSocketFrame::WebSocketFrame(const char* buffer,
+                               unsigned int size,
+                               int flags)
+: _flags(flags)
+{
+    set(buffer,size);
 }
 
 //------------------------------------------------------------------------------
-bool ofxWebSocketFrame::isPing() const {
-    return (flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) == Poco::Net::WebSocket::FRAME_OP_PING;
+WebSocketFrame::~WebSocketFrame()
+{
+
 }
 
 //------------------------------------------------------------------------------
-bool ofxWebSocketFrame::isPong() const {
-    return (flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) == Poco::Net::WebSocket::FRAME_OP_PONG;
+int WebSocketFrame::getFlags() const
+{
+    return _flags;
 }
 
 //------------------------------------------------------------------------------
-bool ofxWebSocketFrame::isFinal() const {
-    return flags & Poco::Net::WebSocket::FRAME_FLAG_FIN;
+bool WebSocketFrame::isContinuation() const
+{
+    return (_flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_CONT;
 }
 
 //------------------------------------------------------------------------------
-bool ofxWebSocketFrame::isRSV1() const {
-    return flags & Poco::Net::WebSocket::FRAME_FLAG_RSV1;
+bool WebSocketFrame::isText() const
+{
+    return (_flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_TEXT;
 }
 
 //------------------------------------------------------------------------------
-bool ofxWebSocketFrame::isRSV2() const {
-    return flags & Poco::Net::WebSocket::FRAME_FLAG_RSV2;
+bool WebSocketFrame::isBinary() const
+{
+    return (_flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_BINARY;
 }
 
 //------------------------------------------------------------------------------
-bool ofxWebSocketFrame::isRSV3() const {
-    return flags & Poco::Net::WebSocket::FRAME_FLAG_RSV3;
+bool WebSocketFrame::isClose() const
+{
+    return (_flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_CLOSE;
 }
 
 //------------------------------------------------------------------------------
-string ofxWebSocketFrame::toString() const {
-    stringstream ss;
+bool WebSocketFrame::isPing() const
+{
+    return (_flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_PING;
+}
+
+//------------------------------------------------------------------------------
+bool WebSocketFrame::isPong() const
+{
+    return (_flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_PONG;
+}
+
+//------------------------------------------------------------------------------
+bool WebSocketFrame::isFinal() const
+{
+    return _flags & Poco::Net::WebSocket::FRAME_FLAG_FIN;
+}
+
+//------------------------------------------------------------------------------
+bool WebSocketFrame::isRSV1() const
+{
+    return _flags & Poco::Net::WebSocket::FRAME_FLAG_RSV1;
+}
+
+//------------------------------------------------------------------------------
+bool WebSocketFrame::isRSV2() const
+{
+    return _flags & Poco::Net::WebSocket::FRAME_FLAG_RSV2;
+}
+
+//------------------------------------------------------------------------------
+bool WebSocketFrame::isRSV3() const
+{
+    return _flags & Poco::Net::WebSocket::FRAME_FLAG_RSV3;
+}
+
+//------------------------------------------------------------------------------
+std::string WebSocketFrame::toString() const
+{
+    std::stringstream ss;
     ss << "Flags:";
     ss << " CONT="    << (isContinuation() ? "Y" : "N");
     ss << ", TXT="    << (isText()         ? "Y" : "N");

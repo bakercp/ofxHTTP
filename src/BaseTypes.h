@@ -46,14 +46,32 @@ namespace HTTP {
 
 class BaseRouteSettings {
 public:
-    BaseRouteSettings(const std::string& _route) : route(_route) { }
-    virtual ~BaseRouteSettings() { }
-    virtual string getRoute() const { return route; };
-    virtual void setRoute(const string& _route) { route = _route; }
-    
+    BaseRouteSettings(const std::string& route)
+    : _route(route)
+    {
+
+    }
+
+    virtual ~BaseRouteSettings()
+    {
+
+    }
+
+    std::string getRoute() const
+    {
+        return _route;
+    }
+
+    void setRoute(const std::string& route)
+    {
+        _route = route;
+    }
+
 protected:
-    string route;
+    std::string _route;
+
 };
+
 
 class BaseServerRoute : public Poco::Net::HTTPRequestHandlerFactory {
 public:
@@ -65,17 +83,6 @@ public:
     virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request, bool bIsSecurePort) = 0;
     
 //    virtual string getRoute() const = 0;
-    
-};
-
-//typedef ofPtr<ofxBaseHTTPServerRoute> ofxBaseHTTPServerRoutePtr;
-
-class BaseRequestHandler : public Poco::Net::HTTPRequestHandler {
-public:
-    BaseRequestHandler() { }
-    virtual ~BaseRequestHandler() { }
-    
-    virtual void handleExchange(ServerExchange& exchange) = 0;
     
 };
 

@@ -1,26 +1,30 @@
+
+
 #include "WebSocketRouteHandler.h"
+
 
 namespace ofx {
 namespace HTTP {
 
+
 //------------------------------------------------------------------------------
-ofxWebSocketRouteHandler::ofxWebSocketRouteHandler(ofxBaseWebSocketSessionManager& _manager,
-                                                   const Settings& _settings)
-: ofxBaseWebSocketRouteHandler(_settings)
-, settings(_settings)
-, manager(_manager)
-, bIsConnected(false)
+WebSocketRouteHandler::WebSocketRouteHandler(BaseWebSocketSessionManager& manager,
+                                             const Settings& settings)
+: BaseWebSocketRouteHandler(settings)
+, _manager(manager)
+, _bIsConnected(false)
 {
     manager.registerRouteHandler(this);
 }
 
 //------------------------------------------------------------------------------
-ofxWebSocketRouteHandler::~ofxWebSocketRouteHandler() {
-    manager.unregisterRouteHandler(this);
+WebSocketRouteHandler::~WebSocketRouteHandler()
+{
+    _manager.unregisterRouteHandler(this);
 }
 
 //------------------------------------------------------------------------------
-void ofxWebSocketRouteHandler::handleExchange(ServerExchange& exchange) {
+void WebSocketRouteHandler::handleExchange(ServerExchange& exchange) {
 
     try {
         applyFirefoxHack(exchange.request); // TODO: fix when poco is upgraded
@@ -40,8 +44,8 @@ void ofxWebSocketRouteHandler::handleExchange(ServerExchange& exchange) {
 
         setIsConnected(true);
 
-        ofxWebSocketEventArgs eventArgs(*this);
-        ofNotifyEvent(manager.events.onOpenEvent, eventArgs, this);
+        WebSocketEventArgs eventArgs(*this);
+        ofNotifyEvent(_manager.events.onOpenEvent, eventArgs, this);
         
         ofLogNotice("ServerWebSocketRouteHandler::handleRequest") << "WebSocket connection established.";
 
@@ -53,21 +57,21 @@ void ofxWebSocketRouteHandler::handleExchange(ServerExchange& exchange) {
 //        int numBytesSent = 0;
         
         do {
-            if(ws.poll(settings.pollTimeout, Socket::SELECT_READ)) {
+            if(ws.poll(settings.pollTimeout, Poco::Net::Socket::SELECT_READ)) {
                 numBytesReceived = ws.receiveFrame(buffer, sizeof(buffer), flags);
                 
                 if(numBytesReceived > 0) {
                     
-                    ofxWebSocketFrame frame(buffer,numBytesReceived,flags);
+                    WebSocketFrame frame(buffer,numBytesReceived,flags);
                     
                     if(settings.bAutoPingPongResponse) {
                         if(frame.isPing()) {
-                            ofxWebSocketFrame pongFrame(buffer,
+                            WebSocketFrame pongFrame(buffer,
                                                         numBytesReceived,
                                                         Poco::Net::WebSocket::FRAME_FLAG_FIN | Poco::Net::WebSocket::FRAME_OP_PONG);
                             sendFrame(pongFrame);
                         } else if(frame.isPong()) {
-                            ofxWebSocketFrame pingFrame(buffer,
+                            WebSocketFrame pingFrame(buffer,
                                                         numBytesReceived,
                                                         Poco::Net::WebSocket::FRAME_FLAG_FIN | Poco::Net::WebSocket::FRAME_OP_PING);
                             sendFrame(pingFrame);
@@ -76,8 +80,9 @@ void ofxWebSocketRouteHandler::handleExchange(ServerExchange& exchange) {
                     
                     frameReceived(frame);
                     
-                    ofxWebSocketFrameEventArgs frameArgs(*this,frame);
-                    ofNotifyEvent(manager.events.onFrameReceivedEvent,frameArgs,this);
+                    WebSocketFrameEventArgs frameArgs(*this,frame);
+                    ofNotifyEvent(_manager.events.onFrameReceivedEvent,frameArgs,this);
+                    
                 } else {
                     // clean shutdown
                     disconnect();
@@ -87,36 +92,36 @@ void ofxWebSocketRouteHandler::handleExchange(ServerExchange& exchange) {
             // lock the queue while we work on it
             processFrameQueue(ws);
             
-            if(ws.poll(settings.pollTimeout, Socket::SELECT_ERROR)) {
+            if(ws.poll(settings.pollTimeout, Poco::Net::Socket::SELECT_ERROR)) {
                 disconnect(); // locks!
                 cout << "GOT ERROR KILLING IT!" << endl;
             }
             
-        } while (bIsConnected && (flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) != Poco::Net::WebSocket::FRAME_OP_CLOSE);
+        } while (_bIsConnected && (flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) != Poco::Net::WebSocket::FRAME_OP_CLOSE);
         
         ofLogNotice("ServerWebSocketRouteHandler::handleRequest") << "WebSocket connection closed.";
     
-    } catch (const WebSocketException& exc) {
+    } catch (const Poco::Net::WebSocketException& exc) {
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "WebSocketException: " << exc.code() << " Desc: " << exc.what();
-        ofxWebSocketEventArgs eventArgs(*this);
+        WebSocketEventArgs eventArgs(*this);
         switch (exc.code()) {
-            case WebSocket::WS_ERR_HANDSHAKE_UNSUPPORTED_VERSION:
+            case Poco::Net::WebSocket::WS_ERR_HANDSHAKE_UNSUPPORTED_VERSION:
                 eventArgs.setError(WS_ERR_HANDSHAKE_UNSUPPORTED_VERSION);
                 exchange.response.set("Sec-WebSocket-Version", Poco::Net::WebSocket::WEBSOCKET_VERSION);
                 exchange.response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
                 exchange.response.setReason("WS_ERR_HANDSHAKE_UNSUPPORTED_VERSION");
                 break;
-            case WebSocket::WS_ERR_NO_HANDSHAKE:
+            case Poco::Net::WebSocket::WS_ERR_NO_HANDSHAKE:
                 eventArgs.setError(WS_ERR_NO_HANDSHAKE);
                 exchange.response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
                 exchange.response.setReason("WS_ERR_NO_HANDSHAKE");
                 break;
-            case WebSocket::WS_ERR_HANDSHAKE_NO_VERSION:
+            case Poco::Net::WebSocket::WS_ERR_HANDSHAKE_NO_VERSION:
                 eventArgs.setError(WS_ERR_HANDSHAKE_NO_VERSION);
                 exchange.response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
                 exchange.response.setReason("WS_ERR_HANDSHAKE_NO_VERSION");
                 break;
-            case WebSocket::WS_ERR_HANDSHAKE_NO_KEY:
+            case Poco::Net::WebSocket::WS_ERR_HANDSHAKE_NO_KEY:
                 eventArgs.setError(WS_ERR_HANDSHAKE_NO_KEY);
                 exchange.response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
                 exchange.response.setReason("WS_ERR_HANDSHAKE_NO_KEY");
@@ -125,48 +130,48 @@ void ofxWebSocketRouteHandler::handleExchange(ServerExchange& exchange) {
         
         sendErrorResponse(exchange.response);
         socketClosed();
-        ofNotifyEvent(manager.events.onErrorEvent, eventArgs, this);
-    } catch (const TimeoutException& exc) {
+        ofNotifyEvent(_manager.events.onErrorEvent, eventArgs, this);
+    } catch (const Poco::TimeoutException& exc) {
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "TimeoutException: " << exc.code() << " Desc: " << exc.what();
         socketClosed();
-        ofxWebSocketEventArgs eventArgs(*this,WS_ERR_TIMEOUT);
-        ofNotifyEvent(manager.events.onErrorEvent, eventArgs, this);
+        WebSocketEventArgs eventArgs(*this,WS_ERR_TIMEOUT);
+        ofNotifyEvent(_manager.events.onErrorEvent, eventArgs, this);
         // response socket has already been closed (!?)
-    } catch (const NetException& exc) {
+    } catch (const Poco::Net::NetException& exc) {
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "NetException: " << exc.code() << " Desc: " << exc.what();
         socketClosed();
-        ofxWebSocketEventArgs eventArgs(*this,WS_ERR_NET_EXCEPTION);
-        ofNotifyEvent(manager.events.onErrorEvent, eventArgs, this);
+        WebSocketEventArgs eventArgs(*this,WS_ERR_NET_EXCEPTION);
+        ofNotifyEvent(_manager.events.onErrorEvent, eventArgs, this);
         // response socket has already been closed (!?)
     } catch (const exception& exc) {
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "exception: " << exc.what();
         exchange.response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         sendErrorResponse(exchange.response);
         socketClosed();
-        ofxWebSocketEventArgs eventArgs(*this,WS_ERR_OTHER);
-        ofNotifyEvent(manager.events.onErrorEvent, eventArgs, this);
+        WebSocketEventArgs eventArgs(*this,WS_ERR_OTHER);
+        ofNotifyEvent(_manager.events.onErrorEvent, eventArgs, this);
     } catch ( ... ) {
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "... Unknown exception.";
         exchange.response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         sendErrorResponse(exchange.response);
         socketClosed();
-        ofxWebSocketEventArgs eventArgs(*this,WS_ERR_OTHER);
-        ofNotifyEvent(manager.events.onErrorEvent, eventArgs, this);
+        WebSocketEventArgs eventArgs(*this,WS_ERR_OTHER);
+        ofNotifyEvent(_manager.events.onErrorEvent, eventArgs, this);
     }
-    ofxWebSocketEventArgs eventArgs(*this);
-    ofNotifyEvent(manager.events.onCloseEvent,eventArgs,this);
+    WebSocketEventArgs eventArgs(*this);
+    ofNotifyEvent(_manager.events.onCloseEvent,eventArgs,this);
 }
 
 //------------------------------------------------------------------------------
-void ofxWebSocketRouteHandler::frameReceived(const ofxWebSocketFrame& _frame) {
-    ofxWebSocketFrame frame(_frame);
+void WebSocketRouteHandler::frameReceived(const WebSocketFrame& _frame) {
+    WebSocketFrame frame(_frame);
     sendFrame(_frame); // echo
 }
 
 //------------------------------------------------------------------------------
-bool ofxWebSocketRouteHandler::sendFrame(const ofxWebSocketFrame& _frame) {
+bool WebSocketRouteHandler::sendFrame(const WebSocketFrame& _frame) {
     ofScopedLock lock(mutex);
-    if(bIsConnected) {
+    if(_bIsConnected) {
         frameQueue.push(_frame);
         return true;
     } else {
@@ -175,61 +180,63 @@ bool ofxWebSocketRouteHandler::sendFrame(const ofxWebSocketFrame& _frame) {
 }
 
 //------------------------------------------------------------------------------
-void ofxWebSocketRouteHandler::frameSent(const ofxWebSocketFrame& _frame, int _nBytesSent) {
+void WebSocketRouteHandler::frameSent(const WebSocketFrame& _frame, int _nBytesSent) {
     ofLogVerbose("ServerWebSocketRouteHandler::frameSent") << _frame.toString() << " nBytesSent=" << _nBytesSent;
 }
 
 //------------------------------------------------------------------------------
-void ofxWebSocketRouteHandler::socketClosed() {
+void WebSocketRouteHandler::socketClosed() {
     ofLogVerbose("ServerWebSocketRouteHandler::frameSent") << "Socket closed.";
 }
 
 //------------------------------------------------------------------------------
-size_t ofxWebSocketRouteHandler::getSendQueueSize() {
+size_t WebSocketRouteHandler::getSendQueueSize() const
+{
     ofScopedLock lock(mutex);
     return frameQueue.size();
 }
 
 //------------------------------------------------------------------------------
-void ofxWebSocketRouteHandler::clearSendQueue() {
+void WebSocketRouteHandler::clearSendQueue() {
     ofScopedLock lock(mutex);
-    queue<ofxWebSocketFrame> empty; // a way to clear queues.
+    queue<WebSocketFrame> empty; // a way to clear queues.
     swap( frameQueue, empty );
 }
 
 //------------------------------------------------------------------------------
-void ofxWebSocketRouteHandler::disconnect() {
+void WebSocketRouteHandler::disconnect() {
     setIsConnected(false);
 }
 
 //------------------------------------------------------------------------------
-bool ofxWebSocketRouteHandler::isConnected() {
+bool WebSocketRouteHandler::isConnected() const
+{
     ofScopedLock lock(mutex);
-    return bIsConnected;
+    return _bIsConnected;
 }
 
 //------------------------------------------------------------------------------
-void ofxWebSocketRouteHandler::setIsConnected(bool _bIsConnected) {
+void WebSocketRouteHandler::setIsConnected(bool bIsConnected) {
     ofScopedLock lock(mutex);
-    bIsConnected = _bIsConnected;
+    _bIsConnected = bIsConnected;
 }
 
 
 //------------------------------------------------------------------------------
-string ofxWebSocketRouteHandler::getSubprotocol() {
+string WebSocketRouteHandler::getSubprotocol() const {
     ofScopedLock lock(mutex);
     return settings.subprotocol;
 }
 
 //------------------------------------------------------------------------------
-void ofxWebSocketRouteHandler::handleOrigin(ServerExchange &exchange) {
+void WebSocketRouteHandler::handleOrigin(ServerExchange &exchange) {
     ofLogError("ofxWebSocketRouteHandler::handleOrigin") << "TODO: handle/check origin";
 }
 
 //------------------------------------------------------------------------------
-void ofxWebSocketRouteHandler::handleSubprotocols(ServerExchange& exchange) {
+void WebSocketRouteHandler::handleSubprotocols(ServerExchange& exchange) {
     
-    bool validProtocol = manager.selectSubprotocol(ofSplitString(exchange.request.get("Sec-WebSocket-Protocol",""),",",true,true),settings.subprotocol);
+    bool validProtocol = _manager.selectSubprotocol(ofSplitString(exchange.request.get("Sec-WebSocket-Protocol",""),",",true,true),settings.subprotocol);
     
     // if we don't support the protocol, we don't send a Sec-WebSocket-Protocol header with the response.
     // in doing so, we leave the decision up to the client.  most clients should terminate the connection.
@@ -243,7 +250,8 @@ void ofxWebSocketRouteHandler::handleSubprotocols(ServerExchange& exchange) {
 }
 
 //------------------------------------------------------------------------------
-void ofxWebSocketRouteHandler::handleExtensions(ServerExchange& exchange) {
+void WebSocketRouteHandler::handleExtensions(ServerExchange& exchange) {
+
     if(exchange.request.has("Sec-WebSocket-Extensions")) {
         // TODO: support these
         // http://tools.ietf.org/html/draft-tyoshino-hybi-websocket-perframe-deflate-05
@@ -251,34 +259,34 @@ void ofxWebSocketRouteHandler::handleExtensions(ServerExchange& exchange) {
     }
 }
 
-void ofxWebSocketRouteHandler::processFrameQueue(Poco::Net::WebSocket& ws) {
+void WebSocketRouteHandler::processFrameQueue(Poco::Net::WebSocket& ws) {
     int numBytesSent = 0;
     
     ofScopedLock lock(mutex);
     while(!frameQueue.empty()) {
-        ofxWebSocketFrame frame = frameQueue.front();
+        WebSocketFrame frame = frameQueue.front();
         frameQueue.pop();
         
         if(frame.size() > 0) {
-            if(ws.poll(settings.pollTimeout, Socket::SELECT_WRITE)) {
+            if(ws.poll(settings.pollTimeout, Poco::Net::Socket::SELECT_WRITE)) {
                 numBytesSent = ws.sendFrame(frame.getBinaryBuffer(),
                                             frame.size(),
                                             frame.getFlags());
                 
-                ofxWebSocketFrameEventArgs eventArgs(*this,frame);
+                WebSocketFrameEventArgs eventArgs(*this,frame);
                 
                 if(numBytesSent <= 0) {
                     ofLogWarning("ServerWebSocketRouteHandler::handleRequest") << "WebSocket numBytesSent <= 0";
                     eventArgs.setError(WS_ERROR_ZERO_BYTE_FRAME_SENT);
                 } else if(numBytesSent < frame.size()) {
                     ofLogWarning("ServerWebSocketRouteHandler::handleRequest") << "WebSocket numBytesSent < frame.size()";
-                    ofxWebSocketEventArgs eventArgs(*this);
+                    WebSocketEventArgs eventArgs(*this);
                     eventArgs.setError(WS_ERROR_INCOMPLETE_FRAME_SENT);
                 }
                 
                 frameSent(frame,numBytesSent);
                 
-                ofNotifyEvent(manager.events.onFrameSentEvent, eventArgs, this);
+                ofNotifyEvent(_manager.events.onFrameSentEvent, eventArgs, this);
             }
             
         }

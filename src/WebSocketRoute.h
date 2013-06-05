@@ -38,25 +38,34 @@ namespace HTTP {
 
 
 //------------------------------------------------------------------------------
-class ofxWebSocketRoute : public BaseServerRoute, public ofxBaseWebSocketSessionManager {
+class WebSocketRoute
+: public BaseServerRoute
+, public BaseWebSocketSessionManager
+{
 public:
-    typedef ofxWebSocketRouteHandler::Settings Settings;
-    typedef ofPtr<ofxWebSocketRoute> Ptr;
+    typedef WebSocketRouteHandler::Settings Settings;
+    typedef ofPtr<WebSocketRoute> Ptr;
     
-    ofxWebSocketRoute(const Settings& _settings);
-    virtual ~ofxWebSocketRoute();
+    WebSocketRoute(const Settings& _settings);
+    virtual ~WebSocketRoute();
 
-    bool canHandleRequest(const Poco::Net::HTTPServerRequest& request, bool bIsSecurePort);
+    bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
+                          bool bIsSecurePort);
+
     Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
 
-    virtual string getRoute() const { return settings.getRoute(); }
+    virtual std::string getRoute() const
+    {
+        return _settings.getRoute();
+    }
     
-    static Ptr Instance(const Settings& settings = Settings()) {
-        return Ptr(new ofxWebSocketRoute(settings));
+    static Ptr Instance(const Settings& settings = Settings())
+    {
+        return Ptr(new WebSocketRoute(settings));
     }
     
 protected:
-    Settings settings;
+    Settings _settings;
 
 };
 

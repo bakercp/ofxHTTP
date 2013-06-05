@@ -31,16 +31,20 @@ namespace HTTP {
 
 
 //------------------------------------------------------------------------------
-ofxWebSocketRoute::ofxWebSocketRoute(const Settings& _settings) { }
+WebSocketRoute::WebSocketRoute(const Settings& settings)
+: _settings(settings)
+{
+
+}
     
 //------------------------------------------------------------------------------
-ofxWebSocketRoute::~ofxWebSocketRoute() {
+WebSocketRoute::~WebSocketRoute() {
     cout << "closing down route!" << endl;
 }
     
 //------------------------------------------------------------------------------
-bool ofxWebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
-                                         bool bIsSecurePort)
+bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
+                                      bool bIsSecurePort)
 {
     // require HTTP_GET
     if(request.getMethod() != Poco::Net::HTTPRequest::HTTP_GET) return false;
@@ -73,12 +77,13 @@ bool ofxWebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& req
     // make paths absolute
     if(path.empty()) { path = "/"; }
     
-    return Poco::RegularExpression(settings.getRoute()).match(path);
+    return Poco::RegularExpression(_settings.getRoute()).match(path);
 }
                                  
 //------------------------------------------------------------------------------
-Poco::Net::HTTPRequestHandler* ofxWebSocketRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request) {
-    return new ofxWebSocketRouteHandler(*this,settings);
+Poco::Net::HTTPRequestHandler* WebSocketRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+{
+    return new WebSocketRouteHandler(*this,_settings);
 }
 
 

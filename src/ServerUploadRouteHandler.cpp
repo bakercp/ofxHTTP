@@ -6,18 +6,25 @@ namespace HTTP {
         
 
 //------------------------------------------------------------------------------
-ServerUploadRouteHandler::ServerUploadRouteHandler(const Settings& _settings) :
-ServerRouteHandler(_settings),
-settings(_settings)
-{ }
+ServerUploadRouteHandler::ServerUploadRouteHandler(const Settings& _settings)
+: BaseServerRouteHandler(_settings)
+{
+
+}
 
 //------------------------------------------------------------------------------
-ServerUploadRouteHandler::~ServerUploadRouteHandler() { }
+ServerUploadRouteHandler::~ServerUploadRouteHandler()
+{
+
+}
 
 //------------------------------------------------------------------------------
-void ServerUploadRouteHandler::handleRequest(HTTPServerRequest& request, HTTPServerResponse& response) {
+void ServerUploadRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
+                                             Poco::Net::HTTPServerResponse& response)
+{
+
 //    if(isValidRequest(request,response,settings.route)) {
-//        
+//
 //        Path dataFolder(ofToDataPath("",true));
 //        Path uploadFolder(ofToDataPath(settings.uploadFolder,true));
 //        
@@ -49,7 +56,9 @@ void ServerUploadRouteHandler::handleRequest(HTTPServerRequest& request, HTTPSer
 }
 
 //------------------------------------------------------------------------------
-void ServerUploadRouteHandler::handlePart(const MessageHeader& header, std::istream& stream) {
+void ServerUploadRouteHandler::handlePart(const Poco::Net::MessageHeader& header,
+                                          std::istream& stream)
+{
     //NameValueCollection::ConstIterator iter = header.begin();
     
     //        while(iter != header.end()) {
@@ -71,9 +80,10 @@ void ServerUploadRouteHandler::handlePart(const MessageHeader& header, std::istr
     
     // is this an uploaded file?
     if(header.has("Content-Disposition")) {// && header.has("form-data")) {
-        string contentDisposition = header["Content-Disposition"];
-        NameValueCollection parameters;
-        MessageHeader::splitParameters(contentDisposition.begin(),contentDisposition.end(),parameters);
+
+        std::string contentDisposition = header["Content-Disposition"];
+        Poco::Net::NameValueCollection parameters;
+        Poco::Net::MessageHeader::splitParameters(contentDisposition.begin(),contentDisposition.end(),parameters);
         
         if(parameters.has("filename")) {
             try {
@@ -82,7 +92,7 @@ void ServerUploadRouteHandler::handlePart(const MessageHeader& header, std::istr
 
                 cout << file.getAbsolutePath() << endl;
                 
-                streamsize sz = StreamCopier::copyStream(stream,file,settings.writeBufferSize);
+                std::streamsize sz = Poco::StreamCopier::copyStream(stream,file,settings.writeBufferSize);
                 
                 cout << sz << endl;
                 
@@ -106,9 +116,9 @@ void ServerUploadRouteHandler::handlePart(const MessageHeader& header, std::istr
                 
                 file.close();
                 
-            } catch(const Exception& exc) {
+            } catch(const Poco::Exception& exc) {
                 ofLogError("ServerUploadRouteHandler::handlePart") << exc.displayText();
-            } catch(const exception& exc) {
+            } catch(const std::exception& exc) {
                 ofLogError("ServerUploadRouteHandler::handlePart") << exc.what();
             } catch(...) {
                 ofLogError("ServerUploadRouteHandler::handlePart") << "Uncaught thread exception: Unknown exception.";

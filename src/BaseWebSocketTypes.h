@@ -34,27 +34,42 @@ namespace ofx {
 namespace HTTP {
 
 
-class ofxBaseWebSocketRouteHandler : public ServerRouteHandler {
+class BaseWebSocketRouteHandler : public BaseServerRouteHandler {
 public:
-    ofxBaseWebSocketRouteHandler(const BaseRouteSettings& _settings) : ServerRouteHandler(_settings) { }
-    virtual ~ofxBaseWebSocketRouteHandler() { }
+    BaseWebSocketRouteHandler(const BaseRouteSettings& settings)
+    : BaseServerRouteHandler(settings)
+    {
+
+    }
+
+    virtual ~BaseWebSocketRouteHandler()
+    {
+
+    }
     
-    virtual bool sendFrame(const ofxWebSocketFrame& _frame) = 0;
+    virtual bool sendFrame(const WebSocketFrame& _frame) = 0;
     virtual void disconnect() = 0;
+    
 };
 
-class ofxBaseWebSocketSessionManager {
+class BaseWebSocketSessionManager {
 public:
     
-    ofxBaseWebSocketSessionManager() {
+    BaseWebSocketSessionManager()
+    {
     
     }
     
-    virtual ~ofxBaseWebSocketSessionManager() { }
+    virtual ~BaseWebSocketSessionManager()
+    {
+
+    }
 
     //virtual void getSessionData(ofxWebSocketRouteHandler* handler) = 0;
 
-    bool sendFrame(ofxBaseWebSocketRouteHandler* handler, const ofxWebSocketFrame& frame) {
+    bool sendFrame(BaseWebSocketRouteHandler* handler,
+                   const WebSocketFrame& frame)
+    {
         if(handler != NULL) {
             return handler->sendFrame(frame);
         } else {
@@ -63,7 +78,7 @@ public:
         }
     }
     
-    void disconnect(ofxBaseWebSocketRouteHandler* handler) {
+    void disconnect(BaseWebSocketRouteHandler* handler) {
         if(handler != NULL) {
             handler->disconnect();
         } else {
@@ -73,32 +88,34 @@ public:
     
     void disconnectAll() {
         ofScopedLock lock(mutex);
-        set<ofxBaseWebSocketRouteHandler*>::iterator iter = handlers.begin();
+
+        HandlerSetIter iter = handlers.begin();
+
         while(iter != handlers.end()) {
             disconnect(*iter);
             ++iter;
         }
     }
     
-    bool sendBinary(ofxBaseWebSocketRouteHandler* handler, ofImage& image) {
+    bool sendBinary(BaseWebSocketRouteHandler* handler, ofImage& image) {
         return sendBinary(handler, image.getPixelsRef());
     }
     
-    bool sendBinary(ofxBaseWebSocketRouteHandler* handler, ofPixels& pixels) {
+    bool sendBinary(BaseWebSocketRouteHandler* handler, ofPixels& pixels) {
         return sendBinary(handler,pixels.getPixels(),static_cast<unsigned int>(pixels.size()));
     }
 
-    bool sendBinary(ofxBaseWebSocketRouteHandler* handler, char * data, unsigned int size ) {
-        return sendFrame(handler,ofxWebSocketFrame(data,size,Poco::Net::WebSocket::FRAME_BINARY));
+    bool sendBinary(BaseWebSocketRouteHandler* handler, char * data, unsigned int size ) {
+        return sendFrame(handler,WebSocketFrame(data,size,Poco::Net::WebSocket::FRAME_BINARY));
     }
 
-    bool sendBinary(ofxBaseWebSocketRouteHandler* handler, unsigned char * data, unsigned int size ) {
-        return sendFrame(handler,ofxWebSocketFrame(data,size,Poco::Net::WebSocket::FRAME_BINARY));
+    bool sendBinary(BaseWebSocketRouteHandler* handler, unsigned char * data, unsigned int size ) {
+        return sendFrame(handler,WebSocketFrame(data,size,Poco::Net::WebSocket::FRAME_BINARY));
     }
     
     void broadcast(ofPixelsRef pixels) {
         ofScopedLock lock(mutex);
-        set<ofxBaseWebSocketRouteHandler*>::iterator iter = handlers.begin();
+        std::set<BaseWebSocketRouteHandler*>::iterator iter = handlers.begin();
         
         int numChannels = pixels.getNumChannels();
         int width       = pixels.getWidth();
@@ -118,13 +135,15 @@ public:
     }
     
     void broadcast(const string& text) {
-        broadcast(ofxWebSocketFrame(text));
+        broadcast(WebSocketFrame(text));
     }
 
     
-    void broadcast(const ofxWebSocketFrame& frame) {
+    void broadcast(const WebSocketFrame& frame) {
         ofScopedLock lock(mutex);
-        set<ofxBaseWebSocketRouteHandler*>::iterator iter = handlers.begin();
+
+        std::set<BaseWebSocketRouteHandler*>::iterator iter = handlers.begin();
+
         while(iter != handlers.end()) {
             sendFrame(*iter,frame);
             ++iter;
@@ -149,7 +168,7 @@ public:
         ofRemoveListener(events.onErrorEvent,listener,&ListenerClass::onErrorEvent);
     }
     
-    void registerRouteHandler(ofxBaseWebSocketRouteHandler* handler) {
+    void registerRouteHandler(BaseWebSocketRouteHandler* handler) {
         cout << "registering ..." << endl;
 
         ofScopedLock lock(mutex);
@@ -158,7 +177,7 @@ public:
         }
     }
     
-    void unregisterRouteHandler(ofxBaseWebSocketRouteHandler* handler) {
+    void unregisterRouteHandler(BaseWebSocketRouteHandler* handler) {
         cout << "unregistering ..." << endl;
         ofScopedLock lock(mutex);
         size_t numErased = handlers.erase(handler);
@@ -175,26 +194,36 @@ public:
     
     vector<string> getAvailableSubprotcols() {
         ofScopedLock lock(mutex);
-        vector<string> availableSubprotocols;
-        map<string,ofxWebsocketEvents>::iterator eventIter = subprotocolEvents.begin();
-        while(eventIter != subprotocolEvents.end()) {
+
+        std::vector<std::string> availableSubprotocols;
+
+        EventMapIter eventIter = eventMap.begin();
+        
+        while(eventIter != eventMap.end()) {
             availableSubprotocols.push_back((*eventIter).first);
             ++eventIter;
         }
+        
         return availableSubprotocols;
     }
         
-    bool selectSubprotocol(const vector<string>& proposedSubprotocols, string& selectedSubprotocol) {
+    bool selectSubprotocol(const std::vector<std::string>& proposedSubprotocols,
+                           std::string& selectedSubprotocol) {
+
         selectedSubprotocol.clear();
 
         if(proposedSubprotocols.empty()) {
             return false;
         } else {
             ofScopedLock lock(mutex);
-            vector<string>::const_iterator iter = proposedSubprotocols.begin();
+
+            std::vector<std::string>::const_iterator iter = proposedSubprotocols.begin();
+
             while(iter != proposedSubprotocols.end()) {
-                map<string,ofxWebsocketEvents>::iterator eventIter = subprotocolEvents.find(*iter);
-                if(eventIter != subprotocolEvents.end()) {
+
+                EventMapIter eventIter = eventMap.find(*iter);
+
+                if(eventIter != eventMap.end()) {
                     selectedSubprotocol = (*eventIter).first;
                     return true;
                 }
@@ -204,13 +233,22 @@ public:
         }
     }
     
-    ofxWebsocketEvents events;
+    WebsocketEvents events;
 
 protected:
-    mutable ofMutex mutex; // locks the handlers set
-    set<ofxBaseWebSocketRouteHandler*> handlers;
+    BaseWebSocketSessionManager(const BaseWebSocketSessionManager& that);
+	BaseWebSocketSessionManager& operator = (const BaseWebSocketSessionManager& that);
+
+    mutable Poco::FastMutex mutex; // locks the handlers set
+
+    typedef std::set<BaseWebSocketRouteHandler*>            HandlerSet;
+    typedef std::set<BaseWebSocketRouteHandler*>::iterator  HandlerSetIter;
+    typedef std::map<std::string,WebsocketEvents>           EventMap;
+    typedef std::map<std::string,WebsocketEvents>::iterator EventMapIter;
+
+    HandlerSet handlers;
     
-    map<string,ofxWebsocketEvents> subprotocolEvents;
+    EventMap eventMap;
 
 };
 
