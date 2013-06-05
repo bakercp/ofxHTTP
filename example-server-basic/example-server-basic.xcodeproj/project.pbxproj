@@ -55,6 +55,7 @@
 		FD018D4B175F04D4004CC4B6 /* WebSocketRoute.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D2D175F04D4004CC4B6 /* WebSocketRoute.cpp */; };
 		FD018D4C175F04D4004CC4B6 /* WebSocketRouteHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D2F175F04D4004CC4B6 /* WebSocketRouteHandler.cpp */; };
 		FD018D53175F052F004CC4B6 /* MediaTypeMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D51175F052F004CC4B6 /* MediaTypeMap.cpp */; };
+		FD018D55175F8CD1004CC4B6 /* ProxySettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD018D54175F8CD0004CC4B6 /* ProxySettings.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -185,6 +186,7 @@
 		FD018D50175F052F004CC4B6 /* BaseMediaTypeProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseMediaTypeProvider.h; sourceTree = "<group>"; };
 		FD018D51175F052F004CC4B6 /* MediaTypeMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MediaTypeMap.cpp; sourceTree = "<group>"; };
 		FD018D52175F052F004CC4B6 /* MediaTypeMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaTypeMap.h; sourceTree = "<group>"; };
+		FD018D54175F8CD0004CC4B6 /* ProxySettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ProxySettings.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -340,6 +342,7 @@
 				FD018D03175F04D4004CC4B6 /* ProgressMonitor.cpp */,
 				FD018D04175F04D4004CC4B6 /* ProgressMonitor.h */,
 				FD018D05175F04D4004CC4B6 /* ProxySettings.h */,
+				FD018D54175F8CD0004CC4B6 /* ProxySettings.cpp */,
 				FD018D06175F04D4004CC4B6 /* Request */,
 				FD018D0F175F04D4004CC4B6 /* ResponseStream.cpp */,
 				FD018D10175F04D4004CC4B6 /* ResponseStream.h */,
@@ -530,6 +533,7 @@
 				FD018D4B175F04D4004CC4B6 /* WebSocketRoute.cpp in Sources */,
 				FD018D4C175F04D4004CC4B6 /* WebSocketRouteHandler.cpp in Sources */,
 				FD018D53175F052F004CC4B6 /* MediaTypeMap.cpp in Sources */,
+				FD018D55175F8CD1004CC4B6 /* ProxySettings.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
