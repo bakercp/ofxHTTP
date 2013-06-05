@@ -68,7 +68,6 @@ public:
     SessionSettings getSessionSettings();
     SessionSettings& getSessionSettingsRef();
     
-    // no consts because all of these objects are synchronized and need access to their mutexes
     CookieStore  getCookieStore();
     CookieStore& getCookieStoreRef();
     
@@ -93,10 +92,10 @@ private:
     // client settings (i.e. thread pools, # connections, etc).
     // vs. context-settings (num redirects, auth handlers, etc).
     
-    SessionSettings sessionSettings;
-    CredentialStore credentialStore;
+    SessionSettings _sessionSettings;
+    CredentialStore _credentialStore;
     
-    CookieStore     cookieStore;
+    CookieStore     _cookieStore;
 
 };
 

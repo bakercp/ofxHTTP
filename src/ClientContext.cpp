@@ -4,39 +4,32 @@ namespace ofx {
 namespace HTTP {
 
     
-static ClientContext::Ptr DefaultClientContext = ClientContext::Ptr(new ClientContext());
-
 //------------------------------------------------------------------------------
-ClientContext::Ptr ClientContext::defaultClientContext() {
-    return DefaultClientContext;
-}
-
-//------------------------------------------------------------------------------
-ClientContext::ClientContext() { }
-
-//------------------------------------------------------------------------------
-ClientContext::ClientContext(SessionSettings& _sessionSettings)
-: sessionSettings(_sessionSettings)
+ClientContext::ClientContext()
 {
-
 }
 
 //------------------------------------------------------------------------------
-ClientContext::ClientContext(SessionSettings& _sessionSettings,
-                             CredentialStore& _credentialStore)
-: sessionSettings(_sessionSettings)
-, credentialStore(_credentialStore)
+ClientContext::ClientContext(SessionSettings& sessionSettings)
+: _sessionSettings(sessionSettings)
 {
-
 }
 
 //------------------------------------------------------------------------------
-ClientContext::ClientContext(SessionSettings& _sessionSettings,
-                             CredentialStore& _credentialStore,
-                             CookieStore& _cookieStore)
-: sessionSettings(_sessionSettings)
-, credentialStore(_credentialStore)
-, cookieStore(_cookieStore)
+ClientContext::ClientContext(SessionSettings& sessionSettings,
+                             CredentialStore& credentialStore)
+: _sessionSettings(sessionSettings)
+, _credentialStore(credentialStore)
+{
+}
+
+//------------------------------------------------------------------------------
+ClientContext::ClientContext(SessionSettings& sessionSettings,
+                             CredentialStore& credentialStore,
+                             CookieStore& cookieStore)
+: _sessionSettings(sessionSettings)
+, _credentialStore(credentialStore)
+, _cookieStore(cookieStore)
 {
 
 }
@@ -44,59 +37,65 @@ ClientContext::ClientContext(SessionSettings& _sessionSettings,
 //------------------------------------------------------------------------------
 ClientContext::ClientContext(ClientContext& that)
 {
-    sessionSettings = that.sessionSettings;
-    credentialStore = that.credentialStore;
-    cookieStore     = that.cookieStore;
+    _sessionSettings = that._sessionSettings;
+    _credentialStore = that._credentialStore;
+    _cookieStore     = that._cookieStore;
 }
 
 //------------------------------------------------------------------------------
 ClientContext& ClientContext::operator = (ClientContext& that)
 {
-    sessionSettings = that.sessionSettings;
-    credentialStore = that.credentialStore;
-    cookieStore     = that.cookieStore;
+    _sessionSettings = that._sessionSettings;
+    _credentialStore = that._credentialStore;
+    _cookieStore     = that._cookieStore;
 }
 
 //------------------------------------------------------------------------------
 ClientContext::~ClientContext()
 {
-
 }
 
 //------------------------------------------------------------------------------
 SessionSettings ClientContext::getSessionSettings()
 {
-    return sessionSettings;
+    return _sessionSettings;
 }
 
 //------------------------------------------------------------------------------
 SessionSettings& ClientContext::getSessionSettingsRef()
 {
-    return sessionSettings;
+    return _sessionSettings;
 }
 
 //------------------------------------------------------------------------------
 CookieStore ClientContext::getCookieStore()
 {
-    return cookieStore;
+    return _cookieStore;
 }
 
 //------------------------------------------------------------------------------
 CookieStore& ClientContext::getCookieStoreRef()
 {
-    return cookieStore;
+    return _cookieStore;
+}
+
+//------------------------------------------------------------------------------
+ClientContext::Ptr ClientContext::defaultClientContext() {
+    static ClientContext::Ptr DefaultClientContext = ClientContext::Ptr(new ClientContext());
+
+    return DefaultClientContext;
 }
 
 //------------------------------------------------------------------------------
 CredentialStore ClientContext::getCredentialStore()
 {
-    return credentialStore;
+    return _credentialStore;
 }
 
 //------------------------------------------------------------------------------
 CredentialStore& ClientContext::getCredentialStoreRef()
 {
-    return credentialStore;
+    return _credentialStore;
 }
 
 ////------------------------------------------------------------------------------
