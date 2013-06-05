@@ -46,15 +46,12 @@ namespace HTTP {
 
 class BaseRouteSettings {
 public:
-    BaseRouteSettings(const std::string& route)
-    : _route(route)
+    BaseRouteSettings(const std::string& route) : _route(route)
     {
-
     }
 
     virtual ~BaseRouteSettings()
     {
-
     }
 
     std::string getRoute() const
@@ -77,10 +74,16 @@ class BaseServerRoute : public Poco::Net::HTTPRequestHandlerFactory {
 public:
     typedef ofPtr<BaseServerRoute> Ptr;
     
-    BaseServerRoute() { }
-    virtual ~BaseServerRoute() { }
+    BaseServerRoute()
+    {
+    }
+
+    virtual ~BaseServerRoute()
+    {
+    }
     
-    virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request, bool bIsSecurePort) = 0;
+    virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
+                                  bool bIsSecurePort) = 0;
     
 //    virtual string getRoute() const = 0;
     
@@ -88,8 +91,13 @@ public:
 
 class BaseServerAuthenticationManager {
 public:
-    BaseServerAuthenticationManager() { }
-    virtual ~BaseServerAuthenticationManager() { }
+    BaseServerAuthenticationManager()
+    {
+    }
+
+    virtual ~BaseServerAuthenticationManager()
+    {
+    }
     
     // checkes the request for the correct authentication headers
     virtual Authentication::Status authenticate(Poco::Net::HTTPServerRequest& request) = 0;
@@ -101,10 +109,16 @@ public:
 
 class BaseServerBasicAuthenticationManager : public BaseServerAuthenticationManager {
 public:
-    BaseServerBasicAuthenticationManager(const string& _realm) : realm(_realm) { }
-    virtual ~BaseServerBasicAuthenticationManager() { }
+    BaseServerBasicAuthenticationManager(const string& realm) : _realm(realm)
+    {
+    }
+
+    virtual ~BaseServerBasicAuthenticationManager()
+    {
+    }
     
-    Authentication::Status authenticate(Poco::Net::HTTPServerRequest& request) {
+    Authentication::Status authenticate(Poco::Net::HTTPServerRequest& request)
+    {
         if(request.hasCredentials()) {
             if(Poco::Net::HTTPCredentials::hasBasicCredentials(request)) {
                 Poco::Net::HTTPBasicCredentials pCredentials(request);
@@ -118,8 +132,8 @@ public:
                 ofLogWarning("ofxBaseHTTPServerBasicAuthenticationManager::authenticate") << "HTTPServerResponse does not currently support DIGEST Auththentication";
                 return Authentication::UNAUTHORIZED;
             } else {
-                string scheme;
-                string authInfo;
+                std::string scheme;
+                std::string authInfo;
 
                 try {
                     request.getCredentials(scheme, authInfo);
@@ -135,11 +149,14 @@ public:
             return Authentication::NO_CREDENTIALS;
         }
     }
-    
-    string getRealm() { return realm; };
+
+    std::string getRealm()
+    {
+        return _realm;
+    };
     
 protected:
-    string realm;
+    std::string _realm;
 
     virtual bool checkCredentials(const Credentials& credentials) = 0;
     
@@ -148,7 +165,7 @@ protected:
         // but we want to send our own content after the
         // headers have been sent.
         string auth("Basic realm=\"");
-        auth.append(realm);
+        auth.append(_realm);
         auth.append("\"");
         response.set("WWW-Authenticate", auth);
     }
@@ -156,18 +173,31 @@ protected:
 
 class BaseServerSessionManager {
 public:
-    BaseServerSessionManager() { }
-    virtual ~BaseServerSessionManager() { }
+    BaseServerSessionManager()
+    {
+    }
+
+    virtual ~BaseServerSessionManager()
+    {
+    }
+
     virtual bool update(Poco::Net::HTTPServerRequest& request,
                         Poco::Net::HTTPServerResponse& response) = 0;
 };
 
 class BaseResponseStreamConsumer {
 public:
-    BaseResponseStreamConsumer() { }
-    virtual ~BaseResponseStreamConsumer() { }
+    BaseResponseStreamConsumer()
+    {
+    }
+
+    virtual ~BaseResponseStreamConsumer()
+    {
+    }
+
     // the consumer subclass must free the response stream
     virtual void consume(ResponseStream* reponseStream) = 0;
+
 };
 
 
