@@ -27,33 +27,53 @@
 
 
 #include <string>
-#include <vector>
-#include "Poco/URI.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
-#include "ofLog.h"
-#include "ofUtils.h"
+#include "BaseRouteSettings.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class Utils
+class FileSystemRouteSettings: public BaseRouteSettings
 {
 public:
-    static Poco::Net::NameValueCollection getQueryMap(const Poco::URI& uri);
+    FileSystemRouteSettings(const std::string& routePathPattern = BaseRouteSettings::DEFAULT_ROUTE_PATH_PATTERN);
 
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    virtual ~FileSystemRouteSettings();
 
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    // TODO:
+    // e.g. http://httpd.apache.org/docs/2.2/mod/mod_deflate.html
+    // or the reverse? compression type as key?
+    //    ofxHTTPCompressorEntry html(MediaType("text/html"));
+    //    html.addCompressionType(GZIP);
+    //    html.addCompressionType(DEFLATE);
+    //
+    //    ofxHTTPCompressorEntry plain(MediaType("text/plain"));
+    //    html.addCompressionType(GZIP);
+    //    html.addCompressionType(DEFLATE);
 
-    static void dumpHeaders(const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    void setDefaultIndex(const std::string& defaultIndex);
+    std::string getDefaultIndex() const;
 
+    void setDocumentRoot(const std::string& documentRoot);
+    std::string getDocumentRoot() const;
+
+    void setAutoCreateDocumentRoot(bool autoCreateDocumentRoot);
+    bool getAutoCreateDocumentRoot() const;
+
+    void setRequireDocumentRootInDataFolder(bool requireDocumentRootInDataFolder);
+    bool getRequireDocumentRootInDataFolder() const;
+
+    static const std::string DEFAULT_DOCUMENT_ROOT;
+    static const std::string DEFAULT_INDEX;
+    
+private:
+    std::string _defaultIndex;
+    std::string _documentRoot;
+
+    bool _autoCreateDocumentRoot;
+    bool _requireDocumentRootInDataFolder;
+    
 };
 
 

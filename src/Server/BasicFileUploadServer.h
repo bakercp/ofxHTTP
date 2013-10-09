@@ -26,34 +26,44 @@
 #pragma once
 
 
-#include <string>
-#include <vector>
-#include "Poco/URI.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
-#include "ofLog.h"
-#include "ofUtils.h"
+#include "BasicServer.h"
+#include "FileUploadRoute.h"
+#include "FileUploadRouteSettings.h"
+#include "FileUploadRouteEvents.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class Utils
+class BasicFileUploadServerSettings:
+    public FileUploadRouteSettings,
+    public BasicServerSettings
+{
+};
+
+
+class BasicFileUploadServer: public BasicServer
 {
 public:
-    static Poco::Net::NameValueCollection getQueryMap(const Poco::URI& uri);
+    typedef std::shared_ptr<BasicFileUploadServer> SharedPtr;
+    typedef std::weak_ptr<BasicFileUploadServer>   WeakPtr;
+    typedef BasicFileUploadServerSettings          Settings;
 
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    BasicFileUploadServer(const Settings& settings = Settings());
+    virtual ~BasicFileUploadServer();
 
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    FileUploadRoute::SharedPtr getFileUploadRoute();
 
-    static void dumpHeaders(const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    // this method is a hack replacement for std::make_shared<BasicServer>(...);
+    static SharedPtr makeShared(const Settings& settings = Settings())
+    {
+        return SharedPtr(new BasicFileUploadServer(settings));
+    }
 
+protected:
+    FileUploadRoute::SharedPtr _fileUploadRoute;
+    
 };
 
 

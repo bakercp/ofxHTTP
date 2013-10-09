@@ -23,38 +23,32 @@
 // =============================================================================
 
 
-#pragma once
-
-
-#include <string>
-#include <vector>
-#include "Poco/URI.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
-#include "ofLog.h"
-#include "ofUtils.h"
+#include "BaseRouteHandler.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class Utils
+BaseRouteHandler::BaseRouteHandler(Poco::Net::HTTPRequestHandler& defaultRouteHandler):
+    _defaultRouteHandler(defaultRouteHandler)
 {
-public:
-    static Poco::Net::NameValueCollection getQueryMap(const Poco::URI& uri);
+}
 
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+BaseRouteHandler::~BaseRouteHandler()
+{
+}
 
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+void BaseRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
+                                     Poco::Net::HTTPServerResponse& response)
+{
+    _defaultRouteHandler.handleRequest(request,response);
+}
 
-    static void dumpHeaders(const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
-
-};
+void BaseRouteHandler::stop()
+{
+    // empty
+}
 
 
 } } // namespace ofx::HTTP

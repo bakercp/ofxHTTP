@@ -26,35 +26,56 @@
 #pragma once
 
 
-#include <string>
-#include <vector>
-#include "Poco/URI.h"
+#include <istream>
+#include "Poco/Buffer.h"
+#include "Poco/Exception.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/Net/HTMLForm.h"
+#include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
+#include "Poco/Net/MessageHeader.h"
+#include "Poco/Net/NameValueCollection.h"
+#include "Poco/Net/PartHandler.h"
 #include "ofLog.h"
 #include "ofUtils.h"
+#include "ofFileUtils.h"
+#include "AbstractTypes.h"
+#include "FileUploadRouteSettings.h"
+#include "FileUploadRouteEvents.h"
+#include "FileUploadRouteInterface.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class Utils
+class FileUploadRouteHandler:
+    public BaseRouteHandler,
+    public Poco::Net::PartHandler
 {
 public:
-    static Poco::Net::NameValueCollection getQueryMap(const Poco::URI& uri);
+    typedef FileUploadRouteSettings Settings;
 
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    FileUploadRouteHandler(FileUploadRouteInterface& parent);
+    virtual ~FileUploadRouteHandler();
+    
+    void handleRequest(Poco::Net::HTTPServerRequest& request,
+                       Poco::Net::HTTPServerResponse& response);
 
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
+                          bool isSecurePort) const;
 
-    static void dumpHeaders(const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    void handlePart(const Poco::Net::MessageHeader& header,
+                    std::istream& stream);
 
+    virtual bool isContentTypeValid(const std::string& contentType) const;
+    
+private:
+    FileUploadRouteInterface& _parent;
+
+    std::size_t contentLength;
 };
 
-
+    
 } } // namespace ofx::HTTP

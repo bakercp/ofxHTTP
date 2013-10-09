@@ -35,11 +35,9 @@
 #include "ofFileUtils.h"
 #include "ofLog.h"
 #include "AbstractTypes.h"
-#include "BaseRouteHandler.h"
 #include "BaseWebSocketSessionManager.h"
-#include "WebSocketConnection.h"
-#include "WebSocketRouteSettings.h"
 #include "WebSocketRouteInterface.h"
+#include "WebSocketRouteSettings.h"
 #include "WebSocketEvents.h"
 #include "WebSocketFrame.h"
 #include "Utils.h"
@@ -52,25 +50,70 @@ namespace HTTP {
 // - move default constants to enum
 
 //------------------------------------------------------------------------------
-class WebSocketRouteHandler: public BaseRouteHandler
+class WebSocketConnection: public AbstractWebSocketConnection
 {
 public:
-    typedef WebSocketRouteSettings Settings;
+    WebSocketConnection(WebSocketRouteInterface& parent);
 
-    WebSocketRouteHandler(WebSocketRouteInterface& parent);
-    
-    virtual ~WebSocketRouteHandler();
+    virtual ~WebSocketConnection();
 
     virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
                                Poco::Net::HTTPServerResponse& response);
 
-    virtual void close();
+    bool sendFrame(const WebSocketFrame& frame); // returns false if frame not queued
 
-private:
+    void stop();
+
+    virtual void frameReceived(const WebSocketFrame& frame);
+    virtual void frameSent(const WebSocketFrame& frame, std::size_t numBytesSent);
+    virtual void socketClosed();
+
+    void broadcast(const WebSocketFrame& frame) const;
+
+    Poco::Net::NameValueCollection getRequestHeaders() const;
+    Poco::Net::SocketAddress getClientAddress() const;
+
+    bool isConnected() const;
+
+
+
+//    std::string getSubprotocol() const;
+
+    std::size_t getSendQueueSize() const;
+    void clearSendQueue();
+
+protected:
+    void setIsConnected(bool bIsConnected);
+
     WebSocketRouteInterface& _parent;
 
+private:
+//    void handleErrorResponse(Poco::Net::HTTPServerResponse& response);
+
+//    void handleSubprotocols(Poco::Net::HTTPServerRequest& request,
+//                            Poco::Net::HTTPServerResponse& response);
+    void handleOrigin(Poco::Net::HTTPServerRequest& request,
+                      Poco::Net::HTTPServerResponse& response);
+    void handleExtensions(Poco::Net::HTTPServerRequest& request,
+                          Poco::Net::HTTPServerResponse& response);
+    
+    void processFrameQueue(Poco::Net::WebSocket& ws);
+    
+    // this is all fixed in Poco 1.4.6 and 1.5.+
+    void applyFirefoxHack(Poco::Net::HTTPServerRequest& request);
+
+    Poco::Net::NameValueCollection _requestHeaders;
+    Poco::Net::SocketAddress _clientAddress;
+
+    bool _isConnected;
+
+    std::queue<WebSocketFrame> _frameQueue;
+    
+
+    mutable Poco::FastMutex _mutex;
+    
 };
 
 
 } } // namespace ofx::HTTP
-            
+

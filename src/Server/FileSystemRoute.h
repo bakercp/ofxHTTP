@@ -26,35 +26,44 @@
 #pragma once
 
 
-#include <string>
-#include <vector>
-#include "Poco/URI.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
-#include "ofLog.h"
-#include "ofUtils.h"
+#include "FileSystemRouteHandler.h"
+#include "FileSystemRouteInterface.h"
+#include "FileSystemRouteSettings.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class Utils
+class FileSystemRoute: public FileSystemRouteInterface
 {
 public:
-    static Poco::Net::NameValueCollection getQueryMap(const Poco::URI& uri);
+    typedef std::shared_ptr<FileSystemRoute> SharedPtr;
+    typedef std::weak_ptr<FileSystemRoute>   WeakPtr;
+    typedef FileSystemRouteSettings Settings;
 
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    FileSystemRoute(const Settings& settings);
+    virtual ~FileSystemRoute();
 
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
+                               Poco::Net::HTTPServerResponse& response);
 
-    static void dumpHeaders(const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
+                                  bool isSecurePort) const;
+
+    Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
+
+    FileSystemRouteSettings getSettings() const;
+
+    static SharedPtr makeShared(const Settings& settings)
+    {
+        return SharedPtr(new FileSystemRoute(settings));
+    }
+
+private:
+    Settings _settings;
 
 };
 
-
+    
 } } // namespace ofx::HTTP

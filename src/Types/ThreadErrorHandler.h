@@ -26,35 +26,49 @@
 #pragma once
 
 
-#include <string>
-#include <vector>
-#include "Poco/URI.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
 #include "ofLog.h"
-#include "ofUtils.h"
+#include "Poco/ErrorHandler.h"
 
 
-namespace ofx {
-namespace HTTP {
-
-
-class Utils
+class ThreadErrorHandler: public Poco::ErrorHandler
 {
 public:
-    static Poco::Net::NameValueCollection getQueryMap(const Poco::URI& uri);
+    
+    ThreadErrorHandler(const std::string& threadName = "NONE"):
+        _threadName(threadName)
+    {
+    }
+    
+    virtual ~ThreadErrorHandler()
+    {
+    }
+    
+    void exception(const Poco::Exception& exc)
+    {
+        ofLogError("ofThreadErrorHandler::exception") << "Uncaught thread exception: " << exc.displayText();
+    }
+    
+    void exception(const std::exception& exc)
+    {
+        ofLogError("ofThreadErrorHandler::exception") << "Uncaught thread exception: " << exc.what();
+    }
 
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
-
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
-
-    static void dumpHeaders(const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    void exception()
+    {
+        ofLogError("ofThreadErrorHandler::exception") << "Uncaught thread exception: Unknown exception.";
+    }
+    
+    void setThreadName(const std::string& threadName)
+    {
+        _threadName = threadName;
+    }
+    
+    std::string getName() const
+    {
+        return _threadName;
+    }
+    
+private:
+    std::string _threadName;
 
 };
-
-
-} } // namespace ofx::HTTP

@@ -26,33 +26,55 @@
 #pragma once
 
 
-#include <string>
-#include <vector>
-#include "Poco/URI.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
-#include "ofLog.h"
-#include "ofUtils.h"
+#include "ofEvents.h"
+#include "ofFileUtils.h"
+#include "ServerEvents.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class Utils
+class FileUploadEventArgs: public BaseServerEvent
 {
 public:
-    static Poco::Net::NameValueCollection getQueryMap(const Poco::URI& uri);
+    FileUploadEventArgs(const std::string& fileName,
+                   std::size_t fileSize,
+                   std::size_t numBytesTransferred):
+        _fileName(fileName),
+        _fileSize(fileSize),
+        _numBytesTransferred(numBytesTransferred)
+    {
+    }
 
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    std::string getFileName() const
+    {
+        return _fileName;
+    }
 
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    std::size_t getFileSize()
+    {
+        return _fileSize;
+    }
 
-    static void dumpHeaders(const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    std::size_t getNumBytesTransferred() const
+    {
+        return _numBytesTransferred;
+    }
+
+private:
+    std::string _fileName;
+    std::size_t _fileSize;
+    std::size_t _numBytesTransferred;
+};
+
+
+class FileUploadRouteEvents
+{
+public:
+    ofEvent<FileUploadEventArgs> onUploadStarted;
+    ofEvent<FileUploadEventArgs> onUploadProgress;
+    ofEvent<FileUploadEventArgs> onUploadFinished;
 
 };
 

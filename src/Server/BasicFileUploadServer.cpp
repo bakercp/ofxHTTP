@@ -23,38 +23,29 @@
 // =============================================================================
 
 
-#pragma once
-
-
-#include <string>
-#include <vector>
-#include "Poco/URI.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
-#include "ofLog.h"
-#include "ofUtils.h"
+#include "BasicFileUploadServer.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class Utils
+BasicFileUploadServer::BasicFileUploadServer(const Settings& settings):
+    BasicServer(settings), 
+    _fileUploadRoute(FileUploadRoute::makeShared(settings))
 {
-public:
-    static Poco::Net::NameValueCollection getQueryMap(const Poco::URI& uri);
+    addRoute(_fileUploadRoute);
+}
 
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+BasicFileUploadServer::~BasicFileUploadServer()
+{
+    removeRoute(_fileUploadRoute);
+}
 
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+FileUploadRoute::SharedPtr BasicFileUploadServer::getFileUploadRoute()
+{
+    return _fileUploadRoute;
+}
 
-    static void dumpHeaders(const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
-
-};
-
-
+        
 } } // namespace ofx::HTTP

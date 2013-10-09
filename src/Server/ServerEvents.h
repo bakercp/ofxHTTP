@@ -26,35 +26,21 @@
 #pragma once
 
 
-#include <string>
-#include <vector>
-#include "Poco/URI.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
-#include "ofLog.h"
-#include "ofUtils.h"
+#include "Poco/Net/SocketAddress.h"
+#include "ofEvents.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class Utils
+class BaseServerEvent: public ofEventArgs
 {
 public:
-    static Poco::Net::NameValueCollection getQueryMap(const Poco::URI& uri);
-
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
-
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
-
-    static void dumpHeaders(const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
-
+    Poco::Net::SocketAddress clientAddress;
 };
+
+
 
 
 } } // namespace ofx::HTTP

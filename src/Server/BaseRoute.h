@@ -27,32 +27,42 @@
 
 
 #include <string>
-#include <vector>
-#include "Poco/URI.h"
 #include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
+#include "Poco/Net/HTTPRequestHandler.h"
+#include "Poco/RegularExpression.h"
+#include "Poco/URI.h"
 #include "ofLog.h"
-#include "ofUtils.h"
+#include "AbstractTypes.h"
+#include "BaseRouteHandler.h"
+#include "BaseRouteSettings.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class Utils
+class BaseRoute: public AbstractRoute
 {
 public:
-    static Poco::Net::NameValueCollection getQueryMap(const Poco::URI& uri);
+    BaseRoute();
 
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    virtual ~BaseRoute();
 
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    virtual std::string getRoutePathPattern() const;
 
-    static void dumpHeaders(const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
+                                  bool isSecurePort) const;
+
+    virtual Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
+
+    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
+                               Poco::Net::HTTPServerResponse& response);
+
+    virtual void stop();
+
+private:
+    BaseRoute(const BaseRoute&);
+	BaseRoute& operator = (const BaseRoute&);
 
 };
 

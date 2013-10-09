@@ -26,35 +26,33 @@
 #pragma once
 
 
-#include <string>
-#include <vector>
-#include "Poco/URI.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
-#include "ofLog.h"
 #include "ofUtils.h"
+#include "MediaTypeMap.h"
+#include "BaseRouteHandler.h"
+#include "FileSystemRouteInterface.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class Utils
+class FileSystemRouteHandler: public BaseRouteHandler
 {
 public:
-    static Poco::Net::NameValueCollection getQueryMap(const Poco::URI& uri);
+    typedef FileSystemRouteSettings Settings;
 
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    FileSystemRouteHandler(FileSystemRouteInterface& parent);
 
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    virtual ~FileSystemRouteHandler();
 
-    static void dumpHeaders(const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
+                               Poco::Net::HTTPServerResponse& response);
 
+private:
+    FileSystemRouteInterface& _parent;
+
+    
 };
-
+    
 
 } } // namespace ofx::HTTP

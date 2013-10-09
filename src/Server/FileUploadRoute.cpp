@@ -23,38 +23,41 @@
 // =============================================================================
 
 
-#pragma once
-
-
-#include <string>
-#include <vector>
-#include "Poco/URI.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
-#include "ofLog.h"
-#include "ofUtils.h"
+#include "FileUploadRoute.h"
 
 
 namespace ofx {
 namespace HTTP {
 
-
-class Utils
+    
+FileUploadRoute::FileUploadRoute(const Settings& settings):
+    _settings(settings)
 {
-public:
-    static Poco::Net::NameValueCollection getQueryMap(const Poco::URI& uri);
+}
 
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+FileUploadRoute::~FileUploadRoute()
+{
+}
 
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+std::string FileUploadRoute::getRoutePathPattern() const
+{
+    return _settings.getRoutePathPattern();
+}
 
-    static void dumpHeaders(const Poco::Net::HTTPServerResponse& response,
-                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+Poco::Net::HTTPRequestHandler* FileUploadRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+{
+    return new FileUploadRouteHandler(*this);
+}
 
-};
+FileUploadRouteEvents& FileUploadRoute::getEventsRef()
+{
+    return events;
+}
+
+FileUploadRoute::Settings FileUploadRoute::getSettings() const
+{
+    return _settings;
+}
 
 
 } } // namespace ofx::HTTP

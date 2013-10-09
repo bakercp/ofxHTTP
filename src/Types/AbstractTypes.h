@@ -26,158 +26,96 @@
 #pragma once
 
 
-#include <set>
-#include "Poco/RegularExpression.h"
-#include "Poco/Net/HTTPBasicCredentials.h"
+#include <string>
+#include "Poco/Net/HTTPServerRequest.h"
+#include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/HTTPRequestHandler.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
-#include "Poco/Net/HTTPServerResponse.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/NetException.h"
-#include "Authentication.h"
-#include "Credentials.h"
-#include "ResponseStream.h"
-#include "ServerExchange.h"
+#include "ofTypes.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-using Poco::Net::HTTPRequestHandlerFactory;
-using Poco::Net::HTTPRequestHandler;
-using Poco::Net::HTTPServerRequest;
-using Poco::Net::HTTPServerResponse;
-
-
-class AbstractHasRoute {
+class AbstractInterruptible
+{
 public:
-    AbstractHasRoute()
+    AbstractInterruptible()
     {
     }
 
-    virtual ~AbstractHasRoute()
+    virtual ~AbstractInterruptible()
     {
     }
 
-    virtual std::string getRoute() const = 0;
-
-};
-
-class AbstractServerRoute : public HTTPRequestHandlerFactory {
-public:
-    typedef ofPtr<AbstractServerRoute> Ptr;
-
-    AbstractServerRoute()
-    {
-    }
-
-    virtual ~AbstractServerRoute()
-    {
-    }
-    
-    virtual bool canHandleRequest(const HTTPServerRequest& request,
-                                  bool bIsSecurePort) = 0;
-
-};
-
-
-class AbstractServerRouteHandler : public HTTPRequestHandler {
-public:
-    AbstractServerRouteHandler()
-    {
-    }
-
-    virtual ~AbstractServerRouteHandler()
-    {
-    }
-
-protected:
-    // authenticate is expected to check authentication and also
-    // set any response headers if authentication has failed.
-    virtual Authentication::Status authenticate(ServerExchange& exchange) = 0;
-    virtual void updateSession(ServerExchange& exchange) = 0;
-    virtual void handleExchange(ServerExchange& exchange) = 0;
-    virtual void sendErrorResponse(HTTPServerResponse& response) = 0;
-
-};
-
-
-class AbstractServerSessionData {
-public:
-    AbstractServerSessionData()
-    {
-    }
-
-    virtual ~AbstractServerSessionData()
-    {
-    }
-
-    virtual bool update(HTTPServerRequest& request,
-                        HTTPServerResponse& response) = 0;
+    virtual void stop() = 0;
     
 };
 
 
-class AbstractBasicCredentialsAuthenticator {
+class WebSocketFrame;
+
+
+class AbstractWebSocketConnection:
+    public AbstractInterruptible
+{
 public:
-    AbstractBasicCredentialsAuthenticator()
+    AbstractWebSocketConnection()
     {
     }
 
-    virtual ~AbstractBasicCredentialsAuthenticator()
+    virtual ~AbstractWebSocketConnection()
     {
     }
 
-    virtual bool isAuthenticated(const Credentials& credentials) = 0;
+    virtual bool sendFrame(const WebSocketFrame& frame) = 0;
+
 };
 
 
-class AbstractServerAuthenticationManager {
+class AbstractRouteHandler:
+    public AbstractInterruptible,
+    public Poco::Net::HTTPRequestHandler
+{
 public:
-    AbstractServerAuthenticationManager()
+    typedef std::shared_ptr<AbstractRouteHandler> SharedPtr;
+    typedef std::weak_ptr<AbstractRouteHandler> WeakPtr;
+
+    
+    AbstractRouteHandler()
     {
     }
 
-    virtual ~AbstractServerAuthenticationManager()
+    virtual ~AbstractRouteHandler()
     {
     }
-    
-    // checks the request for the correct authentication headers
-    virtual Authentication::Status authenticate(HTTPServerRequest& request) = 0;
-    
-    // writes the required authentication headers to the response
-    virtual void setAuthenticationRequiredHeaders(HTTPServerResponse& response) = 0;
-    
+
 };
 
 
-class AbstractServerSessionManager {
+class AbstractRoute:
+    public AbstractInterruptible,
+    public Poco::Net::HTTPRequestHandler,
+    public Poco::Net::HTTPRequestHandlerFactory
+{
 public:
-    AbstractServerSessionManager()
+    typedef std::shared_ptr<AbstractRoute> SharedPtr;
+    typedef std::weak_ptr<AbstractRoute> WeakPtr;
+
+    AbstractRoute()
     {
     }
 
-    virtual ~AbstractServerSessionManager()
+    virtual ~AbstractRoute()
     {
     }
 
-    virtual bool update(HTTPServerRequest& request,
-                        HTTPServerResponse& response) = 0;
-};
+    virtual std::string getRoutePathPattern() const = 0;
 
-class AbstractResponseStreamConsumer {
-public:
-    AbstractResponseStreamConsumer()
-    {
-    }
+    virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
+                                  bool isSecurePort) const = 0;
 
-    virtual ~AbstractResponseStreamConsumer()
-    {
-    }
-
-    // the consumer subclass must free the response stream
-    virtual void consume(ResponseStream* reponseStream) = 0;
 
 };
 

@@ -23,49 +23,78 @@
 // =============================================================================
 
 
-#include "BaseRouteSettings.h"
+#include "FileSystemRouteSettings.h"
 
 
 namespace ofx {
 namespace HTTP {
 
-const std::string BaseRouteSettings::DEFAULT_ROUTE_PATH_PATTERN = "/.*";
+
+const std::string FileSystemRouteSettings::DEFAULT_DOCUMENT_ROOT = "DocumentRoot/";
+const std::string FileSystemRouteSettings::DEFAULT_INDEX         = "index.html";
 
 
 //------------------------------------------------------------------------------
-BaseRouteSettings::BaseRouteSettings(const std::string& routePathPattern):
-    _routePathPattern(routePathPattern),
-    _requireSecurePort(false)
+FileSystemRouteSettings::FileSystemRouteSettings(const std::string& routePathPattern):
+    BaseRouteSettings(routePathPattern),
+    _defaultIndex(DEFAULT_INDEX),
+    _documentRoot(DEFAULT_DOCUMENT_ROOT),
+    _autoCreateDocumentRoot(false),
+    _requireDocumentRootInDataFolder(true)
 {
 }
 
 //------------------------------------------------------------------------------
-BaseRouteSettings::~BaseRouteSettings()
+FileSystemRouteSettings::~FileSystemRouteSettings()
 {
 }
 
 //------------------------------------------------------------------------------
-void BaseRouteSettings::setRoutePathPattern(const std::string& routePathPattern)
+void FileSystemRouteSettings::setDefaultIndex(const std::string& defaultIndex)
 {
-    _routePathPattern = routePathPattern;
+    _defaultIndex = defaultIndex;
 }
 
 //------------------------------------------------------------------------------
-std::string BaseRouteSettings::getRoutePathPattern() const
+std::string FileSystemRouteSettings::getDefaultIndex() const
 {
-    return _routePathPattern;
+    return _defaultIndex;
 }
 
 //------------------------------------------------------------------------------
-void BaseRouteSettings::setRequireSecurePort(bool requireSecurePort)
+void FileSystemRouteSettings::setDocumentRoot(const std::string& documentRoot)
 {
-    _requireSecurePort = requireSecurePort;
+    _documentRoot = documentRoot;
 }
 
 //------------------------------------------------------------------------------
-bool BaseRouteSettings::getRequireSecurePort() const
+std::string FileSystemRouteSettings::getDocumentRoot() const
 {
-    return _requireSecurePort;
+    return _documentRoot;
+}
+
+//------------------------------------------------------------------------------
+void FileSystemRouteSettings::setAutoCreateDocumentRoot(bool autoCreateDocumentRoot)
+{
+    _autoCreateDocumentRoot = autoCreateDocumentRoot;
+}
+
+//------------------------------------------------------------------------------
+bool FileSystemRouteSettings::getAutoCreateDocumentRoot() const
+{
+    return _autoCreateDocumentRoot;
+}
+
+//------------------------------------------------------------------------------
+void FileSystemRouteSettings::setRequireDocumentRootInDataFolder(bool requireDocumentRootInDataFolder)
+{
+    _requireDocumentRootInDataFolder = requireDocumentRootInDataFolder;
+}
+
+//------------------------------------------------------------------------------
+bool FileSystemRouteSettings::getRequireDocumentRootInDataFolder() const
+{
+    return _requireDocumentRootInDataFolder;
 }
 
 

@@ -23,136 +23,132 @@
 // =============================================================================
 
 
-#include "WebSocketFrame.h"
+#include "FileUploadRouteSettings.h"
 
 
 namespace ofx {
 namespace HTTP {
 
-
-//------------------------------------------------------------------------------
-WebSocketFrame::WebSocketFrame(const ofBuffer& buffer, int flags):
-    ofBuffer(buffer),
-    _flags(flags)
-{
-}
-
-//------------------------------------------------------------------------------
-WebSocketFrame::WebSocketFrame(const std::string& text, int flags):
-    ofBuffer(text),
-    _flags(flags)
-{
-}
-
-//------------------------------------------------------------------------------
-WebSocketFrame::WebSocketFrame(const unsigned char* buffer,
-                               std::size_t size,
-                               int flags):
-    ofBuffer(reinterpret_cast<const char*>(buffer),size),
-    _flags(flags)
-{
-}
-
-//------------------------------------------------------------------------------
-WebSocketFrame::WebSocketFrame(const char* buffer,
-                               std::size_t size,
-                               int flags):
-    ofBuffer(buffer,size),
-    _flags(flags)
-{
-}
-
-//------------------------------------------------------------------------------
-WebSocketFrame::~WebSocketFrame()
-{
-}
-
-//------------------------------------------------------------------------------
-int WebSocketFrame::getFlags() const
-{
-    return _flags;
-}
-
-//------------------------------------------------------------------------------
-bool WebSocketFrame::isContinuation() const
-{
-    return (_flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_CONT;
-}
-
-//------------------------------------------------------------------------------
-bool WebSocketFrame::isText() const
-{
-    return (_flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_TEXT;
-}
-
-//------------------------------------------------------------------------------
-bool WebSocketFrame::isBinary() const
-{
-    return (_flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_BINARY;
-}
-
-//------------------------------------------------------------------------------
-bool WebSocketFrame::isClose() const
-{
-    return (_flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_CLOSE;
-}
-
-//------------------------------------------------------------------------------
-bool WebSocketFrame::isPing() const
-{
-    return (_flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_PING;
-}
-
-//------------------------------------------------------------------------------
-bool WebSocketFrame::isPong() const
-{
-    return (_flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_PONG;
-}
-
-//------------------------------------------------------------------------------
-bool WebSocketFrame::isFinal() const
-{
-    return _flags & Poco::Net::WebSocket::FRAME_FLAG_FIN;
-}
-
-//------------------------------------------------------------------------------
-bool WebSocketFrame::isRSV1() const
-{
-    return _flags & Poco::Net::WebSocket::FRAME_FLAG_RSV1;
-}
-
-//------------------------------------------------------------------------------
-bool WebSocketFrame::isRSV2() const
-{
-    return _flags & Poco::Net::WebSocket::FRAME_FLAG_RSV2;
-}
-
-//------------------------------------------------------------------------------
-bool WebSocketFrame::isRSV3() const
-{
-    return _flags & Poco::Net::WebSocket::FRAME_FLAG_RSV3;
-}
-
-//------------------------------------------------------------------------------
-std::string WebSocketFrame::toString() const
-{
-    std::stringstream ss;
-    ss << "Flags:";
-    ss << " CONT="    << (isContinuation() ? "Y" : "N");
-    ss << ", TXT="    << (isText()         ? "Y" : "N");
-    ss << ", BIN="    << (isBinary()       ? "Y" : "N");
-    ss << ", CLOSE="  << (isClose()        ? "Y" : "N");
-    ss << ", PING="   << (isPing()         ? "Y" : "N");
-    ss << ", PONG="   << (isPong()         ? "Y" : "N");
-    ss << ", FINAL="  << (isFinal()        ? "Y" : "N");
-    ss << ", RSV1="   << (isRSV1()         ? "Y" : "N");
-    ss << ", RSV2="   << (isRSV2()         ? "Y" : "N");
-    ss << ", RSV3="   << (isRSV3()         ? "Y" : "N");
-    ss << ", nBytes=" << size();
-    ss << ", bytes="  << getText();
     
-    return ss.str();
+const std::string FileUploadRouteSettings::DEFAULT_UPLOAD_ROUTE    = "/upload";
+const std::string FileUploadRouteSettings::DEFAULT_UPLOAD_FOLDER   = "uploads/";
+const std::string FileUploadRouteSettings::DEFAULT_UPLOAD_REDIRECT = "uploaded.html";
+const std::size_t FileUploadRouteSettings::DEFAULT_BUFFER_SIZE     = 8192;
+
+
+//------------------------------------------------------------------------------
+FileUploadRouteSettings::FileUploadRouteSettings(const std::string& routePathPattern):
+    BaseRouteSettings(routePathPattern),
+    _requireUploadFolderInDataFolder(true),
+    _uploadFolder(DEFAULT_UPLOAD_FOLDER),
+    _autoCreateUploadFolder(false),
+    _uploadRedirect(DEFAULT_UPLOAD_REDIRECT),
+    _writeBufferSize(DEFAULT_BUFFER_SIZE),
+    _requireValidContentType(false),
+    _autoRename(true)
+{
 }
 
-    
+//------------------------------------------------------------------------------
+FileUploadRouteSettings::~FileUploadRouteSettings()
+{
+}
+
+//------------------------------------------------------------------------------
+void FileUploadRouteSettings::setRequireUploadFolderInDataFolder(bool requireUploadFolderInDataFolder)
+{
+    _requireUploadFolderInDataFolder = requireUploadFolderInDataFolder;
+}
+
+//------------------------------------------------------------------------------
+bool FileUploadRouteSettings::getRequireUploadFolderInDataFolder() const
+{
+    return _requireUploadFolderInDataFolder;
+}
+
+//------------------------------------------------------------------------------
+void FileUploadRouteSettings::setUploadFolder(const std::string& uploadFolder)
+{
+    _uploadFolder = uploadFolder;
+}
+
+//------------------------------------------------------------------------------
+std::string FileUploadRouteSettings::getUploadFolder() const
+{
+    return _uploadFolder;
+}
+
+//------------------------------------------------------------------------------
+void FileUploadRouteSettings::setAutoCreateUploadFolder(bool autoCreateUploadFolder)
+{
+    _autoCreateUploadFolder = autoCreateUploadFolder;
+}
+
+//------------------------------------------------------------------------------
+bool FileUploadRouteSettings::getAutoCreateUploadFolder() const
+{
+    return _autoCreateUploadFolder;
+}
+
+//------------------------------------------------------------------------------
+void FileUploadRouteSettings::setUploadRedirect(const std::string& uploadRedirect)
+{
+    _uploadRedirect = uploadRedirect;
+}
+
+//------------------------------------------------------------------------------
+std::string FileUploadRouteSettings::getUploadRedirect() const
+{
+    return _uploadRedirect;
+}
+
+//------------------------------------------------------------------------------
+void FileUploadRouteSettings::setWriteBufferSize(std::size_t writeBufferSize)
+{
+    _writeBufferSize = writeBufferSize;
+}
+
+//------------------------------------------------------------------------------
+std::size_t FileUploadRouteSettings::getWriteBufferSize() const
+{
+    return _writeBufferSize;
+}
+
+//------------------------------------------------------------------------------
+void FileUploadRouteSettings::setRequireValidContentType(bool requireValidContentType)
+{
+    _requireValidContentType = requireValidContentType;
+}
+
+//------------------------------------------------------------------------------
+bool FileUploadRouteSettings::getRequireValidContentType() const
+{
+    return _requireValidContentType;
+}
+
+//------------------------------------------------------------------------------
+void FileUploadRouteSettings::setValidContentTypes(const std::vector<Poco::Net::MediaType>& validContentTypes)
+{
+    _validContentTypes = validContentTypes;
+}
+
+//------------------------------------------------------------------------------
+std::vector<Poco::Net::MediaType> FileUploadRouteSettings::getValidContentTypes() const
+{
+    return _validContentTypes;
+}
+
+//------------------------------------------------------------------------------
+void FileUploadRouteSettings::setAutoRename(bool autoRename)
+{
+    _autoRename = autoRename;
+}
+
+//------------------------------------------------------------------------------
+bool FileUploadRouteSettings::getAutoRename() const
+{
+    return _autoRename;
+}
+
+
 } } // namespace ofx::HTTP
