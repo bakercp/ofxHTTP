@@ -30,6 +30,7 @@ namespace ofx {
 namespace HTTP {
 
 
+const std::string WebSocketRouteSettings::DEFAULT_WEBSOCKET_ROUTE_PATH_PATTERN = "/";
 
 
 WebSocketRouteSettings::WebSocketRouteSettings(const std::string& routePathPattern):

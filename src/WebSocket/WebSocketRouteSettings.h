@@ -38,7 +38,7 @@ namespace HTTP {
 class WebSocketRouteSettings: public BaseRouteSettings
 {
 public:
-    WebSocketRouteSettings(const std::string& routePathPattern = "/");
+    WebSocketRouteSettings(const std::string& routePathPattern = DEFAULT_WEBSOCKET_ROUTE_PATH_PATTERN);
 
     virtual ~WebSocketRouteSettings();
 
@@ -71,6 +71,9 @@ public:
 
     void setBufferSize(std::size_t bufferSize);
     std::size_t getBufferSize() const;
+
+
+    static const std::string DEFAULT_WEBSOCKET_ROUTE_PATH_PATTERN;
 
 private:
     std::string _subprotocol;
