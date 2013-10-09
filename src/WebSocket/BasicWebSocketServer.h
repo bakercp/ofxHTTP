@@ -28,7 +28,7 @@
 
 #include "BasicServer.h"
 #include "WebSocketRoute.h"
-#include "WebSocketROuteSettings.h"
+#include "WebSocketRouteSettings.h"
 
 
 namespace ofx {
