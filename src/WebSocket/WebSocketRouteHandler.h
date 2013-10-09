@@ -48,10 +48,8 @@
 namespace ofx {
 namespace HTTP {
 
-// TODO:
-// - move default constants to enum
 
-//------------------------------------------------------------------------------
+// TODO: move default constants to enum
 class WebSocketRouteHandler: public BaseRouteHandler
 {
 public:

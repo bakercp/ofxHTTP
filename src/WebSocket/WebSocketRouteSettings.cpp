@@ -30,11 +30,8 @@ namespace ofx {
 namespace HTTP {
 
 
-//const std::string FileSystemRouteSettings::DEFAULT_DOCUMENT_ROOT = "DocumentRoot/";
-//const std::string FileSystemRouteSettings::DEFAULT_INDEX         = "index.html";
 
 
-//------------------------------------------------------------------------------
 WebSocketRouteSettings::WebSocketRouteSettings(const std::string& routePathPattern):
     BaseRouteSettings(routePathPattern),
     _subprotocol(""),
@@ -50,126 +47,105 @@ WebSocketRouteSettings::WebSocketRouteSettings(const std::string& routePathPatte
 {
 }
 
-//------------------------------------------------------------------------------
 WebSocketRouteSettings::~WebSocketRouteSettings()
 {
 }
 
-//------------------------------------------------------------------------------
 void WebSocketRouteSettings::setSubprotocol(const std::string& subprotocol)
 {
     _subprotocol = subprotocol;
 }
 
-//------------------------------------------------------------------------------
 std::string WebSocketRouteSettings::getSubprotocol() const
 {
     return _subprotocol;
 }
 
-//------------------------------------------------------------------------------
 void WebSocketRouteSettings::setAllowEmptySubprotocol(bool allowEmptySubprotocol)
 {
     _allowEmptySubprotocol = allowEmptySubprotocol;
 }
 
-//------------------------------------------------------------------------------
 bool WebSocketRouteSettings::getAllowEmptySubprotocol() const
 {
     return _allowEmptySubprotocol;
 }
 
-//------------------------------------------------------------------------------
 void WebSocketRouteSettings::setAllowCrossOriginConnections(bool allowCrossOriginConnections)
 {
     _allowCrossOriginConnections = allowCrossOriginConnections;
 }
 
-//------------------------------------------------------------------------------
 bool WebSocketRouteSettings::getAllowCrossOriginConnections() const
 {
     return _allowCrossOriginConnections;
 }
 
-//------------------------------------------------------------------------------
 void WebSocketRouteSettings::setIsBinary(bool isBinary)
 {
     _isBinary = isBinary;
 }
 
-//------------------------------------------------------------------------------
 bool WebSocketRouteSettings::getIsBinary() const
 {
     return _isBinary;
 }
 
-//------------------------------------------------------------------------------
 void WebSocketRouteSettings::setAutoPingPongResponse(bool autoPingPongResponse)
 {
     _autoPingPongResponse = autoPingPongResponse;
 }
 
-//------------------------------------------------------------------------------
 bool WebSocketRouteSettings::getAutoPingPongResponse() const
 {
     return _autoPingPongResponse;
 }
 
-//------------------------------------------------------------------------------
 void WebSocketRouteSettings::setKeepAlive(bool keepAlive)
 {
     _keepAlive = keepAlive;
 }
 
-//------------------------------------------------------------------------------
 bool WebSocketRouteSettings::getKeepAlive() const
 {
     return _keepAlive;
 }
 
-//------------------------------------------------------------------------------
 void WebSocketRouteSettings::setReceiveTimeout(const Poco::Timespan& receiveTimeout)
 {
     _receiveTimeout = receiveTimeout;
 }
 
-//------------------------------------------------------------------------------
 Poco::Timespan WebSocketRouteSettings::getReceiveTimeout() const
 {
     return _receiveTimeout;
 }
 
-//------------------------------------------------------------------------------
 void WebSocketRouteSettings::setSendTimeout(const Poco::Timespan& sendTimeout)
 {
     _sendTimeout = sendTimeout;
 }
 
-//------------------------------------------------------------------------------
 Poco::Timespan WebSocketRouteSettings::getSendTimeout() const
 {
     return _sendTimeout;
 }
 
-//------------------------------------------------------------------------------
 void WebSocketRouteSettings::setPollTimeout(const Poco::Timespan& pollTimeout)
 {
     _pollTimeout = pollTimeout;
 }
 
-//------------------------------------------------------------------------------
 Poco::Timespan WebSocketRouteSettings::getPollTimeout() const
 {
     return _pollTimeout;
 }
 
-//------------------------------------------------------------------------------
 void WebSocketRouteSettings::setBufferSize(std::size_t bufferSize)
 {
     _bufferSize = bufferSize;
 }
 
-//------------------------------------------------------------------------------
 std::size_t WebSocketRouteSettings::getBufferSize() const
 {
     return _bufferSize;

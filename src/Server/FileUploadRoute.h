@@ -39,9 +39,9 @@ namespace HTTP {
 class FileUploadRoute: public FileUploadRouteInterface
 {
 public:
-    typedef FileUploadRouteSettings Settings;
-    typedef std::shared_ptr<FileUploadRoute> SharedPtr;
-    typedef std::weak_ptr<FileUploadRoute>   WeakPtr;
+    typedef std::shared_ptr<FileUploadRoute>    SharedPtr;
+    typedef std::weak_ptr<FileUploadRoute>      WeakPtr;
+    typedef FileUploadRouteSettings             Settings;
 
     FileUploadRoute(const Settings& settings = Settings());
     virtual ~FileUploadRoute();
