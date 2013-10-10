@@ -35,107 +35,37 @@
 #include "ofFileUtils.h"
 #include "ofLog.h"
 #include "AbstractTypes.h"
+#include "BaseRouteHandler.h"
 #include "BaseWebSocketSessionManager.h"
-#include "BaseWebSocketRouteHandler.h"
-#include "BaseServerRouteHandler.h"
+#include "WebSocketConnection.h"
+#include "WebSocketRouteSettings.h"
+#include "WebSocketRouteInterface.h"
 #include "WebSocketEvents.h"
 #include "WebSocketFrame.h"
+#include "Utils.h"
 
 
 namespace ofx {
 namespace HTTP {
 
-// TODO:
-// - move default constants to enum
 
-class WebSocketRouteSettings : public BaseServerRouteSettings {
-public:
-    WebSocketRouteSettings(const std::string& route = "/") :
-        BaseServerRouteSettings(route),
-        subprotocol(""),
-        bAutoPingPongResponse(true),
-        bKeepAlive(true),
-        bAllowEmptySubprotocol(false),
-        bAllowCrossOriginConnections(false),
-        bIsBinary(false),
-        receiveTimeout(Poco::Timespan(60 * Poco::Timespan::SECONDS)),
-        sendTimeout(Poco::Timespan(60 * Poco::Timespan::SECONDS)),
-        pollTimeout(Poco::Timespan(10 * Poco::Timespan::MILLISECONDS)),
-        bufferSize(1024)
-    {
-    }
-    
-    virtual ~WebSocketRouteSettings()
-    {
-    }
-    
-    std::string subprotocol;
-
-    bool bAllowEmptySubprotocol;
-    bool bAllowCrossOriginConnections;
-    
-    bool bIsBinary;
-    
-    bool bAutoPingPongResponse; // automatically return pong frames if true
-    bool bKeepAlive;
-    
-    Poco::Timespan receiveTimeout;
-    Poco::Timespan sendTimeout;
-    Poco::Timespan pollTimeout;
-    
-    size_t bufferSize;
-    
-};
-
-
-//------------------------------------------------------------------------------
-class WebSocketRouteHandler : public BaseWebSocketRouteHandler {
+// TODO: move default constants to enum
+class WebSocketRouteHandler: public BaseRouteHandler
+{
 public:
     typedef WebSocketRouteSettings Settings;
-    
-    WebSocketRouteHandler(BaseWebSocketSessionManager& manager,
-                          const Settings& settings);
+
+    WebSocketRouteHandler(WebSocketRouteInterface& parent);
     
     virtual ~WebSocketRouteHandler();
 
-    virtual void handleExchange(ServerExchange& exchange);
-    
-    bool sendFrame(const WebSocketFrame& frame); // returns false if frame not queued
+    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
+                               Poco::Net::HTTPServerResponse& response);
 
-    void disconnect();
+    virtual void close();
 
-    virtual void frameReceived(const WebSocketFrame& frame);
-    virtual void frameSent(const WebSocketFrame& frame, int numBytesSent);
-    virtual void socketClosed();
-    
-    void broadcast(const WebSocketFrame& frame) const;
-
-    bool isConnected() const;
-    std::string getSubprotocol() const;
-    
-    size_t getSendQueueSize() const;
-    void   clearSendQueue();
-    
-protected:
-    void setIsConnected(bool bIsConnected);
-    
-    Settings settings;
-
-    BaseWebSocketSessionManager& _manager;
-    
 private:
-    void handleSubprotocols(ServerExchange& exchange);
-    void handleOrigin(ServerExchange& exchange);
-    void handleExtensions(ServerExchange& exchange);
-    
-    void processFrameQueue(Poco::Net::WebSocket& ws);
-    
-    // this is all fixed in Poco 1.4.6 and 1.5.+
-    void applyFirefoxHack(Poco::Net::HTTPServerRequest& _request);
-
-    mutable Poco::FastMutex _mutex;
-    bool _bIsConnected;
-    std::queue<WebSocketFrame> _frameQueue;
+    WebSocketRouteInterface& _parent;
 
 };
 

@@ -26,92 +26,94 @@
 #pragma once
 
 
+#include <set>
 #include "ofBaseTypes.h"
-#include "BaseWebSocketRouteHandler.h"
+#include "AbstractTypes.h"
 #include "WebSocketEvents.h"
 #include "WebSocketFrame.h"
+
 
 namespace ofx {
 namespace HTTP {
 
 
-class BaseWebSocketSessionManager {
+class BaseWebSocketSessionManager
+{
 public:
+//    typedef std::vector<std::string>                 SubprotocolList;
+//    typedef std::vector<std::string>::iterator       SubprotocolListIter;
+//    typedef std::vector<std::string>::const_iterator SubprotocolListConstIter;
+
     BaseWebSocketSessionManager();
     virtual ~BaseWebSocketSessionManager();
 
-    bool sendFrame(BaseWebSocketRouteHandler* handler,const WebSocketFrame& frame);
-    void disconnect(BaseWebSocketRouteHandler* handler);
+    bool sendFrame(AbstractWebSocketConnection* connection, const WebSocketFrame& frame);
+    void close(AbstractWebSocketConnection* connection);
 
-    void disconnectAll();
+    void close();
 
-    bool sendBinary(BaseWebSocketRouteHandler* handler, ofBaseHasPixels& image);
-
-    bool sendBinary(BaseWebSocketRouteHandler* handler, ofPixels& pixels);
-
-    bool sendBinary(BaseWebSocketRouteHandler* handler,
+    bool sendBinary(AbstractWebSocketConnection* connection, ofBaseHasPixels& image);
+    bool sendBinary(AbstractWebSocketConnection* connection, ofPixels& pixels);
+    bool sendBinary(AbstractWebSocketConnection* connection,
                     unsigned char* data,
-                    size_t size);
+                    std::size_t size);
 
-    void broadcast(ofPixelsRef pixels);
-
+    void broadcast(ofPixels& pixels);
     void broadcast(const std::string& text);
-
     void broadcast(const WebSocketFrame& frame);
 
     template<class ListenerClass>
-    void registerWebSocketEvents(ListenerClass * listener);
+    void registerWebSocketEvents(ListenerClass* listener);
 
     template<class ListenerClass>
-    void unregisterWebSocketEvents(ListenerClass * listener);
+    void unregisterWebSocketEvents(ListenerClass* listener);
 
-    void registerRouteHandler(BaseWebSocketRouteHandler* handler);
-    void unregisterRouteHandler(BaseWebSocketRouteHandler* handler);
+    void registerWebSocketConnection(AbstractWebSocketConnection* connection);
+    void unregisterWebSocketConnection(AbstractWebSocketConnection* connection);
 
-    size_t getNumClientsConnected();
+    std::size_t getNumWebSocketConnections();
 
-    std::vector<std::string> getAvailableSubprotcols();
-
-    bool selectSubprotocol(const std::vector<std::string>& proposedSubprotocols,
-                           std::string& selectedSubprotocol);
-    
-    WebsocketEvents events;
+//    SubprotocolList getAvailableSubprotcols();
+//
+//    bool selectSubprotocol(const SubprotocolList& proposedSubprotocols,
+//                           std::string& selectedSubprotocol);
+    WebSocketEvents events;
 
 protected:
     BaseWebSocketSessionManager(const BaseWebSocketSessionManager& that);
 	BaseWebSocketSessionManager& operator = (const BaseWebSocketSessionManager& that);
 
-    typedef std::set<BaseWebSocketRouteHandler*>            HandlerSet;
-    typedef std::set<BaseWebSocketRouteHandler*>::iterator  HandlerSetIter;
-    typedef std::map<std::string,WebsocketEvents>           EventMap;
-    typedef std::map<std::string,WebsocketEvents>::iterator EventMapIter;
+    typedef std::set<AbstractWebSocketConnection*>              WebSocketConnections;
+    typedef std::set<AbstractWebSocketConnection*>::iterator    WebSocketConnectionsIter;
+    typedef std::map<std::string,WebSocketEvents>               EventMap;
+    typedef std::map<std::string,WebSocketEvents>::iterator     EventMapIter;
     
-    HandlerSet handlers;
+    WebSocketConnections _connections;
     
-    EventMap eventMap;
+    EventMap _eventMap;
     
-    mutable Poco::FastMutex mutex; // locks the handlers set
+    mutable ofMutex _mutex; // locks the handlers set
     
 };
 
 
 template<class ListenerClass>
-void BaseWebSocketSessionManager::registerWebSocketEvents(ListenerClass * listener) {
-    ofAddListener(events.onOpenEvent, listener, &ListenerClass::onOpenEvent);
-    ofAddListener(events.onCloseEvent,listener, &ListenerClass::onCloseEvent);
-    ofAddListener(events.onFrameReceivedEvent, listener, &ListenerClass::onFrameReceivedEvent);
-    ofAddListener(events.onFrameSentEvent,listener,&ListenerClass::onFrameSentEvent);
-    ofAddListener(events.onErrorEvent,listener,&ListenerClass::onErrorEvent);
+void BaseWebSocketSessionManager::registerWebSocketEvents(ListenerClass* listener) {
+    ofAddListener(events.onOpenEvent, listener, &ListenerClass::onWebSocketOpenEvent);
+    ofAddListener(events.onCloseEvent,listener, &ListenerClass::onWebSocketCloseEvent);
+    ofAddListener(events.onFrameReceivedEvent, listener, &ListenerClass::onWebSocketFrameReceivedEvent);
+    ofAddListener(events.onFrameSentEvent,listener,&ListenerClass::onWebSocketFrameSentEvent);
+    ofAddListener(events.onErrorEvent,listener,&ListenerClass::onWebSocketErrorEvent);
 }
 
 
 template<class ListenerClass>
-void BaseWebSocketSessionManager::unregisterWebSocketEvents(ListenerClass * listener) {
-    ofRemoveListener(events.onOpenEvent,listener,&ListenerClass::onOpenEvent);
-    ofRemoveListener(events.onCloseEvent,listener,&ListenerClass::onCloseEvent);
-    ofRemoveListener(events.onFrameReceivedEvent,listener,&ListenerClass::onFrameReceivedEvent);
-    ofRemoveListener(events.onFrameSentEvent,listener,&ListenerClass::onFrameSentEvent);
-    ofRemoveListener(events.onErrorEvent,listener,&ListenerClass::onErrorEvent);
+void BaseWebSocketSessionManager::unregisterWebSocketEvents(ListenerClass* listener) {
+    ofRemoveListener(events.onOpenEvent,listener,&ListenerClass::onWebSocketOpenEvent);
+    ofRemoveListener(events.onCloseEvent,listener,&ListenerClass::onWebSocketCloseEvent);
+    ofRemoveListener(events.onFrameReceivedEvent,listener,&ListenerClass::onWebSocketFrameReceivedEvent);
+    ofRemoveListener(events.onFrameSentEvent,listener,&ListenerClass::onWebSocketFrameSentEvent);
+    ofRemoveListener(events.onErrorEvent,listener,&ListenerClass::onWebSocketErrorEvent);
 }
 
 

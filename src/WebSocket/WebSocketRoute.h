@@ -28,6 +28,7 @@
 
 #include "AbstractTypes.h"
 #include "WebSocketRouteHandler.h"
+#include "WebSocketRouteInterface.h"
 #include "WebSocketEvents.h"
 
 
@@ -35,35 +36,37 @@ namespace ofx {
 namespace HTTP {
 
 
-class WebSocketRoute :
-    public AbstractServerRoute,
-    public BaseWebSocketSessionManager
+class WebSocketRoute: public BaseWebSocketSessionManager, public WebSocketRouteInterface
 {
 public:
-    typedef WebSocketRouteHandler::Settings Settings;
-    typedef ofPtr<WebSocketRoute> Ptr;
+    typedef std::shared_ptr<WebSocketRoute> SharedPtr;
+    typedef std::weak_ptr<WebSocketRoute>   WeakPtr;
+    typedef WebSocketRouteSettings Settings;
 
     WebSocketRoute(const Settings& settings);
     virtual ~WebSocketRoute();
 
-    bool canHandleRequest(const HTTPServerRequest& request, bool bIsSecurePort);
+    virtual std::string getRoutePathPattern() const;
 
-    HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request);
+    virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
+                                  bool isSecurePort) const;
 
-    virtual std::string getRoute() const
+    virtual Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
+
+    virtual void stop();
+
+    WebSocketRouteSettings getSettings() const;
+    BaseWebSocketSessionManager& getSessionManagerRef();
+
+    static SharedPtr makeShared(const Settings& settings)
     {
-        return _settings.getRoute();
+        return SharedPtr(new WebSocketRoute(settings));
     }
-    
-    static Ptr Instance(const Settings& settings = Settings())
-    {
-        return Ptr(new WebSocketRoute(settings));
-    }
-    
-protected:
+
+private:
     Settings _settings;
-
+    
 };
 
-    
+
 } } // namespace ofx::HTTP

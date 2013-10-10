@@ -35,25 +35,31 @@ Poco::Net::NameValueCollection Utils::getQueryMap(const Poco::URI& uri)
 {
     Poco::Net::NameValueCollection nvc;
     
-    if(uri.empty()) {
+    if(uri.empty())
+    {
         return nvc;
     }
 
     std::string query = uri.getQuery();
 
-    if(query.empty()) {
+    if(query.empty())
+    {
         return nvc;
     }
 
     std::vector<std::string> arguments = ofSplitString(query,"&",true);
     
     std::vector<std::string>::const_iterator iter = arguments.begin();
-    while(iter != arguments.end()) {
+    
+    while(iter != arguments.end())
+    {
         std::vector<std::string> tokens = ofSplitString(*iter,"=",true);
-        if(tokens.size() > 0) {
+        if(tokens.size() > 0)
+        {
             std::string key   = tokens[0];
             std::string value = "";
-            if(tokens.size() > 1) {
+            if(tokens.size() > 1)
+            {
                 value = tokens[1];
             }
             nvc.add(key,value);
@@ -64,28 +70,45 @@ Poco::Net::NameValueCollection Utils::getQueryMap(const Poco::URI& uri)
     return nvc;
 }
 
+
 //------------------------------------------------------------------------------
-void Utils::dumpRequestHeaders(const ServerExchange& exchange,
-                               ofLogLevel logLevel)
+void Utils::dumpHeaders(const Poco::Net::HTTPServerRequest& request,
+                        const Poco::Net::HTTPServerResponse& response,
+                        ofLogLevel logLevel)
 {
-    if(logLevel >= ofGetLogLevel()) {
+    dumpHeaders(request,logLevel);
+    dumpHeaders(response,logLevel);
+}
+
+//------------------------------------------------------------------------------
+void Utils::dumpHeaders(const Poco::Net::HTTPServerRequest& request,
+                        ofLogLevel logLevel)
+{
+    if(logLevel >= ofGetLogLevel())
+    {
         ofLog(logLevel) << "Being ofDumpRequestHeaders =================" << endl;
-        Poco::Net::NameValueCollection::ConstIterator iter = exchange.request.begin();
-        while(iter != exchange.request.end()) {
+        Poco::Net::NameValueCollection::ConstIterator iter = request.begin();
+
+        while(iter != request.end())
+        {
             ofLog(logLevel) << (*iter).first << ":" << (*iter).second;
             ++iter;
         }
+
         ofLog(logLevel) << "End ofDumpRequestHeaders =================" << endl;
     }
 }
 
 //------------------------------------------------------------------------------
-void Utils::dumpReponseHeaders(const ServerExchange& exchange, ofLogLevel logLevel)
+void Utils::dumpHeaders(const Poco::Net::HTTPServerResponse& response,
+                        ofLogLevel logLevel)
 {
-    if(logLevel >= ofGetLogLevel()) {
-        Poco::Net::NameValueCollection::ConstIterator iter = exchange.response.begin();
+    if(logLevel >= ofGetLogLevel())
+    {
+        Poco::Net::NameValueCollection::ConstIterator iter = response.begin();
         ofLog(logLevel) << "Begin ofDumpReponseHeaders =================" << endl;
-        while(iter != exchange.request.end()) {
+        while(iter != response.end())
+        {
             ofLog(logLevel) << (*iter).first << ":" << (*iter).second;
             ++iter;
         }

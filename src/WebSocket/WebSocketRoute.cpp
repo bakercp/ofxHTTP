@@ -31,67 +31,85 @@ namespace HTTP {
 
 
 //------------------------------------------------------------------------------
-WebSocketRoute::WebSocketRoute(const Settings& settings)
-: _settings(settings)
+WebSocketRoute::WebSocketRoute(const Settings& settings):
+    _settings(settings)
 {
+}
+    
+//------------------------------------------------------------------------------
+WebSocketRoute::~WebSocketRoute()
+{
+}
 
-}
-    
-//------------------------------------------------------------------------------
-WebSocketRoute::~WebSocketRoute() {
-    ofLogVerbose("WebSocketRoute::~WebSocketRoute") << "Closing down route: " << getRoute() << endl;
-}
-    
-//------------------------------------------------------------------------------
-bool WebSocketRoute::canHandleRequest(const HTTPServerRequest& request,
-                                      bool bIsSecurePort)
+std::string WebSocketRoute::getRoutePathPattern() const
 {
+    return _settings.getRoutePathPattern();
+}
+
+bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
+                                      bool isSecurePort) const
+{
+    
     // require HTTP_GET
-    if(request.getMethod() != Poco::Net::HTTPRequest::HTTP_GET) {
-        return false;
-    }
-    
-    if(Poco::icompare(request.get("Upgrade", ""), "websocket")  != 0) {
+    if(request.getMethod() != Poco::Net::HTTPRequest::HTTP_GET)
+    {
         return false;
     }
 
+    // check route
+    if(!BaseRoute::canHandleRequest(request, isSecurePort))
+    {
+        return false;
+    }
+
+    // check to see if this is an websocket upgrade request
+    if(Poco::icompare(request.get("Upgrade", ""), "websocket")  != 0)
+    {
+        return false;
+    }
+
+    // TODO: firefox hack
     // require websocket upgrade headers
     // this is all fixed in Poco 1.4.6 and 1.5.+
     std::string connectionHeader = Poco::toLower(request.get("Connection", ""));
-    
-    if(Poco::icompare(connectionHeader, "Upgrade") != 0 &&
-       !ofIsStringInString(connectionHeader,"upgrade")) {
-       // this request is coming from firefox, which is known to send things that look like:
-       // Connection:keep-alive, Upgrade
-       // thus failing the standard Poco upgrade test.
-       // we can't do this here, but will do a similar hack in the handler
-        return false;
-    }
-    
-    // require a valid path
-    Poco::URI uri;
-    
-    try {
-        uri = Poco::URI(request.getURI());
-    } catch(const Poco::SyntaxException& exc) {
-        ofLogError("ServerWebSocketRoute::canHandleRequest") << exc.what();
-        return false;
-    }
-    
-    // just get the path
-    std::string path = uri.getPath();
 
-    // make paths absolute
-    if(path.empty()) { path = "/"; }
+    if(Poco::icompare(connectionHeader, "Upgrade") != 0 &&
+       !ofIsStringInString(connectionHeader,"upgrade"))
+    {
+        // this request is coming from firefox, which is known to send things that look like:
+        // Connection:keep-alive, Upgrade
+        // thus failing the standard Poco upgrade test.
+        // we can't do this here, but will do a similar hack in the handler
+        return false;
+    }
     
-    return Poco::RegularExpression(_settings.getRoute()).match(path);
+    return true;
+
 }
-                                 
-//------------------------------------------------------------------------------
-HTTPRequestHandler* WebSocketRoute::createRequestHandler(const HTTPServerRequest& request)
+
+Poco::Net::HTTPRequestHandler* WebSocketRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
 {
-    return new WebSocketRouteHandler(*this,_settings);
+    return new WebSocketRouteHandler(*this);
 }
+
+
+void WebSocketRoute::stop()
+{
+    close(); // TODO: get method signatures in sync ...
+}
+
+
+WebSocketRouteSettings WebSocketRoute::getSettings() const
+{
+    return _settings;
+}
+
+BaseWebSocketSessionManager& WebSocketRoute::getSessionManagerRef()
+{
+    return *this;
+}
+
+
 
 
 } } // namespace ofx::HTTP

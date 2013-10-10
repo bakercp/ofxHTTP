@@ -33,13 +33,14 @@
 using Poco::Net::WebSocket;
 
 // TODO:
-// - replace ofBuffer with Poco::FIFOBuffer
+// - replace ofBuffer with Poco::FIFOBuffer or ofx::IO::ByteBuffer
 
 namespace ofx {
 namespace HTTP {
 
 
-class WebSocketFrame : public ofBuffer {
+class WebSocketFrame: public ofBuffer
+{
 public:
     WebSocketFrame(const ofBuffer& buffer,
                    int flags = WebSocket::FRAME_TEXT);
@@ -48,11 +49,11 @@ public:
                    int flags = WebSocket::FRAME_TEXT);
 
     WebSocketFrame(const char* buffer,
-                   unsigned int size,
+                   std::size_t size,
                    int flags = WebSocket::FRAME_TEXT);
 
     WebSocketFrame(const unsigned char* buffer,
-                   unsigned int size,
+                   std::size_t size,
                    int flags = WebSocket::FRAME_TEXT);
     
     virtual ~WebSocketFrame();

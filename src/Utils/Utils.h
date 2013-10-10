@@ -29,26 +29,30 @@
 #include <string>
 #include <vector>
 #include "Poco/URI.h"
-#include "Poco/StringTokenizer.h"
-#include "Poco/Net/NameValueCollection.h"
+#include "Poco/Net/HTTPServerRequest.h"
+#include "Poco/Net/HTTPServerResponse.h"
+#include "ofLog.h"
 #include "ofUtils.h"
-#include "ofTypes.h"
-#include "ServerExchange.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class Utils {
+class Utils
+{
 public:
     static Poco::Net::NameValueCollection getQueryMap(const Poco::URI& uri);
 
-    static void dumpRequestHeaders(const ServerExchange& exchange,
-                                   ofLogLevel logLevel = OF_LOG_VERBOSE);
+    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
+                            const Poco::Net::HTTPServerResponse& response,
+                            ofLogLevel logLevel = OF_LOG_VERBOSE);
 
-    static void dumpReponseHeaders(const ServerExchange& exchange,
-                                   ofLogLevel logLevel = OF_LOG_VERBOSE);
+    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
+                            ofLogLevel logLevel = OF_LOG_VERBOSE);
+
+    static void dumpHeaders(const Poco::Net::HTTPServerResponse& response,
+                            ofLogLevel logLevel = OF_LOG_VERBOSE);
 
 };
 

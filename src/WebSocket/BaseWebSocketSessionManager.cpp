@@ -41,74 +41,81 @@ BaseWebSocketSessionManager::~BaseWebSocketSessionManager()
 }
 
 //------------------------------------------------------------------------------
-bool BaseWebSocketSessionManager::sendFrame(BaseWebSocketRouteHandler* handler,
+bool BaseWebSocketSessionManager::sendFrame(AbstractWebSocketConnection* connection,
                                             const WebSocketFrame& frame)
 {
-    if(handler != NULL) {
-        return handler->sendFrame(frame);
-    } else {
-        ofLogError("ofxBaseWebSocketSessionManager::sendFrame") << "handler == NULL";
+    if(0 != connection)
+    {
+        return connection->sendFrame(frame);
+    }
+    else
+    {
+        ofLogError("BaseWebSocketSessionManager::sendFrame") << "handler == NULL";
         return false;
     }
 }
 
 //------------------------------------------------------------------------------
-void BaseWebSocketSessionManager::disconnect(BaseWebSocketRouteHandler* handler)
+void BaseWebSocketSessionManager::close(AbstractWebSocketConnection* connection)
 {
-    if(handler != NULL) {
-        handler->disconnect();
-    } else {
-        ofLogError("ofxBaseWebSocketSessionManager::disconnect") << "handler == NULL";
+    if(0 != connection)
+    {
+        connection->stop();
+    }
+    else
+    {
+        ofLogError("BaseWebSocketSessionManager::disconnect") << "handler == NULL";
     }
 }
 
 //------------------------------------------------------------------------------
-void BaseWebSocketSessionManager::disconnectAll()
+void BaseWebSocketSessionManager::close()
 {
-    Poco::FastMutex::ScopedLock lock(mutex);
-
-    HandlerSetIter iter = handlers.begin();
-
-    while(iter != handlers.end()) {
-        disconnect(*iter);
+    ofScopedLock lock(_mutex);
+    WebSocketConnectionsIter iter = _connections.begin();
+    while(iter != _connections.end())
+    {
+        close(*iter);
         ++iter;
     }
 }
 
 //------------------------------------------------------------------------------
-bool BaseWebSocketSessionManager::sendBinary(BaseWebSocketRouteHandler* handler,
+bool BaseWebSocketSessionManager::sendBinary(AbstractWebSocketConnection* connection,
                                              ofBaseHasPixels& image)
 {
-    return sendBinary(handler,image.getPixelsRef());
+    return sendBinary(connection,image.getPixelsRef());
 }
 
 //------------------------------------------------------------------------------
-bool BaseWebSocketSessionManager::sendBinary(BaseWebSocketRouteHandler* handler,
+bool BaseWebSocketSessionManager::sendBinary(AbstractWebSocketConnection* connection,
                                              ofPixels& pixels)
 {
-    return sendBinary(handler,pixels.getPixels(),static_cast<unsigned int>(pixels.size()));
+    return sendBinary(connection,pixels.getPixels(),
+                      static_cast<unsigned int>(pixels.size()));
 }
 
 //------------------------------------------------------------------------------
-bool BaseWebSocketSessionManager::sendBinary(BaseWebSocketRouteHandler* handler,
+bool BaseWebSocketSessionManager::sendBinary(AbstractWebSocketConnection* connection,
                                              unsigned char* data,
-                                             size_t size)
+                                             std::size_t size)
 {
     WebSocketFrame frame(data,size,Poco::Net::WebSocket::FRAME_BINARY);
-    return sendFrame(handler,frame);
+    return sendFrame(connection,frame);
 }
 
 //------------------------------------------------------------------------------
-void BaseWebSocketSessionManager::broadcast(ofPixelsRef pixels)
+void BaseWebSocketSessionManager::broadcast(ofPixels& pixels)
 {
-    Poco::FastMutex::ScopedLock lock(mutex);
-    std::set<BaseWebSocketRouteHandler*>::iterator iter = handlers.begin();
+    ofScopedLock lock(_mutex);
+    WebSocketConnectionsIter iter = _connections.begin();
 
     int numChannels = pixels.getNumChannels();
     int width       = pixels.getWidth();
     int height      = pixels.getHeight();
 
-    while(iter != handlers.end()) {
+    while(iter != _connections.end())
+    {
         ofPixels pixels;
         //sendFrame(*iter,frame);
         ++iter;
@@ -124,90 +131,91 @@ void BaseWebSocketSessionManager::broadcast(const std::string& text)
 //------------------------------------------------------------------------------
 void BaseWebSocketSessionManager::broadcast(const WebSocketFrame& frame)
 {
-    Poco::FastMutex::ScopedLock lock(mutex);
-
-    std::set<BaseWebSocketRouteHandler*>::iterator iter = handlers.begin();
-
-    while(iter != handlers.end()) {
+    ofScopedLock lock(_mutex);
+    WebSocketConnectionsIter iter = _connections.begin();
+    while(iter != _connections.end())
+    {
         sendFrame(*iter,frame);
         ++iter;
     }
 }
 
 //------------------------------------------------------------------------------
-void BaseWebSocketSessionManager::registerRouteHandler(BaseWebSocketRouteHandler* handler)
+void BaseWebSocketSessionManager::registerWebSocketConnection(AbstractWebSocketConnection* connection)
 {
-    cout << "registering ..." << endl;
-
-    Poco::FastMutex::ScopedLock lock(mutex);
-    if(!handlers.insert(handler).second) {
-        ofLogError("ofxWebSocketManager::registerRouteHandler") << "Element was already in set!";
+    ofScopedLock lock(_mutex);
+    if(!_connections.insert(connection).second)
+    {
+        ofLogError("BaseWebSocketSessionManager::registerRouteHandler") << "Element was already in set!";
     }
 }
 
 //------------------------------------------------------------------------------
-void BaseWebSocketSessionManager::unregisterRouteHandler(BaseWebSocketRouteHandler* handler)
+void BaseWebSocketSessionManager::unregisterWebSocketConnection(AbstractWebSocketConnection* connection)
 {
-    cout << "unregistering ..." << endl;
-    Poco::FastMutex::ScopedLock lock(mutex);
-    size_t numErased = handlers.erase(handler);
+    ofScopedLock lock(_mutex);
+    // TODO, this will never return more than 1
+    std::size_t numErased = _connections.erase(connection);
 
-    if(numErased != 1) {
-        ofLogError("ofxWebSocketManager::unregisterRouteHandler") << "Num erased != 1: " << numErased;
+    if(numErased != 1)
+    {
+        ofLogError("BaseWebSocketSessionManager::unregisterRouteHandler") << "Num erased != 1: " << numErased;
     }
 }
 
 //------------------------------------------------------------------------------
-size_t BaseWebSocketSessionManager::getNumClientsConnected()
+std::size_t BaseWebSocketSessionManager::getNumWebSocketConnections()
 {
-    Poco::FastMutex::ScopedLock lock(mutex);
-    return handlers.size();
+    ofScopedLock lock(_mutex);
+    return _connections.size();
 }
 
-//------------------------------------------------------------------------------
-std::vector<std::string> BaseWebSocketSessionManager::getAvailableSubprotcols()
-{
-    Poco::FastMutex::ScopedLock lock(mutex);
-
-    std::vector<std::string> availableSubprotocols;
-
-    EventMapIter eventIter = eventMap.begin();
-
-    while(eventIter != eventMap.end()) {
-        availableSubprotocols.push_back((*eventIter).first);
-        ++eventIter;
-    }
-
-    return availableSubprotocols;
-}
-
-//------------------------------------------------------------------------------
-bool BaseWebSocketSessionManager::selectSubprotocol(const std::vector<std::string>& proposedSubprotocols,
-                                                    std::string& selectedSubprotocol)
-{
-
-    selectedSubprotocol.clear();
-
-    if(proposedSubprotocols.empty()) {
-        return false;
-    } else {
-        Poco::FastMutex::ScopedLock lock(mutex);
-
-        std::vector<std::string>::const_iterator iter = proposedSubprotocols.begin();
-
-        while(iter != proposedSubprotocols.end()) {
-
-            EventMapIter eventIter = eventMap.find(*iter);
-
-            if(eventIter != eventMap.end()) {
-                selectedSubprotocol = (*eventIter).first;
-                return true;
-            }
-            ++iter;
-        }
-        return false;
-    }
-}
+////------------------------------------------------------------------------------
+//BaseWebSocketSessionManager::SubprotocolList BaseWebSocketSessionManager::getAvailableSubprotcols()
+//{
+//    ofScopedLock lock(_mutex);
+//
+//    SubprotocolList availableSubprotocols;
+//
+//    EventMapIter eventIter = _eventMap.begin();
+//
+//    while(eventIter != _eventMap.end())
+//    {
+//        availableSubprotocols.push_back((*eventIter).first);
+//        ++eventIter;
+//    }
+//
+//    return availableSubprotocols;
+//}
+//
+////------------------------------------------------------------------------------
+//bool BaseWebSocketSessionManager::selectSubprotocol(const SubprotocolList& proposedSubprotocols,
+//                                                    std::string& selectedSubprotocol)
+//{
+//    selectedSubprotocol.clear();
+//
+//    if(proposedSubprotocols.empty())
+//    {
+//        return false;
+//    }
+//    else
+//    {
+//        ofScopedLock lock(_mutex);
+//        // TODO: use find
+//        SubprotocolList::const_iterator iter = proposedSubprotocols.begin();
+//        while(iter != proposedSubprotocols.end())
+//        {
+//            EventMapIter eventIter = _eventMap.find(*iter);
+//            if(eventIter != _eventMap.end())
+//            {
+//                selectedSubprotocol = (*eventIter).first;
+//                return true;
+//            }
+//            ++iter;
+//        }
+//        return false;
+//    }
+//}
 
     
 } } // namespace ofx::HTTP

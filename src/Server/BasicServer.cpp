@@ -30,19 +30,16 @@ namespace ofx {
 namespace HTTP {
 
 
-BasicServer::BasicServer(const Settings& settings) : Server(settings)
+BasicServer::BasicServer(const Settings& settings):
+    BaseServer_<BasicServerSettings>(settings),
+    _fileSystemRoute(FileSystemRoute::makeShared(settings))
 {
-    defaultRoute = BaseServerRoute::Instance(settings);
-    addRoute(defaultRoute);
+    addRoute(_fileSystemRoute);
 }
 
 BasicServer::~BasicServer()
 {
-}
-
-BasicServer::Ptr BasicServer::Instance(const Settings& settings)
-{
-    return Ptr(new BasicServer(settings));
+    removeRoute(_fileSystemRoute);
 }
 
 
