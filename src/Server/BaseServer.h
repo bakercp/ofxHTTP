@@ -279,7 +279,9 @@ void BaseServer_<SettingsType>::stop()
     // we gotta wait for all of them ... ugh.
     // Particularly troubling if we are sharing
     // this pool with other non-server-based-processes.
-    getThreadPoolRef().joinAll();
+    // getThreadPoolRef().joinAll();
+
+    getThreadPoolRef().stopAll(); // at least there's a chance of shutting down
 
     _server.reset();
 
