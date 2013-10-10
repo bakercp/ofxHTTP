@@ -1,3 +1,2 @@
 ofxHTTP
-ofxIpVideoServer
 ofxMediaType
