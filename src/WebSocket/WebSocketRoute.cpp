@@ -49,6 +49,7 @@ std::string WebSocketRoute::getRoutePathPattern() const
 bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
                                       bool isSecurePort) const
 {
+    
     // require HTTP_GET
     if(request.getMethod() != Poco::Net::HTTPRequest::HTTP_GET)
     {
