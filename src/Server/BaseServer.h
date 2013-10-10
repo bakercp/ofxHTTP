@@ -27,6 +27,7 @@
 
 
 #include <string>
+#include "Poco/ErrorHandler.h"
 #include "Poco/RWLock.h"
 #include "Poco/Thread.h"
 #include "Poco/ThreadPool.h"
@@ -52,6 +53,24 @@ namespace ofx {
 namespace HTTP {
 
 
+class MyErrorHandler: public Poco::ErrorHandler
+{
+public:
+    void exception(const Poco::Exception& exc)
+    {
+        std::cerr << exc.displayText() << std::endl;
+    }
+    void exception(const std::exception& exc)
+    {
+        std::cerr << exc.what() << std::endl;
+    }
+    void exception()
+    {
+        std::cerr << "unknown exception" << std::endl;
+    }
+};
+
+
 class BaseServerHandle: public Poco::Net::HTTPRequestHandlerFactory
 {
 public:
@@ -72,6 +91,8 @@ private:
     Poco::Net::HTTPRequestHandlerFactory& _factory;
 
 };
+
+
 
 
 template <typename SettingsType>
@@ -126,6 +147,9 @@ private:
 
     Poco::ThreadPool& _threadPoolRef;
 
+    MyErrorHandler eh;
+    Poco::ErrorHandler* pOldEH;
+
 };
 
 
@@ -142,6 +166,9 @@ BaseServer_<SettingsType>::BaseServer_(const SettingsType& settings,
 {
     ofAddListener(ofEvents().exit, this, &BaseServer_<SettingsType>::exit);
     Poco::Net::initializeSSL();
+
+    pOldEH = Poco::ErrorHandler::set(&eh);
+
 }
 
 //------------------------------------------------------------------------------
@@ -150,6 +177,8 @@ BaseServer_<SettingsType>::~BaseServer_()
 {
     stop();
     Poco::Net::uninitializeSSL();
+
+    Poco::ErrorHandler::set(pOldEH);
 }
 
 //------------------------------------------------------------------------------
