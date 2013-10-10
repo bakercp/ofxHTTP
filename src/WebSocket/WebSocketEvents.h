@@ -36,11 +36,12 @@ namespace HTTP {
 
 class WebSocketFrame;
 class WebSocketRouteHandler;
+class WebSocketConnection;
 
 
-enum WebSocketError {
+enum WebSocketError
+{
     WS_ERR_NONE                           = 0,
-    
     WS_ERR_NO_HANDSHAKE                   = 1,
     /// No Connection: Upgrade or Upgrade: websocket header in handshake request.
     WS_ERR_HANDSHAKE_NO_VERSION           = 2,
@@ -57,21 +58,19 @@ enum WebSocketError {
     /// Payload too big for supplied buffer.
     WS_ERR_INCOMPLETE_FRAME               = 11,
     /// Incomplete frame received.
-
     WS_ERROR_INCOMPLETE_FRAME_SENT        = 15,
     WS_ERROR_ZERO_BYTE_FRAME_SENT         = 15,
-    
     WS_ERR_TIMEOUT                        = 20,
     WS_ERR_NET_EXCEPTION                  = 30,
-
     WS_ERR_OTHER                          = 50,
     
 };
 
-class WebSocketEventArgs {
+class WebSocketEventArgs
+{
 public:
-    WebSocketEventArgs(WebSocketRouteHandler& connection,
-                       WebSocketError error = WS_ERR_NONE) :
+    WebSocketEventArgs(WebSocketConnection& connection,
+                       WebSocketError error = WS_ERR_NONE):
         _connection(connection),
         _error(error)
     {
@@ -92,22 +91,23 @@ public:
         _error = error;
     }
 
-    WebSocketRouteHandler& getConnectionRef()
+    WebSocketConnection& getConnectionRef()
     {
         return _connection;
     }
 
 private:
-    WebSocketRouteHandler& _connection;
+    WebSocketConnection& _connection;
     WebSocketError _error;
     
 };
 
-class WebSocketFrameEventArgs : public WebSocketEventArgs {
+class WebSocketFrameEventArgs: public WebSocketEventArgs
+{
 public:
-    WebSocketFrameEventArgs(WebSocketRouteHandler& connection,
+    WebSocketFrameEventArgs(WebSocketConnection& connection,
                             WebSocketFrame& frame,
-                            WebSocketError error = WS_ERR_NONE) :
+                            WebSocketError error = WS_ERR_NONE):
         WebSocketEventArgs(connection,error),
         _frame(frame)
     {
@@ -123,7 +123,8 @@ private:
 
 };
 
-class WebsocketEvents {
+class WebSocketEvents
+{
 public:
     ofEvent<WebSocketEventArgs>      onOpenEvent;
     ofEvent<WebSocketEventArgs>      onCloseEvent;

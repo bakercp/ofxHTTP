@@ -26,32 +26,39 @@
 #pragma once
 
 
-#include "Server.h"
-#include "BaseServerRoute.h"
+#include "BaseServer.h"
+#include "FileSystemRoute.h"
+#include "FileSystemRouteSettings.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class BasicServerSettings :
-    public Server::Settings,
-    public BaseServerRoute::Settings
+class BasicServerSettings:
+    public FileSystemRouteSettings,
+    public BaseServerSettings
 {
 };
 
-//------------------------------------------------------------------------------
-class BasicServer : public Server {
+class BasicServer: public BaseServer_<BasicServerSettings>
+{
 public:
+    typedef std::shared_ptr<BasicServer> SharedPtr;
     typedef BasicServerSettings Settings;
-    typedef ofPtr<BasicServer> Ptr;
-    
+
     BasicServer(const Settings& settings = Settings());
     virtual ~BasicServer();
 
-    static Ptr Instance(const Settings& settings = Settings());
-    
-    ofPtr<BaseServerRoute> defaultRoute;
+    // this method is a hack replacement for std::make_shared<BasicServer>(...);
+    static SharedPtr makeShared(const Settings& settings = Settings())
+    {
+        return SharedPtr(new BasicServer(settings));
+    }
+
+private:
+    FileSystemRoute::SharedPtr _fileSystemRoute;
+
 };
 
 

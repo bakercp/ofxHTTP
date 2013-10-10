@@ -28,136 +28,41 @@
 
 #include "BasicServer.h"
 #include "WebSocketRoute.h"
+#include "WebSocketRouteSettings.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class BasicWebSocketServerSettings :
-    public BasicServer::Settings,
-    public WebSocketRoute::Settings
+class BasicWebSocketServerSettings:
+    public WebSocketRouteSettings,
+    public BasicServerSettings
 {
 };
 
 
-class BasicWebSocketServer : public BasicServer {
+class BasicWebSocketServer: public BasicServer
+{
 public:
-    typedef BasicWebSocketServerSettings Settings;
-    typedef ofPtr<BasicWebSocketServer> Ptr;
+    typedef std::shared_ptr<BasicWebSocketServer> SharedPtr;
+    typedef std::weak_ptr<BasicWebSocketServer>   WeakPtr;
+    typedef BasicWebSocketServerSettings          Settings;
 
-    BasicWebSocketServer(const Settings& settings = Settings()) :
-        BasicServer(settings)
+    BasicWebSocketServer(const Settings& settings = Settings());
+    virtual ~BasicWebSocketServer();
+
+    WebSocketRoute::SharedPtr getWebSocketRoute();
+
+    // this method is a hack replacement for std::make_shared<BasicServer>(...);
+    static SharedPtr makeShared(const Settings& settings = Settings())
     {
-        websocket = WebSocketRoute::Instance(_settings);
-        addRoute(websocket);
+        return SharedPtr(new BasicWebSocketServer(settings));
     }
+private:
+    WebSocketRoute::SharedPtr _webSocketRoute;
     
-    virtual ~BasicWebSocketServer()
-    {
-    }
-    
-    void broadcast(const WebSocketFrame& frame) const
-    {
-        if(websocket == NULL) {
-            ofLogError("ofxWebSocketServerBasic::broadcast") << "call loadSettings first.";
-            return;
-        }
-        
-        websocket->broadcast(frame);
-    }
-    
-    
-    void broadcast(ofPixelsRef pixels) const
-    {
-        if(websocket == NULL) {
-            ofLogError("ofxWebSocketServerBasic::broadcast") << "call loadSettings first.";
-            return;
-        }
-        
-        websocket->broadcast(pixels);
-    }
-    
-    bool sendFrame(WebSocketRouteHandler* handler,
-                   const WebSocketFrame& frame) const
-    {
-
-        if(websocket == NULL) {
-            ofLogError("ofxWebSocketServerBasic::sendFrame") << "call loadSettings first.";
-            return false;
-        }
-        
-        return websocket->sendFrame(handler,frame);
-    }
-    
-    void disconnect(WebSocketRouteHandler* handler)
-    {
-        if(websocket == NULL) {
-            ofLogError("ofxWebSocketServerBasic::disconnect") << "call loadSettings first.";
-            return;
-        }
-        websocket->disconnect(handler);
-    }
-    
-    void disconnectAll()
-    {
-        if(websocket == NULL) {
-            ofLogError("ofxWebSocketServerBasic::disconnectAll") << "call loadSettings first.";
-            return;
-        }
-        websocket->disconnectAll();
-    }
-
-    size_t getNumClientsConnected()
-    {
-        if(websocket == NULL) {
-            ofLogError("ofxWebSocketServerBasic::getNumClientsConnected") << "call loadSettings first.";
-            return -1;
-        }
-        return websocket->getNumClientsConnected();
-    }
-
-
-    template<class ListenerClass>
-    void registerWebSocketEvents(ListenerClass* listener) {
-        if(websocket == NULL) {
-            ofLogError("ofxWebSocketServerBasic::registerWebSocketEvents") << "call loadSettings first.";
-            return;
-        }
-        websocket->registerWebSocketEvents(listener);
-    }
-
-//    template<class ListenerClass>
-//    void registerWebSocketEvents(const ListenerClass& listener) {
-//        websocket->registerWebSocketEvents(&listener);
-//    }
-
-    
-    template<class ListenerClass>
-    void unregisterWebSocketEvents(ListenerClass* listener) {
-        if(websocket == NULL) {
-            ofLogError("ofxWebSocketServerBasic::unregisterWebSocketEvents") << "call loadSettings first.";
-            return;
-        }
-        websocket->unregisterWebSocketEvents(listener);
-    }
-
-//    template<class ListenerClass>
-//    void unregisterWebSocketEvents(const ListenerClass& listener) {
-//        websocket->unregisterWebSocketEvents(&listener);
-//    }
-
-    
-    WebSocketRoute::Ptr websocket;
-
-    static Ptr Instance(const Settings& settings = Settings()) {
-        return Ptr(new BasicWebSocketServer(settings));
-    }
-    
-protected:
-    Settings _settings;
-
 };
 
-
+    
 } } // namespace ofx::HTTP

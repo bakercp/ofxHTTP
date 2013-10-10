@@ -29,26 +29,39 @@
 namespace ofx {
 namespace HTTP {
 
-//------------------------------------------------------------------------------
 
-//BaseRouteSettings::BaseRouteSettings(const std::string& route) :
-//    _route(route)
-//{
-//}
-//
-//BaseRouteSettings::~BaseRouteSettings()
-//{
-//}
-//
-//std::string BaseRouteSettings::getRoute() const
-//{
-//    return _route;
-//}
-//
-//void BaseRouteSettings::setRoute(const std::string& route)
-//{
-//    _route = route;
-//}
+const std::string BaseRouteSettings::DEFAULT_ROUTE_PATH_PATTERN = "/.*";
+
+
+BaseRouteSettings::BaseRouteSettings(const std::string& routePathPattern):
+    _routePathPattern(routePathPattern),
+    _requireSecurePort(false)
+{
+}
+
+BaseRouteSettings::~BaseRouteSettings()
+{
+}
+
+void BaseRouteSettings::setRoutePathPattern(const std::string& routePathPattern)
+{
+    _routePathPattern = routePathPattern;
+}
+
+std::string BaseRouteSettings::getRoutePathPattern() const
+{
+    return _routePathPattern;
+}
+
+void BaseRouteSettings::setRequireSecurePort(bool requireSecurePort)
+{
+    _requireSecurePort = requireSecurePort;
+}
+
+bool BaseRouteSettings::getRequireSecurePort() const
+{
+    return _requireSecurePort;
+}
 
 
 } } // namespace ofx::HTTP

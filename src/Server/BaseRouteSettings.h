@@ -27,37 +27,32 @@
 
 
 #include <string>
+#include "AbstractTypes.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-//class AbstractHasRoute {
-//    AbstractHasRoute()
-//    {
-//    }
-//
-//    virtual ~AbstractHasRoute()
-//    {
-//    }
-//
-//    virtual std::string getRoute() const = 0;
+class BaseRouteSettings
+{
+public:
+    BaseRouteSettings(const std::string& routePathPattern = BaseRouteSettings::DEFAULT_ROUTE_PATH_PATTERN);
+    virtual ~BaseRouteSettings();
 
-//};
+    void setRoutePathPattern(const std::string& routePathPattern);
+    std::string getRoutePathPattern() const;
 
-//class BaseRouteSettings {
-//public:
-////    BaseRouteSettings(const std::string& route);
-////    virtual ~BaseRouteSettings();
-//
-//    std::string getRoute() const;
-//    void setRoute(const std::string& route);
-//
-//protected:
-//    std::string _route;
-//    
-//};
+    void setRequireSecurePort(bool requireSecurePort);
+    bool getRequireSecurePort() const;
 
-    
+    static const std::string DEFAULT_ROUTE_PATH_PATTERN;
+
+private:
+    std::string _routePathPattern;
+    bool _requireSecurePort;
+
+};
+
+
 } } // namespace ofx::HTTP
