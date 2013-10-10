@@ -236,6 +236,9 @@ void BaseServer_<SettingsType>::start()
 
     _isSecurePort = socket.secure();
 
+    // essential on a mac!  fixed in 1.4.6p2+ / 1.5.2+
+    socket.setOption(SOL_SOCKET, SO_NOSIGPIPE, 1); // ignore SIGPIPE
+
     // start the http server
     _server->start();
 
