@@ -32,7 +32,6 @@
 //------------------------------------------------------------------------------
 void ofApp::setup()
 {
-    ofSetLogLevel(OF_LOG_VERBOSE);
     ofSetFrameRate(30);
 
     BasicServerSettings settings;

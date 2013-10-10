@@ -29,12 +29,10 @@
 void ofApp::setup()
 {
     ofSetFrameRate(30);
-    ofSetLogLevel(OF_LOG_NOTICE);
 
     bgColor = ofColor::white;
 
     BasicWebSocketServerSettings settings;
-    settings.setPort(8989);
 
     server = BasicWebSocketServer::makeShared(settings);
 
