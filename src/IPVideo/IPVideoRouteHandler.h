@@ -25,7 +25,13 @@
 
 #pragma once
 
+#if defined(TARGET_WIN32)
+    // #define clash with std::min
+    // http://stackoverflow.com/questions/5004858/stdmin-gives-error
+    #define NOMINMAX
+#endif
 
+#include <algorithm>
 #include "Poco/CountingStream.h"
 #include "Poco/Exception.h"
 #include "Poco/DateTimeFormat.h"

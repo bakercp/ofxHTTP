@@ -74,8 +74,10 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
 
         ofLogNotice("ServerWebSocketRouteHandler::handleRequest") << "WebSocket connection established.";
 
-        char buffer[_parent.getSettings().getBufferSize()];
-        std::memset(buffer,0,sizeof(buffer)); // initialize to 0
+        const std::size_t bufferSize = _parent.getSettings().getBufferSize();
+
+        char buffer[bufferSize];
+        std::memset(buffer,0,bufferSize); // initialize to 0
 
         int flags = 0;
         int numBytesReceived = 0;
@@ -88,7 +90,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
         {
             if(ws.poll(_parent.getSettings().getPollTimeout(),Poco::Net::Socket::SELECT_READ))
             {
-                numBytesReceived = ws.receiveFrame(buffer,sizeof(buffer),flags);
+                numBytesReceived = ws.receiveFrame(buffer,bufferSize,flags);
 
                 if(numBytesReceived > 0)
                 {
@@ -343,6 +345,8 @@ void WebSocketConnection::setIsConnected(bool isConnected)
 void WebSocketConnection::handleOrigin(Poco::Net::HTTPServerRequest& request,
                                        Poco::Net::HTTPServerResponse& response)
 {
+
+    // http://en.wikipedia.org/wiki/Same_origin_policy
 
 //    _settings.getAllowCrossOriginConnections();
 //    Utils::dumpHeaders(request,OF_LOG_NOTICE);
