@@ -178,7 +178,7 @@ void IPVideoRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
 
                     if(0 != frame)
                     {
-                        ofBuffer& buffer = frame->getBufferRef();
+                        const ofBuffer& buffer = frame->getBufferRef();
 
                         ostr << _parent.getSettings().getBoundaryMarker();
                         ostr << "\r\n";
