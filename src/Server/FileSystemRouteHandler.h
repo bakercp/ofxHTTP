@@ -27,7 +27,7 @@
 
 
 #include "ofUtils.h"
-#include "MediaTypeMap.h"
+//#include "MediaTypeMap.h"
 #include "BaseRouteHandler.h"
 #include "FileSystemRouteInterface.h"
 
