@@ -91,7 +91,7 @@ public:
         _error = error;
     }
 
-    WebSocketConnection& getConnectionRef()
+    const WebSocketConnection& getConnectionRef() const
     {
         return _connection;
     }
@@ -113,10 +113,12 @@ public:
     {
     }
 
-    WebSocketFrame& getFrameRef()
+    const WebSocketFrame& getFrameRef() const
     {
         return _frame;
     }
+
+
 
 private:
     WebSocketFrame& _frame;

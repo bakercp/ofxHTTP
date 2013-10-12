@@ -60,7 +60,7 @@ public:
     virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
                                Poco::Net::HTTPServerResponse& response);
 
-    bool sendFrame(const WebSocketFrame& frame); // returns false if frame not queued
+    bool sendFrame(const WebSocketFrame& frame) const; // returns false if frame not queued
 
     void stop();
 
@@ -107,8 +107,7 @@ private:
 
     bool _isConnected;
 
-    std::queue<WebSocketFrame> _frameQueue;
-    
+    mutable std::queue<WebSocketFrame> _frameQueue;
 
     mutable Poco::FastMutex _mutex;
     

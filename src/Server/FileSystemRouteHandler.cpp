@@ -96,9 +96,47 @@ void FileSystemRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request
 
     try
     {
-        ofx::Media::MediaTypeMap mediaMap;
-        Poco::Net::MediaType mediaType = mediaMap.getMediaTypeForSuffix(file.getExtension());
-        response.sendFile(file.getAbsolutePath(), mediaType.toString()); // will throw exceptions
+//        ofx::Media::MediaTypeMap mediaMap;
+//        Poco::Net::MediaType mediaType = mediaMap.getMediaTypeForSuffix(file.getExtension());
+
+        std::string mediaTypeString = "application/octet-stream";
+        std::string ext = file.getExtension();
+
+
+        if(ext == "json")
+        {
+            mediaTypeString = "application/json";
+        }
+        else if(ext == "html")
+        {
+            mediaTypeString = "text/html";
+        }
+        else if(ext == "jpg" || ext == "jpeg")
+        {
+            mediaTypeString = "image/jpeg";
+        }
+        else if(ext == "png")
+        {
+            mediaTypeString = "image/png";
+        }
+        else if(ext == "js")
+        {
+            mediaTypeString = "application/javascript";
+        }
+        else if(ext == "css")
+        {
+            mediaTypeString = "text/css";
+        }
+        else if(ext == "xml")
+        {
+            mediaTypeString = "application/xml";
+        }
+        else if(ext == "ico")
+        {
+            mediaTypeString = "image/x-icon";
+        }
+
+        response.sendFile(file.getAbsolutePath(), mediaTypeString); // will throw exceptions
         return;
     }
     catch (const Poco::FileNotFoundException& ex)

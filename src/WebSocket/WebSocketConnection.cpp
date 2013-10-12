@@ -223,7 +223,7 @@ void WebSocketConnection::frameReceived(const WebSocketFrame& frame)
 }
 
 //------------------------------------------------------------------------------
-bool WebSocketConnection::sendFrame(const WebSocketFrame& frame)
+bool WebSocketConnection::sendFrame(const WebSocketFrame& frame) const
 {
     ofScopedLock lock(_mutex);
     if(_isConnected)
@@ -409,6 +409,9 @@ void WebSocketConnection::processFrameQueue(Poco::Net::WebSocket& ws)
         {
             if(ws.poll(_parent.getSettings().getPollTimeout(), Poco::Net::Socket::SELECT_WRITE))
             {
+                cout << "frame " << frame.getBinaryBuffer() << " sz=" << frame.size() << " flags=" << frame.getFlags() << endl;
+
+
                 numBytesSent = ws.sendFrame(frame.getBinaryBuffer(),
                                             frame.size(),
                                             frame.getFlags());

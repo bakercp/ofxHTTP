@@ -50,7 +50,7 @@ bool BaseWebSocketSessionManager::sendFrame(AbstractWebSocketConnection* connect
     }
     else
     {
-        ofLogError("BaseWebSocketSessionManager::sendFrame") << "handler == NULL";
+        ofLogError("BaseWebSocketSessionManager::sendFrame") << "0 == handler";
         return false;
     }
 }
@@ -64,7 +64,7 @@ void BaseWebSocketSessionManager::close(AbstractWebSocketConnection* connection)
     }
     else
     {
-        ofLogError("BaseWebSocketSessionManager::disconnect") << "handler == NULL";
+        ofLogError("BaseWebSocketSessionManager::disconnect") << "0 == handler";
     }
 }
 
@@ -157,9 +157,9 @@ void BaseWebSocketSessionManager::unregisterWebSocketConnection(AbstractWebSocke
     // TODO, this will never return more than 1
     std::size_t numErased = _connections.erase(connection);
 
-    if(numErased != 1)
+    if(1 != numErased)
     {
-        ofLogError("BaseWebSocketSessionManager::unregisterRouteHandler") << "Num erased != 1: " << numErased;
+        ofLogError("BaseWebSocketSessionManager::unregisterRouteHandler") << "1 != numErased" << numErased;
     }
 }
 

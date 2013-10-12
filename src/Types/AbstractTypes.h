@@ -69,7 +69,7 @@ public:
     {
     }
 
-    virtual bool sendFrame(const WebSocketFrame& frame) = 0;
+    virtual bool sendFrame(const WebSocketFrame& frame) const = 0;
 
 };
 
