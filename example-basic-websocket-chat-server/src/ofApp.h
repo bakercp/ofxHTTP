@@ -100,7 +100,7 @@ public:
 
     std::string toString() const
     {
-        return ofToString(_time) + " " + _user.getName() + " : " + _message + " " + _user.getColor();
+        return _user.getName() + " : " + _message;
     }
 
 private:
@@ -127,8 +127,9 @@ public:
 
     std::map<std::string,User> activeUsers;
 
-//    std::vector<Message> history;
-//    std::size_t maxHistory;
+    std::vector<Message> history;
+    std::size_t maxHistory;
+
 
     mutable ofMutex mutex;
 

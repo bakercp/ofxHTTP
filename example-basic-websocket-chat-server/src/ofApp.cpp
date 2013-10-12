@@ -30,9 +30,10 @@ void ofApp::setup()
 {
     ofSetFrameRate(30);
     
-//    maxHistory = 100;
+    maxHistory = 100;
 
     BasicWebSocketServerSettings settings;
+//    settings.setPort(80);
 
     server = BasicWebSocketServer::makeShared(settings);
 
@@ -58,7 +59,27 @@ void ofApp::draw()
 
     ofSetColor(0);
 
-    ofDrawBitmapStringHighlight("Num Connected: " + ofToString(numConnected),ofPoint(40,40));
+    ofDrawBitmapStringHighlight("Num Connected: " + ofToString(numConnected),ofPoint(0,12));
+
+    ofPushMatrix();
+
+        std::vector<Message>::reverse_iterator iter = history.rbegin();
+
+        int y = 30;
+
+
+        while(iter != history.rend())
+        {
+            const Message& message = *iter; // create a const reference
+
+            y+= 20;
+
+            ofDrawBitmapStringHighlight(message.toString(), 10, y);
+
+            ++iter;
+        }
+
+    ofPopMatrix();
 
 }
 
@@ -83,8 +104,8 @@ void ofApp::onWebSocketFrameReceivedEvent(WebSocketFrameEventArgs& evt)
     std::string text = evt.getFrameRef().getText();
 
 
-    cout << "Frame From: " << evt.getConnectionRef().getClientAddress().toString() << endl;
-    cout << "\t=" << text << endl;
+//    cout << "Frame From: " << evt.getConnectionRef().getClientAddress().toString() << endl;
+//    cout << "\t=" << text << endl;
 
     std::map<std::string,User>::iterator iter = activeUsers.find(clientAddress);
 
@@ -170,13 +191,13 @@ void ofApp::onWebSocketFrameReceivedEvent(WebSocketFrameEventArgs& evt)
         server->getWebSocketRoute()->broadcast(json.toStyledString());
 
 
-//        ofScopedLock lock(mutex); // lock the history
-//        // add it to our history
-//        history.push_back(message);
-//        while(history.size() > maxHistory)
-//        {
-//            history.erase(history.begin()); // erase the oldest element
-//        }
+        ofScopedLock lock(mutex); // lock the history
+        // add it to our history
+        history.push_back(message);
+        while(history.size() > maxHistory)
+        {
+            history.erase(history.begin()); // erase the oldest element
+        }
 
     }
 }
