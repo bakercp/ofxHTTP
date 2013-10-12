@@ -33,7 +33,7 @@ void ofApp::setup()
     maxHistory = 100;
 
     BasicWebSocketServerSettings settings;
-//    settings.setPort(80);
+    settings.setPort(80);
 
     server = BasicWebSocketServer::makeShared(settings);
 
