@@ -23,36 +23,11 @@
 // =============================================================================
 
 
-#pragma once
+#include "ofApp.h"
 
 
-#include "ofUtils.h"
-//#include "MediaTypeMap.h"
-#include "BaseRouteHandler.h"
-#include "FileSystemRouteInterface.h"
-
-
-namespace ofx {
-namespace HTTP {
-
-
-class FileSystemRouteHandler: public BaseRouteHandler
+int main()
 {
-public:
-    typedef FileSystemRouteSettings Settings;
-
-    FileSystemRouteHandler(FileSystemRouteInterface& parent);
-
-    virtual ~FileSystemRouteHandler();
-
-    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
-                               Poco::Net::HTTPServerResponse& response);
-
-private:
-    FileSystemRouteInterface& _parent;
-
-    
-};
-    
-
-} } // namespace ofx::HTTP
+	ofSetupOpenGL(320,240,OF_WINDOW);
+	ofRunApp(new ofApp());
+}
