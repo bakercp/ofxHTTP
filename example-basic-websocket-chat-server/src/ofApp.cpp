@@ -33,7 +33,7 @@ void ofApp::setup()
     maxHistory = 100;
 
     BasicWebSocketServerSettings settings;
-    settings.setPort(80);
+//    settings.setPort(80);
 
     server = BasicWebSocketServer::makeShared(settings);
 
@@ -60,6 +60,9 @@ void ofApp::draw()
     ofSetColor(0);
 
     ofDrawBitmapStringHighlight("Num Connected: " + ofToString(numConnected),ofPoint(0,12));
+
+
+    ofScopedLock lock(mutex); // lock the history
 
     ofPushMatrix();
 
