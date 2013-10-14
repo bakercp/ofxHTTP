@@ -24,21 +24,9 @@
 
 
 #include "ofApp.h"
-#include <iostream>
-#include <iterator>
-#include <algorithm>
-#include <vector>
 
-//------------------------------------------------------------------------------
 void ofApp::setup()
 {
-    ofSetFrameRate(30);
-
     server = BasicServer::makeShared();
-
     server->start();
-
-    // Launch a browser with the address of the server.
-    ofLaunchBrowser(server->getURL());
-
 }

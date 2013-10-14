@@ -30,10 +30,6 @@
 #include "BasicServer.h"
 
 
-using ofx::HTTP::BasicServer;
-using ofx::HTTP::BasicServerSettings;
-
-
 class ofApp: public ofBaseApp
 {
 public:
@@ -41,5 +37,5 @@ public:
 
     // we do not have a draw method.
 
-    BasicServer::SharedPtr server;
+    ofx::HTTP::BasicServer::SharedPtr server;
 };
