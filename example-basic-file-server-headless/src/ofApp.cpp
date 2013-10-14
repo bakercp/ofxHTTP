@@ -27,6 +27,6 @@
 
 void ofApp::setup()
 {
-    server = BasicServer::makeShared();
+    server = ofx::HTTP::BasicServer::makeShared();
     server->start();
 }
