@@ -22,27 +22,53 @@
 //
 // =============================================================================
 
-
 #pragma once
 
 
-#include "ofMain.h"
-#include "BasicIPVideoServer.h"
+#include "ofx/HTTP/Server/BasicServer.h"
+#include "ofx/HTTP/IPVideo/IPVideoRoute.h"
+#include "ofx/HTTP/IPVideo/IPVideoRouteSettings.h"
 
 
-using ofx::HTTP::BasicIPVideoServer;
-using ofx::HTTP::BasicIPVideoServerSettings;
+namespace ofx {
+namespace HTTP {
 
 
-class ofApp: public ofBaseApp
+class BasicIPVideoServerSettings:
+    public IPVideoRouteSettings,
+    public BasicServerSettings
+{
+};
+
+
+class BasicIPVideoServer: public BasicServer
 {
 public:
-    void setup();
-    void update();
-    void draw();
+    typedef std::shared_ptr<BasicIPVideoServer> SharedPtr;
+    typedef std::weak_ptr<BasicIPVideoServer>   WeakPtr;
+    typedef BasicIPVideoServerSettings Settings;
 
-    BasicIPVideoServer::SharedPtr server;
+    BasicIPVideoServer(const Settings& settings = Settings());
+    virtual ~BasicIPVideoServer();
 
-    ofVideoGrabber player;
+
+    void send(ofPixels& pix);
+
+
+    std::size_t getNumConnections() const
+    {
+        return _ipVideoRoute->getNumConnections();
+    }
+
+    static SharedPtr makeShared(const Settings& settings = Settings())
+    {
+        return SharedPtr(new BasicIPVideoServer(settings));
+    }
+
+protected:
+    IPVideoRoute::SharedPtr _ipVideoRoute;
 
 };
+
+
+} } // namespace ofx::HTTP

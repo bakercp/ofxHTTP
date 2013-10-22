@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2012-2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,23 +26,45 @@
 #pragma once
 
 
-#include "ofMain.h"
-#include "BasicIPVideoServer.h"
+#include <string>
+#include "Poco/Net/HTTPServerRequest.h"
+#include "Poco/Net/HTTPRequestHandler.h"
+#include "Poco/RegularExpression.h"
+#include "Poco/URI.h"
+#include "ofLog.h"
+#include "ofx/HTTP/Types/AbstractTypes.h"
+#include "ofx/HTTP/Server/BaseRouteHandler.h"
+#include "ofx/HTTP/Server/BaseRouteSettings.h"
 
 
-using ofx::HTTP::BasicIPVideoServer;
-using ofx::HTTP::BasicIPVideoServerSettings;
+namespace ofx {
+namespace HTTP {
 
 
-class ofApp: public ofBaseApp
+class BaseRoute: public AbstractRoute
 {
 public:
-    void setup();
-    void update();
-    void draw();
+    BaseRoute();
 
-    BasicIPVideoServer::SharedPtr server;
+    virtual ~BaseRoute();
 
-    ofVideoGrabber player;
+    virtual std::string getRoutePathPattern() const;
+
+    virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
+                                  bool isSecurePort) const;
+
+    virtual Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
+
+    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
+                               Poco::Net::HTTPServerResponse& response);
+
+    virtual void stop();
+
+private:
+    BaseRoute(const BaseRoute&);
+	BaseRoute& operator = (const BaseRoute&);
 
 };
+
+
+} } // namespace ofx::HTTP

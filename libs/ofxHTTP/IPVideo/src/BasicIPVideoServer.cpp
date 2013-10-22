@@ -23,26 +23,29 @@
 // =============================================================================
 
 
-#pragma once
+#include "ofx/HTTP/IPVideo/BasicIPVideoServer.h"
 
 
-#include "ofMain.h"
-#include "BasicIPVideoServer.h"
+namespace ofx {
+namespace HTTP {
 
 
-using ofx::HTTP::BasicIPVideoServer;
-using ofx::HTTP::BasicIPVideoServerSettings;
-
-
-class ofApp: public ofBaseApp
+BasicIPVideoServer::BasicIPVideoServer(const Settings& settings):
+    BasicServer(settings),
+    _ipVideoRoute(IPVideoRoute::makeShared(settings))
 {
-public:
-    void setup();
-    void update();
-    void draw();
+    addRoute(_ipVideoRoute);
+}
 
-    BasicIPVideoServer::SharedPtr server;
+BasicIPVideoServer::~BasicIPVideoServer()
+{
+    removeRoute(_ipVideoRoute);
+}
 
-    ofVideoGrabber player;
+void BasicIPVideoServer::send(ofPixels& pix)
+{
+    _ipVideoRoute->send(pix);
+}
 
-};
+
+} } // namespace ofx::HTTP

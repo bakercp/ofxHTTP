@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2012-2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,23 +26,33 @@
 #pragma once
 
 
-#include "ofMain.h"
-#include "BasicIPVideoServer.h"
+#include "ofUtils.h"
+#include "ofx/Media/MediaTypeMap.h"
+#include "ofx/HTTP/Server/BaseRouteHandler.h"
+#include "ofx/HTTP/Server/FileSystemRouteInterface.h"
 
 
-using ofx::HTTP::BasicIPVideoServer;
-using ofx::HTTP::BasicIPVideoServerSettings;
+namespace ofx {
+namespace HTTP {
 
 
-class ofApp: public ofBaseApp
+class FileSystemRouteHandler: public BaseRouteHandler
 {
 public:
-    void setup();
-    void update();
-    void draw();
+    typedef FileSystemRouteSettings Settings;
 
-    BasicIPVideoServer::SharedPtr server;
+    FileSystemRouteHandler(FileSystemRouteInterface& parent);
 
-    ofVideoGrabber player;
+    virtual ~FileSystemRouteHandler();
 
+    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
+                               Poco::Net::HTTPServerResponse& response);
+
+private:
+    FileSystemRouteInterface& _parent;
+
+    
 };
+    
+
+} } // namespace ofx::HTTP

@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2012-2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,23 +26,36 @@
 #pragma once
 
 
-#include "ofMain.h"
-#include "BasicIPVideoServer.h"
+#include "ofx/HTTP/Server/BaseRoute.h"
 
 
-using ofx::HTTP::BasicIPVideoServer;
-using ofx::HTTP::BasicIPVideoServerSettings;
+namespace ofx {
+namespace HTTP {
 
 
-class ofApp: public ofBaseApp
+class IPVideoRouteSettings;
+    class IPVideoRouteHandler;
+
+
+class IPVideoRouteInterface: public BaseRoute
 {
 public:
-    void setup();
-    void update();
-    void draw();
+    IPVideoRouteInterface()
+    {
+    }
 
-    BasicIPVideoServer::SharedPtr server;
+    virtual ~IPVideoRouteInterface()
+    {
+    }
 
-    ofVideoGrabber player;
+    virtual IPVideoRouteSettings getSettings() const = 0;
+
+    virtual void addConnection(IPVideoRouteHandler* handler) = 0;
+    virtual void removeConnection(IPVideoRouteHandler* handler) = 0;
+
+    virtual std::size_t getNumConnections() const = 0;
 
 };
+
+
+} } // namespace ofx::HTTP

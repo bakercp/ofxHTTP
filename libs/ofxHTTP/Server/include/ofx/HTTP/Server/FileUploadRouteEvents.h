@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2012-2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,23 +26,57 @@
 #pragma once
 
 
-#include "ofMain.h"
-#include "BasicIPVideoServer.h"
+#include "ofEvents.h"
+#include "ofFileUtils.h"
+#include "ofx/HTTP/Server/ServerEvents.h"
 
 
-using ofx::HTTP::BasicIPVideoServer;
-using ofx::HTTP::BasicIPVideoServerSettings;
+namespace ofx {
+namespace HTTP {
 
 
-class ofApp: public ofBaseApp
+class FileUploadEventArgs: public BaseServerEvent
 {
 public:
-    void setup();
-    void update();
-    void draw();
+    FileUploadEventArgs(const std::string& fileName,
+                   std::size_t fileSize,
+                   std::size_t numBytesTransferred):
+        _fileName(fileName),
+        _fileSize(fileSize),
+        _numBytesTransferred(numBytesTransferred)
+    {
+    }
 
-    BasicIPVideoServer::SharedPtr server;
+    std::string getFileName() const
+    {
+        return _fileName;
+    }
 
-    ofVideoGrabber player;
+    std::size_t getFileSize()
+    {
+        return _fileSize;
+    }
+
+    std::size_t getNumBytesTransferred() const
+    {
+        return _numBytesTransferred;
+    }
+
+private:
+    std::string _fileName;
+    std::size_t _fileSize;
+    std::size_t _numBytesTransferred;
+};
+
+
+class FileUploadRouteEvents
+{
+public:
+    ofEvent<FileUploadEventArgs> onUploadStarted;
+    ofEvent<FileUploadEventArgs> onUploadProgress;
+    ofEvent<FileUploadEventArgs> onUploadFinished;
 
 };
+
+
+} } // namespace ofx::HTTP

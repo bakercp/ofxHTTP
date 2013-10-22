@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2012-2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,26 +23,41 @@
 // =============================================================================
 
 
-#pragma once
+#include "ofx/HTTP/Server/FileUploadRoute.h"
 
 
-#include "ofMain.h"
-#include "BasicIPVideoServer.h"
+namespace ofx {
+namespace HTTP {
 
-
-using ofx::HTTP::BasicIPVideoServer;
-using ofx::HTTP::BasicIPVideoServerSettings;
-
-
-class ofApp: public ofBaseApp
+    
+FileUploadRoute::FileUploadRoute(const Settings& settings):
+    _settings(settings)
 {
-public:
-    void setup();
-    void update();
-    void draw();
+}
 
-    BasicIPVideoServer::SharedPtr server;
+FileUploadRoute::~FileUploadRoute()
+{
+}
 
-    ofVideoGrabber player;
+std::string FileUploadRoute::getRoutePathPattern() const
+{
+    return _settings.getRoutePathPattern();
+}
 
-};
+Poco::Net::HTTPRequestHandler* FileUploadRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+{
+    return new FileUploadRouteHandler(*this);
+}
+
+FileUploadRouteEvents& FileUploadRoute::getEventsRef()
+{
+    return events;
+}
+
+FileUploadRoute::Settings FileUploadRoute::getSettings() const
+{
+    return _settings;
+}
+
+
+} } // namespace ofx::HTTP

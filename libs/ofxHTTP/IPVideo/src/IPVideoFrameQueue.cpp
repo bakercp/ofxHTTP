@@ -23,26 +23,79 @@
 // =============================================================================
 
 
-#pragma once
+#include "ofx/HTTP/IPVideo/IPVideoFrameQueue.h"
 
 
-#include "ofMain.h"
-#include "BasicIPVideoServer.h"
+namespace ofx {
+namespace HTTP {
 
 
-using ofx::HTTP::BasicIPVideoServer;
-using ofx::HTTP::BasicIPVideoServerSettings;
-
-
-class ofApp: public ofBaseApp
+IPVideoFrameQueue::IPVideoFrameQueue(std::size_t maxSize):
+    _maxSize(maxSize)
 {
-public:
-    void setup();
-    void update();
-    void draw();
+}
 
-    BasicIPVideoServer::SharedPtr server;
+IPVideoFrameQueue::~IPVideoFrameQueue()
+{
+}
 
-    ofVideoGrabber player;
+IPVideoFrame::SharedPtr IPVideoFrameQueue::pop()
+{
+    IPVideoFrame::SharedPtr frame;
 
-};
+    ofScopedLock lock(_mutex);
+
+    if(!_frames.empty())
+    {
+        frame = _frames.front();
+        _frames.pop_front();
+        return frame;
+    }
+    else
+    {
+        return frame;
+    }
+}
+
+void IPVideoFrameQueue::push(IPVideoFrame::SharedPtr frame)
+{
+    ofScopedLock lock(_mutex);
+
+    _frames.push_back(frame);
+
+    while(_frames.size() > _maxSize)
+    {
+        _frames.pop_front();
+    }
+}
+
+std::size_t IPVideoFrameQueue::getMaxSize() const
+{
+    ofScopedLock lock(_mutex);
+    return _maxSize;
+}
+
+void IPVideoFrameQueue::setMaxSize(std::size_t maxSize)
+{
+    ofScopedLock lock(_mutex);
+    _maxSize = maxSize;
+    while(_frames.size() > _maxSize)
+    {
+        _frames.pop_front();
+    }
+}
+
+std::size_t IPVideoFrameQueue::size() const
+{
+    ofScopedLock lock(_mutex);
+    return _frames.size();
+}
+
+bool IPVideoFrameQueue::empty() const
+{
+    ofScopedLock lock(_mutex);
+    return _frames.empty();
+}
+
+    
+} } // namespace ofx::HTTP

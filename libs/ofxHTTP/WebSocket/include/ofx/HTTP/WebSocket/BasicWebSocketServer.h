@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2012-2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,23 +26,43 @@
 #pragma once
 
 
-#include "ofMain.h"
-#include "BasicIPVideoServer.h"
+#include "ofx/HTTP/Server/BasicServer.h"
+#include "ofx/HTTP/WebSocket/WebSocketRoute.h"
+#include "ofx/HTTP/WebSocket/WebSocketRouteSettings.h"
 
 
-using ofx::HTTP::BasicIPVideoServer;
-using ofx::HTTP::BasicIPVideoServerSettings;
+namespace ofx {
+namespace HTTP {
 
 
-class ofApp: public ofBaseApp
+class BasicWebSocketServerSettings:
+    public WebSocketRouteSettings,
+    public BasicServerSettings
+{
+};
+
+
+class BasicWebSocketServer: public BasicServer
 {
 public:
-    void setup();
-    void update();
-    void draw();
+    typedef std::shared_ptr<BasicWebSocketServer> SharedPtr;
+    typedef std::weak_ptr<BasicWebSocketServer>   WeakPtr;
+    typedef BasicWebSocketServerSettings          Settings;
 
-    BasicIPVideoServer::SharedPtr server;
+    BasicWebSocketServer(const Settings& settings = Settings());
+    virtual ~BasicWebSocketServer();
 
-    ofVideoGrabber player;
+    WebSocketRoute::SharedPtr getWebSocketRoute();
 
+    // this method is a hack replacement for std::make_shared<BasicServer>(...);
+    static SharedPtr makeShared(const Settings& settings = Settings())
+    {
+        return SharedPtr(new BasicWebSocketServer(settings));
+    }
+private:
+    WebSocketRoute::SharedPtr _webSocketRoute;
+    
 };
+
+    
+} } // namespace ofx::HTTP

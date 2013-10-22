@@ -31,9 +31,11 @@ void ofApp::setup()
 {
     ofSetFrameRate(30);
 
-    player.loadMovie("DocumentRoot/fingers.mp4");
-    player.play();
-    player.setLoopState(OF_LOOP_NORMAL);
+//    player.loadMovie("DocumentRoot/fingers.mp4");
+//    player.play();
+//    player.setLoopState(OF_LOOP_NORMAL);
+
+    player.initGrabber(640,480);
 
     BasicIPVideoServerSettings settings;
     server = BasicIPVideoServer::makeShared();

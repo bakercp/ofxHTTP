@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2012-2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,26 +23,45 @@
 // =============================================================================
 
 
-#pragma once
+#include "ofx/HTTP/Server/BaseRouteSettings.h"
 
 
-#include "ofMain.h"
-#include "BasicIPVideoServer.h"
+namespace ofx {
+namespace HTTP {
 
 
-using ofx::HTTP::BasicIPVideoServer;
-using ofx::HTTP::BasicIPVideoServerSettings;
+const std::string BaseRouteSettings::DEFAULT_ROUTE_PATH_PATTERN = "/.*";
 
 
-class ofApp: public ofBaseApp
+BaseRouteSettings::BaseRouteSettings(const std::string& routePathPattern):
+    _routePathPattern(routePathPattern),
+    _requireSecurePort(false)
 {
-public:
-    void setup();
-    void update();
-    void draw();
+}
 
-    BasicIPVideoServer::SharedPtr server;
+BaseRouteSettings::~BaseRouteSettings()
+{
+}
 
-    ofVideoGrabber player;
+void BaseRouteSettings::setRoutePathPattern(const std::string& routePathPattern)
+{
+    _routePathPattern = routePathPattern;
+}
 
-};
+std::string BaseRouteSettings::getRoutePathPattern() const
+{
+    return _routePathPattern;
+}
+
+void BaseRouteSettings::setRequireSecurePort(bool requireSecurePort)
+{
+    _requireSecurePort = requireSecurePort;
+}
+
+bool BaseRouteSettings::getRequireSecurePort() const
+{
+    return _requireSecurePort;
+}
+
+
+} } // namespace ofx::HTTP

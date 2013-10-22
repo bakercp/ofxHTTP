@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2012-2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,26 +23,29 @@
 // =============================================================================
 
 
-#pragma once
+#include "ofx/HTTP/Server/BasicFileUploadServer.h"
 
 
-#include "ofMain.h"
-#include "BasicIPVideoServer.h"
+namespace ofx {
+namespace HTTP {
 
 
-using ofx::HTTP::BasicIPVideoServer;
-using ofx::HTTP::BasicIPVideoServerSettings;
-
-
-class ofApp: public ofBaseApp
+BasicFileUploadServer::BasicFileUploadServer(const Settings& settings):
+    BasicServer(settings), 
+    _fileUploadRoute(FileUploadRoute::makeShared(settings))
 {
-public:
-    void setup();
-    void update();
-    void draw();
+    addRoute(_fileUploadRoute);
+}
 
-    BasicIPVideoServer::SharedPtr server;
+BasicFileUploadServer::~BasicFileUploadServer()
+{
+    removeRoute(_fileUploadRoute);
+}
 
-    ofVideoGrabber player;
+FileUploadRoute::SharedPtr BasicFileUploadServer::getFileUploadRoute()
+{
+    return _fileUploadRoute;
+}
 
-};
+        
+} } // namespace ofx::HTTP

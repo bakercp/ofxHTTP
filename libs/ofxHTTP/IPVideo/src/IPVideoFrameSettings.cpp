@@ -23,26 +23,78 @@
 // =============================================================================
 
 
-#pragma once
+#include "ofx/HTTP/IPVideo/IPVideoFrameSettings.h"
 
 
-#include "ofMain.h"
-#include "BasicIPVideoServer.h"
+namespace ofx {
+namespace HTTP {
 
 
-using ofx::HTTP::BasicIPVideoServer;
-using ofx::HTTP::BasicIPVideoServerSettings;
+const std::size_t IPVideoFrameSettings::DEFAULT_WIDTH = 320;
+const std::size_t IPVideoFrameSettings::DEFAULT_HEIGHT = 240;
 
 
-class ofApp: public ofBaseApp
+IPVideoFrameSettings::IPVideoFrameSettings():
+    _width(320),
+    _height(240),
+    _flipHorizontal(false),
+    _flipVertical(false),
+    _quality(OF_IMAGE_QUALITY_MEDIUM)
 {
-public:
-    void setup();
-    void update();
-    void draw();
+}
 
-    BasicIPVideoServer::SharedPtr server;
+IPVideoFrameSettings::~IPVideoFrameSettings()
+{
+}
 
-    ofVideoGrabber player;
+void IPVideoFrameSettings::setWidth(std::size_t width)
+{
+    _width = width;
+}
 
-};
+std::size_t IPVideoFrameSettings::getWidth()
+{
+    return _width;
+}
+
+void IPVideoFrameSettings::setHeight(std::size_t height)
+{
+    _height = height;
+}
+std::size_t IPVideoFrameSettings::getHeight()
+{
+    return _height;
+}
+
+void IPVideoFrameSettings::setFlipHorizontal(bool flipHorizontal)
+{
+    _flipHorizontal = flipHorizontal;
+}
+
+bool IPVideoFrameSettings::getFlipHorizontal() const
+{
+    return _flipHorizontal;
+}
+
+void IPVideoFrameSettings::setFlipVertical(bool flipVertical)
+{
+    _flipVertical = flipVertical;
+}
+
+bool IPVideoFrameSettings::getFlipVertical() const
+{
+    return _flipVertical;
+}
+
+void IPVideoFrameSettings::setQuality(ofImageQualityType quality)
+{
+    _quality = quality;
+}
+
+ofImageQualityType IPVideoFrameSettings::getQuality() const
+{
+    return _quality;
+}
+
+
+} } // namespace ofx::HTTP

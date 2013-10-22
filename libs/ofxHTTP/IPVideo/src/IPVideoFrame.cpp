@@ -23,26 +23,39 @@
 // =============================================================================
 
 
-#pragma once
+#include "ofx/HTTP/IPVideo/IPVideoFrame.h"
 
 
-#include "ofMain.h"
-#include "BasicIPVideoServer.h"
-
-
-using ofx::HTTP::BasicIPVideoServer;
-using ofx::HTTP::BasicIPVideoServerSettings;
-
-
-class ofApp: public ofBaseApp
+namespace ofx {
+namespace HTTP {
+        
+        
+IPVideoFrame::IPVideoFrame(const Settings& settings,
+                           unsigned long long timestamp,
+                           const ofBuffer& buffer):
+    _settings(settings),
+    _timestamp(timestamp),
+    _buffer(buffer)
 {
-public:
-    void setup();
-    void update();
-    void draw();
+}
 
-    BasicIPVideoServer::SharedPtr server;
+IPVideoFrame::~IPVideoFrame()
+{
+}
 
-    ofVideoGrabber player;
+IPVideoFrame::Settings IPVideoFrame::getSettings() const
+{
+    return _settings;
+}
 
-};
+unsigned long long IPVideoFrame::getTimestamp() const
+{
+    return _timestamp;
+}
+
+ofBuffer& IPVideoFrame::getBufferRef()
+{
+    return _buffer;
+}
+
+} } // namespace ofx::HTTP

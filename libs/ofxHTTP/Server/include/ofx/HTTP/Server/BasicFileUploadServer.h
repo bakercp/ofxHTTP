@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2012-2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,23 +26,45 @@
 #pragma once
 
 
-#include "ofMain.h"
-#include "BasicIPVideoServer.h"
+#include "ofx/HTTP/Server/BasicServer.h"
+#include "ofx/HTTP/Server/FileUploadRoute.h"
+#include "ofx/HTTP/Server/FileUploadRouteSettings.h"
+#include "ofx/HTTP/Server/FileUploadRouteEvents.h"
 
 
-using ofx::HTTP::BasicIPVideoServer;
-using ofx::HTTP::BasicIPVideoServerSettings;
+namespace ofx {
+namespace HTTP {
 
 
-class ofApp: public ofBaseApp
+class BasicFileUploadServerSettings:
+    public FileUploadRouteSettings,
+    public BasicServerSettings
+{
+};
+
+
+class BasicFileUploadServer: public BasicServer
 {
 public:
-    void setup();
-    void update();
-    void draw();
+    typedef std::shared_ptr<BasicFileUploadServer> SharedPtr;
+    typedef std::weak_ptr<BasicFileUploadServer>   WeakPtr;
+    typedef BasicFileUploadServerSettings          Settings;
 
-    BasicIPVideoServer::SharedPtr server;
+    BasicFileUploadServer(const Settings& settings = Settings());
+    virtual ~BasicFileUploadServer();
 
-    ofVideoGrabber player;
+    FileUploadRoute::SharedPtr getFileUploadRoute();
 
+    // this method is a hack replacement for std::make_shared<BasicServer>(...);
+    static SharedPtr makeShared(const Settings& settings = Settings())
+    {
+        return SharedPtr(new BasicFileUploadServer(settings));
+    }
+
+protected:
+    FileUploadRoute::SharedPtr _fileUploadRoute;
+    
 };
+
+
+} } // namespace ofx::HTTP

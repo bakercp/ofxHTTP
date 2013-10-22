@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2012-2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,23 +26,47 @@
 #pragma once
 
 
-#include "ofMain.h"
-#include "BasicIPVideoServer.h"
+#include "ofx/HTTP/Types/AbstractTypes.h"
+#include "ofx/HTTP/WebSocket/WebSocketRouteHandler.h"
+#include "ofx/HTTP/WebSocket/WebSocketRouteInterface.h"
+#include "ofx/HTTP/WebSocket/WebSocketEvents.h"
 
 
-using ofx::HTTP::BasicIPVideoServer;
-using ofx::HTTP::BasicIPVideoServerSettings;
+namespace ofx {
+namespace HTTP {
 
 
-class ofApp: public ofBaseApp
+class WebSocketRoute: public BaseWebSocketSessionManager, public WebSocketRouteInterface
 {
 public:
-    void setup();
-    void update();
-    void draw();
+    typedef std::shared_ptr<WebSocketRoute> SharedPtr;
+    typedef std::weak_ptr<WebSocketRoute>   WeakPtr;
+    typedef WebSocketRouteSettings Settings;
 
-    BasicIPVideoServer::SharedPtr server;
+    WebSocketRoute(const Settings& settings);
+    virtual ~WebSocketRoute();
 
-    ofVideoGrabber player;
+    virtual std::string getRoutePathPattern() const;
 
+    virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
+                                  bool isSecurePort) const;
+
+    virtual Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
+
+    virtual void stop();
+
+    WebSocketRouteSettings getSettings() const;
+    BaseWebSocketSessionManager& getSessionManagerRef();
+
+    static SharedPtr makeShared(const Settings& settings)
+    {
+        return SharedPtr(new WebSocketRoute(settings));
+    }
+
+private:
+    Settings _settings;
+    
 };
+
+
+} } // namespace ofx::HTTP

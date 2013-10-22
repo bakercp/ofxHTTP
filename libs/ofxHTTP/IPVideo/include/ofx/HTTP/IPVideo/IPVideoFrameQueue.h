@@ -22,27 +22,46 @@
 //
 // =============================================================================
 
-
 #pragma once
 
+#include <queue>
 
-#include "ofMain.h"
-#include "BasicIPVideoServer.h"
+//#include "Poco/Condition.h"
+
+//#include "ofTypes.h"
+
+#include "ofx/HTTP/IPVideo/IPVideoFrame.h"
+#include "ofx/HTTP/IPVideo/IPVideoFrameSettings.h"
 
 
-using ofx::HTTP::BasicIPVideoServer;
-using ofx::HTTP::BasicIPVideoServerSettings;
+namespace ofx {
+namespace HTTP {
 
 
-class ofApp: public ofBaseApp
+class IPVideoFrameQueue
 {
 public:
-    void setup();
-    void update();
-    void draw();
+    IPVideoFrameQueue(std::size_t maxSize);
+    virtual ~IPVideoFrameQueue();
 
-    BasicIPVideoServer::SharedPtr server;
+    IPVideoFrame::SharedPtr pop();
+    
+    void push(IPVideoFrame::SharedPtr frame);
 
-    ofVideoGrabber player;
+    std::size_t getMaxSize() const;
+    void setMaxSize(std::size_t maxSize);
+    std::size_t size() const;
+    bool empty() const;
 
+private:
+    typedef std::deque<IPVideoFrame::SharedPtr> ClientFrameQueue;
+
+    ClientFrameQueue _frames;
+    std::size_t _maxSize;
+
+    mutable ofMutex _mutex;
+    
 };
+
+
+} } // namespace ofx::HTTP

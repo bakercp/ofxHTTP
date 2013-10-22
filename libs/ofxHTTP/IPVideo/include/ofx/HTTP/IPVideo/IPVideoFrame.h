@@ -26,23 +26,45 @@
 #pragma once
 
 
-#include "ofMain.h"
-#include "BasicIPVideoServer.h"
+#include "ofFileUtils.h"
+#include "ofImage.h"
+#include "ofx/HTTP/IPVideo/IPVideoFrameSettings.h"
 
 
-using ofx::HTTP::BasicIPVideoServer;
-using ofx::HTTP::BasicIPVideoServerSettings;
+namespace ofx {
+namespace HTTP {
 
 
-class ofApp: public ofBaseApp
+class IPVideoFrame
 {
 public:
-    void setup();
-    void update();
-    void draw();
+    typedef std::shared_ptr<IPVideoFrame>   SharedPtr;
+    typedef std::weak_ptr<IPVideoFrame>     WeakPtr;
+    typedef IPVideoFrameSettings            Settings;
 
-    BasicIPVideoServer::SharedPtr server;
+    IPVideoFrame(const Settings& settings,
+                 unsigned long long timestamp,
+                 const ofBuffer& buffer);
+    
+    virtual ~IPVideoFrame();
 
-    ofVideoGrabber player;
+    Settings getSettings() const;
+    unsigned long long getTimestamp() const;
 
+    ofBuffer& getBufferRef();
+
+    static SharedPtr makeShared(const Settings& settings,
+                                unsigned long long timestamp,
+                                const ofBuffer& buffer)
+    {
+        return SharedPtr(new IPVideoFrame(settings,timestamp,buffer));
+    }
+
+private:
+    Settings _settings;
+    ofBuffer _buffer;
+    unsigned long long _timestamp;
 };
+
+
+} } // namespace ofx::HTTP

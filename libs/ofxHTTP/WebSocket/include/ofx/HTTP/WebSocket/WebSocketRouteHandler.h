@@ -26,19 +26,49 @@
 #pragma once
 
 
-#include "ofMain.h"
-#include "ofxHTTP.h"
+#include <queue>
+#include "Poco/Exception.h"
+#include "Poco/Timespan.h"
+#include "Poco/Net/Socket.h"
+#include "Poco/Net/WebSocket.h"
+#include "Poco/Net/NetException.h"
+#include "ofFileUtils.h"
+#include "ofLog.h"
+#include "ofx/HTTP/Types/AbstractTypes.h"
+#include "ofx/HTTP/Server/BaseRouteHandler.h"
+#include "ofx/HTTP/WebSocket/BaseWebSocketSessionManager.h"
+#include "ofx/HTTP/WebSocket/WebSocketConnection.h"
+#include "ofx/HTTP/WebSocket/WebSocketRouteSettings.h"
+#include "ofx/HTTP/WebSocket/WebSocketRouteInterface.h"
+#include "ofx/HTTP/WebSocket/WebSocketEvents.h"
+#include "ofx/HTTP/WebSocket/WebSocketFrame.h"
+#include "ofx/HTTP/Utils/Utils.h"
 
 
-using namespace ofx::HTTP;
+namespace ofx {
+namespace HTTP {
 
 
-class ofApp: public ofBaseApp
+// TODO: move default constants to enum
+class WebSocketRouteHandler: public BaseRouteHandler
 {
 public:
-    void setup();
-    void draw();
+    typedef WebSocketRouteSettings Settings;
 
-    BasicServer::SharedPtr server;
+    WebSocketRouteHandler(WebSocketRouteInterface& parent);
     
+    virtual ~WebSocketRouteHandler();
+
+    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
+                               Poco::Net::HTTPServerResponse& response);
+
+    virtual void close();
+
+private:
+    WebSocketRouteInterface& _parent;
+
 };
+
+
+} } // namespace ofx::HTTP
+            
