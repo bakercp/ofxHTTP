@@ -27,11 +27,10 @@
 
 
 #include "ofMain.h"
-#include "BasicIPVideoServer.h"
+#include "ofxHTTP.h"
 
 
-using ofx::HTTP::BasicIPVideoServer;
-using ofx::HTTP::BasicIPVideoServerSettings;
+using namespace ofx::HTTP;
 
 
 class ofApp: public ofBaseApp
@@ -43,6 +42,6 @@ public:
 
     BasicIPVideoServer::SharedPtr server;
 
-    ofVideoGrabber player;
+    ofVideoPlayer player;
 
 };
