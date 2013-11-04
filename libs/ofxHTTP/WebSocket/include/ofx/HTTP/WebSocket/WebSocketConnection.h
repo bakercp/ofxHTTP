@@ -75,8 +75,6 @@ public:
 
     bool isConnected() const;
 
-
-
 //    std::string getSubprotocol() const;
 
     std::size_t getSendQueueSize() const;

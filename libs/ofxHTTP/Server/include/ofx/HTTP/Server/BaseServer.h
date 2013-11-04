@@ -66,7 +66,7 @@ public:
     }
     void exception()
     {
-        std::cerr << "unknown exception" << std::endl;
+        std::cerr << "Unknown Exception" << std::endl;
     }
 };
 

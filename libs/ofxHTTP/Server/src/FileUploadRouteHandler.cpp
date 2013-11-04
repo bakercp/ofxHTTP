@@ -64,7 +64,6 @@ void FileUploadRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request
         }
     }
 
-
     if(_parent.getSettings().getAutoCreateUploadFolder())
     {
         uploadsDirectory.create();

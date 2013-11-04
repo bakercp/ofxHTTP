@@ -34,6 +34,7 @@ namespace HTTP {
 
 
 class WebSocketRouteSettings;
+class BaseWebSocketSessionManager;
 
 
 class WebSocketRouteInterface: public BaseRoute

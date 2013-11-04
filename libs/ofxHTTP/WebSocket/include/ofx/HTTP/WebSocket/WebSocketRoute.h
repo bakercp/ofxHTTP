@@ -36,7 +36,9 @@ namespace ofx {
 namespace HTTP {
 
 
-class WebSocketRoute: public BaseWebSocketSessionManager, public WebSocketRouteInterface
+class WebSocketRoute:
+    public BaseWebSocketSessionManager,
+    public WebSocketRouteInterface
 {
 public:
     typedef std::shared_ptr<WebSocketRoute> SharedPtr;

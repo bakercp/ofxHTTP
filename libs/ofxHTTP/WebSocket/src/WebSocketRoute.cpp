@@ -110,6 +110,4 @@ BaseWebSocketSessionManager& WebSocketRoute::getSessionManagerRef()
 }
 
 
-
-
 } } // namespace ofx::HTTP
