@@ -1,3 +1,7 @@
+.AppleDouble
+bin
+obj
+
 *.mode1v3
 
 # xcode
