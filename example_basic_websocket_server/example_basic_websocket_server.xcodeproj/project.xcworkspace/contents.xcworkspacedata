@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:example-basic-file-server.xcodeproj">
+      location = "self:example_basic_websocket_server.xcodeproj">
    </FileRef>
 </Workspace>

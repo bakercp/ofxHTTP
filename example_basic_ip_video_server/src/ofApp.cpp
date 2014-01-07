@@ -31,7 +31,7 @@ void ofApp::setup()
 {
     ofSetFrameRate(30);
 
-    player.loadMovie("DocumentRoot/fingers.mp4");
+    player.loadMovie("fingers.mp4");
     player.play();
     player.setLoopState(OF_LOOP_NORMAL);
 
@@ -59,5 +59,3 @@ void ofApp::draw()
     player.draw(0,0);
     ofDrawBitmapStringHighlight("Num clients connected: " + ofToString(server->getNumConnections()), 20,20);
 }
-
-

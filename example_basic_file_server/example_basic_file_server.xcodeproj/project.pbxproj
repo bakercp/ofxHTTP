@@ -109,7 +109,7 @@
 		3d617c098f38a0bbaff34b8ce939dbb8 /* ofxMediaType.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxMediaType.h; path = ../../../addons/ofxMediaType/src/ofxMediaType.h; sourceTree = SOURCE_ROOT; };
 		3ff68fc20d039360589cc96823ea21db /* ThreadErrorHandler.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ThreadErrorHandler.h; path = ../../../addons/ofxHTTP/libs/ofxHTTP/Types/include/ofx/HTTP/Types/ThreadErrorHandler.h; sourceTree = SOURCE_ROOT; };
 		404ac5c9283814472505247fa776cc4e /* BasicFileUploadServer.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = BasicFileUploadServer.cpp; path = ../../../addons/ofxHTTP/libs/ofxHTTP/Server/src/BasicFileUploadServer.cpp; sourceTree = SOURCE_ROOT; };
-		44161fb58498458ca8470cca060745ea /* BaseMediaTypeProvider.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = BaseMediaTypeProvider.h; path = ../../../addons/ofxMediaType/libs/ofxMediaType/include/ofx/Media/BaseMediaTypeProvider.h; sourceTree = SOURCE_ROOT; };
+		41e1869af0459a34ac58a25f361e8757 /* AbstractMediaTypeProvider.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = AbstractMediaTypeProvider.h; path = ../../../addons/ofxMediaType/libs/ofxMediaType/include/ofx/Media/AbstractMediaTypeProvider.h; sourceTree = SOURCE_ROOT; };
 		469a15ac78ddcb4496aa1cfbd4918b13 /* BaseRouteSettings.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = BaseRouteSettings.h; path = ../../../addons/ofxHTTP/libs/ofxHTTP/Server/include/ofx/HTTP/Server/BaseRouteSettings.h; sourceTree = SOURCE_ROOT; };
 		493bb228974bf6102d17af1202492617 /* BaseServer.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = BaseServer.h; path = ../../../addons/ofxHTTP/libs/ofxHTTP/Server/include/ofx/HTTP/Server/BaseServer.h; sourceTree = SOURCE_ROOT; };
 		4b1a89dbcbac668dfc606e92ed9b2e93 /* FileSystemRouteHandler.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = FileSystemRouteHandler.cpp; path = ../../../addons/ofxHTTP/libs/ofxHTTP/Server/src/FileSystemRouteHandler.cpp; sourceTree = SOURCE_ROOT; };
@@ -144,7 +144,7 @@
 		E45BE9770E8CC7DD009D7055 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
 		E45BE9790E8CC7DD009D7055 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		E45BE97A0E8CC7DD009D7055 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
-		E4B69B5B0A3A1756003C02F2 /* example-basic-file-serverDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "example-basic-file-serverDebug.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E4B69B5B0A3A1756003C02F2 /* example_basic_file_serverDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = example_basic_file_serverDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4B69E1D0A3A1BDC003C02F2 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = SOURCE_ROOT; };
 		E4B6FCAD0C3E899E008CF71C /* openFrameworks-Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = "openFrameworks-Info.plist"; sourceTree = "<group>"; };
 		E4C2424410CC5A17004149E2 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
@@ -541,7 +541,7 @@
 				E4EEC9E9138DF44700A80321 /* openFrameworks */,
 				BB4B014C10F69532006C3DED /* addons */,
 				E45BE5980E8CC70C009D7055 /* frameworks */,
-				E4B69B5B0A3A1756003C02F2 /* example-basic-file-serverDebug.app */,
+				E4B69B5B0A3A1756003C02F2 /* example_basic_file_serverDebug.app */,
 			);
 			sourceTree = "<group>";
 		};
@@ -616,7 +616,7 @@
 		eb54cbdcf702757a9d9ba627c01fa2e0 /* Media */ = {
 			isa = PBXGroup;
 			children = (
-				44161fb58498458ca8470cca060745ea /* BaseMediaTypeProvider.h */,
+				41e1869af0459a34ac58a25f361e8757 /* AbstractMediaTypeProvider.h */,
 				ccd614cd34308e23048f860ad95d0942 /* MediaTypeMap.h */,
 			);
 			name = Media;
@@ -697,9 +697,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		E4B69B5A0A3A1756003C02F2 /* example-basic-file-server */ = {
+		E4B69B5A0A3A1756003C02F2 /* example_basic_file_server */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E4B69B5F0A3A1757003C02F2 /* Build configuration list for PBXNativeTarget "example-basic-file-server" */;
+			buildConfigurationList = E4B69B5F0A3A1757003C02F2 /* Build configuration list for PBXNativeTarget "example_basic_file_server" */;
 			buildPhases = (
 				E4B69B580A3A1756003C02F2 /* Sources */,
 				E4B69B590A3A1756003C02F2 /* Frameworks */,
@@ -711,9 +711,9 @@
 			dependencies = (
 				E4EEB9AC138B136A00A80321 /* PBXTargetDependency */,
 			);
-			name = "example-basic-file-server";
+			name = example_basic_file_server;
 			productName = myOFApp;
-			productReference = E4B69B5B0A3A1756003C02F2 /* example-basic-file-serverDebug.app */;
+			productReference = E4B69B5B0A3A1756003C02F2 /* example_basic_file_serverDebug.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -724,7 +724,7 @@
 			attributes = {
 				LastUpgradeCheck = 0460;
 			};
-			buildConfigurationList = E4B69B4D0A3A1720003C02F2 /* Build configuration list for PBXProject "example-basic-file-server" */;
+			buildConfigurationList = E4B69B4D0A3A1720003C02F2 /* Build configuration list for PBXProject "example_basic_file_server" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -745,7 +745,7 @@
 			);
 			projectRoot = "";
 			targets = (
-				E4B69B5A0A3A1756003C02F2 /* example-basic-file-server */,
+				E4B69B5A0A3A1756003C02F2 /* example_basic_file_server */,
 			);
 		};
 /* End PBXProject section */
@@ -850,6 +850,10 @@
 					src,
 					../../../addons/ofxHTTP/libs,
 					../../../addons/ofxHTTP/libs/ofxHTTP,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Client,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Client/include,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Client/include/ofx,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Client/include/ofx/HTTP,
 					../../../addons/ofxHTTP/libs/ofxHTTP/IPVideo,
 					../../../addons/ofxHTTP/libs/ofxHTTP/IPVideo/include,
 					../../../addons/ofxHTTP/libs/ofxHTTP/IPVideo/include/ofx,
@@ -857,6 +861,18 @@
 					../../../addons/ofxHTTP/libs/ofxHTTP/IPVideo/include/ofx/HTTP/IPVideo,
 					../../../addons/ofxHTTP/libs/ofxHTTP/IPVideo/src,
 					../../../addons/ofxHTTP/libs/ofxHTTP/Server,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/FileSystem,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/FileSystem/include,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/FileSystem/include/ofx,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/FileUpload,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/FileUpload/include,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/FileUpload/include/ofx,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/FileUpload/include/ofx/HTTP,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/FileUpload/include/ofx/HTTP/Server,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/IPVideo,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/IPVideo/include,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/IPVideo/include/ofx,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/IPVideo/src,
 					../../../addons/ofxHTTP/libs/ofxHTTP/Server/include,
 					../../../addons/ofxHTTP/libs/ofxHTTP/Server/include/ofx,
 					../../../addons/ofxHTTP/libs/ofxHTTP/Server/include/ofx/HTTP,
@@ -867,7 +883,6 @@
 					../../../addons/ofxHTTP/libs/ofxHTTP/Types/include/ofx,
 					../../../addons/ofxHTTP/libs/ofxHTTP/Types/include/ofx/HTTP,
 					../../../addons/ofxHTTP/libs/ofxHTTP/Types/include/ofx/HTTP/Types,
-					../../../addons/ofxHTTP/libs/ofxHTTP/Types/src,
 					../../../addons/ofxHTTP/libs/ofxHTTP/Utils,
 					../../../addons/ofxHTTP/libs/ofxHTTP/Utils/include,
 					../../../addons/ofxHTTP/libs/ofxHTTP/Utils/include/ofx,
@@ -880,6 +895,14 @@
 					../../../addons/ofxHTTP/libs/ofxHTTP/WebSocket/include/ofx/HTTP,
 					../../../addons/ofxHTTP/libs/ofxHTTP/WebSocket/include/ofx/HTTP/WebSocket,
 					../../../addons/ofxHTTP/libs/ofxHTTP/WebSocket/src,
+					../../../addons/ofxHTTP/libs/ofxHTTP/include,
+					../../../addons/ofxHTTP/libs/ofxHTTP/include/ofx,
+					../../../addons/ofxHTTP/libs/ofxHTTP/include/ofx/HTTP,
+					../../../addons/ofxHTTP/libs/ofxHTTP/src,
+					../../../addons/ofxHTTP/libs/ofxSSL,
+					../../../addons/ofxHTTP/libs/ofxSSL/include,
+					../../../addons/ofxHTTP/libs/ofxSSL/include/ofx,
+					../../../addons/ofxHTTP/libs/ofxSSL/src,
 					../../../addons/ofxHTTP/src,
 					../../../addons/ofxMediaType/libs,
 					../../../addons/ofxMediaType/libs/ofxMediaType,
@@ -925,6 +948,10 @@
 					src,
 					../../../addons/ofxHTTP/libs,
 					../../../addons/ofxHTTP/libs/ofxHTTP,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Client,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Client/include,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Client/include/ofx,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Client/include/ofx/HTTP,
 					../../../addons/ofxHTTP/libs/ofxHTTP/IPVideo,
 					../../../addons/ofxHTTP/libs/ofxHTTP/IPVideo/include,
 					../../../addons/ofxHTTP/libs/ofxHTTP/IPVideo/include/ofx,
@@ -932,6 +959,18 @@
 					../../../addons/ofxHTTP/libs/ofxHTTP/IPVideo/include/ofx/HTTP/IPVideo,
 					../../../addons/ofxHTTP/libs/ofxHTTP/IPVideo/src,
 					../../../addons/ofxHTTP/libs/ofxHTTP/Server,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/FileSystem,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/FileSystem/include,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/FileSystem/include/ofx,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/FileUpload,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/FileUpload/include,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/FileUpload/include/ofx,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/FileUpload/include/ofx/HTTP,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/FileUpload/include/ofx/HTTP/Server,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/IPVideo,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/IPVideo/include,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/IPVideo/include/ofx,
+					../../../addons/ofxHTTP/libs/ofxHTTP/Server/IPVideo/src,
 					../../../addons/ofxHTTP/libs/ofxHTTP/Server/include,
 					../../../addons/ofxHTTP/libs/ofxHTTP/Server/include/ofx,
 					../../../addons/ofxHTTP/libs/ofxHTTP/Server/include/ofx/HTTP,
@@ -942,7 +981,6 @@
 					../../../addons/ofxHTTP/libs/ofxHTTP/Types/include/ofx,
 					../../../addons/ofxHTTP/libs/ofxHTTP/Types/include/ofx/HTTP,
 					../../../addons/ofxHTTP/libs/ofxHTTP/Types/include/ofx/HTTP/Types,
-					../../../addons/ofxHTTP/libs/ofxHTTP/Types/src,
 					../../../addons/ofxHTTP/libs/ofxHTTP/Utils,
 					../../../addons/ofxHTTP/libs/ofxHTTP/Utils/include,
 					../../../addons/ofxHTTP/libs/ofxHTTP/Utils/include/ofx,
@@ -955,6 +993,14 @@
 					../../../addons/ofxHTTP/libs/ofxHTTP/WebSocket/include/ofx/HTTP,
 					../../../addons/ofxHTTP/libs/ofxHTTP/WebSocket/include/ofx/HTTP/WebSocket,
 					../../../addons/ofxHTTP/libs/ofxHTTP/WebSocket/src,
+					../../../addons/ofxHTTP/libs/ofxHTTP/include,
+					../../../addons/ofxHTTP/libs/ofxHTTP/include/ofx,
+					../../../addons/ofxHTTP/libs/ofxHTTP/include/ofx/HTTP,
+					../../../addons/ofxHTTP/libs/ofxHTTP/src,
+					../../../addons/ofxHTTP/libs/ofxSSL,
+					../../../addons/ofxHTTP/libs/ofxSSL/include,
+					../../../addons/ofxHTTP/libs/ofxSSL/include/ofx,
+					../../../addons/ofxHTTP/libs/ofxSSL/src,
 					../../../addons/ofxHTTP/src,
 					../../../addons/ofxMediaType/libs,
 					../../../addons/ofxMediaType/libs/ofxMediaType,
@@ -1148,7 +1194,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		E4B69B4D0A3A1720003C02F2 /* Build configuration list for PBXProject "example-basic-file-server" */ = {
+		E4B69B4D0A3A1720003C02F2 /* Build configuration list for PBXProject "example_basic_file_server" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E4B69B4E0A3A1720003C02F2 /* Debug */,
@@ -1157,7 +1203,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E4B69B5F0A3A1757003C02F2 /* Build configuration list for PBXNativeTarget "example-basic-file-server" */ = {
+		E4B69B5F0A3A1757003C02F2 /* Build configuration list for PBXNativeTarget "example_basic_file_server" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E4B69B600A3A1757003C02F2 /* Debug */,
