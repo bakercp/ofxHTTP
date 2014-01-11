@@ -31,3 +31,4 @@
 #include "ofx/HTTP/WebSocket/BasicWebSocketServer.h"
 #include "ofx/HTTP/WebSocket/WebSocketEvents.h"
 #include "ofx/HTTP/WebSocket/WebSocketRoute.h"
+#include "ofx/HTTP/WebSocket/WebSocketFrame.h"
