@@ -39,24 +39,29 @@ BaseRouteSettings::BaseRouteSettings(const std::string& routePathPattern):
 {
 }
 
+
 BaseRouteSettings::~BaseRouteSettings()
 {
 }
+
 
 void BaseRouteSettings::setRoutePathPattern(const std::string& routePathPattern)
 {
     _routePathPattern = routePathPattern;
 }
 
+
 std::string BaseRouteSettings::getRoutePathPattern() const
 {
     return _routePathPattern;
 }
 
+
 void BaseRouteSettings::setRequireSecurePort(bool requireSecurePort)
 {
     _requireSecurePort = requireSecurePort;
 }
+
 
 bool BaseRouteSettings::getRequireSecurePort() const
 {

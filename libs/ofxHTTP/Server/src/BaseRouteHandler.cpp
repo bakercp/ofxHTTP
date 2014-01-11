@@ -35,15 +35,18 @@ BaseRouteHandler::BaseRouteHandler(Poco::Net::HTTPRequestHandler& defaultRouteHa
 {
 }
 
+
 BaseRouteHandler::~BaseRouteHandler()
 {
 }
+
 
 void BaseRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
                                      Poco::Net::HTTPServerResponse& response)
 {
     _defaultRouteHandler.handleRequest(request,response);
 }
+
 
 void BaseRouteHandler::stop()
 {

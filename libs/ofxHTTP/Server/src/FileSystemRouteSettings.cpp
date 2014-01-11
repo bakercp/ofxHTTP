@@ -34,7 +34,7 @@ const std::string FileSystemRouteSettings::DEFAULT_DOCUMENT_ROOT = "DocumentRoot
 const std::string FileSystemRouteSettings::DEFAULT_INDEX         = "index.html";
 
 
-//------------------------------------------------------------------------------
+
 FileSystemRouteSettings::FileSystemRouteSettings(const std::string& routePathPattern):
     BaseRouteSettings(routePathPattern),
     _defaultIndex(DEFAULT_INDEX),
@@ -44,54 +44,54 @@ FileSystemRouteSettings::FileSystemRouteSettings(const std::string& routePathPat
 {
 }
 
-//------------------------------------------------------------------------------
+
 FileSystemRouteSettings::~FileSystemRouteSettings()
 {
 }
 
-//------------------------------------------------------------------------------
+
 void FileSystemRouteSettings::setDefaultIndex(const std::string& defaultIndex)
 {
     _defaultIndex = defaultIndex;
 }
 
-//------------------------------------------------------------------------------
+
 std::string FileSystemRouteSettings::getDefaultIndex() const
 {
     return _defaultIndex;
 }
 
-//------------------------------------------------------------------------------
+
 void FileSystemRouteSettings::setDocumentRoot(const std::string& documentRoot)
 {
     _documentRoot = documentRoot;
 }
 
-//------------------------------------------------------------------------------
+
 std::string FileSystemRouteSettings::getDocumentRoot() const
 {
     return _documentRoot;
 }
 
-//------------------------------------------------------------------------------
+
 void FileSystemRouteSettings::setAutoCreateDocumentRoot(bool autoCreateDocumentRoot)
 {
     _autoCreateDocumentRoot = autoCreateDocumentRoot;
 }
 
-//------------------------------------------------------------------------------
+
 bool FileSystemRouteSettings::getAutoCreateDocumentRoot() const
 {
     return _autoCreateDocumentRoot;
 }
 
-//------------------------------------------------------------------------------
+
 void FileSystemRouteSettings::setRequireDocumentRootInDataFolder(bool requireDocumentRootInDataFolder)
 {
     _requireDocumentRootInDataFolder = requireDocumentRootInDataFolder;
 }
 
-//------------------------------------------------------------------------------
+
 bool FileSystemRouteSettings::getRequireDocumentRootInDataFolder() const
 {
     return _requireDocumentRootInDataFolder;

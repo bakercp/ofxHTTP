@@ -37,14 +37,16 @@ FileSystemRouteHandler::FileSystemRouteHandler(FileSystemRouteInterface& parent)
 {
 }
 
+
 FileSystemRouteHandler::~FileSystemRouteHandler()
 {
 }
 
+
 void FileSystemRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
                                            Poco::Net::HTTPServerResponse& response)
 {
-    Poco::Path dataFolder(ofToDataPath("",true));
+    Poco::Path dataFolder(ofToDataPath("", true));
     Poco::Path documentRoot(ofToDataPath(_parent.getSettings().getDocumentRoot(),true));
 
     std::string dataFolderString = dataFolder.toString();

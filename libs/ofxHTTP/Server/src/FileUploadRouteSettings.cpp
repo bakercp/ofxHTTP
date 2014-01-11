@@ -36,7 +36,7 @@ const std::string FileUploadRouteSettings::DEFAULT_UPLOAD_REDIRECT = "uploaded.h
 const std::size_t FileUploadRouteSettings::DEFAULT_BUFFER_SIZE     = 8192;
 
 
-//------------------------------------------------------------------------------
+
 FileUploadRouteSettings::FileUploadRouteSettings(const std::string& routePathPattern):
     BaseRouteSettings(routePathPattern),
     _requireUploadFolderInDataFolder(true),
@@ -49,102 +49,102 @@ FileUploadRouteSettings::FileUploadRouteSettings(const std::string& routePathPat
 {
 }
 
-//------------------------------------------------------------------------------
+
 FileUploadRouteSettings::~FileUploadRouteSettings()
 {
 }
 
-//------------------------------------------------------------------------------
+
 void FileUploadRouteSettings::setRequireUploadFolderInDataFolder(bool requireUploadFolderInDataFolder)
 {
     _requireUploadFolderInDataFolder = requireUploadFolderInDataFolder;
 }
 
-//------------------------------------------------------------------------------
+
 bool FileUploadRouteSettings::getRequireUploadFolderInDataFolder() const
 {
     return _requireUploadFolderInDataFolder;
 }
 
-//------------------------------------------------------------------------------
+
 void FileUploadRouteSettings::setUploadFolder(const std::string& uploadFolder)
 {
     _uploadFolder = uploadFolder;
 }
 
-//------------------------------------------------------------------------------
+
 std::string FileUploadRouteSettings::getUploadFolder() const
 {
     return _uploadFolder;
 }
 
-//------------------------------------------------------------------------------
+
 void FileUploadRouteSettings::setAutoCreateUploadFolder(bool autoCreateUploadFolder)
 {
     _autoCreateUploadFolder = autoCreateUploadFolder;
 }
 
-//------------------------------------------------------------------------------
+
 bool FileUploadRouteSettings::getAutoCreateUploadFolder() const
 {
     return _autoCreateUploadFolder;
 }
 
-//------------------------------------------------------------------------------
+
 void FileUploadRouteSettings::setUploadRedirect(const std::string& uploadRedirect)
 {
     _uploadRedirect = uploadRedirect;
 }
 
-//------------------------------------------------------------------------------
+
 std::string FileUploadRouteSettings::getUploadRedirect() const
 {
     return _uploadRedirect;
 }
 
-//------------------------------------------------------------------------------
+
 void FileUploadRouteSettings::setWriteBufferSize(std::size_t writeBufferSize)
 {
     _writeBufferSize = writeBufferSize;
 }
 
-//------------------------------------------------------------------------------
+
 std::size_t FileUploadRouteSettings::getWriteBufferSize() const
 {
     return _writeBufferSize;
 }
 
-//------------------------------------------------------------------------------
+
 void FileUploadRouteSettings::setRequireValidContentType(bool requireValidContentType)
 {
     _requireValidContentType = requireValidContentType;
 }
 
-//------------------------------------------------------------------------------
+
 bool FileUploadRouteSettings::getRequireValidContentType() const
 {
     return _requireValidContentType;
 }
 
-//------------------------------------------------------------------------------
+
 void FileUploadRouteSettings::setValidContentTypes(const std::vector<Poco::Net::MediaType>& validContentTypes)
 {
     _validContentTypes = validContentTypes;
 }
 
-//------------------------------------------------------------------------------
+
 std::vector<Poco::Net::MediaType> FileUploadRouteSettings::getValidContentTypes() const
 {
     return _validContentTypes;
 }
 
-//------------------------------------------------------------------------------
+
 void FileUploadRouteSettings::setAutoRename(bool autoRename)
 {
     _autoRename = autoRename;
 }
 
-//------------------------------------------------------------------------------
+
 bool FileUploadRouteSettings::getAutoRename() const
 {
     return _autoRename;

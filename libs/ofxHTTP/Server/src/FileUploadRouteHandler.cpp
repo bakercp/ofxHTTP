@@ -30,7 +30,7 @@ namespace ofx {
 namespace HTTP {
 
 
-//------------------------------------------------------------------------------
+
 FileUploadRouteHandler::FileUploadRouteHandler(FileUploadRouteInterface& parent):
     BaseRouteHandler(parent),
     _parent(parent),
@@ -38,12 +38,12 @@ FileUploadRouteHandler::FileUploadRouteHandler(FileUploadRouteInterface& parent)
 {
 }
 
-//------------------------------------------------------------------------------
+
 FileUploadRouteHandler::~FileUploadRouteHandler()
 {
 }
 
-//------------------------------------------------------------------------------
+
 void FileUploadRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
                                            Poco::Net::HTTPServerResponse& response)
 {
@@ -121,14 +121,14 @@ void FileUploadRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request
 
 }
 
-//------------------------------------------------------------------------------
+
 bool FileUploadRouteHandler::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
                                               bool isSecurePort) const
 {
     return request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST;
 }
 
-//------------------------------------------------------------------------------
+
 void FileUploadRouteHandler::handlePart(const Poco::Net::MessageHeader& header,
                                         std::istream& stream)
 {
@@ -224,7 +224,7 @@ void FileUploadRouteHandler::handlePart(const Poco::Net::MessageHeader& header,
     }
 }
 
-//------------------------------------------------------------------------------
+
 bool FileUploadRouteHandler::isContentTypeValid(const std::string& contentType) const
 {
     Poco::Net::MediaType mediaType(contentType);

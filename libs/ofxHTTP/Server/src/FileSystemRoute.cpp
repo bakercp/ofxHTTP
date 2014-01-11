@@ -35,9 +35,11 @@ FileSystemRoute::FileSystemRoute(const Settings& settings):
 {
 }
 
+
 FileSystemRoute::~FileSystemRoute()
 {
 }
+
 
 bool FileSystemRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
                                        bool isSecurePort) const
@@ -46,6 +48,7 @@ bool FileSystemRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& reque
     return request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET &&
         BaseRoute::canHandleRequest(request, isSecurePort);
 }
+
 
 void FileSystemRoute::handleRequest(Poco::Net::HTTPServerRequest& request,
                                     Poco::Net::HTTPServerResponse& response)
@@ -85,6 +88,7 @@ void FileSystemRoute::handleRequest(Poco::Net::HTTPServerRequest& request,
 
     BaseRoute::handleRequest(request,response);
 }
+
 
 Poco::Net::HTTPRequestHandler* FileSystemRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
 {

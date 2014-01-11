@@ -37,10 +37,12 @@ BasicFileUploadServer::BasicFileUploadServer(const Settings& settings):
     addRoute(_fileUploadRoute);
 }
 
+
 BasicFileUploadServer::~BasicFileUploadServer()
 {
     removeRoute(_fileUploadRoute);
 }
+
 
 FileUploadRoute::SharedPtr BasicFileUploadServer::getFileUploadRoute()
 {

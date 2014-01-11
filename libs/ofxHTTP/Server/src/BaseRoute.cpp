@@ -30,23 +30,22 @@ namespace ofx {
 namespace HTTP {
 
 
-//------------------------------------------------------------------------------
 BaseRoute::BaseRoute()
 {
 }
 
-//------------------------------------------------------------------------------
+
 BaseRoute::~BaseRoute()
 {
 }
 
-//------------------------------------------------------------------------------
+
 std::string BaseRoute::getRoutePathPattern() const
 {
     return BaseRouteSettings::DEFAULT_ROUTE_PATH_PATTERN;
 }
 
-//------------------------------------------------------------------------------
+
 bool BaseRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
                                  bool isSecurePort) const
 {
@@ -71,13 +70,13 @@ bool BaseRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
     return Poco::RegularExpression(getRoutePathPattern()).match(path);
 }
 
-//------------------------------------------------------------------------------
+
 Poco::Net::HTTPRequestHandler* BaseRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
 {
     return new BaseRouteHandler(*this);
 }
 
-//------------------------------------------------------------------------------
+
 void BaseRoute::handleRequest(Poco::Net::HTTPServerRequest& request,
                               Poco::Net::HTTPServerResponse& response)
 {
@@ -116,7 +115,7 @@ void BaseRoute::handleRequest(Poco::Net::HTTPServerRequest& request,
     }
 }
 
-//------------------------------------------------------------------------------
+
 void BaseRoute::stop()
 {
     // empty

@@ -37,6 +37,7 @@ BasicServer::BasicServer(const Settings& settings):
     addRoute(_fileSystemRoute);
 }
 
+
 BasicServer::~BasicServer()
 {
     removeRoute(_fileSystemRoute);

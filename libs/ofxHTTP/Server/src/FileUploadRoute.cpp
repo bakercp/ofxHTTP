@@ -35,24 +35,29 @@ FileUploadRoute::FileUploadRoute(const Settings& settings):
 {
 }
 
+
 FileUploadRoute::~FileUploadRoute()
 {
 }
+
 
 std::string FileUploadRoute::getRoutePathPattern() const
 {
     return _settings.getRoutePathPattern();
 }
 
+
 Poco::Net::HTTPRequestHandler* FileUploadRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
 {
     return new FileUploadRouteHandler(*this);
 }
 
+
 FileUploadRouteEvents& FileUploadRoute::getEventsRef()
 {
     return events;
 }
+
 
 FileUploadRoute::Settings FileUploadRoute::getSettings() const
 {
