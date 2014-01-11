@@ -164,7 +164,7 @@ void BaseWebSocketSessionManager::unregisterWebSocketConnection(AbstractWebSocke
 }
 
 //------------------------------------------------------------------------------
-std::size_t BaseWebSocketSessionManager::getNumWebSocketConnections()
+std::size_t BaseWebSocketSessionManager::getNumWebSocketConnections() const
 {
     ofScopedLock lock(_mutex);
     return _connections.size();

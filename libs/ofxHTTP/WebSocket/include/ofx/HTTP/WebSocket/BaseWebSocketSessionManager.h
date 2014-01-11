@@ -71,7 +71,7 @@ public:
     void registerWebSocketConnection(AbstractWebSocketConnection* connection);
     void unregisterWebSocketConnection(AbstractWebSocketConnection* connection);
 
-    std::size_t getNumWebSocketConnections();
+    std::size_t getNumWebSocketConnections() const;
 
 //    SubprotocolList getAvailableSubprotcols();
 //
