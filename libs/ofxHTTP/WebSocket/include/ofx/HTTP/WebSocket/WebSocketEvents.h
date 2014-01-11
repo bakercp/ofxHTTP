@@ -43,21 +43,21 @@ enum WebSocketError
 {
     WS_ERR_NONE                           = 0,
     WS_ERR_NO_HANDSHAKE                   = 1,
-    /// No Connection: Upgrade or Upgrade: websocket header in handshake request.
+        ///< \brief No Connection: Upgrade or Upgrade: websocket header in handshake request.
     WS_ERR_HANDSHAKE_NO_VERSION           = 2,
-    /// No Sec-WebSocket-Version header in handshake request.
+        ///< \brief  No Sec-WebSocket-Version header in handshake request.
     WS_ERR_HANDSHAKE_UNSUPPORTED_VERSION  = 3,
-    /// Unsupported WebSocket version requested by client.
+        ///< \brief  Unsupported WebSocket version requested by client.
     WS_ERR_HANDSHAKE_NO_KEY               = 4,
-    /// No Sec-WebSocket-Key header in handshake request.
+        ///< \brief  No Sec-WebSocket-Key header in handshake request.
     WS_ERR_HANDSHAKE_ACCEPT               = 5,
-    /// No Sec-WebSocket-Accept header or wrong value.
+        ///< \brief  No Sec-WebSocket-Accept header or wrong value.
     WS_ERR_UNAUTHORIZED                   = 6,
-    /// The server rejected the username or password for authentication.
+        ///< \brief  The server rejected the username or password for authentication.
     WS_ERR_PAYLOAD_TOO_BIG                = 10,
-    /// Payload too big for supplied buffer.
+        ///< \brief  Payload too big for supplied buffer.
     WS_ERR_INCOMPLETE_FRAME               = 11,
-    /// Incomplete frame received.
+        ///< \brief  Incomplete frame received.
     WS_ERROR_INCOMPLETE_FRAME_SENT        = 15,
     WS_ERROR_ZERO_BYTE_FRAME_SENT         = 15,
     WS_ERR_TIMEOUT                        = 20,
@@ -133,6 +133,7 @@ public:
     ofEvent<WebSocketFrameEventArgs> onFrameReceivedEvent;
     ofEvent<WebSocketFrameEventArgs> onFrameSentEvent;
     ofEvent<WebSocketEventArgs>      onErrorEvent;
+    
 };
 
     

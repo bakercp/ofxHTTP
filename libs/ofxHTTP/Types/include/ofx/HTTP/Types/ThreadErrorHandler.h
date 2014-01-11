@@ -30,10 +30,10 @@
 #include "Poco/ErrorHandler.h"
 
 
-class ThreadErrorHandler: public Poco::ErrorHandler
+class ThreadErrorHandler:
+    public Poco::ErrorHandler
 {
 public:
-    
     ThreadErrorHandler(const std::string& threadName = "NONE"):
         _threadName(threadName)
     {

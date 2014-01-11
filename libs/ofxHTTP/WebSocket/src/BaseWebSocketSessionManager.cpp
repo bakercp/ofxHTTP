@@ -30,17 +30,16 @@ namespace ofx {
 namespace HTTP {
 
 
-//------------------------------------------------------------------------------
 BaseWebSocketSessionManager::BaseWebSocketSessionManager()
 {
 }
 
-//------------------------------------------------------------------------------
+
 BaseWebSocketSessionManager::~BaseWebSocketSessionManager()
 {
 }
 
-//------------------------------------------------------------------------------
+
 bool BaseWebSocketSessionManager::sendFrame(AbstractWebSocketConnection* connection,
                                             const WebSocketFrame& frame)
 {
@@ -55,7 +54,7 @@ bool BaseWebSocketSessionManager::sendFrame(AbstractWebSocketConnection* connect
     }
 }
 
-//------------------------------------------------------------------------------
+
 void BaseWebSocketSessionManager::close(AbstractWebSocketConnection* connection)
 {
     if(0 != connection)
@@ -68,7 +67,7 @@ void BaseWebSocketSessionManager::close(AbstractWebSocketConnection* connection)
     }
 }
 
-//------------------------------------------------------------------------------
+
 void BaseWebSocketSessionManager::close()
 {
     ofScopedLock lock(_mutex);
@@ -80,14 +79,14 @@ void BaseWebSocketSessionManager::close()
     }
 }
 
-//------------------------------------------------------------------------------
+
 bool BaseWebSocketSessionManager::sendBinary(AbstractWebSocketConnection* connection,
                                              ofBaseHasPixels& image)
 {
     return sendBinary(connection,image.getPixelsRef());
 }
 
-//------------------------------------------------------------------------------
+
 bool BaseWebSocketSessionManager::sendBinary(AbstractWebSocketConnection* connection,
                                              ofPixels& pixels)
 {
@@ -95,7 +94,7 @@ bool BaseWebSocketSessionManager::sendBinary(AbstractWebSocketConnection* connec
                       static_cast<unsigned int>(pixels.size()));
 }
 
-//------------------------------------------------------------------------------
+
 bool BaseWebSocketSessionManager::sendBinary(AbstractWebSocketConnection* connection,
                                              unsigned char* data,
                                              std::size_t size)
@@ -104,7 +103,7 @@ bool BaseWebSocketSessionManager::sendBinary(AbstractWebSocketConnection* connec
     return sendFrame(connection,frame);
 }
 
-//------------------------------------------------------------------------------
+
 void BaseWebSocketSessionManager::broadcast(ofPixels& pixels)
 {
     ofScopedLock lock(_mutex);
@@ -122,13 +121,13 @@ void BaseWebSocketSessionManager::broadcast(ofPixels& pixels)
     }
 }
 
-//------------------------------------------------------------------------------
+
 void BaseWebSocketSessionManager::broadcast(const std::string& text)
 {
     broadcast(WebSocketFrame(text));
 }
 
-//------------------------------------------------------------------------------
+
 void BaseWebSocketSessionManager::broadcast(const WebSocketFrame& frame)
 {
     ofScopedLock lock(_mutex);
@@ -140,7 +139,7 @@ void BaseWebSocketSessionManager::broadcast(const WebSocketFrame& frame)
     }
 }
 
-//------------------------------------------------------------------------------
+
 void BaseWebSocketSessionManager::registerWebSocketConnection(AbstractWebSocketConnection* connection)
 {
     ofScopedLock lock(_mutex);
@@ -150,7 +149,7 @@ void BaseWebSocketSessionManager::registerWebSocketConnection(AbstractWebSocketC
     }
 }
 
-//------------------------------------------------------------------------------
+
 void BaseWebSocketSessionManager::unregisterWebSocketConnection(AbstractWebSocketConnection* connection)
 {
     ofScopedLock lock(_mutex);
@@ -163,14 +162,14 @@ void BaseWebSocketSessionManager::unregisterWebSocketConnection(AbstractWebSocke
     }
 }
 
-//------------------------------------------------------------------------------
+
 std::size_t BaseWebSocketSessionManager::getNumWebSocketConnections() const
 {
     ofScopedLock lock(_mutex);
     return _connections.size();
 }
 
-////------------------------------------------------------------------------------
+//
 //BaseWebSocketSessionManager::SubprotocolList BaseWebSocketSessionManager::getAvailableSubprotcols()
 //{
 //    ofScopedLock lock(_mutex);
@@ -188,7 +187,7 @@ std::size_t BaseWebSocketSessionManager::getNumWebSocketConnections() const
 //    return availableSubprotocols;
 //}
 //
-////------------------------------------------------------------------------------
+//
 //bool BaseWebSocketSessionManager::selectSubprotocol(const SubprotocolList& proposedSubprotocols,
 //                                                    std::string& selectedSubprotocol)
 //{

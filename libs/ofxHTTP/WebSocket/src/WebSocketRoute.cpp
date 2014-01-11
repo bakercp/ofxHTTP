@@ -30,21 +30,22 @@ namespace ofx {
 namespace HTTP {
 
 
-//------------------------------------------------------------------------------
 WebSocketRoute::WebSocketRoute(const Settings& settings):
     _settings(settings)
 {
 }
-    
-//------------------------------------------------------------------------------
+
+
 WebSocketRoute::~WebSocketRoute()
 {
 }
+
 
 std::string WebSocketRoute::getRoutePathPattern() const
 {
     return _settings.getRoutePathPattern();
 }
+
 
 bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
                                       bool isSecurePort) const
@@ -86,6 +87,7 @@ bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& reques
     return true;
 
 }
+
 
 Poco::Net::HTTPRequestHandler* WebSocketRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
 {

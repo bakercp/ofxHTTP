@@ -37,10 +37,12 @@ BasicWebSocketServer::BasicWebSocketServer(const Settings& settings):
     addRoute(_webSocketRoute);
 }
 
+
 BasicWebSocketServer::~BasicWebSocketServer()
 {
     removeRoute(_webSocketRoute);
 }
+
 
 WebSocketRoute::SharedPtr BasicWebSocketServer::getWebSocketRoute()
 {

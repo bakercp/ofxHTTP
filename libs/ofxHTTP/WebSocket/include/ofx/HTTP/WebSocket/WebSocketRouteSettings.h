@@ -72,7 +72,6 @@ public:
     void setBufferSize(std::size_t bufferSize);
     std::size_t getBufferSize() const;
 
-
     static const std::string DEFAULT_WEBSOCKET_ROUTE_PATH_PATTERN;
 
 private:

@@ -30,7 +30,7 @@ namespace ofx {
 namespace HTTP {
 
     
-//------------------------------------------------------------------------------
+
 Poco::Net::NameValueCollection Utils::getQueryMap(const Poco::URI& uri)
 {
     Poco::Net::NameValueCollection nvc;
@@ -71,7 +71,7 @@ Poco::Net::NameValueCollection Utils::getQueryMap(const Poco::URI& uri)
 }
 
 
-//------------------------------------------------------------------------------
+
 void Utils::dumpHeaders(const Poco::Net::HTTPServerRequest& request,
                         const Poco::Net::HTTPServerResponse& response,
                         ofLogLevel logLevel)
@@ -80,7 +80,7 @@ void Utils::dumpHeaders(const Poco::Net::HTTPServerRequest& request,
     dumpHeaders(response,logLevel);
 }
 
-//------------------------------------------------------------------------------
+
 void Utils::dumpHeaders(const Poco::Net::HTTPServerRequest& request,
                         ofLogLevel logLevel)
 {
@@ -99,7 +99,7 @@ void Utils::dumpHeaders(const Poco::Net::HTTPServerRequest& request,
     }
 }
 
-//------------------------------------------------------------------------------
+
 void Utils::dumpHeaders(const Poco::Net::HTTPServerResponse& response,
                         ofLogLevel logLevel)
 {

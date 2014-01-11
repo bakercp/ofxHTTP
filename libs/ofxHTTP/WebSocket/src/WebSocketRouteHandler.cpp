@@ -30,19 +30,18 @@ namespace ofx {
 namespace HTTP {
 
 
-//------------------------------------------------------------------------------
 WebSocketRouteHandler::WebSocketRouteHandler(WebSocketRouteInterface& parent):
     BaseRouteHandler(parent),
     _parent(parent)
 {
 }
 
-//------------------------------------------------------------------------------
+
 WebSocketRouteHandler::~WebSocketRouteHandler()
 {
 }
 
-//------------------------------------------------------------------------------
+
 void WebSocketRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
                                           Poco::Net::HTTPServerResponse& response)
 {
@@ -53,7 +52,7 @@ void WebSocketRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
     // done!
 }
 
-//------------------------------------------------------------------------------
+
 void WebSocketRouteHandler::close()
 {
     _parent.getSessionManagerRef().close();

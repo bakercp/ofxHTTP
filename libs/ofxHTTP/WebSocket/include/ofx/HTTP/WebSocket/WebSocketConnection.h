@@ -49,7 +49,7 @@ namespace HTTP {
 // TODO:
 // - move default constants to enum
 
-//------------------------------------------------------------------------------
+
 class WebSocketConnection: public AbstractWebSocketConnection
 {
 public:

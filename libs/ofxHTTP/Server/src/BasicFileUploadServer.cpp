@@ -31,7 +31,7 @@ namespace HTTP {
 
 
 BasicFileUploadServer::BasicFileUploadServer(const Settings& settings):
-    BasicServer(settings), 
+    BasicServer(settings),
     _fileUploadRoute(FileUploadRoute::makeShared(settings))
 {
     addRoute(_fileUploadRoute);
@@ -49,5 +49,5 @@ FileUploadRoute::SharedPtr BasicFileUploadServer::getFileUploadRoute()
     return _fileUploadRoute;
 }
 
-        
+
 } } // namespace ofx::HTTP

@@ -30,19 +30,18 @@ namespace ofx {
 namespace HTTP {
 
 
-//------------------------------------------------------------------------------
 WebSocketConnection::WebSocketConnection(WebSocketRouteInterface& parent):
     _parent(parent),
     _isConnected(false)
 {
 }
 
-//------------------------------------------------------------------------------
+
 WebSocketConnection::~WebSocketConnection()
 {
 }
 
-//------------------------------------------------------------------------------
+
 void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                                         Poco::Net::HTTPServerResponse& response)
 {
@@ -214,7 +213,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
     ofNotifyEvent(_parent.getSessionManagerRef().events.onCloseEvent,eventArgs,this);
 }
 
-//------------------------------------------------------------------------------
+
 void WebSocketConnection::frameReceived(const WebSocketFrame& frame)
 {
 //    WebSocketFrame _frame(frame);
@@ -222,7 +221,7 @@ void WebSocketConnection::frameReceived(const WebSocketFrame& frame)
 //    sendFrame(frame);
 }
 
-//------------------------------------------------------------------------------
+
 bool WebSocketConnection::sendFrame(const WebSocketFrame& frame) const
 {
     ofScopedLock lock(_mutex);
@@ -237,27 +236,27 @@ bool WebSocketConnection::sendFrame(const WebSocketFrame& frame) const
     }
 }
 
-//------------------------------------------------------------------------------
+
 void WebSocketConnection::frameSent(const WebSocketFrame& frame,
                                     std::size_t nBytesSent)
 {
     ofLogVerbose("ServerWebSocketRouteHandler::frameSent") << frame.toString() << " nBytesSent=" << nBytesSent;
 }
 
-//------------------------------------------------------------------------------
+
 void WebSocketConnection::socketClosed()
 {
     ofLogVerbose("ServerWebSocketRouteHandler::frameSent") << "Socket closed.";
 }
 
-//------------------------------------------------------------------------------
+
 std::size_t WebSocketConnection::getSendQueueSize() const
 {
     ofScopedLock lock(_mutex);
     return _frameQueue.size();
 }
 
-//------------------------------------------------------------------------------
+
 void WebSocketConnection::clearSendQueue()
 {
     ofScopedLock lock(_mutex);
@@ -265,32 +264,32 @@ void WebSocketConnection::clearSendQueue()
     std::swap(_frameQueue,empty);
 }
 
-//------------------------------------------------------------------------------
+
 void WebSocketConnection::stop()
 {
     setIsConnected(false);
 }
 
-//------------------------------------------------------------------------------
+
 Poco::Net::NameValueCollection WebSocketConnection::getRequestHeaders() const
 {
     return _requestHeaders;
 }
 
-//------------------------------------------------------------------------------
+
 Poco::Net::SocketAddress WebSocketConnection::getClientAddress() const
 {
     return _clientAddress;
 }
 
-//------------------------------------------------------------------------------
+
 bool WebSocketConnection::isConnected() const
 {
     ofScopedLock lock(_mutex);
     return _isConnected;
 }
 
-//------------------------------------------------------------------------------
+
 void WebSocketConnection::setIsConnected(bool isConnected)
 {
     ofScopedLock lock(_mutex);
@@ -298,14 +297,14 @@ void WebSocketConnection::setIsConnected(bool isConnected)
 }
 
 
-////------------------------------------------------------------------------------
+//
 //std::string WebSocketConnection::getSubprotocol() const
 //{
 //    ofScopedLock lock(_mutex);
 //    return _settings.getSubprotocol();
 //}
 
-//------------------------------------------------------------------------------
+
 //void WebSocketConnection::handleErrorResponse(Poco::Net::HTTPServerResponse& response)
 //{
 //    // TODO: come up with a better solution for shared / default error handling
@@ -341,7 +340,7 @@ void WebSocketConnection::setIsConnected(bool isConnected)
 //
 //}
 
-//------------------------------------------------------------------------------
+
 void WebSocketConnection::handleOrigin(Poco::Net::HTTPServerRequest& request,
                                        Poco::Net::HTTPServerResponse& response)
 {
@@ -355,7 +354,7 @@ void WebSocketConnection::handleOrigin(Poco::Net::HTTPServerRequest& request,
     //    ofLogError("ServerRouteHandler::handleOrigin") << "TODO: handle/check origin";
 }
 
-////------------------------------------------------------------------------------
+//
 //void WebSocketConnection::handleSubprotocols(Poco::Net::HTTPServerRequest& request,
 //                                             Poco::Net::HTTPServerResponse& response)
 //{
@@ -382,7 +381,7 @@ void WebSocketConnection::handleOrigin(Poco::Net::HTTPServerRequest& request,
 //    }
 //}
 
-//------------------------------------------------------------------------------
+
 void WebSocketConnection::handleExtensions(Poco::Net::HTTPServerRequest& request,
                                            Poco::Net::HTTPServerResponse& response)
 {
@@ -394,7 +393,7 @@ void WebSocketConnection::handleExtensions(Poco::Net::HTTPServerRequest& request
     }
 }
 
-//------------------------------------------------------------------------------
+
 void WebSocketConnection::processFrameQueue(Poco::Net::WebSocket& ws)
 {
     int numBytesSent = 0;
@@ -439,7 +438,7 @@ void WebSocketConnection::processFrameQueue(Poco::Net::WebSocket& ws)
     }
 }
 
-//------------------------------------------------------------------------------
+
 void WebSocketConnection::applyFirefoxHack(Poco::Net::HTTPServerRequest& request)
 {
     // HACK FOR FIREFOX
