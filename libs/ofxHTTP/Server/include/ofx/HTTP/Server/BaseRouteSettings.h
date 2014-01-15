@@ -41,7 +41,7 @@ class BaseRouteSettings
 {
 public:
     BaseRouteSettings(const std::string& routePathPattern = BaseRouteSettings::DEFAULT_ROUTE_PATH_PATTERN);
-        ///< \brief Create the BaseRouteSettings using the given route path.
+        ///< \brief Create the BaseRouteSettings with the given route path.
         ///< \param routePathPattern The regex pattern that this route
         ///<        will handle.
 
@@ -75,8 +75,8 @@ private:
         ///< \brief the route's regex route pattern.
 
     bool _requireSecurePort;
-    ///< \brief true if this route can only handle requests submitted on
-    ///<        an SSL encrypted port.
+        ///< \brief true if this route can only handle requests submitted on
+        ///<        an SSL encrypted port.
 
 };
 

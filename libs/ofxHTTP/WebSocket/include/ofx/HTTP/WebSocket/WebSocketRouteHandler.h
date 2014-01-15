@@ -51,21 +51,33 @@ namespace HTTP {
 
 // TODO: move default constants to enum
 class WebSocketRouteHandler: public BaseRouteHandler
+    /// \brief A WebSocketRouteHandler registers new WebSocketConnections.
+    /// \details Upon creating a new WebSocketConnection, the connection is
+    ///         returned to the parent WebSocketRoute for management via
+    ///         the WebSocketRouteInterface.
+    ///         A WebSocketRouteHandler exist as long as the
+    ///         WebSocketConnection remains alive.  Upon completion,
+    ///         the WebSocketConnection is unregistered and cleaned up.
 {
 public:
     typedef WebSocketRouteSettings Settings;
+        ///< \brief A typedef for Settings.
 
     WebSocketRouteHandler(WebSocketRouteInterface& parent);
-    
+        ///< \brief Create a WebSocketRouteHandler with a reference to
+        ///<        its parent route.
+        ///< \param parent A reference to the parent route.  Used for
+        ///<        long-term WebSocketConnection maintenance.
+
     virtual ~WebSocketRouteHandler();
+        ///< \brief Destroy the WebSocketRouteHandler.
 
     virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
                                Poco::Net::HTTPServerResponse& response);
 
-    virtual void close();
-
 private:
     WebSocketRouteInterface& _parent;
+        ///< \brief The parent WebSocketRouteInterface.
 
 };
 

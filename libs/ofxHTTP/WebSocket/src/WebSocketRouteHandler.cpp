@@ -47,15 +47,9 @@ void WebSocketRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
 {
     WebSocketConnection connection(_parent);
     _parent.getSessionManagerRef().registerWebSocketConnection(&connection);
-    connection.handleRequest(request,response);
+    connection.handleRequest(request, response);
     _parent.getSessionManagerRef().unregisterWebSocketConnection(&connection);
     // done!
-}
-
-
-void WebSocketRouteHandler::close()
-{
-    _parent.getSessionManagerRef().close();
 }
 
 
