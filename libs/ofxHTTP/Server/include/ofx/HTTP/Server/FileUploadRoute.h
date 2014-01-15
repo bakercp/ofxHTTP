@@ -39,9 +39,9 @@ namespace HTTP {
 class FileUploadRoute: public BaseRoute
 {
 public:
-    typedef std::shared_ptr<FileUploadRoute>    SharedPtr;
-    typedef std::weak_ptr<FileUploadRoute>      WeakPtr;
-    typedef FileUploadRouteSettings             Settings;
+    typedef std::shared_ptr<FileUploadRoute> SharedPtr;
+    typedef std::weak_ptr<FileUploadRoute> WeakPtr;
+    typedef FileUploadRouteSettings Settings;
 
     FileUploadRoute(const Settings& settings = Settings());
     virtual ~FileUploadRoute();
@@ -80,6 +80,7 @@ void FileUploadRoute::registerFileUploadEvents(ListenerClass* listener)
     ofAddListener(events.onUploadProgress,listener, &ListenerClass::onFileUploadProgress);
     ofAddListener(events.onUploadFinished, listener, &ListenerClass::onFileUploadFinished);
 }
+
 
 template<class ListenerClass>
 void FileUploadRoute::unregisterFileUploadEvents(ListenerClass* listener)
