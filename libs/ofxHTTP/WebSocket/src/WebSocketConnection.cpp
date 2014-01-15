@@ -66,7 +66,9 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
         ws.setSendTimeout(_parent.getSettings().getSendTimeout());
         ws.setKeepAlive(_parent.getSettings().getKeepAlive());
 
-        setIsConnected(true);
+        _mutex.lock();
+        _isConnected = true;
+        _mutex.unlock();
 
 //        WebSocketEventArgs eventArgs(*this);
 //        ofNotifyEvent(_manager.events.onOpenEvent, eventArgs, this);
@@ -177,7 +179,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
     {
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "TimeoutException: " << exc.code() << " Desc: " << exc.what();
         socketClosed();
-        WebSocketEventArgs eventArgs(*this,WS_ERR_TIMEOUT);
+        WebSocketEventArgs eventArgs(*this, WS_ERR_TIMEOUT);
         ofNotifyEvent(_parent.getSessionManagerRef().events.onErrorEvent, eventArgs, this);
         // response socket has already been closed (!?)
     }
@@ -185,7 +187,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
     {
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "NetException: " << exc.code() << " Desc: " << exc.what();
         socketClosed();
-        WebSocketEventArgs eventArgs(*this,WS_ERR_NET_EXCEPTION);
+        WebSocketEventArgs eventArgs(*this, WS_ERR_NET_EXCEPTION);
         ofNotifyEvent(_parent.getSessionManagerRef().events.onErrorEvent, eventArgs, this);
         // response socket has already been closed (!?)
     }
@@ -193,9 +195,9 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
     {
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "exception: " << exc.what();
         response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-        _parent.handleRequest(request,response);
+        _parent.handleRequest(request, response);
         socketClosed();
-        WebSocketEventArgs eventArgs(*this,WS_ERR_OTHER);
+        WebSocketEventArgs eventArgs(*this, WS_ERR_OTHER);
         ofNotifyEvent(_parent.getSessionManagerRef().events.onErrorEvent, eventArgs, this);
     }
     catch ( ... )
@@ -204,12 +206,12 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
         response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         _parent.handleRequest(request,response);
         socketClosed();
-        WebSocketEventArgs eventArgs(*this,WS_ERR_OTHER);
+        WebSocketEventArgs eventArgs(*this, WS_ERR_OTHER);
         ofNotifyEvent(_parent.getSessionManagerRef().events.onErrorEvent, eventArgs, this);
     }
 
     WebSocketEventArgs eventArgs(*this);
-    ofNotifyEvent(_parent.getSessionManagerRef().events.onCloseEvent,eventArgs,this);
+    ofNotifyEvent(_parent.getSessionManagerRef().events.onCloseEvent, eventArgs, this);
 }
 
 
@@ -239,13 +241,13 @@ bool WebSocketConnection::sendFrame(const WebSocketFrame& frame) const
 void WebSocketConnection::frameSent(const WebSocketFrame& frame,
                                     std::size_t nBytesSent)
 {
-    ofLogVerbose("ServerWebSocketRouteHandler::frameSent") << frame.toString() << " nBytesSent=" << nBytesSent;
+    //ofLogVerbose("ServerWebSocketRouteHandler::frameSent") << frame.toString() << " nBytesSent=" << nBytesSent;
 }
 
 
 void WebSocketConnection::socketClosed()
 {
-    ofLogVerbose("ServerWebSocketRouteHandler::frameSent") << "Socket closed.";
+    //ofLogVerbose("ServerWebSocketRouteHandler::frameSent") << "Socket closed.";
 }
 
 
@@ -260,24 +262,27 @@ void WebSocketConnection::clearSendQueue()
 {
     ofScopedLock lock(_mutex);
     std::queue<WebSocketFrame> empty; // a way to clear queues.
-    std::swap(_frameQueue,empty);
+    std::swap(_frameQueue, empty);
 }
 
 
 void WebSocketConnection::stop()
 {
-    setIsConnected(false);
+    ofScopedLock lock(_mutex);
+    _isConnected = false;
 }
 
 
 Poco::Net::NameValueCollection WebSocketConnection::getRequestHeaders() const
 {
+    ofScopedLock lock(_mutex);
     return _requestHeaders;
 }
 
 
 Poco::Net::SocketAddress WebSocketConnection::getClientAddress() const
 {
+    ofScopedLock lock(_mutex);
     return _clientAddress;
 }
 
@@ -286,13 +291,6 @@ bool WebSocketConnection::isConnected() const
 {
     ofScopedLock lock(_mutex);
     return _isConnected;
-}
-
-
-void WebSocketConnection::setIsConnected(bool isConnected)
-{
-    ofScopedLock lock(_mutex);
-    _isConnected = isConnected;
 }
 
 

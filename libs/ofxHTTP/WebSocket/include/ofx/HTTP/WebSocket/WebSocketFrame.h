@@ -40,42 +40,69 @@ namespace HTTP {
 
 
 class WebSocketFrame: public ofBuffer
+    /// \brief A WebSocketFrame frame.
 {
 public:
     WebSocketFrame(const ofBuffer& buffer,
                    int flags = WebSocket::FRAME_TEXT);
+        ///< \brief Create a WebSocketFrame.
 
     WebSocketFrame(const std::string& text,
                    int flags = WebSocket::FRAME_TEXT);
+        ///< \brief Create a WebSocketFrame.
 
     WebSocketFrame(const char* buffer,
                    std::size_t size,
                    int flags = WebSocket::FRAME_TEXT);
+        ///< \brief Create a WebSocketFrame.
 
     WebSocketFrame(const unsigned char* buffer,
                    std::size_t size,
                    int flags = WebSocket::FRAME_TEXT);
-    
+        ///< \brief Create a WebSocketFrame.
+
     virtual ~WebSocketFrame();
-    
+        ///< \brief Destroy a WebSocketFrame.
+
     int getFlags() const;
+        ///< \returns the WebSockFrame flags.
     
     bool isContinuation() const;
+        ///< \returns true iff a continuation frame.
+
     bool isText() const;
+        ///< \returns true iff a text frame.
+
     bool isBinary() const;
+        ///< \returns true iff a binary frame.
+
     bool isClose() const;
+        ///< \returns true iff a close frame.
+
     bool isPing() const;
+        ///< \returns true iff a ping frame.
+
     bool isPong() const;
-    
+        ///< \returns true iff a pong frame.
+
     bool isFinal() const;
+        ///< \returns true iff a final frame.
+
     bool isRSV1() const;
+        ///< \returns true iff a RSV1 frame.
+
     bool isRSV2() const;
+        ///< \returns true iff a RSV2 frame.
+
     bool isRSV3() const;
-    
+        ///< \returns true iff a RSV3 frame.
+
     std::string toString() const;
+        ///< \returns a string representing the WebSocketFrame.
 
 protected:
     int _flags;
+        ///< \brief the websocket flags for this frame.
     
 };
 

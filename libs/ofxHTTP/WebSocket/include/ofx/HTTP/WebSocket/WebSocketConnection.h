@@ -46,45 +46,75 @@
 namespace ofx {
 namespace HTTP {
 
-// TODO:
-// - move default constants to enum
 
-
-class WebSocketConnection: public AbstractWebSocketConnection
+class WebSocketConnection:
+    public AbstractWebSocketConnection,
+    public Poco::Net::HTTPRequestHandler
+    /// \brief A thread safe WebSocketConnection represents a
+    ///         WebSocket connection with a single client.
+    /// \details Frames can be sent across thread boundaries and are
+    ///         queued for sending during the WebSocketConnection's
+    ///         service loop.
 {
 public:
     WebSocketConnection(WebSocketRouteInterface& parent);
+        ///< \brief Create a WebSocketConnection.
+        ///< \param parent A reference to the parent WebSocketRoute.
 
     virtual ~WebSocketConnection();
+        ///< \brief Destroy the WebSocketConnection.
 
     virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
                                Poco::Net::HTTPServerResponse& response);
+        ///< \brief Handle a HTTPServerRequest.
+        ///< \param request The server request to handle.
+        ///< \param response The Server response to return.
 
     bool sendFrame(const WebSocketFrame& frame) const;
+        ///< \brief Queue a frame to be sent.
+        ///< 
         ///< \returns false if frame not queued
 
     void stop();
 
     virtual void frameReceived(const WebSocketFrame& frame);
-    virtual void frameSent(const WebSocketFrame& frame, std::size_t numBytesSent);
-    virtual void socketClosed();
+        ///< \brief Called when a WebSocketFrame is received.
+        ///< \details Subclasses can implement this method.
+        ///< \param frame The WebSocketFrame that was received.
 
-    void broadcast(const WebSocketFrame& frame) const;
+    virtual void frameSent(const WebSocketFrame& frame,
+                           std::size_t numBytesSent);
+        ///< \brief Called when a WebSocketFrame is sent.
+        ///< \details Subclasses can implement this method.
+        ///< \param frame The WebSocketFrame that was sent.
+        ///< \param numBytesSent The number of bytes sent in the WebSocketFrame.
+
+    virtual void socketClosed();
+        ///< \brief Called when a WebSocketConnection is closed.
+        ///< \details Subclasses can implement this method.
 
     Poco::Net::NameValueCollection getRequestHeaders() const;
+        ///< \returns The request headers submitted when
+        ///<        establishing this connection.
+
     Poco::Net::SocketAddress getClientAddress() const;
+        ///< \returns the SocketAddress of the client that
+        ///<        established this connection.
 
     bool isConnected() const;
+        ///< \returns true iff this WebSocketConnect is connected to a client.
 
 //    std::string getSubprotocol() const;
 
     std::size_t getSendQueueSize() const;
+        ///< \returns the size of the send queue.
+
     void clearSendQueue();
+        ///< \brief Clears the send queue.
 
 protected:
-    void setIsConnected(bool bIsConnected);
-
     WebSocketRouteInterface& _parent;
+        ///< \brief A reference to the parent WebSocketRoute.
 
 private:
 //    void handleErrorResponse(Poco::Net::HTTPServerResponse& response);
@@ -114,4 +144,3 @@ private:
 
 
 } } // namespace ofx::HTTP
-

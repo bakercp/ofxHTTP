@@ -39,7 +39,7 @@ namespace HTTP {
 
 
 class AbstractInterruptible
-    /// \brief Provides and abstract interface for stopping subclasses.
+    /// \brief Defines an abstract interface for stopping subclasses.
 {
 public:
     virtual ~AbstractInterruptible()
@@ -58,7 +58,7 @@ class WebSocketFrame;
 
 class AbstractWebSocketConnection:
     public AbstractInterruptible
-    /// \brief Provides an abstract interface for sending a WebSocketFrame.
+    /// \brief Defines an abstract interface for sending a WebSocketFrame.
 {
 public:
     virtual ~AbstractWebSocketConnection()
@@ -77,7 +77,7 @@ public:
 class AbstractRouteHandler:
     public AbstractInterruptible,
     public Poco::Net::HTTPRequestHandler
-    /// \brief Defines and abstract HTTP route handler.
+    /// \brief Defines an abstract HTTP route handler.
     /// \details Route handlers are invoked in route handling threads
     ///         created by classes that inherit from AbstractRoute.
 {

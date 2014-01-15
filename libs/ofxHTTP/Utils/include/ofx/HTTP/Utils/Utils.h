@@ -40,19 +40,30 @@ namespace HTTP {
 
 
 class Utils
+    /// \brief A collection of HTTP utilities.
 {
 public:
     static Poco::Net::NameValueCollection getQueryMap(const Poco::URI& uri);
+        ///< \brief Extracts a map of query parameter names and their values.
+        ///< \param uri The URI from which to extract the parameter map.
+        ///< \returns a map of query parameter names and their values.
 
     static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
                             const Poco::Net::HTTPServerResponse& response,
                             ofLogLevel logLevel = OF_LOG_VERBOSE);
+        ///< \brief Dump headers from both server requests and responses.
+        ///< \param request the HTTPServerRequest request.
+        ///< \param response the HTTPServerResponse response.
 
     static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
                             ofLogLevel logLevel = OF_LOG_VERBOSE);
+        ///< \brief Dump headers from a server request.
+        ///< \param request the HTTPServerRequest request.
 
     static void dumpHeaders(const Poco::Net::HTTPServerResponse& response,
                             ofLogLevel logLevel = OF_LOG_VERBOSE);
+        ///< \brief Dump headers from a server response.
+        ///< \param response the HTTPServerResponse response.
 
 };
 
