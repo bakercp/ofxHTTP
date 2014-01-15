@@ -26,7 +26,9 @@
 #pragma once
 
 
-#include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/MediaType.h"
+#include "Poco/Net/NameValueCollection.h"
+#include "Poco/Net/HTTPServerRequest.h"
 #include "ofEvents.h"
 
 
@@ -37,7 +39,55 @@ namespace HTTP {
 class BaseServerEvent: public ofEventArgs
 {
 public:
-    Poco::Net::SocketAddress clientAddress;
+    typedef Poco::Net::NameValueCollection Headers;
+    typedef Poco::Net::NameValueCollection::ConstIterator HeadersIter;
+
+//    BaseServerEvent(const Headers& headers):
+//        _headers(headers)
+//    {
+//    }
+//
+//
+//    Headers getHeaders() const
+//    {
+//        return _headers;
+//    }
+
+
+//    std::size_t getContentLength() const
+//    {
+//        HeadersIter iter = _headers.find("Content-Length");
+//
+//        if (iter != _headers.end())
+//        {
+//            std::istringstream buffer((*iter).second);
+//            std::size_t result;
+//            buffer >> result;
+//            return result;
+//        }
+//        else
+//        {
+//            return 0;
+//        }
+//    }
+//
+//
+//    Poco::Net::MediaType getContentType() const
+//    {
+//        HeadersIter iter = _headers.find("Content-Type");
+//
+//        if (iter != _headers.end())
+//        {
+//            return Poco::Net::MediaType((*iter).second);
+//        }
+//        else
+//        {
+//            return Poco::Net::MediaType("text/plain");
+//        }
+//    }
+
+protected:
+    Headers _headers;
 
 };
 

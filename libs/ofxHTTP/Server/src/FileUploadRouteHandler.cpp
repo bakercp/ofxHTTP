@@ -78,7 +78,7 @@ void FileUploadRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request
     // upload folder validity check
     if(_parent.getSettings().getRequireUploadFolderInDataFolder() &&
        (uploadFolderString.length() < dataFolderString.length() ||
-        uploadFolderString.substr(0,dataFolderString.length()) != dataFolderString))
+        uploadFolderString.substr(0, dataFolderString.length()) != dataFolderString))
     {
            ofLogError("ServerUploadRouteHandler::handleRequest") << "Upload folder is not a sub directory of the data folder.";
            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
@@ -122,11 +122,11 @@ void FileUploadRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request
 }
 
 
-bool FileUploadRouteHandler::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
-                                              bool isSecurePort) const
-{
-    return request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST;
-}
+//bool FileUploadRouteHandler::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
+//                                              bool isSecurePort) const
+//{
+//    return request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST;
+//}
 
 
 void FileUploadRouteHandler::handlePart(const Poco::Net::MessageHeader& header,

@@ -63,8 +63,8 @@ public:
     void handleRequest(Poco::Net::HTTPServerRequest& request,
                        Poco::Net::HTTPServerResponse& response);
 
-    bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
-                          bool isSecurePort) const;
+//    bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
+//                          bool isSecurePort) const;
 
     void handlePart(const Poco::Net::MessageHeader& header,
                     std::istream& stream);

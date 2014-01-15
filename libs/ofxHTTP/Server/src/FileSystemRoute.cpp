@@ -46,7 +46,7 @@ bool FileSystemRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& reque
 {
     // require an HTTP_GET call
     return request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET &&
-        BaseRoute::canHandleRequest(request, isSecurePort);
+           BaseRoute::canHandleRequest(request, isSecurePort);
 }
 
 

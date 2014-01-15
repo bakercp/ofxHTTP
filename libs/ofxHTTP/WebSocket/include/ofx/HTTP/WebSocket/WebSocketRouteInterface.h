@@ -41,10 +41,12 @@ class WebSocketRouteInterface: public BaseRoute
 {
 public:
     WebSocketRouteInterface()
+        ///< \brief Create a WebSocketRouteInterface
     {
     }
 
     virtual ~WebSocketRouteInterface()
+        ///< \brief Destroy the WebSocketRouteInterface
     {
     }
     

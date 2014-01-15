@@ -115,8 +115,8 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
 
                     frameReceived(frame);
 
-                    WebSocketFrameEventArgs frameArgs(*this,frame);
-                    ofNotifyEvent(_parent.getSessionManagerRef().events.onFrameReceivedEvent,frameArgs,this);
+                    WebSocketFrameEventArgs frameArgs(frame, *this);
+                    ofNotifyEvent(_parent.getSessionManagerRef().events.onFrameReceivedEvent, frameArgs, this);
 
                 }
                 else
@@ -145,33 +145,32 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
     {
 
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "WebSocketException: " << exc.code() << " Desc: " << exc.what();
-        WebSocketEventArgs eventArgs(*this);
+
         switch (exc.code())
         {
             case Poco::Net::WebSocket::WS_ERR_HANDSHAKE_UNSUPPORTED_VERSION:
-                eventArgs.setError(WS_ERR_HANDSHAKE_UNSUPPORTED_VERSION);
                 response.set("Sec-WebSocket-Version", Poco::Net::WebSocket::WEBSOCKET_VERSION);
                 response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
                 response.setReason("WS_ERR_HANDSHAKE_UNSUPPORTED_VERSION");
                 break;
             case Poco::Net::WebSocket::WS_ERR_NO_HANDSHAKE:
-                eventArgs.setError(WS_ERR_NO_HANDSHAKE);
                 response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
                 response.setReason("WS_ERR_NO_HANDSHAKE");
                 break;
             case Poco::Net::WebSocket::WS_ERR_HANDSHAKE_NO_VERSION:
-                eventArgs.setError(WS_ERR_HANDSHAKE_NO_VERSION);
                 response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
                 response.setReason("WS_ERR_HANDSHAKE_NO_VERSION");
                 break;
             case Poco::Net::WebSocket::WS_ERR_HANDSHAKE_NO_KEY:
-                eventArgs.setError(WS_ERR_HANDSHAKE_NO_KEY);
                 response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
                 response.setReason("WS_ERR_HANDSHAKE_NO_KEY");
                 break;
         }
         _parent.handleRequest(request,response);
         socketClosed();
+
+        WebSocketEventArgs eventArgs(*this, (WebSocketError)exc.code());
+
         ofNotifyEvent(_parent.getSessionManagerRef().events.onErrorEvent, eventArgs, this);
     }
     catch (const Poco::TimeoutException& exc)
@@ -408,28 +407,30 @@ void WebSocketConnection::processFrameQueue(Poco::Net::WebSocket& ws)
         {
             if(ws.poll(_parent.getSettings().getPollTimeout(), Poco::Net::Socket::SELECT_WRITE))
             {
-                cout << "frame " << frame.getBinaryBuffer() << " sz=" << frame.size() << " flags=" << frame.getFlags() << endl;
+//                cout << "frame " << frame.getBinaryBuffer() << " sz=" << frame.size() << " flags=" << frame.getFlags() << endl;
 
 
                 numBytesSent = ws.sendFrame(frame.getBinaryBuffer(),
                                             frame.size(),
                                             frame.getFlags());
                 
-                WebSocketFrameEventArgs eventArgs(*this,frame);
-                
+                WebSocketError error = WS_ERR_NONE;
+
                 if(numBytesSent <= 0)
                 {
                     ofLogWarning("ServerWebSocketRouteHandler::handleRequest") << "WebSocket numBytesSent <= 0";
-                    eventArgs.setError(WS_ERROR_ZERO_BYTE_FRAME_SENT);
+                    error = WS_ERROR_ZERO_BYTE_FRAME_SENT;
                 }
                 else if(numBytesSent < frame.size())
                 {
                     ofLogWarning("ServerWebSocketRouteHandler::handleRequest") << "WebSocket numBytesSent < frame.size()";
                     WebSocketEventArgs eventArgs(*this);
-                    eventArgs.setError(WS_ERROR_INCOMPLETE_FRAME_SENT);
+                    error = WS_ERROR_INCOMPLETE_FRAME_SENT;
                 }
-                
-                frameSent(frame,numBytesSent);
+
+                WebSocketFrameEventArgs eventArgs(frame, *this, error);
+
+                frameSent(frame, numBytesSent);
                 
                 ofNotifyEvent(_parent.getSessionManagerRef().events.onFrameSentEvent, eventArgs, this);
             }
