@@ -45,9 +45,11 @@ IPVideoRouteHandler::IPVideoRouteHandler(IPVideoRouteInterface& parent):
 {
 }
 
+
 IPVideoRouteHandler::~IPVideoRouteHandler()
 {
 }
+
 
 void IPVideoRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
                                         Poco::Net::HTTPServerResponse& response)
@@ -222,21 +224,25 @@ void IPVideoRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
 
 }
 
+
 void IPVideoRouteHandler::stop()
 {
     _isRunning = false;
 }
+
 
 IPVideoFrameSettings IPVideoRouteHandler::getFrameSettings() const
 {
     return _frameSettings;
 }
 
+
 float IPVideoRouteHandler::getCurrentBitRate() const
 {
     ofScopedLock lock(_mutex);
     return (float)_bytesSent * 8.0f / (ofGetElapsedTimeMillis() - _startTime);
 }
+
 
 float IPVideoRouteHandler::getCurrentFrameRate() const
 {

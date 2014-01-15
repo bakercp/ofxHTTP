@@ -31,15 +31,10 @@ namespace HTTP {
 
 
 const std::string IPVideoRouteSettings::DEFAULT_VIDEO_ROUTE = "/ipvideo";
-const std::size_t IPVideoRouteSettings::DEFAULT_MAX_CLIENT_CONNECTIONS = 5;
-const std::size_t IPVideoRouteSettings::DEFAULT_MAX_CLIENT_BITRATE = 1024;
-const std::size_t IPVideoRouteSettings::DEFAULT_MAX_CLIENT_FRAMERATE = 30;
-const std::size_t IPVideoRouteSettings::DEFAULT_MAX_CLIENT_QUEUE_SIZE = 10;
 const std::string IPVideoRouteSettings::DEFAULT_BOUNDARY_MARKER = "--boundary";
 const Poco::Net::MediaType IPVideoRouteSettings::DEFAULT_MEDIA_TYPE = Poco::Net::MediaType("multipart/x-mixed-replace");
-const std::size_t IPVideoRouteSettings::DEFAULT_MAX_STREAM_WIDTH = 1920;
-const std::size_t IPVideoRouteSettings::DEFAULT_MAX_STREAM_HEIGHT = 1080;
 
+    
 IPVideoRouteSettings::IPVideoRouteSettings(const std::string& routePathPattern):
     BaseRouteSettings(routePathPattern),
     _maxClientConnections(DEFAULT_MAX_CLIENT_CONNECTIONS),

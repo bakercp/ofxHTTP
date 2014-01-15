@@ -51,6 +51,7 @@ public:
     virtual IPVideoRouteSettings getSettings() const = 0;
 
     virtual void addConnection(IPVideoRouteHandler* handler) = 0;
+
     virtual void removeConnection(IPVideoRouteHandler* handler) = 0;
 
     virtual std::size_t getNumConnections() const = 0;

@@ -37,10 +37,12 @@ BasicIPVideoServer::BasicIPVideoServer(const Settings& settings):
     addRoute(_ipVideoRoute);
 }
 
+
 BasicIPVideoServer::~BasicIPVideoServer()
 {
     removeRoute(_ipVideoRoute);
 }
+
 
 void BasicIPVideoServer::send(ofPixels& pix)
 {
