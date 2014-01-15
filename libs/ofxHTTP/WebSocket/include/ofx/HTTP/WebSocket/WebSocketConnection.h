@@ -66,9 +66,9 @@ public:
 
     virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
                                Poco::Net::HTTPServerResponse& response);
-        ///< \brief Handle a HTTPServerRequest.
-        ///< \param request The server request to handle.
-        ///< \param response The Server response to return.
+        ///< \brief Handle an HTTPServerRequest with an HTTPServerResponse.
+        ///< \param request The HTTPServerRequest to handle.
+        ///< \param response The HTTPServerResponse to return.
 
     bool sendFrame(const WebSocketFrame& frame) const;
         ///< \brief Queue a frame to be sent.

@@ -87,7 +87,8 @@ void BaseRoute::handleRequest(Poco::Net::HTTPServerRequest& request,
         // if we got this far and our status is still marked as 200, that constitutes a server error.
         if(response.getStatus() == Poco::Net::HTTPResponse::HTTP_OK)
         {
-            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "No handlers for route.");
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR,
+                                        "No handlers for route.");
         }
 
         response.setChunkedTransferEncoding(true);

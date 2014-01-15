@@ -93,6 +93,12 @@ public:
     {
     }
 
+    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
+                               Poco::Net::HTTPServerResponse& response) = 0;
+        ///< \brief Handle an HTTPServerRequest with an HTTPServerResponse.
+        ///< \param request The HTTPServerRequest to handle.
+        ///< \param response The HTTPServerResponse to return.
+
 };
 
 
@@ -115,7 +121,12 @@ public:
     }
 
     virtual std::string getRoutePathPattern() const = 0;
-        ///< \returns The Route path regex pattern.
+        ///< \brief Get the route's regex path pattern.
+        ///< \details The path pattern is used to match incoming
+        ///<        server requests and allows requests to be
+        ///<        routed to different routes based on their
+        ///<        requested URI.
+        ///< \returns the regex path pattern.
 
     virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
                                   bool isSecurePort) const = 0;
@@ -126,6 +137,20 @@ public:
         ///<        Some implmenetations of this interface may choose to only
         ///<        handle requests on secure ports.
         ///< \returns true iff the route can handle the given request.
+
+    virtual Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request) = 0;
+        ///< \brief Creates a new HTTPRequestHandler for the given request.
+        ///< \details Before this is called, it is expected that the calling
+        ///<        server has confirmed that this route is capable of handling
+        ///<        the request by calling canHandleRequest().
+        ///< \param request The HTTPServerRequest to be passed to the handler.
+        ///< \returns An HTTPRequestHandler that will handle the request.
+
+    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
+                               Poco::Net::HTTPServerResponse& response) = 0;
+        ///< \brief Handle an HTTPServerRequest with an HTTPServerResponse.
+        ///< \param request The HTTPServerRequest to handle.
+        ///< \param response The HTTPServerResponse to return.
 
 };
 

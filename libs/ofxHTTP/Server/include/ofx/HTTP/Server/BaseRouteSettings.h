@@ -35,22 +35,48 @@ namespace HTTP {
 
 
 class BaseRouteSettings
+    /// \brief A base implementation of route settings.
+    /// \details These settings define the basic information needed
+    ///         to implement BaseRoute::canHandleRequest() method.
 {
 public:
     BaseRouteSettings(const std::string& routePathPattern = BaseRouteSettings::DEFAULT_ROUTE_PATH_PATTERN);
+        ///< \brief Create the BaseRouteSettings using the given route path.
+        ///< \param routePathPattern The regex pattern that this route
+        ///<        will handle.
+
     virtual ~BaseRouteSettings();
+        ///< \brief Destroy the BaseRoutSettings.
 
     void setRoutePathPattern(const std::string& routePathPattern);
+        ///< \brief Set the route path regex pattern.
+        ///< \param routePathPattern The regex pattern that this route
+        ///<        will handle.
+
     std::string getRoutePathPattern() const;
+        ///< \returns The regex pattern that this route handles.
 
     void setRequireSecurePort(bool requireSecurePort);
+        ///< \brief Set the secure port requirement.
+        ///< \param requireSecurePort Set to true if this route
+        ///<        can only handle requests submitted on an SSL
+        ///<        encrypted port.
+
     bool getRequireSecurePort() const;
+        ///< \returns true iff this route requires communication on
+        ///<        an SSL encrypted port.
 
     static const std::string DEFAULT_ROUTE_PATH_PATTERN;
+        ///< \brief The default route path regex pattern.
+        ///< \details By default, this pattern matches all requests.
 
 private:
     std::string _routePathPattern;
+        ///< \brief the route's regex route pattern.
+
     bool _requireSecurePort;
+    ///< \brief true if this route can only handle requests submitted on
+    ///<        an SSL encrypted port.
 
 };
 

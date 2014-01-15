@@ -40,7 +40,11 @@ class BaseRouteHandler: public AbstractRouteHandler
 {
 public:
     BaseRouteHandler(Poco::Net::HTTPRequestHandler& defaultHandler);
+        ///< \brief Create a BaseRouteHandler with the given handler reference.
+        ///< \param defaultHandler The default HTTPRequestHandler to use.
+
     virtual ~BaseRouteHandler();
+        ///< \brief Destroy the BaseRouteHandler.
 
     virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
                                Poco::Net::HTTPServerResponse& response);

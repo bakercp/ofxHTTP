@@ -38,6 +38,10 @@ class BaseWebSocketSessionManager;
 
 
 class WebSocketRouteInterface: public BaseRoute
+    /// \brief Defines a base interface for a WebSocketRoute.
+    /// \details This interface is intended to provide a way for
+    ///         WebSocketConnections to get session information and settings
+    ///         from the parent WebSocketRoute.
 {
 public:
     WebSocketRouteInterface()
@@ -51,7 +55,11 @@ public:
     }
     
     virtual WebSocketRouteSettings getSettings() const = 0;
+        ///< \returns the WebSocketRouteSettings.
+
     virtual BaseWebSocketSessionManager& getSessionManagerRef() = 0;
+        ///< \returns a reference to the BaseWebSocketSessionManager.
+
 };
 
 

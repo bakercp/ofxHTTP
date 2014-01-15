@@ -145,7 +145,6 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
     }
     catch (const Poco::Net::WebSocketException& exc)
     {
-
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "WebSocketException: " << exc.code() << " Desc: " << exc.what();
 
         switch (exc.code())

@@ -42,11 +42,14 @@ namespace HTTP {
 
 
 class BaseRoute: public AbstractRoute
+    /// \brief The base implmentation of a server route.
 {
 public:
     BaseRoute();
+        ///< \brief Create a BaseRoute.
 
     virtual ~BaseRoute();
+        ///< \brief Destroy a BaseRoute.
 
     virtual std::string getRoutePathPattern() const;
 
@@ -57,6 +60,7 @@ public:
 
     virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
                                Poco::Net::HTTPServerResponse& response);
+        
 
     virtual void stop();
 
