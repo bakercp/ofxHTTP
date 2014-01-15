@@ -24,6 +24,7 @@
 
 
 #include "ofx/HTTP/WebSocket/WebSocketRoute.h"
+#include "ofx/HTTP/WebSocket/WebSocketConnection.h"
 
 
 namespace ofx {
@@ -106,10 +107,88 @@ WebSocketRouteSettings WebSocketRoute::getSettings() const
     return _settings;
 }
 
-BaseWebSocketSessionManager& WebSocketRoute::getSessionManagerRef()
+
+bool WebSocketRoute::sendFrame(const AbstractWebSocketConnection* connection,
+                                            const WebSocketFrame& frame)
 {
-    return *this;
+    if(0 != connection)
+    {
+        return connection->sendFrame(frame);
+    }
+    else
+    {
+        ofLogError("BaseWebSocketSessionManager::sendFrame") << "0 == handler";
+        return false;
+    }
 }
+
+
+void WebSocketRoute::close(AbstractWebSocketConnection* connection)
+{
+    if(0 != connection)
+    {
+        connection->close();
+    }
+    else
+    {
+        ofLogError("BaseWebSocketSessionManager::disconnect") << "0 == handler";
+    }
+}
+
+
+void WebSocketRoute::close()
+{
+    ofScopedLock lock(_mutex);
+    WebSocketConnectionsIter iter = _connections.begin();
+    while(iter != _connections.end())
+    {
+        close(*iter);
+        ++iter;
+    }
+}
+
+
+void WebSocketRoute::broadcast(const WebSocketFrame& frame)
+{
+    ofScopedLock lock(_mutex);
+    WebSocketConnectionsIter iter = _connections.begin();
+    while(iter != _connections.end())
+    {
+        sendFrame(*iter,frame);
+        ++iter;
+    }
+}
+
+
+void WebSocketRoute::registerWebSocketConnection(AbstractWebSocketConnection* connection)
+{
+    ofScopedLock lock(_mutex);
+    if(!_connections.insert(connection).second)
+    {
+        ofLogError("BaseWebSocketSessionManager::registerRouteHandler") << "Element was already in set!";
+    }
+}
+
+
+void WebSocketRoute::unregisterWebSocketConnection(AbstractWebSocketConnection* connection)
+{
+    ofScopedLock lock(_mutex);
+    // TODO, this will never return more than 1
+    std::size_t numErased = _connections.erase(connection);
+
+    if(1 != numErased)
+    {
+        ofLogError("BaseWebSocketSessionManager::unregisterRouteHandler") << "1 != numErased" << numErased;
+    }
+}
+
+
+std::size_t WebSocketRoute::getNumWebSocketConnections() const
+{
+    ofScopedLock lock(_mutex);
+    return _connections.size();
+}
+
 
 
 } } // namespace ofx::HTTP

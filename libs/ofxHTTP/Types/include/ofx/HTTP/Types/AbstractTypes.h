@@ -38,27 +38,55 @@ namespace ofx {
 namespace HTTP {
 
 
-class AbstractInterruptible
-    /// \brief Defines an abstract interface for stopping subclasses.
-{
-public:
-    virtual ~AbstractInterruptible()
-        /// \brief Destroy the AbstractInterruptible instance.
-    {
-    }
-
-    virtual void stop() = 0;
-        ///< \brief Interrupt the activity defined in the subclass.
-    
-};
-
-
 class WebSocketFrame;
 
 
-class AbstractWebSocketConnection:
-    public AbstractInterruptible
-    /// \brief Defines an abstract interface for sending a WebSocketFrame.
+class AbstractHTTPRequestHandler: public Poco::Net::HTTPRequestHandler
+    /// \brief An AbstractHTTPRequestHandler.
+    /// \note This layer of abstraction is to make documentation simpler.
+{
+public:
+    virtual ~AbstractHTTPRequestHandler()
+        ///< \brief Destroy the AbstractHTTPRequestHandler.
+    {
+    }
+
+    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
+                               Poco::Net::HTTPServerResponse& response) = 0;
+        ///< \brief Handle an HTTPServerRequest with an HTTPServerResponse.
+        ///< \param request The HTTPServerRequest to handle.
+        ///< \param response The HTTPServerResponse to return.
+        ///< \note Redeclared here for documentation puposes.
+
+};
+
+
+
+class AbstractHTTPRequestHandlerFactory:
+    public Poco::Net::HTTPRequestHandlerFactory
+    /// \brief An AbstractHTTPRequestHandlerFactory.
+    /// \note This layer of abstraction is to make documentation simpler.
+{
+public:
+    virtual ~AbstractHTTPRequestHandlerFactory()
+        ///< \brief Destroy the AbstractHTTPRequestHandlerFactory.
+    {
+    }
+
+    virtual Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request) = 0;
+        ///< \brief Creates a new HTTPRequestHandler for the given request.
+        ///< \details Before this is called, it is expected that the calling
+        ///<        server has confirmed that this route is capable of handling
+        ///<        the request by calling canHandleRequest().
+        ///< \param request The HTTPServerRequest to be passed to the handler.
+        ///< \returns An HTTPRequestHandler that will handle the request.
+        ///< \note Redeclared here for documentation puposes.
+
+};
+
+
+class AbstractWebSocketConnection: public AbstractHTTPRequestHandler
+    /// \brief Defines an interface for handling a websocket connection.
 {
 public:
     virtual ~AbstractWebSocketConnection()
@@ -66,17 +94,19 @@ public:
     {
     }
 
+
     virtual bool sendFrame(const WebSocketFrame& frame) const = 0;
         ///< \brief Send a WebSocketFrame using this connection.
         ///< \param frame The WebSocketFrame to send.
         ///< \returns true iff the sending operation was successful.
 
+    virtual void close() = 0;
+        ///< \brief Close the connection.
+
 };
 
 
-class AbstractRouteHandler:
-    public AbstractInterruptible,
-    public Poco::Net::HTTPRequestHandler
+class AbstractRouteHandler: public AbstractHTTPRequestHandler
     /// \brief Defines an abstract HTTP route handler.
     /// \details Route handlers are invoked in route handling threads
     ///         created by classes that inherit from AbstractRoute.
@@ -93,19 +123,12 @@ public:
     {
     }
 
-    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
-                               Poco::Net::HTTPServerResponse& response) = 0;
-        ///< \brief Handle an HTTPServerRequest with an HTTPServerResponse.
-        ///< \param request The HTTPServerRequest to handle.
-        ///< \param response The HTTPServerResponse to return.
-
 };
 
 
 class AbstractRoute:
-    public AbstractInterruptible,
-    public Poco::Net::HTTPRequestHandler,
-    public Poco::Net::HTTPRequestHandlerFactory
+    public AbstractHTTPRequestHandler,
+    public AbstractHTTPRequestHandlerFactory
     /// \brief Defines an abstract HTTP server route.
 {
 public:
@@ -138,19 +161,9 @@ public:
         ///<        handle requests on secure ports.
         ///< \returns true iff the route can handle the given request.
 
-    virtual Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request) = 0;
-        ///< \brief Creates a new HTTPRequestHandler for the given request.
-        ///< \details Before this is called, it is expected that the calling
-        ///<        server has confirmed that this route is capable of handling
-        ///<        the request by calling canHandleRequest().
-        ///< \param request The HTTPServerRequest to be passed to the handler.
-        ///< \returns An HTTPRequestHandler that will handle the request.
-
-    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
-                               Poco::Net::HTTPServerResponse& response) = 0;
-        ///< \brief Handle an HTTPServerRequest with an HTTPServerResponse.
-        ///< \param request The HTTPServerRequest to handle.
-        ///< \param response The HTTPServerResponse to return.
+    virtual void stop() = 0;
+        ///< \brief Stop any pending activity and close this route.
+        ///< \details This method may block until the route is fully stopped.
 
 };
 

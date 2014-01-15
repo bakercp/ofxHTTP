@@ -36,10 +36,8 @@
 #include "ofLog.h"
 #include "ofx/HTTP/Types/AbstractTypes.h"
 #include "ofx/HTTP/Server/BaseRouteHandler.h"
-#include "ofx/HTTP/WebSocket/BaseWebSocketSessionManager.h"
 #include "ofx/HTTP/WebSocket/WebSocketConnection.h"
 #include "ofx/HTTP/WebSocket/WebSocketRouteSettings.h"
-#include "ofx/HTTP/WebSocket/WebSocketRouteInterface.h"
 #include "ofx/HTTP/WebSocket/WebSocketEvents.h"
 #include "ofx/HTTP/WebSocket/WebSocketFrame.h"
 #include "ofx/HTTP/Utils/Utils.h"
@@ -47,6 +45,9 @@
 
 namespace ofx {
 namespace HTTP {
+
+
+class WebSocketRoute;
 
 
 // TODO: move default constants to enum
@@ -63,7 +64,7 @@ public:
     typedef WebSocketRouteSettings Settings;
         ///< \brief A typedef for Settings.
 
-    WebSocketRouteHandler(WebSocketRouteInterface& parent);
+    WebSocketRouteHandler(WebSocketRoute& parent);
         ///< \brief Create a WebSocketRouteHandler with a reference to
         ///<        its parent route.
         ///< \param parent A reference to the parent route.  Used for
@@ -76,7 +77,7 @@ public:
                                Poco::Net::HTTPServerResponse& response);
 
 private:
-    WebSocketRouteInterface& _parent;
+    WebSocketRoute& _parent;
         ///< \brief The parent WebSocketRouteInterface.
 
 };

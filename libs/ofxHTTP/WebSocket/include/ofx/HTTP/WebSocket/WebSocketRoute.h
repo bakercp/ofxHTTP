@@ -26,9 +26,11 @@
 #pragma once
 
 
+#include <set>
+#include "ofx/HTTP/Server/BaseRoute.h"
 #include "ofx/HTTP/Types/AbstractTypes.h"
 #include "ofx/HTTP/WebSocket/WebSocketRouteHandler.h"
-#include "ofx/HTTP/WebSocket/WebSocketRouteInterface.h"
+#include "ofx/HTTP/WebSocket/WebSocketRouteSettings.h"
 #include "ofx/HTTP/WebSocket/WebSocketEvents.h"
 
 
@@ -36,9 +38,7 @@ namespace ofx {
 namespace HTTP {
 
 
-class WebSocketRoute:
-    public BaseWebSocketSessionManager,
-    public WebSocketRouteInterface
+class WebSocketRoute: public BaseRoute
 {
 public:
     typedef std::shared_ptr<WebSocketRoute> SharedPtr;
@@ -46,7 +46,10 @@ public:
     typedef WebSocketRouteSettings Settings;
 
     WebSocketRoute(const Settings& settings);
+        ///< \brief Create a WebSocketRoute with the given Settings.
+
     virtual ~WebSocketRoute();
+        ///< \brief Destroy the WebSocketRoute.
 
     virtual std::string getRoutePathPattern() const;
 
@@ -57,8 +60,29 @@ public:
 
     virtual void stop();
 
+    bool sendFrame(const AbstractWebSocketConnection* connection,
+                   const WebSocketFrame& frame);
+
+    void broadcast(const WebSocketFrame& frame);
+
+    void close(AbstractWebSocketConnection* connection);
+
+    void close();
+
+    template<class ListenerClass>
+    void registerWebSocketEvents(ListenerClass* listener);
+
+    template<class ListenerClass>
+    void unregisterWebSocketEvents(ListenerClass* listener);
+
+    void registerWebSocketConnection(AbstractWebSocketConnection* connection);
+    void unregisterWebSocketConnection(AbstractWebSocketConnection* connection);
+
+    std::size_t getNumWebSocketConnections() const;
+
+    WebSocketEvents events;
+
     WebSocketRouteSettings getSettings() const;
-    BaseWebSocketSessionManager& getSessionManagerRef();
 
     static SharedPtr makeShared(const Settings& settings)
     {
@@ -67,8 +91,41 @@ public:
 
 private:
     Settings _settings;
-    
+
+    typedef std::set<AbstractWebSocketConnection*>              WebSocketConnections;
+    typedef std::set<AbstractWebSocketConnection*>::iterator    WebSocketConnectionsIter;
+    typedef std::map<std::string,WebSocketEvents>               EventMap;
+    typedef std::map<std::string,WebSocketEvents>::iterator     EventMapIter;
+
+    WebSocketConnections _connections;
+
+    EventMap _eventMap;
+
+    mutable ofMutex _mutex; // locks the handlers set
+
 };
+
+
+template<class ListenerClass>
+void WebSocketRoute::registerWebSocketEvents(ListenerClass* listener)
+{
+    ofAddListener(events.onOpenEvent, listener, &ListenerClass::onWebSocketOpenEvent);
+    ofAddListener(events.onCloseEvent,listener, &ListenerClass::onWebSocketCloseEvent);
+    ofAddListener(events.onFrameReceivedEvent, listener, &ListenerClass::onWebSocketFrameReceivedEvent);
+    ofAddListener(events.onFrameSentEvent,listener,&ListenerClass::onWebSocketFrameSentEvent);
+    ofAddListener(events.onErrorEvent,listener,&ListenerClass::onWebSocketErrorEvent);
+}
+
+
+template<class ListenerClass>
+void WebSocketRoute::unregisterWebSocketEvents(ListenerClass* listener)
+{
+    ofRemoveListener(events.onOpenEvent,listener,&ListenerClass::onWebSocketOpenEvent);
+    ofRemoveListener(events.onCloseEvent,listener,&ListenerClass::onWebSocketCloseEvent);
+    ofRemoveListener(events.onFrameReceivedEvent,listener,&ListenerClass::onWebSocketFrameReceivedEvent);
+    ofRemoveListener(events.onFrameSentEvent,listener,&ListenerClass::onWebSocketFrameSentEvent);
+    ofRemoveListener(events.onErrorEvent,listener,&ListenerClass::onWebSocketErrorEvent);
+}
 
 
 } } // namespace ofx::HTTP

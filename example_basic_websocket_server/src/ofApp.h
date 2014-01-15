@@ -28,16 +28,10 @@
 
 #include "ofMain.h"
 #include "ofxJSONElement.h"
-#include "BasicWebSocketServer.h"
-#include "WebSocketEvents.h"
-#include "WebSocketRoute.h"
+#include "ofxHTTP.h"
 
 
-using ofx::HTTP::BasicWebSocketServer;
-using ofx::HTTP::BasicWebSocketServerSettings;
-using ofx::HTTP::WebSocketEventArgs;
-using ofx::HTTP::WebSocketFrameEventArgs;
-using ofx::HTTP::WebSocketRoute;
+using namespace ofx;
 
 
 class ofApp: public ofBaseApp
@@ -47,14 +41,14 @@ public:
     void update();
     void draw();
 
-    void onWebSocketOpenEvent(WebSocketEventArgs& evt);
-    void onWebSocketCloseEvent(WebSocketEventArgs& evt);
-    void onWebSocketFrameReceivedEvent(WebSocketFrameEventArgs& evt);
-    void onWebSocketFrameSentEvent(WebSocketFrameEventArgs& evt);
-    void onWebSocketErrorEvent(WebSocketEventArgs& evt);
+    void onWebSocketOpenEvent(HTTP::WebSocketEventArgs& evt);
+    void onWebSocketCloseEvent(HTTP::WebSocketEventArgs& evt);
+    void onWebSocketFrameReceivedEvent(HTTP::WebSocketFrameEventArgs& evt);
+    void onWebSocketFrameSentEvent(HTTP::WebSocketFrameEventArgs& evt);
+    void onWebSocketErrorEvent(HTTP::WebSocketEventArgs& evt);
 
     ofColor bgColor;
 
-    BasicWebSocketServer::SharedPtr server;
+    HTTP::BasicWebSocketServer::SharedPtr server;
 
 };

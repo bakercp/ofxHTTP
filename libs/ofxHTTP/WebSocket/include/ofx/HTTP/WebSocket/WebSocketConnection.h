@@ -35,8 +35,6 @@
 #include "ofFileUtils.h"
 #include "ofLog.h"
 #include "ofx/HTTP/Types/AbstractTypes.h"
-#include "ofx/HTTP/WebSocket/BaseWebSocketSessionManager.h"
-#include "ofx/HTTP/WebSocket/WebSocketRouteInterface.h"
 #include "ofx/HTTP/WebSocket/WebSocketRouteSettings.h"
 #include "ofx/HTTP/WebSocket/WebSocketEvents.h"
 #include "ofx/HTTP/WebSocket/WebSocketFrame.h"
@@ -47,9 +45,10 @@ namespace ofx {
 namespace HTTP {
 
 
-class WebSocketConnection:
-    public AbstractWebSocketConnection,
-    public Poco::Net::HTTPRequestHandler
+class WebSocketRoute;
+
+
+class WebSocketConnection: public AbstractWebSocketConnection
     /// \brief A thread safe WebSocketConnection represents a
     ///         WebSocket connection with a single client.
     /// \details Frames can be sent across thread boundaries and are
@@ -57,7 +56,7 @@ class WebSocketConnection:
     ///         service loop.
 {
 public:
-    WebSocketConnection(WebSocketRouteInterface& parent);
+    WebSocketConnection(WebSocketRoute& parent);
         ///< \brief Create a WebSocketConnection.
         ///< \param parent A reference to the parent WebSocketRoute.
 
@@ -75,7 +74,7 @@ public:
         ///< 
         ///< \returns false if frame not queued
 
-    void stop();
+    void close();
 
     virtual void frameReceived(const WebSocketFrame& frame);
         ///< \brief Called when a WebSocketFrame is received.
@@ -113,7 +112,7 @@ public:
         ///< \brief Clears the send queue.
 
 protected:
-    WebSocketRouteInterface& _parent;
+    WebSocketRoute& _parent;
         ///< \brief A reference to the parent WebSocketRoute.
 
 private:

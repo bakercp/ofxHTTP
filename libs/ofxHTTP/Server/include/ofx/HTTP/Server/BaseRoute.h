@@ -55,12 +55,16 @@ public:
 
     virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
                                   bool isSecurePort) const;
+        ///< \brief The canHandleRequest method is called by most subclasses.
+        ///< \details This base method will handle the most basic matching,
+        ///<        including matching the route via the route path pattern
+        ///<        regex and matching on port security.
 
     virtual Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
 
     virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
                                Poco::Net::HTTPServerResponse& response);
-        
+
 
     virtual void stop();
 

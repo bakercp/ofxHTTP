@@ -84,15 +84,15 @@ void FileSystemRoute::handleRequest(Poco::Net::HTTPServerRequest& request,
             ofLogVerbose("ServerRouteHandler::sendErrorResponse") << "... Unknown exception.";
         }
     }
-    // if nothing is returned, then base route will get it
 
-    BaseRoute::handleRequest(request,response);
+    // if nothing is returned, then base route will get it
+    BaseRoute::handleRequest(request, response);
 }
 
 
 Poco::Net::HTTPRequestHandler* FileSystemRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
 {
-  return new FileSystemRouteHandler(*this);
+    return new FileSystemRouteHandler(*this);
 }
 
 

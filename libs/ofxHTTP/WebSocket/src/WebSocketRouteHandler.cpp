@@ -24,13 +24,14 @@
 
 
 #include "ofx/HTTP/WebSocket/WebSocketRouteHandler.h"
+#include "ofx/HTTP/WebSocket/WebSocketRoute.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-WebSocketRouteHandler::WebSocketRouteHandler(WebSocketRouteInterface& parent):
+WebSocketRouteHandler::WebSocketRouteHandler(WebSocketRoute& parent):
     BaseRouteHandler(parent),
     _parent(parent)
 {
@@ -46,9 +47,9 @@ void WebSocketRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
                                           Poco::Net::HTTPServerResponse& response)
 {
     WebSocketConnection connection(_parent);
-    _parent.getSessionManagerRef().registerWebSocketConnection(&connection);
+    _parent.registerWebSocketConnection(&connection);
     connection.handleRequest(request, response);
-    _parent.getSessionManagerRef().unregisterWebSocketConnection(&connection);
+    _parent.unregisterWebSocketConnection(&connection);
     // done!
 }
 
