@@ -39,17 +39,16 @@ namespace HTTP {
 
 
 class AbstractInterruptible
+    /// \brief Provides and abstract interface for stopping subclasses.
 {
 public:
-    AbstractInterruptible()
-    {
-    }
-
     virtual ~AbstractInterruptible()
+        /// \brief Destroy the AbstractInterruptible instance.
     {
     }
 
     virtual void stop() = 0;
+        ///< \brief Interrupt the activity defined in the subclass. 
     
 };
 
@@ -59,17 +58,18 @@ class WebSocketFrame;
 
 class AbstractWebSocketConnection:
     public AbstractInterruptible
+    /// \brief Provides an abstract interface for sending a WebSocketFrame.
 {
 public:
-    AbstractWebSocketConnection()
-    {
-    }
-
     virtual ~AbstractWebSocketConnection()
+        ///< \brief Destroy the AbstractWebSocketConnection instance.
     {
     }
 
     virtual bool sendFrame(const WebSocketFrame& frame) const = 0;
+        ///< \brief Send a WebSocketFrame using this connection.
+        ///< \param frame The WebSocketFrame to send.
+        ///< \returns true iff the sending operation was successful.
 
 };
 
@@ -77,17 +77,19 @@ public:
 class AbstractRouteHandler:
     public AbstractInterruptible,
     public Poco::Net::HTTPRequestHandler
+    /// \brief Defines and abstract HTTP route handler.
+    /// \details Route handlers are invoked in route handling threads
+    ///         created by classes that inherit from AbstractRoute.
 {
 public:
     typedef std::shared_ptr<AbstractRouteHandler> SharedPtr;
-    typedef std::weak_ptr<AbstractRouteHandler> WeakPtr;
+        ///< \brief A typedef for a shared pointer.
 
-    
-    AbstractRouteHandler()
-    {
-    }
+    typedef std::weak_ptr<AbstractRouteHandler> WeakPtr;
+        ///< \brief A typedef for a weak pointer.
 
     virtual ~AbstractRouteHandler()
+        ///< \brief Destroy the AbstractRouteHandler instance.
     {
     }
 
@@ -98,24 +100,32 @@ class AbstractRoute:
     public AbstractInterruptible,
     public Poco::Net::HTTPRequestHandler,
     public Poco::Net::HTTPRequestHandlerFactory
+    /// \brief Defines an abstract HTTP server route.
 {
 public:
     typedef std::shared_ptr<AbstractRoute> SharedPtr;
-    typedef std::weak_ptr<AbstractRoute> WeakPtr;
+        ///< \brief A typedef for a shared pointer.
 
-    AbstractRoute()
-    {
-    }
+    typedef std::weak_ptr<AbstractRoute> WeakPtr;
+        ///< \brief A typedef for a weak pointer.
 
     virtual ~AbstractRoute()
+        ///< \brief Destroy the AbstractRoute instance.
     {
     }
 
     virtual std::string getRoutePathPattern() const = 0;
+        ///< \returns The Route path regex pattern.
 
     virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
                                   bool isSecurePort) const = 0;
-
+        ///< \brief Determine if this route can handle the given request.
+        ///< \param request The incoming Poco::Net::HTTPServerRequest to be
+        ///<        tested.
+        ///< \param isSecurePort true iff the connection is SSL encrypted.
+        ///<        Some implmenetations of this interface may choose to only
+        ///<        handle requests on secure ports.
+        ///< \returns true iff the route can handle the given request.
 
 };
 
