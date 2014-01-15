@@ -48,7 +48,7 @@ public:
     }
 
     virtual void stop() = 0;
-        ///< \brief Interrupt the activity defined in the subclass. 
+        ///< \brief Interrupt the activity defined in the subclass.
     
 };
 

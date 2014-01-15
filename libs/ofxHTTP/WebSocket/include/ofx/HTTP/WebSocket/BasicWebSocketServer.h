@@ -38,29 +38,45 @@ namespace HTTP {
 class BasicWebSocketServerSettings:
     public WebSocketRouteSettings,
     public BasicServerSettings
+    /// \brief Aggregate settings for a BasicWebSocketServer.
 {
 };
 
 
 class BasicWebSocketServer: public BasicServer
+    /// \brief A basic implementation of an HTTP Server supporting WebSockets.
 {
 public:
     typedef std::shared_ptr<BasicWebSocketServer> SharedPtr;
+        ///< \brief A typedef for a shared pointer.
+
     typedef std::weak_ptr<BasicWebSocketServer>   WeakPtr;
+        ///< \brief A typedef for a weak pointer.
+
     typedef BasicWebSocketServerSettings          Settings;
+        ///< \brief A typedef for the BasicWebSocketServerSettings.
 
     BasicWebSocketServer(const Settings& settings = Settings());
+        ///< \brief Create a BasicWebSocketServer with the provided Settings.
+        ///< \param settings The Settings used to configure the server.
+
     virtual ~BasicWebSocketServer();
+        ///< \brief Destroy the BasicWebSocketServer.
 
     WebSocketRoute::SharedPtr getWebSocketRoute();
+        ///< \returns the WebSocketRoute attached to this server.
 
-    // this method is a hack replacement for std::make_shared<BasicServer>(...);
     static SharedPtr makeShared(const Settings& settings = Settings())
+        ///< \brief Construct a shared pointer to this server.
+        ///< \param settings The Settings used to configure the server.
+        ///< \note This will be replaced with C++11 (std::make_shared<...>).
     {
         return SharedPtr(new BasicWebSocketServer(settings));
     }
+
 private:
     WebSocketRoute::SharedPtr _webSocketRoute;
+        ///< \brief The WebSocketRoute attached to this server.
     
 };
 
