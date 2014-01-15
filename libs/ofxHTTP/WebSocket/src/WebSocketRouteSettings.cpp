@@ -38,7 +38,6 @@ WebSocketRouteSettings::WebSocketRouteSettings(const std::string& routePathPatte
     _subprotocol(""),
     _allowEmptySubprotocol(false),
     _allowCrossOriginConnections(false),
-//    _isBinary(false),
     _autoPingPongResponse(true),
     _keepAlive(true),
     _receiveTimeout(Poco::Timespan(60 * Poco::Timespan::SECONDS)),
@@ -88,18 +87,6 @@ bool WebSocketRouteSettings::getAllowCrossOriginConnections() const
 {
     return _allowCrossOriginConnections;
 }
-
-
-//void WebSocketRouteSettings::setIsBinary(bool isBinary)
-//{
-//    _isBinary = isBinary;
-//}
-
-
-//bool WebSocketRouteSettings::getIsBinary() const
-//{
-//    return _isBinary;
-//}
 
 
 void WebSocketRouteSettings::setAutoPingPongResponse(bool autoPingPongResponse)

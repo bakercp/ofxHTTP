@@ -26,8 +26,8 @@
 #pragma once
 
 
+#include "ofx/HTTP/Server/BaseRoute.h"
 #include "ofx/HTTP/Server/FileSystemRouteHandler.h"
-#include "ofx/HTTP/Server/FileSystemRouteInterface.h"
 #include "ofx/HTTP/Server/FileSystemRouteSettings.h"
 
 
@@ -35,7 +35,7 @@ namespace ofx {
 namespace HTTP {
 
 
-class FileSystemRoute: public FileSystemRouteInterface
+class FileSystemRoute: public BaseRoute
 {
 public:
     typedef std::shared_ptr<FileSystemRoute> SharedPtr;

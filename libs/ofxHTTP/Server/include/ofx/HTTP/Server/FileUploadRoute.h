@@ -26,9 +26,9 @@
 #pragma once
 
 
+#include "ofx/HTTP/Server/BaseRoute.h"
 #include "ofx/HTTP/Server/FileUploadRouteEvents.h"
 #include "ofx/HTTP/Server/FileUploadRouteHandler.h"
-#include "ofx/HTTP/Server/FileUploadRouteInterface.h"
 #include "ofx/HTTP/Server/FileUploadRouteSettings.h"
 
 
@@ -36,7 +36,7 @@ namespace ofx {
 namespace HTTP {
 
 
-class FileUploadRoute: public FileUploadRouteInterface
+class FileUploadRoute: public BaseRoute
 {
 public:
     typedef std::shared_ptr<FileUploadRoute>    SharedPtr;

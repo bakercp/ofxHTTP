@@ -35,7 +35,6 @@
 #include "ofFileUtils.h"
 #include "ofLog.h"
 #include "ofx/HTTP/Types/AbstractTypes.h"
-#include "ofx/HTTP/Server/BaseRouteHandler.h"
 #include "ofx/HTTP/WebSocket/WebSocketConnection.h"
 #include "ofx/HTTP/WebSocket/WebSocketRouteSettings.h"
 #include "ofx/HTTP/WebSocket/WebSocketEvents.h"
@@ -51,7 +50,7 @@ class WebSocketRoute;
 
 
 // TODO: move default constants to enum
-class WebSocketRouteHandler: public BaseRouteHandler
+class WebSocketRouteHandler: public AbstractRouteHandler
     /// \brief A WebSocketRouteHandler registers new WebSocketConnections.
     /// \details Upon creating a new WebSocketConnection, the connection is
     ///         returned to the parent WebSocketRoute for management via

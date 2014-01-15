@@ -32,7 +32,6 @@ namespace HTTP {
 
 
 WebSocketRouteHandler::WebSocketRouteHandler(WebSocketRoute& parent):
-    BaseRouteHandler(parent),
     _parent(parent)
 {
 }

@@ -74,14 +74,6 @@ public:
     bool getAllowCrossOriginConnections() const;
         ///< \returns true if these settings allow cross origin connections.
 
-//    void setIsBinary(bool isBinary);
-//        ///< \brief Allow WebSocket connections that do not define a protocol.
-//        ///< \param allowEmptySubprotocol true if this WebSocketRouteSettings
-//        ///<        supports WebSocket connections with empty protocols.
-//
-//    bool getIsBinary() const;
-//        ///< \returns truee
-
     void setAutoPingPongResponse(bool autoPingPongResponse);
 
     bool getAutoPingPongResponse() const;
@@ -113,8 +105,6 @@ private:
 
     bool _allowEmptySubprotocol;
     bool _allowCrossOriginConnections;
-
-//    bool _isBinary;
 
     bool _autoPingPongResponse; // automatically return pong frames if true
     bool _keepAlive;

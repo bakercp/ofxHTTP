@@ -44,7 +44,6 @@
 #include "ofEvents.h"
 #include "ofx/HTTP/Types/AbstractTypes.h"
 #include "ofx/HTTP/Server/BaseRoute.h"
-#include "ofx/HTTP/Server/BaseRouteHandler.h"
 #include "ofx/HTTP/Server/BaseServerSettings.h"
 #include "ofx/HTTP/Types/ThreadErrorHandler.h"
 

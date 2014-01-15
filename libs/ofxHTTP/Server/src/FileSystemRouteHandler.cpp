@@ -24,15 +24,13 @@
 
 
 #include "ofx/HTTP/Server/FileSystemRouteHandler.h"
-#include "ofx/HTTP/Server/FileSystemRouteSettings.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-FileSystemRouteHandler::FileSystemRouteHandler(FileSystemRouteInterface& parent):
-    BaseRouteHandler(parent),
+FileSystemRouteHandler::FileSystemRouteHandler(FileSystemRoute& parent):
     _parent(parent)
 {
 }

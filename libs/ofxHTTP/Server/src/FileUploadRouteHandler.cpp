@@ -24,6 +24,7 @@
 
 
 #include "ofx/HTTP/Server/FileUploadRouteHandler.h"
+#include "ofx/HTTP/Server/FileUploadRoute.h"
 
 
 namespace ofx {
@@ -31,8 +32,7 @@ namespace HTTP {
 
 
 
-FileUploadRouteHandler::FileUploadRouteHandler(FileUploadRouteInterface& parent):
-    BaseRouteHandler(parent),
+FileUploadRouteHandler::FileUploadRouteHandler(FileUploadRoute& parent):
     _parent(parent),
     contentLength(0)
 {

@@ -39,7 +39,7 @@ namespace ofx {
 namespace HTTP {
 
 
-class IPVideoRoute: public IPVideoRouteInterface
+class IPVideoRoute: public BaseRoute
 {
 public:
     typedef std::shared_ptr<IPVideoRoute> SharedPtr;

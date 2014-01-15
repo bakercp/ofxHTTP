@@ -24,14 +24,14 @@
 
 
 #include "ofx/HTTP/IPVideo/IPVideoRouteHandler.h"
+#include "ofx/HTTP/IPVideo/IPVideoRoute.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-IPVideoRouteHandler::IPVideoRouteHandler(IPVideoRouteInterface& parent):
-    BaseRouteHandler(parent),
+IPVideoRouteHandler::IPVideoRouteHandler(IPVideoRoute& parent):
     IPVideoFrameQueue(parent.getSettings().getMaxClientQueueSize()),
     _parent(parent),
     _isRunning(true),

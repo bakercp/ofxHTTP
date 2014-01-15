@@ -39,8 +39,6 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/Net/MediaType.h"
 #include "Poco/Thread.h"
-#include "ofx/HTTP/Server/BaseRouteHandler.h"
-#include "ofx/HTTP/IPVideo/IPVideoRouteInterface.h"
 #include "ofx/HTTP/IPVideo/IPVideoRouteSettings.h"
 #include "ofx/HTTP/IPVideo/IPVideoFrame.h"
 #include "ofx/HTTP/IPVideo/IPVideoFrameSettings.h"
@@ -52,10 +50,13 @@ namespace ofx {
 namespace HTTP {
 
 
-class IPVideoRouteHandler: public BaseRouteHandler, public IPVideoFrameQueue
+class IPVideoRoute;
+
+
+class IPVideoRouteHandler: public AbstractRouteHandler, public IPVideoFrameQueue
 {
 public:
-    IPVideoRouteHandler(IPVideoRouteInterface& parent);
+    IPVideoRouteHandler(IPVideoRoute& parent);
     virtual ~IPVideoRouteHandler();
     
     void handleRequest(Poco::Net::HTTPServerRequest& request,
@@ -70,7 +71,7 @@ public:
 
 protected:
     IPVideoFrameSettings _frameSettings;
-    IPVideoRouteInterface& _parent;
+    IPVideoRoute& _parent;
     bool _isRunning;
 
     unsigned long long _startTime;

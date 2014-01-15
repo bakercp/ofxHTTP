@@ -43,21 +43,23 @@
 #include "ofx/HTTP/Types/AbstractTypes.h"
 #include "ofx/HTTP/Server/FileUploadRouteSettings.h"
 #include "ofx/HTTP/Server/FileUploadRouteEvents.h"
-#include "ofx/HTTP/Server/FileUploadRouteInterface.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
+class FileUploadRoute;
+
+
 class FileUploadRouteHandler:
-    public BaseRouteHandler,
+    public AbstractRouteHandler,
     public Poco::Net::PartHandler
 {
 public:
     typedef FileUploadRouteSettings Settings;
 
-    FileUploadRouteHandler(FileUploadRouteInterface& parent);
+    FileUploadRouteHandler(FileUploadRoute& parent);
     virtual ~FileUploadRouteHandler();
     
     void handleRequest(Poco::Net::HTTPServerRequest& request,
@@ -72,7 +74,7 @@ public:
     virtual bool isContentTypeValid(const std::string& contentType) const;
     
 private:
-    FileUploadRouteInterface& _parent;
+    FileUploadRoute& _parent;
 
     std::size_t contentLength;
 };

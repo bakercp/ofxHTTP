@@ -28,20 +28,23 @@
 
 #include "ofUtils.h"
 #include "ofx/Media/MediaTypeMap.h"
-#include "ofx/HTTP/Server/BaseRouteHandler.h"
-#include "ofx/HTTP/Server/FileSystemRouteInterface.h"
+#include "ofx/HTTP/Server/FileSystemRouteSettings.h"
+#include "ofx/HTTP/Server/FileSystemRoute.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class FileSystemRouteHandler: public BaseRouteHandler
+class FileSystemRoute;
+
+
+class FileSystemRouteHandler: public AbstractRouteHandler
 {
 public:
     typedef FileSystemRouteSettings Settings;
 
-    FileSystemRouteHandler(FileSystemRouteInterface& parent);
+    FileSystemRouteHandler(FileSystemRoute& parent);
 
     virtual ~FileSystemRouteHandler();
 
@@ -49,7 +52,7 @@ public:
                                Poco::Net::HTTPServerResponse& response);
 
 private:
-    FileSystemRouteInterface& _parent;
+    FileSystemRoute& _parent;
 
     
 };

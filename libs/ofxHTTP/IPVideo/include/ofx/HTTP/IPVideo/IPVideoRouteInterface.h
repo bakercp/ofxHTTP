@@ -34,10 +34,10 @@ namespace HTTP {
 
 
 class IPVideoRouteSettings;
-    class IPVideoRouteHandler;
+class IPVideoRouteHandler;
 
 
-class IPVideoRouteInterface: public BaseRoute
+class IPVideoRouteInterface//: public BaseRoute
 {
 public:
     IPVideoRouteInterface()
