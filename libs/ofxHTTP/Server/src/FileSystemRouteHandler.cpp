@@ -135,7 +135,13 @@ void FileSystemRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request
 //            mediaTypeString = "image/x-icon";
 //        }
 
+        std::cout << file.path() << std::endl;
+        std::cout << file.getAbsolutePath() << std::endl;
+
         std::string mediaTypeString = Media::MediaTypeMap::getDefault()->getMediaTypeForPath(file.path()).toString();
+
+        std::cout << mediaTypeString << std::endl;
+        std::cout << "----" << std::endl;
 
         response.sendFile(file.getAbsolutePath(), mediaTypeString);
                           // will throw exceptions
