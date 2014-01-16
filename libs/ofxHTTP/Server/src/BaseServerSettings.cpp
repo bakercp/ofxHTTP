@@ -35,7 +35,6 @@ const unsigned short BaseServerSettings::DEFAULT_PORT = 8080;
 const bool BaseServerSettings::DEFAULT_USE_SSL        = false;
 
 
-
 BaseServerSettings::BaseServerSettings(const std::string& host,
                                        const unsigned short port,
                                        bool useSSL):

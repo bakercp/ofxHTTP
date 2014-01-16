@@ -35,7 +35,7 @@ namespace ofx {
 namespace HTTP {
 
 
-class FileSystemRoute: public BaseRoute
+class FileSystemRoute: public BaseRoute_<FileSystemRouteSettings>
 {
 public:
     typedef std::shared_ptr<FileSystemRoute> SharedPtr;
@@ -48,20 +48,12 @@ public:
     virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
                                Poco::Net::HTTPServerResponse& response);
 
-    virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
-                                  bool isSecurePort) const;
-
     Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
-
-    FileSystemRouteSettings getSettings() const;
 
     static SharedPtr makeShared(const Settings& settings)
     {
         return SharedPtr(new FileSystemRoute(settings));
     }
-
-private:
-    Settings _settings;
 
 };
 

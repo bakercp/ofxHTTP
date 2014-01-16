@@ -24,6 +24,7 @@
 
 
 #include "ofx/HTTP/Server/FileSystemRouteHandler.h"
+#include "ofx/HTTP/Server/FileSystemRoute.h"
 
 
 namespace ofx {
@@ -45,7 +46,7 @@ void FileSystemRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request
                                            Poco::Net::HTTPServerResponse& response)
 {
     Poco::Path dataFolder(ofToDataPath("", true));
-    Poco::Path documentRoot(ofToDataPath(_parent.getSettings().getDocumentRoot(),true));
+    Poco::Path documentRoot(ofToDataPath(_parent.getSettings().getDocumentRoot(), true));
 
     std::string dataFolderString = dataFolder.toString();
     std::string documentRootString = documentRoot.toString();
@@ -96,47 +97,48 @@ void FileSystemRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request
 
     try
     {
-//        ofx::Media::MediaTypeMap mediaMap;
-//        Poco::Net::MediaType mediaType = mediaMap.getMediaTypeForSuffix(file.getExtension());
 
-        std::string mediaTypeString = "application/octet-stream";
-        std::string ext = file.getExtension();
+//        std::string mediaTypeString = "application/octet-stream";
+//        std::string ext = file.getExtension();
+//
+//
+//        if(ext == "json")
+//        {
+//            mediaTypeString = "application/json";
+//        }
+//        else if(ext == "html")
+//        {
+//            mediaTypeString = "text/html";
+//        }
+//        else if(ext == "jpg" || ext == "jpeg")
+//        {
+//            mediaTypeString = "image/jpeg";
+//        }
+//        else if(ext == "png")
+//        {
+//            mediaTypeString = "image/png";
+//        }
+//        else if(ext == "js")
+//        {
+//            mediaTypeString = "application/javascript";
+//        }
+//        else if(ext == "css")
+//        {
+//            mediaTypeString = "text/css";
+//        }
+//        else if(ext == "xml")
+//        {
+//            mediaTypeString = "application/xml";
+//        }
+//        else if(ext == "ico")
+//        {
+//            mediaTypeString = "image/x-icon";
+//        }
 
+        std::string mediaTypeString = Media::MediaTypeMap::getDefault()->getMediaTypeForPath(file.path()).toString();
 
-        if(ext == "json")
-        {
-            mediaTypeString = "application/json";
-        }
-        else if(ext == "html")
-        {
-            mediaTypeString = "text/html";
-        }
-        else if(ext == "jpg" || ext == "jpeg")
-        {
-            mediaTypeString = "image/jpeg";
-        }
-        else if(ext == "png")
-        {
-            mediaTypeString = "image/png";
-        }
-        else if(ext == "js")
-        {
-            mediaTypeString = "application/javascript";
-        }
-        else if(ext == "css")
-        {
-            mediaTypeString = "text/css";
-        }
-        else if(ext == "xml")
-        {
-            mediaTypeString = "application/xml";
-        }
-        else if(ext == "ico")
-        {
-            mediaTypeString = "image/x-icon";
-        }
-
-        response.sendFile(file.getAbsolutePath(), mediaTypeString); // will throw exceptions
+        response.sendFile(file.getAbsolutePath(), mediaTypeString);
+                          // will throw exceptions
         return;
     }
     catch (const Poco::FileNotFoundException& ex)

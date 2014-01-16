@@ -34,9 +34,11 @@ const std::string FileSystemRouteSettings::DEFAULT_DOCUMENT_ROOT = "DocumentRoot
 const std::string FileSystemRouteSettings::DEFAULT_INDEX         = "index.html";
 
 
-
-FileSystemRouteSettings::FileSystemRouteSettings(const std::string& routePathPattern):
-    BaseRouteSettings(routePathPattern),
+FileSystemRouteSettings::FileSystemRouteSettings(const std::string& routePathPattern,
+                                                 bool requireSecurePort):
+    BaseRouteSettings(routePathPattern,
+                      requireSecurePort,
+                      BaseRouteSettings::DEFAULT_HTTP_METHODS),
     _defaultIndex(DEFAULT_INDEX),
     _documentRoot(DEFAULT_DOCUMENT_ROOT),
     _autoCreateDocumentRoot(false),

@@ -28,8 +28,8 @@
 
 #include <algorithm>
 #include "ofImage.h"
+#include "ofx/HTTP/Server/BaseRoute.h"
 #include "ofx/HTTP/IPVideo/IPVideoRouteHandler.h"
-#include "ofx/HTTP/IPVideo/IPVideoRouteInterface.h"
 #include "ofx/HTTP/IPVideo/IPVideoRouteSettings.h"
 #include "ofx/HTTP/IPVideo/IPVideoFrameQueue.h"
 #include "ofx/HTTP/Utils/Utils.h"
@@ -39,7 +39,7 @@ namespace ofx {
 namespace HTTP {
 
 
-class IPVideoRoute: public BaseRoute
+class IPVideoRoute: public BaseRoute_<IPVideoRouteSettings>
 {
 public:
     typedef std::shared_ptr<IPVideoRoute> SharedPtr;
@@ -49,15 +49,9 @@ public:
     IPVideoRoute(const Settings& settings);
     virtual ~IPVideoRoute();
 
-    virtual std::string getRoutePathPattern() const;
-    virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
-                                  bool isSecurePort) const;
-
     Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
 
     void send(ofPixels& pix);
-
-    IPVideoRouteSettings getSettings() const;
 
     void addConnection(IPVideoRouteHandler* handler);
     void removeConnection(IPVideoRouteHandler* handler);
@@ -77,7 +71,7 @@ protected:
 
     Connections _connections;
 
-    Settings _settings;
+//    Settings _settings;
 
     mutable ofMutex _mutex;
 

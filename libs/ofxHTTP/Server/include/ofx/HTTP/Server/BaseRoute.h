@@ -41,38 +41,180 @@ namespace ofx {
 namespace HTTP {
 
 
-class BaseRoute: public AbstractRoute
+template<typename SettingsType>
+class BaseRoute_: public AbstractRoute
     /// \brief The base implmentation of a server route.
 {
 public:
-    BaseRoute();
+    BaseRoute_(const SettingsType& settings = SettingsType());
         ///< \brief Create a BaseRoute.
 
-    virtual ~BaseRoute();
+    virtual ~BaseRoute_();
         ///< \brief Destroy a BaseRoute.
 
     virtual std::string getRoutePathPattern() const;
 
     virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
                                   bool isSecurePort) const;
-        ///< \brief The canHandleRequest method is called by most subclasses.
-        ///< \details This base method will handle the most basic matching,
-        ///<        including matching the route via the route path pattern
-        ///<        regex and matching on port security.
 
     virtual Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
 
     virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
                                Poco::Net::HTTPServerResponse& response);
 
-
     virtual void stop();
 
+    const SettingsType& getSettings() const;
+        ///< \returns the route's Settings.
+
+protected:
+    SettingsType _settings;
+        ///< \brief The settings.
+
 private:
-    BaseRoute(const BaseRoute&);
-	BaseRoute& operator = (const BaseRoute&);
+    BaseRoute_(const BaseRoute_&);
+	BaseRoute_& operator = (const BaseRoute_&);
 
 };
+
+
+typedef BaseRoute_<BaseRouteSettings> BaseRoute;
+    ///< \brief A standard base route implementation.
+
+
+template<typename SettingsType>
+BaseRoute_<SettingsType>::BaseRoute_(const SettingsType& settings):
+    _settings(settings)
+{
+}
+
+
+template<typename SettingsType>
+BaseRoute_<SettingsType>::~BaseRoute_()
+{
+}
+
+
+template<typename SettingsType>
+std::string BaseRoute_<SettingsType>::getRoutePathPattern() const
+{
+    return _settings.getRoutePathPattern();
+}
+
+
+template<typename SettingsType>
+bool BaseRoute_<SettingsType>::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
+                                               bool isSecurePort) const
+{
+    // If this isn't a secure pot and we require that, reject it.
+    if(_settings.requireSecurePort() && !isSecurePort)
+    {
+        return false;
+    }
+
+
+    // Check the request method.
+    const BaseRouteSettings::HTTPMethodSet& validHTTPMethods = _settings.getValidHTTPMethods();
+
+    // If validHTTPMethods are defined, then the request must match.
+    if(!validHTTPMethods.empty() &&
+       validHTTPMethods.find(request.getMethod()) == validHTTPMethods.end())
+    {
+        return false;
+    }
+
+    // require a valid path
+    std::string path = "/";
+
+    try
+    {
+        path = Poco::URI(request.getURI()).getPath();
+    }
+    catch (const Poco::SyntaxException& exc)
+    {
+        ofLogError("BaseRoute::canHandleRequest") << exc.what();
+        return false;
+    }
+
+    if(path.empty())
+    {
+        path = "/";
+    }
+
+    try
+    {
+        // TODO: cache this regex
+        return Poco::RegularExpression(getRoutePathPattern()).match(path);
+    }
+    catch (const Poco::RegularExpressionException& exc)
+    {
+        ofLogError("BaseRoute::canHandleRequest") << exc.what();
+        return false;
+    }
+}
+
+
+template<typename SettingsType>
+Poco::Net::HTTPRequestHandler* BaseRoute_<SettingsType>::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+{
+    return new BaseRouteHandler(*this);
+}
+
+
+template<typename SettingsType>
+void BaseRoute_<SettingsType>::handleRequest(Poco::Net::HTTPServerRequest& request,
+                                            Poco::Net::HTTPServerResponse& response)
+{
+    // We gave the handlers every opportunity to send a response.
+    // Now we must conclude that there is a server error.
+    try
+    {
+        // if we got this far and our status is still marked as 200, that constitutes a server error.
+        if(response.getStatus() == Poco::Net::HTTPResponse::HTTP_OK)
+        {
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR,
+                                        "No handlers for route.");
+        }
+
+        response.setChunkedTransferEncoding(true);
+        response.setContentType("text/html");
+
+        std::ostream& ostr = response.send(); // get output stream
+        ostr << "<html>";
+        ostr << "<head><title>" << response.getStatus() << " - " << response.getReason() << "</title></head>";
+        ostr << "<body>";
+        ostr << "<h1>" << response.getStatus() << " - " << response.getReason() << "</h1>";
+        ostr << "</body>";
+        ostr << "<html>";
+    }
+    catch (const Poco::Exception& exc)
+    {
+        ofLogError("BaseRoute::handleRequest") << "Exception: " << exc.code() << " " << exc.displayText();
+    }
+    catch (const std::exception& exc)
+    {
+        ofLogError("BaseRoute::handleRequest") << "exception: " << exc.what();
+    }
+    catch ( ... )
+    {
+        ofLogError("BaseRoute::handleRequest") << "... Unknown exception.";
+    }
+}
+
+
+template<typename SettingsType>
+void BaseRoute_<SettingsType>::stop()
+{
+    // empty
+}
+
+
+template<typename SettingsType>
+const SettingsType& BaseRoute_<SettingsType>::getSettings() const
+{
+    return _settings;
+}
+
 
 
 } } // namespace ofx::HTTP

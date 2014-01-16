@@ -31,7 +31,7 @@ namespace HTTP {
 
 
 IPVideoRoute::IPVideoRoute(const Settings& settings):
-    _settings(settings)
+    BaseRoute_<IPVideoRouteSettings>(settings)
 {
 }
 
@@ -39,21 +39,6 @@ IPVideoRoute::IPVideoRoute(const Settings& settings):
 IPVideoRoute::~IPVideoRoute()
 {
 }
-
-
-std::string IPVideoRoute::getRoutePathPattern() const
-{
-    return _settings.getRoutePathPattern();
-}
-
-
-bool IPVideoRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
-                                    bool isSecurePort) const
-{
-    return request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET &&
-           BaseRoute::canHandleRequest(request, isSecurePort);
-}
-
 
 Poco::Net::HTTPRequestHandler* IPVideoRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
 {
@@ -70,6 +55,7 @@ void IPVideoRoute::send(ofPixels& pix)
         ofPixels pixels(pix); // copy the pixels (const!)
         ofBuffer compressedPixels;
 
+        // TODO: turbo jpeg an option here?
         ofSaveImage(pixels, compressedPixels, OF_IMAGE_FORMAT_JPEG, OF_IMAGE_QUALITY_MEDIUM);
 
         ofScopedLock lock(_mutex);
@@ -80,7 +66,7 @@ void IPVideoRoute::send(ofPixels& pix)
 //
 //        settings.quality = settings.quality;
 
-        IPVideoFrame::SharedPtr frame = IPVideoFrame::makeShared(settings,timestamp,compressedPixels);
+        IPVideoFrame::SharedPtr frame = IPVideoFrame::makeShared(settings, timestamp, compressedPixels);
 
         while(iter != _connections.end())
         {
@@ -98,12 +84,6 @@ void IPVideoRoute::send(ofPixels& pix)
     } else {
         ofLogError("ofxIpVideoServerRoute::pushFrame") << "Pushing unallocated pixels.";
     }
-}
-
-
-IPVideoRouteSettings IPVideoRoute::getSettings() const
-{
-    return _settings;
 }
 
 

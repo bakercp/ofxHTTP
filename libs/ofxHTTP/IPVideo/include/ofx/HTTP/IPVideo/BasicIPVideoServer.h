@@ -51,9 +51,7 @@ public:
     BasicIPVideoServer(const Settings& settings = Settings());
     virtual ~BasicIPVideoServer();
 
-
     void send(ofPixels& pix);
-
 
     std::size_t getNumConnections() const
     {

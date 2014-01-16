@@ -32,7 +32,7 @@ namespace HTTP {
 
 
 WebSocketRoute::WebSocketRoute(const Settings& settings):
-    _settings(settings)
+    BaseRoute_<WebSocketRouteSettings>(settings)
 {
 }
 
@@ -42,24 +42,10 @@ WebSocketRoute::~WebSocketRoute()
 }
 
 
-std::string WebSocketRoute::getRoutePathPattern() const
-{
-    return _settings.getRoutePathPattern();
-}
-
-
 bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
                                       bool isSecurePort) const
 {
-    
-    // require HTTP_GET
-    if(request.getMethod() != Poco::Net::HTTPRequest::HTTP_GET)
-    {
-        return false;
-    }
-
-    // check route
-    if(!BaseRoute::canHandleRequest(request, isSecurePort))
+    if(!BaseRoute_<WebSocketRouteSettings>::canHandleRequest(request, isSecurePort))
     {
         return false;
     }
@@ -76,7 +62,7 @@ bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& reques
     std::string connectionHeader = Poco::toLower(request.get("Connection", ""));
 
     if(Poco::icompare(connectionHeader, "Upgrade") != 0 &&
-       !ofIsStringInString(connectionHeader,"upgrade"))
+       !ofIsStringInString(connectionHeader, "upgrade"))
     {
         // this request is coming from firefox, which is known to send things that look like:
         // Connection:keep-alive, Upgrade
@@ -86,25 +72,18 @@ bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& reques
     }
     
     return true;
-
 }
 
 
 Poco::Net::HTTPRequestHandler* WebSocketRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
 {
-    return new WebSocketRouteHandler(*this);
+    return new WebSocketConnection(*this);
 }
 
 
 void WebSocketRoute::stop()
 {
-    close(); // TODO: get method signatures in sync ...
-}
-
-
-WebSocketRouteSettings WebSocketRoute::getSettings() const
-{
-    return _settings;
+    close(); // close all connections
 }
 
 
@@ -173,9 +152,10 @@ void WebSocketRoute::registerWebSocketConnection(AbstractWebSocketConnection* co
 void WebSocketRoute::unregisterWebSocketConnection(AbstractWebSocketConnection* connection)
 {
     ofScopedLock lock(_mutex);
-    // TODO, this will never return more than 1
+    // TODO: this will never return more than 1
     std::size_t numErased = _connections.erase(connection);
 
+    // TODO: this is strange.
     if(1 != numErased)
     {
         ofLogError("BaseWebSocketSessionManager::unregisterRouteHandler") << "1 != numErased" << numErased;

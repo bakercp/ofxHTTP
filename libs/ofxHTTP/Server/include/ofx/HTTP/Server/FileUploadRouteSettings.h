@@ -39,48 +39,72 @@ namespace HTTP {
 class FileUploadRouteSettings: public BaseRouteSettings
 {
 public:
-    FileUploadRouteSettings(const std::string& routePathPattern = DEFAULT_UPLOAD_ROUTE);
+    typedef std::set<Poco::Net::MediaType> MediaTypeSet;
+
+    FileUploadRouteSettings(const std::string& routePathPattern = DEFAULT_UPLOAD_ROUTE,
+                            bool requireSecurePort = false);
+        ///< \param routePathPattern The regex pattern that this route
+        ///<        will handle.
+        ///< \param requireSecurePorttrue True if this route requires
+        ///<        communication on an SSL encrypted port.
+
     virtual ~FileUploadRouteSettings();
 
     void setRequireUploadFolderInDataFolder(bool requireUploadFolderInDataFolder);
     bool getRequireUploadFolderInDataFolder() const;
 
     void setUploadFolder(const std::string& uploadFolder);
-    std::string getUploadFolder() const;
+    const std::string& getUploadFolder() const;
 
     void setAutoCreateUploadFolder(bool autoCreateUploadFolder);
     bool getAutoCreateUploadFolder() const;
 
     void setUploadRedirect(const std::string& uploadRedirect);
-    std::string getUploadRedirect() const;
+    const std::string& getUploadRedirect() const;
 
     void setWriteBufferSize(std::size_t writeBufferSize);
     std::size_t getWriteBufferSize() const;
 
-    void setRequireValidContentType(bool requireValidContentType);
-    bool getRequireValidContentType() const;
-
-    void setValidContentTypes(const std::vector<Poco::Net::MediaType>& valid);
-    std::vector<Poco::Net::MediaType> getValidContentTypes() const;
+    void setValidContentTypes(const MediaTypeSet& validContentTypes);
+    MediaTypeSet getValidContentTypes() const;
 
     void setAutoRename(bool autoRename);
     bool getAutoRename() const;
 
     static const std::string DEFAULT_UPLOAD_ROUTE;
+        ///< \brief The default upload route path regex.
+
     static const std::string DEFAULT_UPLOAD_FOLDER;
+        ///< \brief The default upload folder location.
+        ///< \details This path will be passed to 
+    
     static const std::string DEFAULT_UPLOAD_REDIRECT;
-    static const std::size_t DEFAULT_BUFFER_SIZE;
+        ///< \brief This path is relative to the site's document root.
+
+    enum
+    {
+        DEFAULT_BUFFER_SIZE = 8192
+            ///< \brief The default filey upload buffer size.
+    };
+
+    static const std::string FILEUPLOAD_HTTP_METHODS_ARRAY[];
+        ///< \brief An unfortunate compromise until C++11.
+        ///< \note C++ is not able to initialize static collections until
+        ///<        after C++11.  This is a compromise until then.
+
+    static const HTTPMethodSet FILEUPLOAD_HTTP_METHODS;
+        ///< \brief The default HTTP methods for this route.
+
 
 private:
-    bool        _requireUploadFolderInDataFolder;
+    bool _requireUploadFolderInDataFolder;
     std::string _uploadFolder;
-    bool        _autoCreateUploadFolder;
+    bool _autoCreateUploadFolder;
     std::string _uploadRedirect;
     std::size_t _writeBufferSize;
-    bool        _autoRename;
+    bool _autoRename;
 
-    bool _requireValidContentType;
-    std::vector<Poco::Net::MediaType> _validContentTypes;
+    MediaTypeSet _validContentTypes;
 
 };
 

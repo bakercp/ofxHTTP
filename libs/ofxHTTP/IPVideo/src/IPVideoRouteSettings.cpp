@@ -35,8 +35,9 @@ const std::string IPVideoRouteSettings::DEFAULT_BOUNDARY_MARKER = "--boundary";
 const Poco::Net::MediaType IPVideoRouteSettings::DEFAULT_MEDIA_TYPE = Poco::Net::MediaType("multipart/x-mixed-replace");
 
     
-IPVideoRouteSettings::IPVideoRouteSettings(const std::string& routePathPattern):
-    BaseRouteSettings(routePathPattern),
+IPVideoRouteSettings::IPVideoRouteSettings(const std::string& routePathPattern,
+                                           bool requireSecurePort):
+    BaseRouteSettings(routePathPattern, requireSecurePort),
     _maxClientConnections(DEFAULT_MAX_CLIENT_CONNECTIONS),
     _maxClientBitRate(DEFAULT_MAX_CLIENT_BITRATE),
     _maxClientFrameRate(DEFAULT_MAX_CLIENT_FRAMERATE),

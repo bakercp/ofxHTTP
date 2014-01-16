@@ -143,7 +143,7 @@ void FileUploadRouteHandler::handlePart(const Poco::Net::MessageHeader& header,
     if(header.has("Content-Type"))
     {
         std::string contentType = header["Content-Type"];
-        if(_parent.getSettings().getRequireValidContentType() && !isContentTypeValid(contentType))
+        if(!_parent.getSettings().getValidContentTypes().empty() && !isContentTypeValid(contentType))
         {
             ofLogError("FileUploadRouteHandler::handlePart") << "Invalid content type: " << contentType;
             return; // reject
@@ -229,8 +229,8 @@ bool FileUploadRouteHandler::isContentTypeValid(const std::string& contentType) 
 {
     Poco::Net::MediaType mediaType(contentType);
 
-    std::vector<Poco::Net::MediaType> validContentTypes = _parent.getSettings().getValidContentTypes();
-    std::vector<Poco::Net::MediaType>::const_iterator iter = validContentTypes.begin();
+    std::set<Poco::Net::MediaType> validContentTypes = _parent.getSettings().getValidContentTypes();
+    std::set<Poco::Net::MediaType>::const_iterator iter = validContentTypes.begin();
 
     while(iter != validContentTypes.end())
     {

@@ -36,7 +36,7 @@ namespace ofx {
 namespace HTTP {
 
 
-class FileUploadRoute: public BaseRoute
+class FileUploadRoute: public BaseRoute_<FileUploadRouteSettings>
 {
 public:
     typedef std::shared_ptr<FileUploadRoute> SharedPtr;
@@ -46,13 +46,9 @@ public:
     FileUploadRoute(const Settings& settings = Settings());
     virtual ~FileUploadRoute();
 
-    std::string getRoutePathPattern() const;
-
     Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
 
     virtual FileUploadRouteEvents& getEventsRef();
-
-    Settings getSettings() const;
 
     FileUploadRouteEvents events;
 
@@ -66,9 +62,6 @@ public:
     {
         return SharedPtr(new FileUploadRoute(settings));
     }
-
-protected:
-    Settings _settings;
 
 };
 

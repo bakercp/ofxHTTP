@@ -37,7 +37,14 @@ namespace HTTP {
 class IPVideoRouteSettings: public BaseRouteSettings
 {
 public:
-    IPVideoRouteSettings(const std::string& routePathPattern = DEFAULT_VIDEO_ROUTE);
+    IPVideoRouteSettings(const std::string& routePathPattern = DEFAULT_VIDEO_ROUTE,
+                         bool requireSecurePort = false);
+    ///< \brief Create the BaseRouteSettings with the given route path.
+    ///< \param routePathPattern The regex pattern that this route
+    ///<        will handle.
+    ///< \param requireSecurePorttrue True if this route requires
+    ///<        communication on an SSL encrypted port.
+
     virtual ~IPVideoRouteSettings();
 
     void setMaxClientConnections(std::size_t maxClientConnections);

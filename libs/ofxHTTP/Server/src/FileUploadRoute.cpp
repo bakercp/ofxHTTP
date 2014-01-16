@@ -31,19 +31,13 @@ namespace HTTP {
 
     
 FileUploadRoute::FileUploadRoute(const Settings& settings):
-    _settings(settings)
+    BaseRoute_<FileUploadRouteSettings>(settings)
 {
 }
 
 
 FileUploadRoute::~FileUploadRoute()
 {
-}
-
-
-std::string FileUploadRoute::getRoutePathPattern() const
-{
-    return _settings.getRoutePathPattern();
 }
 
 
@@ -56,12 +50,6 @@ Poco::Net::HTTPRequestHandler* FileUploadRoute::createRequestHandler(const Poco:
 FileUploadRouteEvents& FileUploadRoute::getEventsRef()
 {
     return events;
-}
-
-
-FileUploadRoute::Settings FileUploadRoute::getSettings() const
-{
-    return _settings;
 }
 
 

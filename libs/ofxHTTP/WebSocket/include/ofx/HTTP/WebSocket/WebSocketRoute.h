@@ -29,7 +29,6 @@
 #include <set>
 #include "ofx/HTTP/Server/BaseRoute.h"
 #include "ofx/HTTP/Types/AbstractTypes.h"
-#include "ofx/HTTP/WebSocket/WebSocketRouteHandler.h"
 #include "ofx/HTTP/WebSocket/WebSocketRouteSettings.h"
 #include "ofx/HTTP/WebSocket/WebSocketEvents.h"
 
@@ -38,12 +37,18 @@ namespace ofx {
 namespace HTTP {
 
 
-class WebSocketRoute: public BaseRoute
+class WebSocketRoute: public BaseRoute_<WebSocketRouteSettings>
+    /// \brief A route for handling WebSockets.
 {
 public:
     typedef std::shared_ptr<WebSocketRoute> SharedPtr;
+        ///< \brief A typedef for a shared pointer.
+
     typedef std::weak_ptr<WebSocketRoute>   WeakPtr;
+        ///< \brief A typedef for a weak pointer.
+
     typedef WebSocketRouteSettings Settings;
+        ///< \brief A typedef for the WebSocketRouteSettings.
 
     WebSocketRoute(const Settings& settings);
         ///< \brief Create a WebSocketRoute with the given Settings.
@@ -51,10 +56,14 @@ public:
     virtual ~WebSocketRoute();
         ///< \brief Destroy the WebSocketRoute.
 
-    virtual std::string getRoutePathPattern() const;
-
     virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
                                   bool isSecurePort) const;
+        ///< \brief A custom canHandleRequest extends the BaseRoute to check
+        ///<        for WebSocket upgrade headers.
+        ///< \param request The HTTPServerRequest to test.
+        ///< \param isSecurePort Indicates whether the request was passed on
+        ///<        an SSL encrypted port.
+        ///< \sa BaseRoute_<WebSocketRouteSettings>::canHandleRequest()
 
     virtual Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
 
@@ -82,16 +91,12 @@ public:
 
     WebSocketEvents events;
 
-    WebSocketRouteSettings getSettings() const;
-
     static SharedPtr makeShared(const Settings& settings)
     {
         return SharedPtr(new WebSocketRoute(settings));
     }
 
 private:
-    Settings _settings;
-
     typedef std::set<AbstractWebSocketConnection*>              WebSocketConnections;
     typedef std::set<AbstractWebSocketConnection*>::iterator    WebSocketConnectionsIter;
     typedef std::map<std::string,WebSocketEvents>               EventMap;

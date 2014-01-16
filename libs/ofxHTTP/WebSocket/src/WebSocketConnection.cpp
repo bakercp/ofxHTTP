@@ -35,17 +35,20 @@ WebSocketConnection::WebSocketConnection(WebSocketRoute& parent):
     _parent(parent),
     _isConnected(false)
 {
+    _parent.registerWebSocketConnection(this);
 }
 
 
 WebSocketConnection::~WebSocketConnection()
 {
+    _parent.unregisterWebSocketConnection(this);
 }
 
 
 void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                                         Poco::Net::HTTPServerResponse& response)
 {
+
     try
     {
         // TODO: copy the request?
@@ -62,7 +65,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
 
         //////////////////////////////////////////////////////
 
-        Poco::Net::WebSocket ws(request,response);
+        Poco::Net::WebSocket ws(request, response);
         ws.setReceiveTimeout(_parent.getSettings().getReceiveTimeout());
         ws.setSendTimeout(_parent.getSettings().getSendTimeout());
         ws.setKeepAlive(_parent.getSettings().getKeepAlive());
@@ -168,6 +171,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                 response.setReason("WS_ERR_HANDSHAKE_NO_KEY");
                 break;
         }
+
         _parent.handleRequest(request,response);
         socketClosed();
 
@@ -217,9 +221,6 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
 
 void WebSocketConnection::frameReceived(const WebSocketFrame& frame)
 {
-//    WebSocketFrame _frame(frame);
-//    sendFrame(_frame); // echo
-//    sendFrame(frame);
 }
 
 
@@ -241,13 +242,11 @@ bool WebSocketConnection::sendFrame(const WebSocketFrame& frame) const
 void WebSocketConnection::frameSent(const WebSocketFrame& frame,
                                     std::size_t nBytesSent)
 {
-    //ofLogVerbose("ServerWebSocketRouteHandler::frameSent") << frame.toString() << " nBytesSent=" << nBytesSent;
 }
 
 
 void WebSocketConnection::socketClosed()
 {
-    //ofLogVerbose("ServerWebSocketRouteHandler::frameSent") << "Socket closed.";
 }
 
 
@@ -345,7 +344,7 @@ void WebSocketConnection::handleOrigin(Poco::Net::HTTPServerRequest& request,
     // http://en.wikipedia.org/wiki/Same_origin_policy
 
 //    _settings.getAllowCrossOriginConnections();
-//    Utils::dumpHeaders(request,OF_LOG_NOTICE);
+    Utils::dumpHeaders(request,OF_LOG_NOTICE);
     // Access-Control-Allow-Origin
 
     //    ofLogError("ServerRouteHandler::handleOrigin") << "TODO: handle/check origin";

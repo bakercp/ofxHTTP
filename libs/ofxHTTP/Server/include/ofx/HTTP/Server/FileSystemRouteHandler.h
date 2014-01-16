@@ -29,7 +29,6 @@
 #include "ofUtils.h"
 #include "ofx/Media/MediaTypeMap.h"
 #include "ofx/HTTP/Server/FileSystemRouteSettings.h"
-#include "ofx/HTTP/Server/FileSystemRoute.h"
 
 
 namespace ofx {

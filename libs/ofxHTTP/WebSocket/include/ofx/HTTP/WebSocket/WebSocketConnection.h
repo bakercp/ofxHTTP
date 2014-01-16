@@ -116,12 +116,9 @@ protected:
         ///< \brief A reference to the parent WebSocketRoute.
 
 private:
-//    void handleErrorResponse(Poco::Net::HTTPServerResponse& response);
-
-//    void handleSubprotocols(Poco::Net::HTTPServerRequest& request,
-//                            Poco::Net::HTTPServerResponse& response);
     void handleOrigin(Poco::Net::HTTPServerRequest& request,
                       Poco::Net::HTTPServerResponse& response);
+    
     void handleExtensions(Poco::Net::HTTPServerRequest& request,
                           Poco::Net::HTTPServerResponse& response);
     

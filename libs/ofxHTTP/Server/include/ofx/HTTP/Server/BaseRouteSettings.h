@@ -26,6 +26,11 @@
 #pragma once
 
 
+#define INIT_SET_WITH_ARRAY(x) x, x + sizeof(x) / sizeof(x[0])
+    ///< \brief An unfortunate compromise until C++11.
+
+
+#include <set>
 #include <string>
 #include "ofx/HTTP/Types/AbstractTypes.h"
 
@@ -40,9 +45,18 @@ class BaseRouteSettings
     ///         to implement BaseRoute::canHandleRequest() method.
 {
 public:
-    BaseRouteSettings(const std::string& routePathPattern = BaseRouteSettings::DEFAULT_ROUTE_PATH_PATTERN);
+    typedef std::set<std::string> HTTPMethodSet;
+        ///< \brief A typedef for HTTPMethodSet.
+
+    BaseRouteSettings(const std::string& routePathPattern = BaseRouteSettings::DEFAULT_ROUTE_PATH_PATTERN,
+                      bool requireSecurePort = false,
+                      const HTTPMethodSet& validHTTPMethods = BaseRouteSettings::DEFAULT_HTTP_METHODS);
         ///< \brief Create the BaseRouteSettings with the given route path.
         ///< \param routePathPattern The regex pattern that this route
+        ///<        will handle.
+        ///< \param requireSecurePorttrue True if this route requires
+        ///<        communication on an SSL encrypted port.
+        ///< \param validHTTPMethods The valid HTTP Methods that this route
         ///<        will handle.
 
     virtual ~BaseRouteSettings();
@@ -53,7 +67,7 @@ public:
         ///< \param routePathPattern The regex pattern that this route
         ///<        will handle.
 
-    std::string getRoutePathPattern() const;
+    const std::string& getRoutePathPattern() const;
         ///< \returns The regex pattern that this route handles.
 
     void setRequireSecurePort(bool requireSecurePort);
@@ -62,13 +76,32 @@ public:
         ///<        can only handle requests submitted on an SSL
         ///<        encrypted port.
 
-    bool getRequireSecurePort() const;
+    bool requireSecurePort() const;
         ///< \returns true iff this route requires communication on
         ///<        an SSL encrypted port.
+
+    void setValidHTTPMethods(const HTTPMethodSet& validHTTPMethods);
+        ///< \brief Set the list of valid HTTPMethods.
+        ///< \param validHTTPMethods A set of valid HTTPMethods.
+        ///< \note  An empty set means that any requested HTTPMethod will be
+        ///<        accepted.  A non-empty set means that the requested
+        ///<        HTTPMethod MUST be in the set.
+
+    const HTTPMethodSet& getValidHTTPMethods() const;
+        ///< \returns The set of valid HTTP methods.
+        ///< \note  If empty, all requested HTTP methods will be accepted.
 
     static const std::string DEFAULT_ROUTE_PATH_PATTERN;
         ///< \brief The default route path regex pattern.
         ///< \details By default, this pattern matches all requests.
+
+    static const std::string DEFAULT_HTTP_METHODS_ARRAY[];
+        ///< \brief An unfortunate compromise until C++11.
+        ///< \note C++ is not able to initialize static collections until
+        ///<        after C++11.  This is a compromise until then.
+
+    static const HTTPMethodSet DEFAULT_HTTP_METHODS;
+        ///< \brief The default HTTP methods for this route.
 
 private:
     std::string _routePathPattern;
@@ -78,7 +111,11 @@ private:
         ///< \brief true if this route can only handle requests submitted on
         ///<        an SSL encrypted port.
 
+    HTTPMethodSet _validHTTPMethods;
+        ///< \brief A set of valid HTTP methods.
+
 };
 
 
 } } // namespace ofx::HTTP
+

@@ -93,8 +93,7 @@ private:
 
 
 template <typename SettingsType>
-class BaseServer_:
-    public Poco::Net::HTTPRequestHandlerFactory
+class BaseServer_: public Poco::Net::HTTPRequestHandlerFactory
 {
 public:
     typedef std::shared_ptr<BaseServer_<SettingsType> > SharedPtr;
@@ -146,7 +145,7 @@ private:
 
     MyErrorHandler eh;
     Poco::ErrorHandler* pOldEH;
-
+    
 };
 
 
