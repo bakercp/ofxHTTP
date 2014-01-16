@@ -2,7 +2,7 @@ docs/html
 docs/tagfile.xml
 
 .AppleDouble
-bin
+#bin
 obj
 
 *.mode1v3
