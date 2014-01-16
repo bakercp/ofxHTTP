@@ -79,10 +79,8 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
 
         ofLogNotice("ServerWebSocketRouteHandler::handleRequest") << "WebSocket connection established.";
 
-        const std::size_t bufferSize = _parent.getSettings().getBufferSize();
 
-        char buffer[bufferSize];
-        std::memset(buffer,0,bufferSize); // initialize to 0
+        Poco::Buffer<char> buffer(_parent.getSettings().getBufferSize());
 
         int flags = 0;
         int numBytesReceived = 0;
@@ -95,24 +93,24 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
         {
             if(ws.poll(_parent.getSettings().getPollTimeout(),Poco::Net::Socket::SELECT_READ))
             {
-                numBytesReceived = ws.receiveFrame(buffer,bufferSize,flags);
+                numBytesReceived = ws.receiveFrame(buffer.begin(), buffer.size(), flags);
 
                 if(numBytesReceived > 0)
                 {
-                    WebSocketFrame frame(buffer,numBytesReceived,flags);
+                    WebSocketFrame frame(buffer.begin(), numBytesReceived, flags);
 
                     if(_parent.getSettings().getAutoPingPongResponse())
                     {
                         if(frame.isPing())
                         {
-                            WebSocketFrame pongFrame(buffer,
+                            WebSocketFrame pongFrame(buffer.begin(),
                                                      numBytesReceived,
                                                      Poco::Net::WebSocket::FRAME_FLAG_FIN | Poco::Net::WebSocket::FRAME_OP_PONG);
                             sendFrame(pongFrame);
                         }
                         else if(frame.isPong())
                         {
-                            WebSocketFrame pingFrame(buffer,
+                            WebSocketFrame pingFrame(buffer.begin(),
                                                      numBytesReceived,
                                                      Poco::Net::WebSocket::FRAME_FLAG_FIN | Poco::Net::WebSocket::FRAME_OP_PING);
                             sendFrame(pingFrame);

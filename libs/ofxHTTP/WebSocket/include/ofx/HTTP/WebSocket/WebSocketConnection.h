@@ -27,6 +27,7 @@
 
 
 #include <queue>
+#include "Poco/Buffer.h"
 #include "Poco/Exception.h"
 #include "Poco/Timespan.h"
 #include "Poco/Net/Socket.h"
