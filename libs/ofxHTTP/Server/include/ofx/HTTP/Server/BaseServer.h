@@ -155,9 +155,9 @@ typedef BaseServer_<BaseServerSettings> BaseServer;
 template <typename SettingsType>
 BaseServer_<SettingsType>::BaseServer_(const SettingsType& settings,
                                        Poco::ThreadPool& threadPoolRef):
+    _isSecurePort(false),
     _settings(settings),
-    _threadPoolRef(threadPoolRef), 
-    _isSecurePort(false)
+    _threadPoolRef(threadPoolRef)
 {
     ofAddListener(ofEvents().exit, this, &BaseServer_<SettingsType>::exit);
     Poco::Net::initializeSSL();
