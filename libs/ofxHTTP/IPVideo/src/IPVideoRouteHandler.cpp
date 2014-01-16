@@ -27,6 +27,10 @@
 #include "ofx/HTTP/IPVideo/IPVideoRoute.h"
 
 
+#undef min // for windows
+#undef max // for windows
+
+
 namespace ofx {
 namespace HTTP {
 
