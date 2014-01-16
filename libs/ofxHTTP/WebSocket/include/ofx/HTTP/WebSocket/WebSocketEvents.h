@@ -118,8 +118,8 @@ public:
     WebSocketFrameEventArgs(const WebSocketFrame& frame,
                             const WebSocketConnection& connection,
                             WebSocketError error = WS_ERR_NONE):
-        _frame(frame),
-        WebSocketEventArgs(connection, error)
+        WebSocketEventArgs(connection, error),
+        _frame(frame)
             ///< \param connection A reference to the associated WebSocketConnection.
             ///< \param error An error, if any, associated with the event.
 
