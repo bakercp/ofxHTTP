@@ -94,57 +94,12 @@ void FileSystemRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request
     }
 
     ofFile file(requestPathString); // use it to parse file name parts
+    std::string mediaTypeString = Media::MediaTypeMap::getDefault()->getMediaTypeForPath(file.path()).toString();
 
     try
     {
-
-//        std::string mediaTypeString = "application/octet-stream";
-//        std::string ext = file.getExtension();
-//
-//
-//        if(ext == "json")
-//        {
-//            mediaTypeString = "application/json";
-//        }
-//        else if(ext == "html")
-//        {
-//            mediaTypeString = "text/html";
-//        }
-//        else if(ext == "jpg" || ext == "jpeg")
-//        {
-//            mediaTypeString = "image/jpeg";
-//        }
-//        else if(ext == "png")
-//        {
-//            mediaTypeString = "image/png";
-//        }
-//        else if(ext == "js")
-//        {
-//            mediaTypeString = "application/javascript";
-//        }
-//        else if(ext == "css")
-//        {
-//            mediaTypeString = "text/css";
-//        }
-//        else if(ext == "xml")
-//        {
-//            mediaTypeString = "application/xml";
-//        }
-//        else if(ext == "ico")
-//        {
-//            mediaTypeString = "image/x-icon";
-//        }
-
-        std::cout << file.path() << std::endl;
-        std::cout << file.getAbsolutePath() << std::endl;
-
-        std::string mediaTypeString = Media::MediaTypeMap::getDefault()->getMediaTypeForPath(file.path()).toString();
-
-        std::cout << mediaTypeString << std::endl;
-        std::cout << "----" << std::endl;
-
+        // will throw exceptions
         response.sendFile(file.getAbsolutePath(), mediaTypeString);
-                          // will throw exceptions
         return;
     }
     catch (const Poco::FileNotFoundException& ex)
