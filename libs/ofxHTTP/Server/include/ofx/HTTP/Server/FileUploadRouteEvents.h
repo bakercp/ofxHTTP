@@ -39,8 +39,8 @@ class FileUploadEventArgs: public BaseServerEvent
 {
 public:
     FileUploadEventArgs(const std::string& fileName,
-                   std::size_t fileSize,
-                   std::size_t numBytesTransferred):
+                        std::size_t fileSize,
+                        std::streamsize numBytesTransferred):
         _fileName(fileName),
         _fileSize(fileSize),
         _numBytesTransferred(numBytesTransferred)
@@ -57,7 +57,7 @@ public:
         return _fileSize;
     }
 
-    std::size_t getNumBytesTransferred() const
+    std::streamsize getNumBytesTransferred() const
     {
         return _numBytesTransferred;
     }
@@ -65,7 +65,7 @@ public:
 private:
     std::string _fileName;
     std::size_t _fileSize;
-    std::size_t _numBytesTransferred;
+    std::streamsize _numBytesTransferred;
 };
 
 

@@ -122,13 +122,6 @@ void FileUploadRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request
 }
 
 
-//bool FileUploadRouteHandler::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
-//                                              bool isSecurePort) const
-//{
-//    return request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST;
-//}
-
-
 void FileUploadRouteHandler::handlePart(const Poco::Net::MessageHeader& header,
                                         std::istream& stream)
 {
@@ -182,7 +175,7 @@ void FileUploadRouteHandler::handlePart(const Poco::Net::MessageHeader& header,
                 
                 Poco::Buffer<char> buffer(_parent.getSettings().getWriteBufferSize());
                 std::streamsize sz = 0;
-                stream.read(buffer.begin(),_parent.getSettings().getWriteBufferSize());
+                stream.read(buffer.begin(), _parent.getSettings().getWriteBufferSize());
                 std::streamsize n = stream.gcount();
                 while (n > 0)
                 {
@@ -190,19 +183,19 @@ void FileUploadRouteHandler::handlePart(const Poco::Net::MessageHeader& header,
                     file.write(buffer.begin(), n);
                     if (stream && file)
                     {
-                        stream.read(buffer.begin(),_parent.getSettings().getWriteBufferSize());
+                        stream.read(buffer.begin(), _parent.getSettings().getWriteBufferSize());
                         n = stream.gcount();
                     }
                     else n = 0;
 
-                    args = FileUploadEventArgs(fileName,contentLength,sz);
-                    ofNotifyEvent(_parent.getEventsRef().onUploadProgress,args);
+                    args = FileUploadEventArgs(fileName, contentLength, sz);
+                    ofNotifyEvent(_parent.getEventsRef().onUploadProgress, args);
                 }
 
                 file.close();
 
-                args = FileUploadEventArgs(fileName,contentLength,sz);
-                ofNotifyEvent(_parent.getEventsRef().onUploadFinished,args);
+                args = FileUploadEventArgs(fileName,contentLength, sz);
+                ofNotifyEvent(_parent.getEventsRef().onUploadFinished, args);
             }
             catch (const Poco::Exception& exc)
             {
