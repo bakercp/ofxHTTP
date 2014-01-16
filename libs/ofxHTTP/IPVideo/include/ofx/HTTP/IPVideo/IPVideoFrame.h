@@ -62,8 +62,8 @@ public:
 
 private:
     Settings _settings;
-    ofBuffer _buffer;
     unsigned long long _timestamp;
+    ofBuffer _buffer;
 };
 
 
