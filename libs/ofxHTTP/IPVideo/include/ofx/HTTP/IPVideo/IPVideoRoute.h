@@ -43,7 +43,7 @@ class IPVideoRoute: public BaseRoute_<IPVideoRouteSettings>
 {
 public:
     typedef std::shared_ptr<IPVideoRoute> SharedPtr;
-    typedef std::weak_ptr<IPVideoRoute>   WeakPtr;
+    typedef std::weak_ptr<IPVideoRoute> WeakPtr;
     typedef IPVideoRouteSettings Settings;
 
     IPVideoRoute(const Settings& settings);

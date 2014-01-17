@@ -97,7 +97,7 @@ class BaseServer_: public Poco::Net::HTTPRequestHandlerFactory
 {
 public:
     typedef std::shared_ptr<BaseServer_<SettingsType> > SharedPtr;
-    typedef std::weak_ptr<BaseServer_<SettingsType> >   WeakPtr;
+    typedef std::weak_ptr<BaseServer_<SettingsType> > WeakPtr;
 
     BaseServer_(const SettingsType& settings = SettingsType(),
                 Poco::ThreadPool& threadPoolRef = Poco::ThreadPool::defaultPool());

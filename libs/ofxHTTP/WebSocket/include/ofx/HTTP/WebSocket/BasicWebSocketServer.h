@@ -50,10 +50,10 @@ public:
     typedef std::shared_ptr<BasicWebSocketServer> SharedPtr;
         ///< \brief A typedef for a shared pointer.
 
-    typedef std::weak_ptr<BasicWebSocketServer>   WeakPtr;
+    typedef std::weak_ptr<BasicWebSocketServer> WeakPtr;
         ///< \brief A typedef for a weak pointer.
 
-    typedef BasicWebSocketServerSettings          Settings;
+    typedef BasicWebSocketServerSettings Settings;
         ///< \brief A typedef for the BasicWebSocketServerSettings.
 
     BasicWebSocketServer(const Settings& settings = Settings());

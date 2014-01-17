@@ -44,7 +44,7 @@ public:
     typedef std::shared_ptr<WebSocketRoute> SharedPtr;
         ///< \brief A typedef for a shared pointer.
 
-    typedef std::weak_ptr<WebSocketRoute>   WeakPtr;
+    typedef std::weak_ptr<WebSocketRoute> WeakPtr;
         ///< \brief A typedef for a weak pointer.
 
     typedef WebSocketRouteSettings Settings;

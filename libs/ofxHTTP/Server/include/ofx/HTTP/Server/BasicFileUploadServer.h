@@ -47,8 +47,8 @@ class BasicFileUploadServer: public BasicServer
 {
 public:
     typedef std::shared_ptr<BasicFileUploadServer> SharedPtr;
-    typedef std::weak_ptr<BasicFileUploadServer>   WeakPtr;
-    typedef BasicFileUploadServerSettings          Settings;
+    typedef std::weak_ptr<BasicFileUploadServer> WeakPtr;
+    typedef BasicFileUploadServerSettings Settings;
 
     BasicFileUploadServer(const Settings& settings = Settings());
     virtual ~BasicFileUploadServer();

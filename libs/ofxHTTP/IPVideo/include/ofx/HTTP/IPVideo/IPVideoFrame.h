@@ -38,9 +38,9 @@ namespace HTTP {
 class IPVideoFrame
 {
 public:
-    typedef std::shared_ptr<IPVideoFrame>   SharedPtr;
-    typedef std::weak_ptr<IPVideoFrame>     WeakPtr;
-    typedef IPVideoFrameSettings            Settings;
+    typedef std::shared_ptr<IPVideoFrame> SharedPtr;
+    typedef std::weak_ptr<IPVideoFrame> WeakPtr;
+    typedef IPVideoFrameSettings Settings;
 
     IPVideoFrame(const Settings& settings,
                  unsigned long long timestamp,

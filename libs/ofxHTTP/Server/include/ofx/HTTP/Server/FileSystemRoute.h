@@ -39,7 +39,7 @@ class FileSystemRoute: public BaseRoute_<FileSystemRouteSettings>
 {
 public:
     typedef std::shared_ptr<FileSystemRoute> SharedPtr;
-    typedef std::weak_ptr<FileSystemRoute>   WeakPtr;
+    typedef std::weak_ptr<FileSystemRoute> WeakPtr;
     typedef FileSystemRouteSettings Settings;
 
     FileSystemRoute(const Settings& settings);
