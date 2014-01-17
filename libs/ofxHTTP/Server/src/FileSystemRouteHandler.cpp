@@ -98,7 +98,8 @@ void FileSystemRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request
 
     try
     {
-        // will throw exceptions
+        // TODO: this is where we would begin to work honoring
+        /// Accept-Encoding:gzip, deflate, sdch
         response.sendFile(file.getAbsolutePath(), mediaTypeString);
         return;
     }

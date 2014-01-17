@@ -58,7 +58,7 @@ void FileSystemRouteSettings::setDefaultIndex(const std::string& defaultIndex)
 }
 
 
-std::string FileSystemRouteSettings::getDefaultIndex() const
+const std::string& FileSystemRouteSettings::getDefaultIndex() const
 {
     return _defaultIndex;
 }
@@ -70,7 +70,7 @@ void FileSystemRouteSettings::setDocumentRoot(const std::string& documentRoot)
 }
 
 
-std::string FileSystemRouteSettings::getDocumentRoot() const
+const std::string& FileSystemRouteSettings::getDocumentRoot() const
 {
     return _documentRoot;
 }

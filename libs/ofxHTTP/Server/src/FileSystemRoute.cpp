@@ -51,7 +51,7 @@ void FileSystemRoute::handleRequest(Poco::Net::HTTPServerRequest& request,
     {
         try
         {
-            response.sendFile(errorFile.getAbsolutePath(),"text/html");
+            response.sendFile(errorFile.getAbsolutePath(), "text/html");
             return;
         }
         catch (const Poco::FileNotFoundException& exc)
