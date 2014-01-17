@@ -1,0 +1,112 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<!-- Force latest IE rendering engine or ChromeFrame if installed -->
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><![endif]-->
+<meta charset="utf-8">
+<title>ofx::HTTP::BasicPostServer</title>
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="shortcut icon" href="img/favicon.ico">
+<!-- Bootstrap styles -->
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<!-- Generic page styles -->
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">ofx::HTTP::BasicPostServer Demo</a>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <h1>Basic Post Server Demo</h1>
+        <br>
+        <blockquote>
+            <p>
+                <code>ofx::HTTP::BasicServer</code> is a simple server implements an HTML form server.
+            </p>
+        </blockquote>
+        <br>
+        <h2>Example Form Using <code>text/plain</code></h2>
+        <blockquote>
+        <div class="highlight">
+            <pre class="html">
+                Description here.
+                &lt;form role="form" action="/post" method="post" enctype="text/plain"&gt;</code>
+            </pre>
+        </div>
+        </blockquote>
+        <form role="form" action="/post" method="post" enctype="text/plain">
+            <div class="form-group">
+                <label for="email">Text Box 0</label>
+                <textarea name="text_0" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="email">Text Box 1</label>
+                <textarea name="text_1" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input name="checkbox_0" type="checkbox">A Check Box</input>
+                </label>
+            </div>
+            <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+        <br>
+        <h3>Example Form Using <code>application/x-www-form-urlencoded</code></h3>
+        <blockquote>
+            <code>&lt;class="form-inline" role="form" action="/post" method="post" enctype="application/x-www-form-urlencoded"&gt;</code>
+        </blockquote>
+        <form class="form-inline" role="form" action="/post" method="post" enctype="application/x-www-form-urlencoded">
+            <div class="form-group">
+                <label class="sr-only" for="exampleInputEmail2">Email address</label>
+                <input type="email" class="form-control" id="exampleInputEmail2" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+                <label class="sr-only" for="exampleInputPassword2">Password</label>
+                <input type="password" class="form-control" id="exampleInputPassword2" placeholder="Password">
+            </div>
+            <div class="checkbox">
+            <label>
+                <input type="checkbox"> Remember me
+            </label>
+            </div>
+            <button type="submit" class="btn btn-default">Sign in</button>
+        </form>
+        <br>
+        <h3>Example Form Using <code>multipart/form-data</code></h3>
+        <blockquote>
+            <div class="highlight">
+            <code>&lt;role="form" action="/post" method="post" enctype="multipart/form-data"&gt;</code>
+            </div>
+        </blockquote>
+        <form role="form" action="/post" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="email">Email address</label>
+                <input name="email" type="email" class="form-control" id="email" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input name="password" type="password" class="form-control" id="password" placeholder="Password">
+            </div>
+            <div class="form-group">
+                <label for="file">File input</label>
+                <input name="file" type="file" id="file">
+            <p class="help-block">Example block-level help text here.</p>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input name="checkbox" type="checkbox">Check Box
+                </label>
+            </div>
+            <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+        <br>
+    </div>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+</body> 
+</html>
