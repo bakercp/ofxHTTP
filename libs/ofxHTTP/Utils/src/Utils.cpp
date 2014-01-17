@@ -29,90 +29,86 @@
 namespace ofx {
 namespace HTTP {
 
-    
 
-Poco::Net::NameValueCollection Utils::getQueryMap(const Poco::URI& uri)
+Poco::Net::NameValueCollection Utils::splitAndURLDecode(const std::string& encoded)
 {
     Poco::Net::NameValueCollection nvc;
-    
-    if(uri.empty())
-    {
-        return nvc;
-    }
-
-    std::string query = uri.getQuery();
-
-    if(query.empty())
-    {
-        return nvc;
-    }
-
-    std::vector<std::string> arguments = ofSplitString(query,"&",true);
-    
+    std::vector<std::string> arguments = ofSplitString(encoded, "&", true);
     std::vector<std::string>::const_iterator iter = arguments.begin();
-    
     while(iter != arguments.end())
     {
-        std::vector<std::string> tokens = ofSplitString(*iter,"=",true);
+        std::vector<std::string> tokens = ofSplitString(*iter, "=", true);
         if(tokens.size() > 0)
         {
-            std::string key   = tokens[0];
+            std::string key;
+            Poco::URI::decode(tokens[0], key);
             std::string value = "";
             if(tokens.size() > 1)
             {
-                value = tokens[1];
+                Poco::URI::decode(tokens[1], value);
             }
-            nvc.add(key,value);
+            nvc.add(key, value);
         }
         ++iter;
     }
-    
     return nvc;
 }
 
+
+Poco::Net::NameValueCollection Utils::getQueryMap(const Poco::URI& uri)
+{
+    if(uri.empty())
+    {
+        return Poco::Net::NameValueCollection();
+    }
+
+    std::string query = uri.getRawQuery(); // we will decode later
+
+    if(query.empty())
+    {
+        return Poco::Net::NameValueCollection();
+    }
+
+    return splitAndURLDecode(query);
+}
 
 
 void Utils::dumpHeaders(const Poco::Net::HTTPServerRequest& request,
                         const Poco::Net::HTTPServerResponse& response,
                         ofLogLevel logLevel)
 {
-    dumpHeaders(request,logLevel);
-    dumpHeaders(response,logLevel);
+    dumpNameValueCollection(request,logLevel);
+    dumpNameValueCollection(response,logLevel);
 }
 
 
 void Utils::dumpHeaders(const Poco::Net::HTTPServerRequest& request,
                         ofLogLevel logLevel)
 {
-    if(logLevel >= ofGetLogLevel())
-    {
-        ofLog(logLevel) << "Being ofDumpRequestHeaders =================" << endl;
-        Poco::Net::NameValueCollection::ConstIterator iter = request.begin();
-
-        while(iter != request.end())
-        {
-            ofLog(logLevel) << (*iter).first << ":" << (*iter).second;
-            ++iter;
-        }
-
-        ofLog(logLevel) << "End ofDumpRequestHeaders =================" << endl;
-    }
+    dumpNameValueCollection(request, logLevel);
 }
 
 
 void Utils::dumpHeaders(const Poco::Net::HTTPServerResponse& response,
                         ofLogLevel logLevel)
 {
+    dumpNameValueCollection(response, logLevel);
+}
+
+
+void Utils::dumpNameValueCollection(const Poco::Net::NameValueCollection& nvc,
+                                    ofLogLevel logLevel)
+{
     if(logLevel >= ofGetLogLevel())
     {
-        Poco::Net::NameValueCollection::ConstIterator iter = response.begin();
-        ofLog(logLevel) << "Begin ofDumpReponseHeaders =================" << endl;
-        while(iter != response.end())
+        Poco::Net::NameValueCollection::ConstIterator iter = nvc.begin();
+        ofLog(logLevel) << "Begin NameValueCollection =================";
+        while(iter != nvc.end())
         {
             ofLog(logLevel) << (*iter).first << ":" << (*iter).second;
             ++iter;
         }
-        ofLog(logLevel) << "End ofDumpReponseHeaders =================" << endl;
+        ofLog(logLevel) << "End NameValueCollection =================";
     }
 }
 
