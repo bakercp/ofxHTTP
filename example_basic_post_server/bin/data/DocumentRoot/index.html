@@ -41,16 +41,16 @@
         </blockquote>
         <form role="form" action="/post" method="post" enctype="text/plain">
             <div class="form-group">
-                <label for="email">Text Box 0</label>
+                <label for="text_0">Text Box 0</label>
                 <textarea name="text_0" class="form-control" rows="3"></textarea>
             </div>
             <div class="form-group">
-                <label for="email">Text Box 1</label>
+                <label for="text_1">Text Box 1</label>
                 <textarea name="text_1" class="form-control" rows="3"></textarea>
             </div>
             <div class="checkbox">
                 <label>
-                    <input name="checkbox_0" type="checkbox">A Check Box</input>
+                    <input type="checkbox" name="checkbox">A Check Box</input>
                 </label>
             </div>
             <button type="submit" class="btn btn-default">Submit</button>
@@ -62,16 +62,16 @@
         </blockquote>
         <form class="form-inline" role="form" action="/post" method="post" enctype="application/x-www-form-urlencoded">
             <div class="form-group">
-                <label class="sr-only" for="exampleInputEmail2">Email address</label>
-                <input type="email" class="form-control" id="exampleInputEmail2" placeholder="Enter email">
+                <label class="sr-only" for="email">Email address</label>
+                <input type="email" name="email" id="email" class="form-control" placeholder="Enter email">
             </div>
             <div class="form-group">
-                <label class="sr-only" for="exampleInputPassword2">Password</label>
-                <input type="password" class="form-control" id="exampleInputPassword2" placeholder="Password">
+                <label class="sr-only" for="password">Password</label>
+                <input type="password" name="password" id="password" class="form-control" placeholder="Password">
             </div>
             <div class="checkbox">
             <label>
-                <input type="checkbox"> Remember me
+                <input type="checkbox" name="checkbox" > Remember me
             </label>
             </div>
             <button type="submit" class="btn btn-default">Sign in</button>
@@ -86,20 +86,20 @@
         <form role="form" action="/post" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="email">Email address</label>
-                <input name="email" type="email" class="form-control" id="email" placeholder="Enter email">
+                <input type="email" name="email" id="email" class="form-control" placeholder="Enter email">
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input name="password" type="password" class="form-control" id="password" placeholder="Password">
+                <input type="password" name="password" id="password" class="form-control" placeholder="Password">
             </div>
             <div class="form-group">
                 <label for="file">File input</label>
-                <input name="file" type="file" id="file">
-            <p class="help-block">Example block-level help text here.</p>
+                <input type="file" name="file" id="file">
+                <p class="help-block">Example block-level help text here.</p>
             </div>
             <div class="checkbox">
                 <label>
-                    <input name="checkbox" type="checkbox">Check Box
+                    <input type="checkbox" name="checkbox">Check Box
                 </label>
             </div>
             <button type="submit" class="btn btn-default">Submit</button>
