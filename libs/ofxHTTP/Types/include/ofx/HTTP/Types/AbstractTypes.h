@@ -85,27 +85,6 @@ public:
 };
 
 
-class AbstractWebSocketConnection: public AbstractHTTPRequestHandler
-    /// \brief Defines an interface for handling a websocket connection.
-{
-public:
-    virtual ~AbstractWebSocketConnection()
-        ///< \brief Destroy the AbstractWebSocketConnection instance.
-    {
-    }
-
-
-    virtual bool sendFrame(const WebSocketFrame& frame) const = 0;
-        ///< \brief Send a WebSocketFrame using this connection.
-        ///< \param frame The WebSocketFrame to send.
-        ///< \returns true iff the sending operation was successful.
-
-    virtual void close() = 0;
-        ///< \brief Close the connection.
-
-};
-
-
 class AbstractRouteHandler: public AbstractHTTPRequestHandler
     /// \brief Defines an abstract HTTP route handler.
     /// \details Route handlers are invoked in route handling threads
@@ -123,6 +102,27 @@ public:
     {
     }
 
+};
+
+
+class AbstractWebSocketConnection: public AbstractRouteHandler
+/// \brief Defines an interface for handling a websocket connection.
+{
+public:
+    virtual ~AbstractWebSocketConnection()
+    ///< \brief Destroy the AbstractWebSocketConnection instance.
+    {
+    }
+
+
+    virtual bool sendFrame(const WebSocketFrame& frame) const = 0;
+    ///< \brief Send a WebSocketFrame using this connection.
+    ///< \param frame The WebSocketFrame to send.
+    ///< \returns true iff the sending operation was successful.
+
+    virtual void close() = 0;
+    ///< \brief Close the connection.
+    
 };
 
 
