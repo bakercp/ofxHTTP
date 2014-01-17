@@ -66,7 +66,7 @@ public:
     std::size_t getWriteBufferSize() const;
 
     void setValidContentTypes(const MediaTypeSet& validContentTypes);
-    MediaTypeSet getValidContentTypes() const;
+    const MediaTypeSet& getValidContentTypes() const;
 
     void setAutoRename(bool autoRename);
     bool getAutoRename() const;
@@ -83,16 +83,16 @@ public:
 
     enum
     {
-        DEFAULT_BUFFER_SIZE = 8192
+        DEFAULT_UPLOAD_BUFFER_SIZE = 8192
             ///< \brief The default filey upload buffer size.
     };
 
-    static const std::string FILEUPLOAD_HTTP_METHODS_ARRAY[];
+    static const std::string DEFAULT_FILEUPLOAD_HTTP_METHODS_ARRAY[];
         ///< \brief An unfortunate compromise until C++11.
         ///< \note C++ is not able to initialize static collections until
         ///<        after C++11.  This is a compromise until then.
 
-    static const HTTPMethodSet FILEUPLOAD_HTTP_METHODS;
+    static const HTTPMethodSet DEFAULT_FILEUPLOAD_HTTP_METHODS;
         ///< \brief The default HTTP methods for this route.
 
 

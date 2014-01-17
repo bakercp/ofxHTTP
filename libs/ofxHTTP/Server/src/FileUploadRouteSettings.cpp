@@ -33,23 +33,20 @@ namespace HTTP {
 const std::string FileUploadRouteSettings::DEFAULT_UPLOAD_ROUTE    = "/upload";
 const std::string FileUploadRouteSettings::DEFAULT_UPLOAD_FOLDER   = "uploads/";
 const std::string FileUploadRouteSettings::DEFAULT_UPLOAD_REDIRECT = "uploaded.html";
-
-
-const std::string FileUploadRouteSettings::FILEUPLOAD_HTTP_METHODS_ARRAY[] = { "POST" };
-const BaseRouteSettings::HTTPMethodSet FileUploadRouteSettings::FILEUPLOAD_HTTP_METHODS(FILEUPLOAD_HTTP_METHODS_ARRAY,
-                                                                               FILEUPLOAD_HTTP_METHODS_ARRAY + sizeof(FILEUPLOAD_HTTP_METHODS_ARRAY) / sizeof(FILEUPLOAD_HTTP_METHODS_ARRAY[0]));
+const std::string FileUploadRouteSettings::DEFAULT_FILEUPLOAD_HTTP_METHODS_ARRAY[] = { "POST" };
+const BaseRouteSettings::HTTPMethodSet FileUploadRouteSettings::DEFAULT_FILEUPLOAD_HTTP_METHODS(INIT_SET_WITH_ARRAY(DEFAULT_FILEUPLOAD_HTTP_METHODS_ARRAY));
 
 
 FileUploadRouteSettings::FileUploadRouteSettings(const std::string& routePathPattern,
                                                  bool requireSecurePort):
     BaseRouteSettings(routePathPattern,
                       requireSecurePort,
-                      FILEUPLOAD_HTTP_METHODS),
+                      DEFAULT_FILEUPLOAD_HTTP_METHODS),
     _requireUploadFolderInDataFolder(true),
     _uploadFolder(DEFAULT_UPLOAD_FOLDER),
     _autoCreateUploadFolder(false),
     _uploadRedirect(DEFAULT_UPLOAD_REDIRECT),
-    _writeBufferSize(DEFAULT_BUFFER_SIZE),
+    _writeBufferSize(DEFAULT_UPLOAD_BUFFER_SIZE),
     _autoRename(true)
 {
 }
@@ -126,7 +123,7 @@ void FileUploadRouteSettings::setValidContentTypes(const MediaTypeSet& validCont
 }
 
 
-FileUploadRouteSettings::MediaTypeSet FileUploadRouteSettings::getValidContentTypes() const
+const FileUploadRouteSettings::MediaTypeSet& FileUploadRouteSettings::getValidContentTypes() const
 {
     return _validContentTypes;
 }
