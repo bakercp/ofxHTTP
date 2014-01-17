@@ -54,10 +54,10 @@ public:
     //    html.addCompressionType(DEFLATE);
 
     void setDefaultIndex(const std::string& defaultIndex);
-    std::string getDefaultIndex() const;
+    const std::string& getDefaultIndex() const;
 
     void setDocumentRoot(const std::string& documentRoot);
-    std::string getDocumentRoot() const;
+    const std::string& getDocumentRoot() const;
 
     void setAutoCreateDocumentRoot(bool autoCreateDocumentRoot);
     bool getAutoCreateDocumentRoot() const;
