@@ -25,20 +25,22 @@
 
 #include "ofx/HTTP/Server/PostRouteHandler.h"
 #include "ofx/HTTP/Server/PostRoute.h"
+#include "ofx/HTTP/Utils/Utils.h"
+#include "Poco/UUID.h"
+#include "Poco/UUIDGenerator.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-const Poco::Net::MediaType PostRouteHandler::POST_CONTENT_TYPE_MULTIPART  = Poco::Net::MediaType("multipart/form-data");
 const Poco::Net::MediaType PostRouteHandler::POST_CONTENT_TYPE_TEXT_PLAIN = Poco::Net::MediaType("text/plain");
+const Poco::Net::MediaType PostRouteHandler::POST_CONTENT_TYPE_MULTIPART  = Poco::Net::MediaType("multipart/form-data");
 const Poco::Net::MediaType PostRouteHandler::POST_CONTENT_TYPE_URLENCODED = Poco::Net::MediaType("application/x-www-form-urlencoded");
 
 
 PostRouteHandler::PostRouteHandler(PostRoute& parent):
-    _parent(parent),
-    _contentLength(0)
+    _parent(parent)
 {
 }
 
@@ -51,163 +53,66 @@ PostRouteHandler::~PostRouteHandler()
 void PostRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
                                      Poco::Net::HTTPServerResponse& response)
 {
-    if(ofGetLogLevel() <= OF_LOG_VERBOSE)
+    Poco::UUID formUUID = Poco::UUIDGenerator::defaultGenerator().createOne();
+
+    // get the content type header (already checked in parent route)
+    Poco::Net::MediaType contentType(request.get("Content-Type", ""));
+
+    if (contentType.matches(POST_CONTENT_TYPE_URLENCODED) ||
+        contentType.matches(POST_CONTENT_TYPE_MULTIPART))
     {
-        Poco::Net::NameValueCollection::ConstIterator iter = request.begin();
-        while(iter != request.end())
+        // prepare the upload directory if needed
+        if (contentType.matches(POST_CONTENT_TYPE_MULTIPART))
         {
-            ofLogVerbose("PostRouteHandler::handleRequest") << "XYZ Part: " << (*iter).first << "=" << (*iter).second;
-            ++iter;
-        }
-    }
+            ofDirectory _uploadFolder(_parent.getSettings().getUploadFolder());
 
-    if(request.has("Content-Type"))
-    {
-        // get the content type header
-        Poco::Net::MediaType contentType(request.get("Content-Type"));
-
-        if (contentType.matches(POST_CONTENT_TYPE_URLENCODED))
-        {
-//            PostEventArgs args;
-            std::istream& stream = request.stream();
-            Poco::Buffer<char> buffer(_parent.getSettings().getWriteBufferSize());
-            std::streamsize sz = 0;
-            stream.read(buffer.begin(),_parent.getSettings().getWriteBufferSize());
-            std::streamsize n = stream.gcount();
-            std::stringstream ss;
-            while (n > 0)
+            if(!_uploadFolder.exists())
             {
-                sz += n;
-                ss.write(buffer.begin(), n);
-                if (stream && ss)
-                {
-                    stream.read(buffer.begin(),_parent.getSettings().getWriteBufferSize());
-                    n = stream.gcount();
-
-//                    args = PostEventArgs(fileName,contentLength,sz);
-//                    ofNotifyEvent(_parent.getEventsRef().onUploadProgress, args);
-
-                }
-                else n = 0;
-
-            }
-
-
-
-
-
-//            PostEventArgs args;
-
-        }
-        else if (contentType.matches(POST_CONTENT_TYPE_TEXT_PLAIN))
-        {
-            //            PostEventArgs args;
-            std::istream& stream = request.stream();
-
-            Poco::Buffer<char> buffer(_parent.getSettings().getWriteBufferSize());
-            std::streamsize sz = 0;
-            stream.read(buffer.begin(),_parent.getSettings().getWriteBufferSize());
-            std::streamsize n = stream.gcount();
-            std::stringstream ss;
-            while (n > 0)
-            {
-                sz += n;
-                ss.write(buffer.begin(), n);
-                if (stream && ss)
-                {
-                    stream.read(buffer.begin(),_parent.getSettings().getWriteBufferSize());
-                    n = stream.gcount();
-
-                    //                    args = PostEventArgs(fileName,contentLength,sz);
-                    //                    ofNotifyEvent(_parent.getEventsRef().onUploadProgress, args);
-                    
-                }
-                else n = 0;
-            }
-
-            cout << ss.str() << endl;
-        }
-        else if (contentType.matches(POST_CONTENT_TYPE_MULTIPART))
-        {
-            ofLogError("PostRouteHandler::handleRequest") << "----------.";
-
-            ofDirectory uploadsDirectory(_parent.getSettings().getUploadFolder());
-
-            if(!uploadsDirectory.exists())
-            {
-                if(_parent.getSettings().getAutoCreateUploadFolder())
-                {
-                    uploadsDirectory.create();
-                }
-                else
-                {
-                    ofLogError("ServerUploadRouteHandler::handleRequest") << "Upload folder does not exist and cannot be created.";
-                    response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-                    _parent.handleRequest(request,response);
-                    return;
-                }
-            }
-
-            if(_parent.getSettings().getAutoCreateUploadFolder())
-            {
-                uploadsDirectory.create();
-            }
-
-            Poco::Path dataFolder(ofToDataPath("", true));
-            Poco::Path uploadFolder(ofToDataPath(_parent.getSettings().getUploadFolder(), true));
-
-            std::string dataFolderString = dataFolder.toString();
-            std::string uploadFolderString = uploadFolder.toString();
-
-            // upload folder validity check
-            if(_parent.getSettings().getRequireUploadFolderInDataFolder() &&
-               (uploadFolderString.length() < dataFolderString.length() ||
-                uploadFolderString.substr(0, dataFolderString.length()) != dataFolderString))
-            {
-                ofLogError("ServerUploadRouteHandler::handleRequest") << "Upload folder is not a sub directory of the data folder.";
+                ofLogError("ServerUploadRouteHandler::handleRequest") << "Upload folder does not exist and cannot be created.";
                 response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
                 _parent.handleRequest(request,response);
                 return;
             }
-
-            if(ofGetLogLevel() <= OF_LOG_VERBOSE)
-            {
-                Poco::Net::NameValueCollection::ConstIterator iter = request.begin();
-                while(iter != request.end())
-                {
-                    ofLogVerbose("PostRouteHandler::handleRequest") << "XYZ Part: " << (*iter).first << "=" << (*iter).second;
-                    ++iter;
-                }
-            }
-
-            if(request.has("Content-Length"))
-            {
-                std::istringstream value(request.get("Content-Length"));
-                value >> _contentLength;
-            }
-            
-            // this is a reason to break apart the requesthandler factory and the handler
-            // multiple handlers could be useful to keep local variables to share with the
-            // part handler.
-            
-            
-            Poco::Net::HTMLForm form(request, request.stream(), *this);
         }
-        else
-        {
-            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR,
-                                        "Unknown Content-Type: " + contentType.toString());
-            _parent.handleRequest(request, response);
-            return;
-        }
+
+        PostRouteFileHandler postRoutePartHandler(request, _parent, formUUID.toString());
+
+        Poco::Net::HTMLForm form(contentType.toString());
+        form.setFieldLimit(_parent.getSettings().getFieldLimit());
+        form.load(request, request.stream(), postRoutePartHandler);
+
+        HTTPFormEventArgs args(request,
+                               formUUID.toString(),
+                               form);
+
+        ofNotifyEvent(_parent.events.onHTTPFormEvent, args, &_parent);
+    }
+    else if (contentType.matches(POST_CONTENT_TYPE_TEXT_PLAIN))
+    {
+        // Poco::Net::HTMLForm, like php does not handle text/plain because
+        // it cannot be unambiguously encoded.  Here we simply return
+        // the raw text with the event.
+
+        std::string result;
+        Poco::StreamCopier::copyToString(request.stream(), result);
+
+        HTTPRawFormEventArgs args(request,
+                                  formUUID.toString(),
+                                  result);
+
+        ofNotifyEvent(_parent.events.onHTTPRawFormEvent,
+                      args,
+                      &_parent);
     }
     else
     {
-        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "No Content-Type Header");
+        // error events are handled at a deeper level
+        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR,
+                                    "Unknown Content-Type: " + request.get("Content-Type"));
         _parent.handleRequest(request, response);
+
         return;
     }
-
 
     if(!_parent.getSettings().getUploadRedirect().empty())
     {
@@ -215,168 +120,12 @@ void PostRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
     }
     else
     {
+        // done
         response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentLength(0);
         response.send();
     }
 
 }
-
-
-void PostRouteHandler::handlePart(const Poco::Net::MessageHeader& header,
-                                  std::istream& stream)
-{
-//    Poco::Net::NameValueCollection::ConstIterator iter = header.begin();
-//
-//    while(iter != header.end())
-//    {
-//        ofLogVerbose("PostRouteHandler::handlePart") << "XXPart: " << (*iter).first << "=" << (*iter).second;
-//        ++iter;
-//    }
-//
-//    if(header.has("Content-Type"))
-//    {
-//        std::string contentType = header["Content-Type"];
-//
-//        if(!_parent.getSettings().getValidContentTypes().empty() && !isContentTypeValid(contentType))
-//        {
-//            ofLogError("PostRouteHandler::handlePart") << "Invalid content type: " << contentType;
-//            return; // reject
-//        }
-//    }
-//    else
-//    {
-//        ofLogError("PostRouteHandler::handlePart") << "No Content-Type header.";
-//        return;
-//    }
-//
-//    // is this an uploaded file?
-//    if(header.has("Content-Disposition"))
-//    {
-//        std::string contentDisposition = header["Content-Disposition"];
-//
-//        Poco::Net::NameValueCollection parameters;
-//
-//        Poco::Net::MessageHeader::splitParameters(contentDisposition.begin(),
-//                                                  contentDisposition.end(),
-//                                                  parameters);
-//
-//
-//        if (parameters.has("form-data"))
-//        {
-//
-//        }
-//        else
-//        {
-//
-//        }
-//
-//
-//
-
-//        if(parameters.has("filename"))
-//        {
-//            try
-//            {
-//                std::string fileName = ofToDataPath(_parent.getSettings().getUploadFolder() + "/" + parameters["filename"], true);
-//
-//                ofFile file(fileName, ofFile::WriteOnly);
-//
-//                PostEventArgs args(fileName,contentLength,0);
-////                ofNotifyEvent(_parent.getEventsRef().onUploadStarted,args);
-//
-//                ofLogVerbose("PostRouteHandler::handlePart") << "Writing file to absolute path : " << file.getAbsolutePath();
-//                
-//                //std::streamsize sz = Poco::StreamCopier::copyStream(stream,file,_settings.getWriteBufferSize());
-//
-//                // The section below is from StreamCopier::copyStream,
-//                // and might be used for upload progress feedback
-//                
-//                Poco::Buffer<char> buffer(_parent.getSettings().getWriteBufferSize());
-//                std::streamsize sz = 0;
-//                stream.read(buffer.begin(),_parent.getSettings().getWriteBufferSize());
-//                std::streamsize n = stream.gcount();
-//                while (n > 0)
-//                {
-//                    sz += n;
-//                    file.write(buffer.begin(), n);
-//                    if (stream && file)
-//                    {
-//                        stream.read(buffer.begin(),_parent.getSettings().getWriteBufferSize());
-//                        n = stream.gcount();
-//                    }
-//                    else n = 0;
-//
-//                    args = PostEventArgs(fileName,contentLength,sz);
-////                    ofNotifyEvent(_parent.getEventsRef().onUploadProgress,args);
-//                }
-//
-//                file.close();
-//
-//                args = PostEventArgs(fileName,contentLength,sz);
-////                ofNotifyEvent(_parent.getEventsRef().onUploadFinished,args);
-//            }
-//            catch (const Poco::Exception& exc)
-//            {
-//                ofLogError("PostRouteHandler::::handlePart") << exc.displayText();
-//            }
-//            catch (const std::exception& exc)
-//            {
-//                ofLogError("PostRouteHandler::::handlePart") << exc.what();
-//            }
-//            catch ( ... )
-//            {
-//                ofLogError("PostRouteHandler::::handlePart") << "Uncaught thread exception: Unknown exception.";
-//            }
-//        }
-//        else
-//        {
-//            ofLogError("PostRouteHandler::::handlePart") << "No filename in header.";
-//        }
-//    }
-//    else
-//    {
-//        cout << "IN HERE IN HERE IN HERE" << std::endl;
-//
-//
-//        Poco::Buffer<char> buffer(_parent.getSettings().getWriteBufferSize());
-//        std::streamsize sz = 0;
-//        stream.read(buffer.begin(),_parent.getSettings().getWriteBufferSize());
-//        std::streamsize n = stream.gcount();
-//        std::stringstream ss;
-//        while (n > 0)
-//        {
-//            sz += n;
-//            ss.write(buffer.begin(), n);
-//            if (stream && ss)
-//            {
-//                stream.read(buffer.begin(),_parent.getSettings().getWriteBufferSize());
-//                n = stream.gcount();
-//            }
-//            else n = 0;
-//
-//        }
-//
-//        std::cout << ">> " << ss.str() << std::endl;
-//    }
-}
-
-
-bool PostRouteHandler::isContentTypeValid(const std::string& contentType) const
-{
-    Poco::Net::MediaType mediaType(contentType);
-
-    std::set<Poco::Net::MediaType> validContentTypes = _parent.getSettings().getValidContentTypes();
-    std::set<Poco::Net::MediaType>::const_iterator iter = validContentTypes.begin();
-
-    while(iter != validContentTypes.end())
-    {
-        if((*iter).matchesRange(mediaType)) return true;
-        ++iter;
-    }
-
-    return false;
-}
-
     
 } } // namespace ofx::HTTP

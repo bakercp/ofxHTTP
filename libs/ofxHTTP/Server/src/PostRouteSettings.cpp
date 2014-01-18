@@ -37,7 +37,6 @@ const std::string PostRouteSettings::DEFAULT_POST_HTTP_METHODS_ARRAY[] = { "POST
 const BaseRouteSettings::HTTPMethodSet PostRouteSettings::DEFAULT_POST_HTTP_METHODS(INIT_SET_WITH_ARRAY(DEFAULT_POST_HTTP_METHODS_ARRAY));
 
 
-
 PostRouteSettings::PostRouteSettings(const std::string& routePathPattern,
                                      bool requireSecurePort):
     BaseRouteSettings(routePathPattern,
@@ -48,25 +47,14 @@ PostRouteSettings::PostRouteSettings(const std::string& routePathPattern,
     _autoCreateUploadFolder(false),
     _uploadRedirect(DEFAULT_POST_REDIRECT),
     _writeBufferSize(DEFAULT_POST_BUFFER_SIZE),
-    _autoRename(true)
+    _fieldLimit(DEFAULT_FIELD_LIMIT),
+    _maximumFileUploadSize(DEFAULT_MAXIMUM_FILE_UPLOAD_SIZE)
 {
 }
 
 
 PostRouteSettings::~PostRouteSettings()
 {
-}
-
-
-void PostRouteSettings::setRequireUploadFolderInDataFolder(bool requireUploadFolderInDataFolder)
-{
-    _requireUploadFolderInDataFolder = requireUploadFolderInDataFolder;
-}
-
-
-bool PostRouteSettings::getRequireUploadFolderInDataFolder() const
-{
-    return _requireUploadFolderInDataFolder;
 }
 
 
@@ -79,18 +67,6 @@ void PostRouteSettings::setUploadFolder(const std::string& uploadFolder)
 const std::string& PostRouteSettings::getUploadFolder() const
 {
     return _uploadFolder;
-}
-
-
-void PostRouteSettings::setAutoCreateUploadFolder(bool autoCreateUploadFolder)
-{
-    _autoCreateUploadFolder = autoCreateUploadFolder;
-}
-
-
-bool PostRouteSettings::getAutoCreateUploadFolder() const
-{
-    return _autoCreateUploadFolder;
 }
 
 
@@ -130,15 +106,27 @@ const PostRouteSettings::MediaTypeSet& PostRouteSettings::getValidContentTypes()
 }
 
 
-void PostRouteSettings::setAutoRename(bool autoRename)
+void PostRouteSettings::setFieldLimit(std::size_t fieldLimit)
 {
-    _autoRename = autoRename;
+    _fieldLimit = fieldLimit;
 }
 
 
-bool PostRouteSettings::getAutoRename() const
+std::size_t PostRouteSettings::getFieldLimit() const
 {
-    return _autoRename;
+    return _fieldLimit;
+}
+
+
+void PostRouteSettings::setMaximumFileUploadSize(std::streamsize maximumFileUploadSize)
+{
+    _maximumFileUploadSize = maximumFileUploadSize;
+}
+
+
+std::streamsize PostRouteSettings::getMaximumFileUploadSize() const
+{
+    return _maximumFileUploadSize;
 }
 
 

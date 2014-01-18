@@ -28,7 +28,7 @@
 
 void ofApp::setup()
 {
-    ofSetLogLevel(OF_LOG_VERBOSE);
+    ofSetLogLevel(OF_LOG_NOTICE);
     ofSetFrameRate(30);
 
     HTTP::BasicPostServerSettings settings;
@@ -36,7 +36,7 @@ void ofApp::setup()
 
     server = HTTP::BasicPostServer::makeShared(settings);
 
-    server->getPostRoute()->registerFileUploadEvents(this);
+    server->getPostRoute()->registerPostEvents(this);
 
     server->start();
 
@@ -57,6 +57,51 @@ void ofApp::draw()
 }
 
 
-void ofApp::onPost(HTTP::PostEventArgs& args)
+bool ofApp::onHTTPFormEvent(HTTP::HTTPFormEventArgs& args)
 {
+    ofLogNotice("ofApp::onHTTPFormEvent") << "";
+    HTTP::Utils::dumpNameValueCollection(args.form, ofGetLogLevel());
+    return true;
+}
+
+bool ofApp::onHTTPRawFormEvent(HTTP::HTTPRawFormEventArgs& args)
+{
+    ofLogNotice("ofApp::onHTTPRawFormEvent") << "";
+    HTTP::Utils::dumpNameValueCollection(HTTP::Utils::splitTextPlainPost(args.form),
+                                         ofGetLogLevel());
+    return true;
+}
+
+
+bool ofApp::onHTTPUploadStartedEvent(HTTP::HTTPUploadEventArgs& args)
+{
+    ofLogNotice("ofApp::onHTTPUploadStartedEvent") << "";
+    cout << " formFieldName: " << args.getFormFieldName() << endl;
+    cout << "orig. filename: " << args.getOriginalFilename() << endl;
+    cout << "      filename: " << args.getFilename() << endl;
+    cout << "      fileType: " << args.getFileType().toString() << endl;
+    cout << "# bytes xfer'd: " << args.getNumBytesTransferred() << endl;
+    return true;
+}
+
+bool ofApp::onHTTPUploadProgressEvent(HTTP::HTTPUploadEventArgs& args)
+{
+    ofLogNotice("ofApp::onHTTPUploadProgressEvent") << "";
+    cout << " formFieldName: " << args.getFormFieldName() << endl;
+    cout << "orig. filename: " << args.getOriginalFilename() << endl;
+    cout << "      filename: " << args.getFilename() << endl;
+    cout << "      fileType: " << args.getFileType().toString() << endl;
+    cout << "# bytes xfer'd: " << args.getNumBytesTransferred() << endl;
+    return true;
+}
+
+bool ofApp::onHTTPUploadFinishedEvent(HTTP::HTTPUploadEventArgs& args)
+{
+    ofLogNotice("ofApp::onHTTPUploadFinishedEvent") << "";
+    cout << " formFieldName: " << args.getFormFieldName() << endl;
+    cout << "orig. filename: " << args.getOriginalFilename() << endl;
+    cout << "      filename: " << args.getFilename() << endl;
+    cout << "      fileType: " << args.getFileType().toString() << endl;
+    cout << "# bytes xfer'd: " << args.getNumBytesTransferred() << endl;
+    return true;
 }

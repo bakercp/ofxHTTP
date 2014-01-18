@@ -63,6 +63,7 @@ void IPVideoRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
     {
         response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE,
                                     "Maximum client connections exceeded.  Please try again later.");
+
         _parent.handleRequest(request,response);
         return;
     }

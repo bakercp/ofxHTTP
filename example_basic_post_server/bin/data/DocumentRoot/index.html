@@ -30,14 +30,11 @@
             </p>
         </blockquote>
         <br>
-        <h2>Example Form Using <code>text/plain</code></h2>
+        <h3>Example Form Using <code>text/plain</code> Form Encoding</h3>
         <blockquote>
-        <div class="highlight">
-            <pre class="html">
-                Description here.
-                &lt;form role="form" action="/post" method="post" enctype="text/plain"&gt;</code>
-            </pre>
-        </div>
+                The following form is defined by <code>&lt;form role="form" action="/post" method="post" enctype="text/plain"&gt;</code>.
+                This for will send an event to the <code>bool onHTTPFormEvent(HTTP::HTTPFormEventArgs& args);</code> callback.
+                In this case, the content cannot be reliably parsed so it is up to the user to extract name / value pairs.
         </blockquote>
         <form role="form" action="/post" method="post" enctype="text/plain">
             <div class="form-group">
@@ -56,9 +53,10 @@
             <button type="submit" class="btn btn-default">Submit</button>
         </form>
         <br>
-        <h3>Example Form Using <code>application/x-www-form-urlencoded</code></h3>
+        <h3>Example Form Using <code>application/x-www-form-urlencoded</code> Form Encoding</h3>
         <blockquote>
-            <code>&lt;class="form-inline" role="form" action="/post" method="post" enctype="application/x-www-form-urlencoded"&gt;</code>
+            The following form is defined by <code>&lt;class="form-inline" role="form" action="/post" method="post" enctype="application/x-www-form-urlencoded"&gt;</code>.  This will send en event to the <code>bool onHTTPRawFormEvent(HTTP::HTTPRawFormEventArgs& args);</code> callback.  
+            In this case, the content will be parsed and returns as a set of name / value pairs.
         </blockquote>
         <form class="form-inline" role="form" action="/post" method="post" enctype="application/x-www-form-urlencoded">
             <div class="form-group">
@@ -77,11 +75,17 @@
             <button type="submit" class="btn btn-default">Sign in</button>
         </form>
         <br>
-        <h3>Example Form Using <code>multipart/form-data</code></h3>
+        <h3>Example Form Using <code>multipart/form-data</code> Form Encoding</h3>
         <blockquote>
-            <div class="highlight">
-            <code>&lt;role="form" action="/post" method="post" enctype="multipart/form-data"&gt;</code>
-            </div>
+            The following form is defined by <code>&lt;role="form" action="/post" method="post" enctype="multipart/form-data"&gt;</code>.
+            This will send events to four callbacks.  If files are attached, each file will be processed in sequence and 
+            will send events at the beginning of the upload, during progress (as determined by the size of the upload buffer) 
+            and one upon completion.  The callbacks are as follows: <code>bool onHTTPUploadStartedEvent(HTTP::HTTPUploadEventArgs& args);</code>,
+            <code>bool onHTTPUploadProgressEvent(HTTP::HTTPUploadEventArgs& args);</code> and 
+            <code>bool onHTTPUploadFinishedEvent(HTTP::HTTPUploadEventArgs& args);</code>.  After file processing,
+            an event will be sent to the <code>bool onHTTPRawFormEvent(HTTP::HTTPRawFormEventArgs& args);</code> with the remaining
+            url-encoded parameters.
+        </pre>
         </blockquote>
         <form role="form" action="/post" method="post" enctype="multipart/form-data">
             <div class="form-group">
@@ -95,11 +99,16 @@
             <div class="form-group">
                 <label for="file">File input</label>
                 <input type="file" name="file" id="file">
-                <p class="help-block">Example block-level help text here.</p>
+                <p class="help-block">Add a file here.</p>
+            </div>
+            <div class="form-group">
+                <label for="file">File input</label>
+                <input type="file" name="file2" id="file2">
+                <p class="help-block">Add a file here.</p>
             </div>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="checkbox">Check Box
+                    <input type="checkbox" name="checkbox"> Check Box
                 </label>
             </div>
             <button type="submit" class="btn btn-default">Submit</button>

@@ -30,11 +30,6 @@ namespace ofx {
 namespace HTTP {
 
 
-const Poco::Net::MediaType PostRoute::POST_CONTENT_TYPE_MULTIPART  = Poco::Net::MediaType("multipart/form-data");
-const Poco::Net::MediaType PostRoute::POST_CONTENT_TYPE_TEXT_PLAIN = Poco::Net::MediaType("text/plain");
-const Poco::Net::MediaType PostRoute::POST_CONTENT_TYPE_URLENCODED = Poco::Net::MediaType("application/x-www-form-urlencoded");
-
-
 PostRoute::PostRoute(const Settings& settings):
     BaseRoute_<PostRouteSettings>(settings)
 {
@@ -49,22 +44,25 @@ PostRoute::~PostRoute()
 bool PostRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
                                  bool isSecurePort) const
 {
+    // check the base route rules
     if(!BaseRoute_<PostRouteSettings>::canHandleRequest(request, isSecurePort))
     {
         return false;
     }
-
     
     // require a Content-Type header
-    if (!request.has("Content-Type")) return false;
-
+    if (!request.has("Content-Type"))
+    {
+        return false;
+    }
+    
     // get the content type header
     Poco::Net::MediaType contentType(request.get("Content-Type"));
 
     // require the Content-Type to match a typical form "enctype"
-    return contentType.matches(POST_CONTENT_TYPE_URLENCODED) ||
-           contentType.matches(POST_CONTENT_TYPE_MULTIPART)  ||
-           contentType.matches(POST_CONTENT_TYPE_TEXT_PLAIN);
+    return contentType.matches(PostRouteHandler::POST_CONTENT_TYPE_URLENCODED) ||
+           contentType.matches(PostRouteHandler::POST_CONTENT_TYPE_MULTIPART)  ||
+           contentType.matches(PostRouteHandler::POST_CONTENT_TYPE_TEXT_PLAIN);
 }
 
 

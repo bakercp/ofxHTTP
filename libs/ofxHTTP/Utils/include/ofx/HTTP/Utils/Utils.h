@@ -43,6 +43,15 @@ class Utils
     /// \brief A collection of HTTP utilities.
 {
 public:
+    static Poco::Net::NameValueCollection splitTextPlainPost(const std::string& textPlain);
+        ///< \brief Attempt to extract name-value pairs from text/plain encoded
+        ///<        posts.
+        ///< \param textPlain The plain text post data.  This function assumes
+        ///<        that each form field is on its own line.  It then splits the
+        ///<        key / value pairs by finding the first '='.  All other '='
+        ///<        are ignored.
+        ///< \returns A map of the parameter names and their values.
+
     static Poco::Net::NameValueCollection splitAndURLDecode(const std::string& urlEncoded);
         ///< \brief Decode URL-encoded parameters names and their values.
         ///< \param urlEncoded An URL-encoded string.

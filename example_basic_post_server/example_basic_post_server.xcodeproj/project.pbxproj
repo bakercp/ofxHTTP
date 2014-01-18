@@ -49,6 +49,7 @@
 		FD9C96BD1881E142005DD686 /* PostRouteHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD9C96BA1881E142005DD686 /* PostRouteHandler.cpp */; };
 		FD9C96BE1881E142005DD686 /* PostRouteSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD9C96BB1881E142005DD686 /* PostRouteSettings.cpp */; };
 		FD9C96C11881E9B4005DD686 /* BasicPostServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD9C96C01881E9B4005DD686 /* BasicPostServer.cpp */; };
+		FDC3B7C41889886000A5EBA0 /* PostRouteFileHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FDC3B7C31889886000A5EBA0 /* PostRouteFileHandler.cpp */; };
 		ae32f1807796b1050e082651a5fbf40d /* json_value.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0f867b04bf36a560c2493c097d84756e /* json_value.cpp */; };
 		ba28d41531c2e5f68245dce188795e9e /* IPVideoFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16d2c2310805718db935df8364d6b0d9 /* IPVideoFrame.cpp */; };
 		bccd51113e9050297513852eadc84234 /* BasicServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = cb65392fe6e82bdc59d33e1bccd3de76 /* BasicServer.cpp */; };
@@ -173,6 +174,8 @@
 		FD9C96BB1881E142005DD686 /* PostRouteSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PostRouteSettings.cpp; path = ../libs/ofxHTTP/Server/src/PostRouteSettings.cpp; sourceTree = "<group>"; };
 		FD9C96BF1881E99E005DD686 /* BasicPostServer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BasicPostServer.h; path = ../libs/ofxHTTP/Server/include/ofx/HTTP/Server/BasicPostServer.h; sourceTree = "<group>"; };
 		FD9C96C01881E9B4005DD686 /* BasicPostServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BasicPostServer.cpp; path = ../libs/ofxHTTP/Server/src/BasicPostServer.cpp; sourceTree = "<group>"; };
+		FDC3B7C21889884600A5EBA0 /* PostRouteFileHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PostRouteFileHandler.h; path = ../libs/ofxHTTP/Server/include/ofx/HTTP/Server/PostRouteFileHandler.h; sourceTree = "<group>"; };
+		FDC3B7C31889886000A5EBA0 /* PostRouteFileHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PostRouteFileHandler.cpp; path = ../libs/ofxHTTP/Server/src/PostRouteFileHandler.cpp; sourceTree = "<group>"; };
 		a31fb08f6660ce0dc758509eca7313e4 /* MediaTypeMap.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = MediaTypeMap.cpp; path = ../../../addons/ofxMediaType/libs/ofxMediaType/src/MediaTypeMap.cpp; sourceTree = SOURCE_ROOT; };
 		a60db4d20210f3d4aeae3501b3737536 /* FileSystemRoute.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = FileSystemRoute.cpp; path = ../../../addons/ofxHTTP/libs/ofxHTTP/Server/src/FileSystemRoute.cpp; sourceTree = SOURCE_ROOT; };
 		aa19c7b5eb9660087056e75a44a0a212 /* forwards.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = forwards.h; path = ../../../addons/ofxJSON/libs/jsoncpp/include/json/forwards.h; sourceTree = SOURCE_ROOT; };
@@ -390,6 +393,7 @@
 		41f59f7fe879b23d8f98c7b1d867b35f /* src */ = {
 			isa = PBXGroup;
 			children = (
+				FDC3B7C31889886000A5EBA0 /* PostRouteFileHandler.cpp */,
 				FD9C96B91881E142005DD686 /* PostRoute.cpp */,
 				FD9C96BA1881E142005DD686 /* PostRouteHandler.cpp */,
 				FD9C96BB1881E142005DD686 /* PostRouteSettings.cpp */,
@@ -716,6 +720,7 @@
 		ec497f32e852504f2d58ae8efb7448e5 /* Server */ = {
 			isa = PBXGroup;
 			children = (
+				FDC3B7C21889884600A5EBA0 /* PostRouteFileHandler.h */,
 				FD9C96B41881E0FD005DD686 /* PostRoute.h */,
 				FD9C96B51881E0FD005DD686 /* PostRouteEvents.h */,
 				FD9C96B61881E0FD005DD686 /* PostRouteHandler.h */,
@@ -879,6 +884,7 @@
 				0ce5ada5d5f40d5e1bc6cb0c040c24f1 /* IPVideoFrameQueue.cpp in Sources */,
 				bdf2abff855faf5822289eefe57b3d7c /* IPVideoFrameSettings.cpp in Sources */,
 				FD9C96BC1881E142005DD686 /* PostRoute.cpp in Sources */,
+				FDC3B7C41889886000A5EBA0 /* PostRouteFileHandler.cpp in Sources */,
 				ca6fd803094a88c38d52112c378372a1 /* IPVideoRoute.cpp in Sources */,
 				79290a421aa0cc0ec202ec264f481d7a /* IPVideoRouteHandler.cpp in Sources */,
 				1d2e6e5cb9411ec6c748463c1c4a6326 /* IPVideoRouteSettings.cpp in Sources */,

@@ -36,13 +36,11 @@
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NameValueCollection.h"
-#include "Poco/Net/PartHandler.h"
 #include "ofLog.h"
-#include "ofUtils.h"
-#include "ofFileUtils.h"
 #include "ofx/HTTP/Types/AbstractTypes.h"
-#include "ofx/HTTP/Server/PostRouteSettings.h"
 #include "ofx/HTTP/Server/PostRouteEvents.h"
+#include "ofx/HTTP/Server/PostRouteFileHandler.h"
+#include "ofx/HTTP/Server/PostRouteSettings.h"
 
 
 namespace ofx {
@@ -52,35 +50,39 @@ namespace HTTP {
 class PostRoute;
 
 
-class PostRouteHandler:
-    public AbstractRouteHandler,
-    public Poco::Net::PartHandler
+class PostRouteHandler: public AbstractRouteHandler
+    /// \brief A flexible POST route handler.
+    /// \details Form data must be encoded with "multipart/form-data" or
+    ///         "application/x-www-form-urlencoded".  "text/plain"
+    ///         form encoding is supported, but not parsed.
 {
 public:
     typedef PostRouteSettings Settings;
+        ///< \brief A typedef for PostRouteSettings
 
     PostRouteHandler(PostRoute& parent);
+        ///< \brief Create a PostRouteHandler.
+        ///< \param parent The parent PostRoute.
+
     virtual ~PostRouteHandler();
+        ///< \brief Destroy the PostRouteHandler.
     
     void handleRequest(Poco::Net::HTTPServerRequest& request,
                        Poco::Net::HTTPServerResponse& response);
 
-//    bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
-//                          bool isSecurePort) const;
-
-    void handlePart(const Poco::Net::MessageHeader& header,
-                    std::istream& stream);
-
-    virtual bool isContentTypeValid(const std::string& contentType) const;
-
     static const Poco::Net::MediaType POST_CONTENT_TYPE_MULTIPART;
-    static const Poco::Net::MediaType POST_CONTENT_TYPE_TEXT_PLAIN;
+        ///< \brief A constant defining "multipart/form-data".
+
     static const Poco::Net::MediaType POST_CONTENT_TYPE_URLENCODED;
+        ///< \brief A constant defining "application/x-www-form-urlencoded".
+
+    static const Poco::Net::MediaType POST_CONTENT_TYPE_TEXT_PLAIN;
+        ///< \brief A constant defining "text/plain".
 
 private:
     PostRoute& _parent;
+        ///< \brief The parent PostRoute reference.
 
-    std::size_t _contentLength;
 };
 
     

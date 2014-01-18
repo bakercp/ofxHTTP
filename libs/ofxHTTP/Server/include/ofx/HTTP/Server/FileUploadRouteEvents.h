@@ -35,7 +35,7 @@ namespace ofx {
 namespace HTTP {
 
 
-class FileUploadEventArgs: public BaseServerEvent
+class FileUploadEventArgs: public ofEventArgs
 {
 public:
     FileUploadEventArgs(const std::string& fileName,

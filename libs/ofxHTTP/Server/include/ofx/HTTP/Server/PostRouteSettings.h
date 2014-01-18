@@ -38,27 +38,25 @@ namespace HTTP {
 
 
 class PostRouteSettings: public BaseRouteSettings
+    /// \brief Settings for a PostRoute.
 {
 public:
     typedef std::set<Poco::Net::MediaType> MediaTypeSet;
+        ///< \brief A typedef for a MediaTypeSet.
 
     PostRouteSettings(const std::string& routePathPattern = DEFAULT_POST_ROUTE,
                       bool requireSecurePort = false);
+        ///< \brief Create PostRouteSettings.
         ///< \param routePathPattern The regex pattern that this route
         ///<        will handle.
-        ///< \param requireSecurePorttrue True if this route requires
+        ///< \param requireSecurePort True if this route requires
         ///<        communication on an SSL encrypted port.
 
     virtual ~PostRouteSettings();
-
-    void setRequireUploadFolderInDataFolder(bool requireUploadFolderInDataFolder);
-    bool getRequireUploadFolderInDataFolder() const;
+        ///< \brief Destroy the PostRouteSetting.
 
     void setUploadFolder(const std::string& uploadFolder);
     const std::string& getUploadFolder() const;
-
-    void setAutoCreateUploadFolder(bool autoCreateUploadFolder);
-    bool getAutoCreateUploadFolder() const;
 
     void setUploadRedirect(const std::string& uploadRedirect);
     const std::string& getUploadRedirect() const;
@@ -72,8 +70,11 @@ public:
     void setValidContentTypes(const MediaTypeSet& valid);
     const MediaTypeSet& getValidContentTypes() const;
 
-    void setAutoRename(bool autoRename);
-    bool getAutoRename() const;
+    void setFieldLimit(std::size_t fieldLimit);
+    std::size_t getFieldLimit() const;
+
+    void setMaximumFileUploadSize(std::streamsize maximumFileUploadSize);
+    std::streamsize getMaximumFileUploadSize() const;
 
     static const std::string DEFAULT_POST_ROUTE;
     static const std::string DEFAULT_POST_FOLDER;
@@ -81,7 +82,12 @@ public:
 
     enum
     {
-        DEFAULT_POST_BUFFER_SIZE = 8192
+        DEFAULT_POST_BUFFER_SIZE = 8192,
+            /// \brief File upload buffer.
+        DEFAULT_FIELD_LIMIT = 100,
+            /// \brief Maximum number of form fields.
+        DEFAULT_MAXIMUM_FILE_UPLOAD_SIZE = 2097152 // 2 MB
+            /// \brief Maximum file upload size
     };
 
     static const std::string DEFAULT_POST_HTTP_METHODS_ARRAY[];
@@ -99,7 +105,8 @@ private:
     bool _autoCreateUploadFolder;
     std::string _uploadRedirect;
     std::size_t _writeBufferSize;
-    bool _autoRename;
+    std::size_t _fieldLimit;
+    std::streamsize _maximumFileUploadSize;
 
     MediaTypeSet _validContentTypes;
 

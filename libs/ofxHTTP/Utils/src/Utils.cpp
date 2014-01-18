@@ -30,6 +30,32 @@ namespace ofx {
 namespace HTTP {
 
 
+
+Poco::Net::NameValueCollection Utils::splitTextPlainPost(const std::string& textPlain)
+{
+    // Here we handle
+    Poco::Net::NameValueCollection nvc;
+    std::string result;
+    std::stringstream ss;
+    ss << textPlain;
+
+    while (std::getline(ss, result))
+    {
+        std::size_t pos = result.find("=");
+
+        if (pos != std::string::npos)
+        {
+            std::string key = result.substr(0, pos);
+            std::string value = result.substr(pos + 1);
+            nvc.add(key, value);
+        }
+    }
+
+    return nvc;
+}
+
+
+
 Poco::Net::NameValueCollection Utils::splitAndURLDecode(const std::string& encoded)
 {
     Poco::Net::NameValueCollection nvc;

@@ -99,44 +99,119 @@ namespace HTTP {
 //
 //
 
-class PostEventArgs: public BaseServerEvent
+class BaseFormEventArgs: public BaseHTTPServerRequestEventArgs
 {
 public:
-    PostEventArgs(const std::string& fileName,
-                   std::size_t fileSize,
-                   std::size_t numBytesTransferred):
-        _fileName(fileName),
-        _fileSize(fileSize),
+    BaseFormEventArgs(const Poco::Net::HTTPServerRequest& request,
+                      const std::string& formUUID):
+        BaseHTTPServerRequestEventArgs(request),
+        formUUID(formUUID)
+    {
+    }
+
+    const std::string formUUID;
+
+};
+
+class HTTPRawFormEventArgs: public BaseFormEventArgs
+{
+public:
+    HTTPRawFormEventArgs(const Poco::Net::HTTPServerRequest& request,
+                         const std::string& formUUID,
+                         const std::string& form):
+        BaseFormEventArgs(request, formUUID),
+        form(form)
+    {
+    }
+
+    const std::string form;
+};
+
+
+class HTTPFormEventArgs: public BaseFormEventArgs
+{
+public:
+    HTTPFormEventArgs(const Poco::Net::HTTPServerRequest& request,
+                      const std::string& formUUID,
+                      const Poco::Net::NameValueCollection& form):
+        BaseFormEventArgs(request, formUUID),
+        form(form)
+    {
+    }
+
+    const Poco::Net::NameValueCollection form;
+};
+
+
+class HTTPUploadEventArgs: public BaseFormEventArgs
+{
+public:
+    HTTPUploadEventArgs(const Poco::Net::HTTPServerRequest& request,
+                        const std::string& formUUID,
+                        const std::string& formFieldName,
+                        const std::string& originalFilename,
+                        const std::string& filename,
+                        const Poco::Net::MediaType& contentType,
+                        std::streamsize numBytesTransferred):
+        BaseFormEventArgs(request, formUUID),
+        _formFieldName(formFieldName),
+        _originalFilename(originalFilename),
+        _filename(filename),
+        _contentType(contentType),
         _numBytesTransferred(numBytesTransferred)
     {
     }
 
-    std::string getFileName() const
+
+    const std::string& getFormFieldName() const
     {
-        return _fileName;
+        return _formFieldName;
     }
 
-    std::size_t getFileSize()
+
+    const std::string& getOriginalFilename() const
     {
-        return _fileSize;
+        return _originalFilename;
     }
 
-    std::size_t getNumBytesTransferred() const
+
+    const std::string& getFilename() const
+    {
+        return _filename;
+    }
+
+
+    const Poco::Net::MediaType& getFileType() const
+    {
+        return _contentType;
+    }
+
+    
+    std::streamsize getNumBytesTransferred() const
     {
         return _numBytesTransferred;
     }
 
 private:
-    std::string _fileName;
-    std::size_t _fileSize;
-    std::size_t _numBytesTransferred;
+    const std::string& _formFieldName;
+    const std::string& _originalFilename;
+    const std::string& _filename;
+    const Poco::Net::MediaType& _contentType;
+    std::streamsize _numBytesTransferred;
+
 };
+
 
 
 class PostRouteEvents
 {
 public:
-    ofEvent<PostEventArgs> onPost;
+    ofEvent<HTTPFormEventArgs> onHTTPFormEvent;
+    ofEvent<HTTPRawFormEventArgs> onHTTPRawFormEvent;
+
+    ofEvent<HTTPUploadEventArgs> onHTTPUploadStartedEvent;
+    ofEvent<HTTPUploadEventArgs> onHTTPUploadProgressEvent;
+    ofEvent<HTTPUploadEventArgs> onHTTPUploadFinishedEvent;
 
 };
 

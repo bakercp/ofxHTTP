@@ -26,26 +26,38 @@
 #pragma once
 
 
-#include "ofMain.h"
-#include "ofxHTTP.h"
+#include "Poco/Net/PartHandler.h"
+#include "ofx/HTTP/Server/PostRouteEvents.h"
+#include "ofx/HTTP/Server/PostRouteSettings.h"
 
 
-using namespace ofx;
+namespace ofx {
+namespace HTTP {
 
 
-class ofApp: public ofBaseApp
+class PostRoute;
+
+
+class PostRouteFileHandler: public Poco::Net::PartHandler
 {
 public:
-    void setup();
-    void draw();
+    PostRouteFileHandler(const Poco::Net::HTTPServerRequest& request,
+                         PostRoute& parent,
+                         const std::string& formUUID);
 
-    bool onHTTPFormEvent(HTTP::HTTPFormEventArgs& args);
-    bool onHTTPRawFormEvent(HTTP::HTTPRawFormEventArgs& args);
+    virtual ~PostRouteFileHandler();
 
-    bool onHTTPUploadStartedEvent(HTTP::HTTPUploadEventArgs& args);
-    bool onHTTPUploadProgressEvent(HTTP::HTTPUploadEventArgs& args);
-    bool onHTTPUploadFinishedEvent(HTTP::HTTPUploadEventArgs& args);
+    void handlePart(const Poco::Net::MessageHeader& header,
+                    std::istream& stream);
 
-    HTTP::BasicPostServer::SharedPtr server;
+    bool isContentTypeValid(const std::string& contentType) const;
+
+private:
+    const Poco::Net::HTTPServerRequest& _request;
+    PostRoute& _parent;
+    const std::string& _formUUID;
 
 };
+
+
+} } // namespace ofx::HTTP
