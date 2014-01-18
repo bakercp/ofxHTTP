@@ -24,6 +24,7 @@
 
 
 #include "ofx/HTTP/WebSocket/WebSocketRoute.h"
+#include "ofx/HTTP/WebSocket/WebSocketConnection.h"
 
 
 namespace ofx {
@@ -31,7 +32,7 @@ namespace HTTP {
 
 
 WebSocketRoute::WebSocketRoute(const Settings& settings):
-    _settings(settings)
+    BaseRoute_<WebSocketRouteSettings>(settings)
 {
 }
 
@@ -41,24 +42,10 @@ WebSocketRoute::~WebSocketRoute()
 }
 
 
-std::string WebSocketRoute::getRoutePathPattern() const
-{
-    return _settings.getRoutePathPattern();
-}
-
-
 bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
                                       bool isSecurePort) const
 {
-    
-    // require HTTP_GET
-    if(request.getMethod() != Poco::Net::HTTPRequest::HTTP_GET)
-    {
-        return false;
-    }
-
-    // check route
-    if(!BaseRoute::canHandleRequest(request, isSecurePort))
+    if(!BaseRoute_<WebSocketRouteSettings>::canHandleRequest(request, isSecurePort))
     {
         return false;
     }
@@ -75,7 +62,7 @@ bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& reques
     std::string connectionHeader = Poco::toLower(request.get("Connection", ""));
 
     if(Poco::icompare(connectionHeader, "Upgrade") != 0 &&
-       !ofIsStringInString(connectionHeader,"upgrade"))
+       !ofIsStringInString(connectionHeader, "upgrade"))
     {
         // this request is coming from firefox, which is known to send things that look like:
         // Connection:keep-alive, Upgrade
@@ -85,31 +72,103 @@ bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& reques
     }
     
     return true;
-
 }
 
 
 Poco::Net::HTTPRequestHandler* WebSocketRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
 {
-    return new WebSocketRouteHandler(*this);
+    return new WebSocketConnection(*this);
 }
 
 
 void WebSocketRoute::stop()
 {
-    close(); // TODO: get method signatures in sync ...
+    close(); // close all connections
 }
 
 
-WebSocketRouteSettings WebSocketRoute::getSettings() const
+bool WebSocketRoute::sendFrame(const AbstractWebSocketConnection* connection,
+                                            const WebSocketFrame& frame)
 {
-    return _settings;
+    if(0 != connection)
+    {
+        return connection->sendFrame(frame);
+    }
+    else
+    {
+        ofLogError("BaseWebSocketSessionManager::sendFrame") << "0 == handler";
+        return false;
+    }
 }
 
-BaseWebSocketSessionManager& WebSocketRoute::getSessionManagerRef()
+
+void WebSocketRoute::close(AbstractWebSocketConnection* connection)
 {
-    return *this;
+    if(0 != connection)
+    {
+        connection->close();
+    }
+    else
+    {
+        ofLogError("BaseWebSocketSessionManager::disconnect") << "0 == handler";
+    }
 }
+
+
+void WebSocketRoute::close()
+{
+    ofScopedLock lock(_mutex);
+    WebSocketConnectionsIter iter = _connections.begin();
+    while(iter != _connections.end())
+    {
+        close(*iter);
+        ++iter;
+    }
+}
+
+
+void WebSocketRoute::broadcast(const WebSocketFrame& frame)
+{
+    ofScopedLock lock(_mutex);
+    WebSocketConnectionsIter iter = _connections.begin();
+    while(iter != _connections.end())
+    {
+        sendFrame(*iter,frame);
+        ++iter;
+    }
+}
+
+
+void WebSocketRoute::registerWebSocketConnection(AbstractWebSocketConnection* connection)
+{
+    ofScopedLock lock(_mutex);
+    if(!_connections.insert(connection).second)
+    {
+        ofLogError("BaseWebSocketSessionManager::registerRouteHandler") << "Element was already in set!";
+    }
+}
+
+
+void WebSocketRoute::unregisterWebSocketConnection(AbstractWebSocketConnection* connection)
+{
+    ofScopedLock lock(_mutex);
+    // TODO: this will never return more than 1
+    std::size_t numErased = _connections.erase(connection);
+
+    // TODO: this is strange.
+    if(1 != numErased)
+    {
+        ofLogError("BaseWebSocketSessionManager::unregisterRouteHandler") << "1 != numErased" << numErased;
+    }
+}
+
+
+std::size_t WebSocketRoute::getNumWebSocketConnections() const
+{
+    ofScopedLock lock(_mutex);
+    return _connections.size();
+}
+
 
 
 } } // namespace ofx::HTTP

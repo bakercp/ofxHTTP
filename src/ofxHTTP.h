@@ -28,7 +28,6 @@
 
 #include "ofx/HTTP/IPVideo/BasicIPVideoServer.h"
 
-#include "ofx/HTTP/Server/BasicFileUploadServer.h"
 #include "ofx/HTTP/Server/BasicPostServer.h"
 #include "ofx/HTTP/Server/BasicServer.h"
 
@@ -37,4 +36,5 @@
 #include "ofx/HTTP/WebSocket/WebSocketEvents.h"
 #include "ofx/HTTP/WebSocket/WebSocketRoute.h"
 #include "ofx/HTTP/WebSocket/WebSocketFrame.h"
+#include "ofx/HTTP/WebSocket/WebSocketConnection.h"
 

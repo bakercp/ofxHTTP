@@ -44,7 +44,6 @@
 #include "ofEvents.h"
 #include "ofx/HTTP/Types/AbstractTypes.h"
 #include "ofx/HTTP/Server/BaseRoute.h"
-#include "ofx/HTTP/Server/BaseRouteHandler.h"
 #include "ofx/HTTP/Server/BaseServerSettings.h"
 #include "ofx/HTTP/Types/ThreadErrorHandler.h"
 
@@ -94,12 +93,11 @@ private:
 
 
 template <typename SettingsType>
-class BaseServer_:
-    public Poco::Net::HTTPRequestHandlerFactory
+class BaseServer_: public Poco::Net::HTTPRequestHandlerFactory
 {
 public:
     typedef std::shared_ptr<BaseServer_<SettingsType> > SharedPtr;
-    typedef std::weak_ptr<BaseServer_<SettingsType> >   WeakPtr;
+    typedef std::weak_ptr<BaseServer_<SettingsType> > WeakPtr;
 
     BaseServer_(const SettingsType& settings = SettingsType(),
                 Poco::ThreadPool& threadPoolRef = Poco::ThreadPool::defaultPool());
@@ -147,20 +145,19 @@ private:
 
     MyErrorHandler eh;
     Poco::ErrorHandler* pOldEH;
-
+    
 };
 
 
 typedef BaseServer_<BaseServerSettings> BaseServer;
 
 
-//------------------------------------------------------------------------------
 template <typename SettingsType>
 BaseServer_<SettingsType>::BaseServer_(const SettingsType& settings,
                                        Poco::ThreadPool& threadPoolRef):
+    _isSecurePort(false),
     _settings(settings),
-    _threadPoolRef(threadPoolRef), 
-    _isSecurePort(false)
+    _threadPoolRef(threadPoolRef)
 {
     ofAddListener(ofEvents().exit, this, &BaseServer_<SettingsType>::exit);
     Poco::Net::initializeSSL();
@@ -169,7 +166,7 @@ BaseServer_<SettingsType>::BaseServer_(const SettingsType& settings,
 
 }
 
-//------------------------------------------------------------------------------
+
 template <typename SettingsType>
 BaseServer_<SettingsType>::~BaseServer_()
 {
@@ -179,7 +176,7 @@ BaseServer_<SettingsType>::~BaseServer_()
     Poco::ErrorHandler::set(pOldEH);
 }
 
-//------------------------------------------------------------------------------
+
 template <typename SettingsType>
 void BaseServer_<SettingsType>::exit(ofEventArgs& args)
 {
@@ -187,7 +184,7 @@ void BaseServer_<SettingsType>::exit(ofEventArgs& args)
     ofRemoveListener(ofEvents().exit, this, &BaseServer_<SettingsType>::exit);
 }
 
-//------------------------------------------------------------------------------
+
 template <typename SettingsType>
 void BaseServer_<SettingsType>::start()
 {
@@ -244,7 +241,7 @@ void BaseServer_<SettingsType>::start()
 
 }
 
-//------------------------------------------------------------------------------
+
 template <typename SettingsType>
 void BaseServer_<SettingsType>::stop()
 {
@@ -289,49 +286,49 @@ void BaseServer_<SettingsType>::stop()
 
 }
 
-//------------------------------------------------------------------------------
+
 template <typename SettingsType>
 std::string BaseServer_<SettingsType>::getURL() const
 {
     return _settings.getURI().toString();
 }
 
-//------------------------------------------------------------------------------
+
 template <typename SettingsType>
 const SettingsType& BaseServer_<SettingsType>::getSettings() const
 {
     return _settings;
 }
 
-//------------------------------------------------------------------------------
+
 template <typename SettingsType>
 void BaseServer_<SettingsType>::addRoute(AbstractRoute::SharedPtr route)
 {
     _routes.push_back(route);
 }
 
-//------------------------------------------------------------------------------
+
 template <typename SettingsType>
 void BaseServer_<SettingsType>::removeRoute(AbstractRoute::SharedPtr route)
 {
     _routes.erase(std::remove(_routes.begin(),_routes.end(),route),_routes.end());
 }
 
-//------------------------------------------------------------------------------
+
 template <typename SettingsType>
 bool BaseServer_<SettingsType>::isRunning() const
 {
     return 0 != _server;
 }
 
-//------------------------------------------------------------------------------
+
 template <typename SettingsType>
 Poco::ThreadPool& BaseServer_<SettingsType>::getThreadPoolRef()
 {
     return _threadPoolRef;
 }
 
-//------------------------------------------------------------------------------
+
 template <typename SettingsType>
 Poco::Net::HTTPRequestHandler* BaseServer_<SettingsType>::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
 {
@@ -351,7 +348,7 @@ Poco::Net::HTTPRequestHandler* BaseServer_<SettingsType>::createRequestHandler(c
     return _baseRoute.createRequestHandler(request);
 }
 
-//------------------------------------------------------------------------------
+
 template <typename SettingsType>
 Poco::Net::HTTPServerParams::Ptr BaseServer_<SettingsType>::getPocoHTTPServerParams(const HTTPServerParams& params)
 {

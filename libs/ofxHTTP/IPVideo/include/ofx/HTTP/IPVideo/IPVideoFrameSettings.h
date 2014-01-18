@@ -40,10 +40,10 @@ public:
     virtual ~IPVideoFrameSettings();
 
     void setWidth(std::size_t width);
-    std::size_t getWidth();
+    std::size_t getWidth() const;
 
     void setHeight(std::size_t height);
-    std::size_t getHeight();
+    std::size_t getHeight() const;
 
     void setFlipHorizontal(bool flipHorizontal);
     bool getFlipHorizontal() const;
@@ -54,8 +54,11 @@ public:
     void setQuality(ofImageQualityType quality);
     ofImageQualityType getQuality() const;
 
-    static const std::size_t DEFAULT_WIDTH;
-    static const std::size_t DEFAULT_HEIGHT;
+    enum
+    {
+        DEFAULT_WIDTH = 320,
+        DEFAULT_HEIGHT = 240
+    };
 
 private:
     std::size_t _width;

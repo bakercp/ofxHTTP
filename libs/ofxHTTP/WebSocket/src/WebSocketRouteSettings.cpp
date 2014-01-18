@@ -31,20 +31,20 @@ namespace HTTP {
 
 
 const std::string WebSocketRouteSettings::DEFAULT_WEBSOCKET_ROUTE_PATH_PATTERN = "/";
+const Poco::Timespan WebSocketRouteSettings::DEFAULT_RECEIVE_TIMEOUT = Poco::Timespan(60 * Poco::Timespan::SECONDS);
+const Poco::Timespan WebSocketRouteSettings::DEFAULT_SEND_TIMEOUT = Poco::Timespan(60 * Poco::Timespan::SECONDS);
+const Poco::Timespan WebSocketRouteSettings::DEFAULT_POLL_TIMEOUT = Poco::Timespan(10 * Poco::Timespan::MILLISECONDS);
 
 
-WebSocketRouteSettings::WebSocketRouteSettings(const std::string& routePathPattern):
-    BaseRouteSettings(routePathPattern),
-    _subprotocol(""),
-    _allowEmptySubprotocol(false),
-    _allowCrossOriginConnections(false),
-    _isBinary(false),
+WebSocketRouteSettings::WebSocketRouteSettings(const std::string& routePathPattern,
+                                               bool requireSecurePort):
+    BaseRouteSettings(routePathPattern, requireSecurePort),
     _autoPingPongResponse(true),
     _keepAlive(true),
-    _receiveTimeout(Poco::Timespan(60 * Poco::Timespan::SECONDS)),
-    _sendTimeout(Poco::Timespan(60 * Poco::Timespan::SECONDS)),
-    _pollTimeout(Poco::Timespan(10 * Poco::Timespan::MILLISECONDS)),
-    _bufferSize(1024)
+    _receiveTimeout(DEFAULT_RECEIVE_TIMEOUT),
+    _sendTimeout(DEFAULT_SEND_TIMEOUT),
+    _pollTimeout(DEFAULT_POLL_TIMEOUT),
+    _bufferSize(DEFAULT_BUFFER_SIZE)
 {
 }
 
@@ -54,51 +54,27 @@ WebSocketRouteSettings::~WebSocketRouteSettings()
 }
 
 
-void WebSocketRouteSettings::setSubprotocol(const std::string& subprotocol)
+void WebSocketRouteSettings::setValidSubprotcols(const SubprotocolSet& validSubprotocols)
 {
-    _subprotocol = subprotocol;
+    _validSubprotocols = validSubprotocols;
 }
 
 
-std::string WebSocketRouteSettings::getSubprotocol() const
+const WebSocketRouteSettings::SubprotocolSet& WebSocketRouteSettings::getValidSubprotocols() const
 {
-    return _subprotocol;
+    return _validSubprotocols;
 }
 
 
-void WebSocketRouteSettings::setAllowEmptySubprotocol(bool allowEmptySubprotocol)
+void WebSocketRouteSettings::setValidOrigins(const OriginSet& validOrigins)
 {
-    _allowEmptySubprotocol = allowEmptySubprotocol;
+    _validOrigins = validOrigins;
 }
 
 
-bool WebSocketRouteSettings::getAllowEmptySubprotocol() const
+const WebSocketRouteSettings::OriginSet& WebSocketRouteSettings::getValidOrigins() const
 {
-    return _allowEmptySubprotocol;
-}
-
-
-void WebSocketRouteSettings::setAllowCrossOriginConnections(bool allowCrossOriginConnections)
-{
-    _allowCrossOriginConnections = allowCrossOriginConnections;
-}
-
-
-bool WebSocketRouteSettings::getAllowCrossOriginConnections() const
-{
-    return _allowCrossOriginConnections;
-}
-
-
-void WebSocketRouteSettings::setIsBinary(bool isBinary)
-{
-    _isBinary = isBinary;
-}
-
-
-bool WebSocketRouteSettings::getIsBinary() const
-{
-    return _isBinary;
+    return _validOrigins;
 }
 
 

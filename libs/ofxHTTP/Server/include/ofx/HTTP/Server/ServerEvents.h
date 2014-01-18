@@ -28,6 +28,7 @@
 
 #include "Poco/Net/MediaType.h"
 #include "Poco/Net/NameValueCollection.h"
+#include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "ofEvents.h"
 
@@ -36,61 +37,48 @@ namespace ofx {
 namespace HTTP {
 
 
-class BaseServerEvent: public ofEventArgs
+class BaseHTTPServerRequestEventArgs: public ofEventArgs
 {
 public:
-    typedef Poco::Net::NameValueCollection Headers;
-    typedef Poco::Net::NameValueCollection::ConstIterator HeadersIter;
+    BaseHTTPServerRequestEventArgs(const Poco::Net::HTTPServerRequest& request):
+        _request(request)
+    {
+    }
 
-//    BaseServerEvent(const Headers& headers):
-//        _headers(headers)
-//    {
-//    }
-//
-//
-//    Headers getHeaders() const
-//    {
-//        return _headers;
-//    }
+    const Poco::Net::HTTPServerRequest& getRequest() const
+    {
+        return _request;
+    }
 
-
-//    std::size_t getContentLength() const
-//    {
-//        HeadersIter iter = _headers.find("Content-Length");
-//
-//        if (iter != _headers.end())
-//        {
-//            std::istringstream buffer((*iter).second);
-//            std::size_t result;
-//            buffer >> result;
-//            return result;
-//        }
-//        else
-//        {
-//            return 0;
-//        }
-//    }
-//
-//
-//    Poco::Net::MediaType getContentType() const
-//    {
-//        HeadersIter iter = _headers.find("Content-Type");
-//
-//        if (iter != _headers.end())
-//        {
-//            return Poco::Net::MediaType((*iter).second);
-//        }
-//        else
-//        {
-//            return Poco::Net::MediaType("text/plain");
-//        }
-//    }
+    std::streamsize getRequestContentLength() const
+    {
+        return _request.getContentLength();
+    }
 
 protected:
-    Headers _headers;
+    const Poco::Net::HTTPServerRequest& _request;
 
 };
 
+
+class BaseHTTPStatusEvent: public BaseHTTPServerRequestEventArgs
+{
+public:
+    BaseHTTPStatusEvent(const Poco::Net::HTTPServerRequest& request,
+                        Poco::Net::HTTPResponse::HTTPStatus code,
+                        const std::string& message):
+        BaseHTTPServerRequestEventArgs(request),
+        code(code),
+        message(message)
+    {
+    }
+
+    const Poco::Net::HTTPResponse::HTTPStatus code;
+    const std::string message;
+    
+};
+    
+    
 
 
 

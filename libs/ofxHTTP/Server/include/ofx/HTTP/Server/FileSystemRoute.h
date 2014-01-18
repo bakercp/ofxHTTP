@@ -26,8 +26,8 @@
 #pragma once
 
 
+#include "ofx/HTTP/Server/BaseRoute.h"
 #include "ofx/HTTP/Server/FileSystemRouteHandler.h"
-#include "ofx/HTTP/Server/FileSystemRouteInterface.h"
 #include "ofx/HTTP/Server/FileSystemRouteSettings.h"
 
 
@@ -35,11 +35,11 @@ namespace ofx {
 namespace HTTP {
 
 
-class FileSystemRoute: public FileSystemRouteInterface
+class FileSystemRoute: public BaseRoute_<FileSystemRouteSettings>
 {
 public:
     typedef std::shared_ptr<FileSystemRoute> SharedPtr;
-    typedef std::weak_ptr<FileSystemRoute>   WeakPtr;
+    typedef std::weak_ptr<FileSystemRoute> WeakPtr;
     typedef FileSystemRouteSettings Settings;
 
     FileSystemRoute(const Settings& settings);
@@ -48,20 +48,12 @@ public:
     virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
                                Poco::Net::HTTPServerResponse& response);
 
-    virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
-                                  bool isSecurePort) const;
-
     Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
-
-    FileSystemRouteSettings getSettings() const;
 
     static SharedPtr makeShared(const Settings& settings)
     {
         return SharedPtr(new FileSystemRoute(settings));
     }
-
-private:
-    Settings _settings;
 
 };
 

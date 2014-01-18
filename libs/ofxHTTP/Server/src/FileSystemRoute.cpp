@@ -31,22 +31,13 @@ namespace HTTP {
 
 
 FileSystemRoute::FileSystemRoute(const Settings& settings):
-    _settings(settings)
+    BaseRoute_<FileSystemRouteSettings>(settings)
 {
 }
 
 
 FileSystemRoute::~FileSystemRoute()
 {
-}
-
-
-bool FileSystemRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
-                                       bool isSecurePort) const
-{
-    // require an HTTP_GET call
-    return request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET &&
-           BaseRoute::canHandleRequest(request, isSecurePort);
 }
 
 
@@ -60,7 +51,7 @@ void FileSystemRoute::handleRequest(Poco::Net::HTTPServerRequest& request,
     {
         try
         {
-            response.sendFile(errorFile.getAbsolutePath(),"text/html");
+            response.sendFile(errorFile.getAbsolutePath(), "text/html");
             return;
         }
         catch (const Poco::FileNotFoundException& exc)
@@ -84,21 +75,15 @@ void FileSystemRoute::handleRequest(Poco::Net::HTTPServerRequest& request,
             ofLogVerbose("ServerRouteHandler::sendErrorResponse") << "... Unknown exception.";
         }
     }
-    // if nothing is returned, then base route will get it
 
-    BaseRoute::handleRequest(request,response);
+    // if nothing is returned, then base route will get it
+    BaseRoute_<FileSystemRouteSettings>::handleRequest(request, response);
 }
 
 
 Poco::Net::HTTPRequestHandler* FileSystemRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
 {
-  return new FileSystemRouteHandler(*this);
-}
-
-
-FileSystemRouteSettings FileSystemRoute::getSettings() const
-{
-    return _settings;
+    return new FileSystemRouteHandler(*this);
 }
 
 

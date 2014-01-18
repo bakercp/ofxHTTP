@@ -27,6 +27,7 @@
 
 
 #include <queue>
+#include "Poco/Buffer.h"
 #include "Poco/Exception.h"
 #include "Poco/Timespan.h"
 #include "Poco/Net/Socket.h"
@@ -35,8 +36,6 @@
 #include "ofFileUtils.h"
 #include "ofLog.h"
 #include "ofx/HTTP/Types/AbstractTypes.h"
-#include "ofx/HTTP/WebSocket/BaseWebSocketSessionManager.h"
-#include "ofx/HTTP/WebSocket/WebSocketRouteInterface.h"
 #include "ofx/HTTP/WebSocket/WebSocketRouteSettings.h"
 #include "ofx/HTTP/WebSocket/WebSocketEvents.h"
 #include "ofx/HTTP/WebSocket/WebSocketFrame.h"
@@ -46,53 +45,81 @@
 namespace ofx {
 namespace HTTP {
 
-// TODO:
-// - move default constants to enum
+
+class WebSocketRoute;
 
 
 class WebSocketConnection: public AbstractWebSocketConnection
+    /// \brief A thread safe WebSocketConnection represents a
+    ///         WebSocket connection with a single client.
+    /// \details Frames can be sent across thread boundaries and are
+    ///         queued for sending during the WebSocketConnection's
+    ///         service loop.
 {
 public:
-    WebSocketConnection(WebSocketRouteInterface& parent);
+    WebSocketConnection(WebSocketRoute& parent);
+        ///< \brief Create a WebSocketConnection.
+        ///< \param parent A reference to the parent WebSocketRoute.
 
     virtual ~WebSocketConnection();
+        ///< \brief Destroy the WebSocketConnection.
 
     virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
                                Poco::Net::HTTPServerResponse& response);
+        ///< \brief Handle an HTTPServerRequest with an HTTPServerResponse.
+        ///< \param request The HTTPServerRequest to handle.
+        ///< \param response The HTTPServerResponse to return.
 
     bool sendFrame(const WebSocketFrame& frame) const;
+        ///< \brief Queue a frame to be sent.
+        ///< 
         ///< \returns false if frame not queued
 
-    void stop();
+    void close();
 
     virtual void frameReceived(const WebSocketFrame& frame);
-    virtual void frameSent(const WebSocketFrame& frame, std::size_t numBytesSent);
-    virtual void socketClosed();
+        ///< \brief Called when a WebSocketFrame is received.
+        ///< \details Subclasses can implement this method.
+        ///< \param frame The WebSocketFrame that was received.
 
-    void broadcast(const WebSocketFrame& frame) const;
+    virtual void frameSent(const WebSocketFrame& frame,
+                           std::size_t numBytesSent);
+        ///< \brief Called when a WebSocketFrame is sent.
+        ///< \details Subclasses can implement this method.
+        ///< \param frame The WebSocketFrame that was sent.
+        ///< \param numBytesSent The number of bytes sent in the WebSocketFrame.
+
+    virtual void socketClosed();
+        ///< \brief Called when a WebSocketConnection is closed.
+        ///< \details Subclasses can implement this method.
 
     Poco::Net::NameValueCollection getRequestHeaders() const;
+        ///< \returns The request headers submitted when
+        ///<        establishing this connection.
+
     Poco::Net::SocketAddress getClientAddress() const;
+        ///< \returns the SocketAddress of the client that
+        ///<        established this connection.
 
     bool isConnected() const;
+        ///< \returns true iff this WebSocketConnect is connected to a client.
 
 //    std::string getSubprotocol() const;
 
     std::size_t getSendQueueSize() const;
+        ///< \returns the size of the send queue.
+
     void clearSendQueue();
+        ///< \brief Clears the send queue.
 
 protected:
-    void setIsConnected(bool bIsConnected);
-
-    WebSocketRouteInterface& _parent;
+    WebSocketRoute& _parent;
+        ///< \brief A reference to the parent WebSocketRoute.
 
 private:
-//    void handleErrorResponse(Poco::Net::HTTPServerResponse& response);
-
-//    void handleSubprotocols(Poco::Net::HTTPServerRequest& request,
-//                            Poco::Net::HTTPServerResponse& response);
     void handleOrigin(Poco::Net::HTTPServerRequest& request,
                       Poco::Net::HTTPServerResponse& response);
+    
     void handleExtensions(Poco::Net::HTTPServerRequest& request,
                           Poco::Net::HTTPServerResponse& response);
     
@@ -114,4 +141,3 @@ private:
 
 
 } } // namespace ofx::HTTP
-

@@ -1,2 +1,0 @@
-ofxMediaType
-ofxHTTP

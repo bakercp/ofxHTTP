@@ -37,7 +37,14 @@ namespace HTTP {
 class IPVideoRouteSettings: public BaseRouteSettings
 {
 public:
-    IPVideoRouteSettings(const std::string& routePathPattern = DEFAULT_VIDEO_ROUTE);
+    IPVideoRouteSettings(const std::string& routePathPattern = DEFAULT_VIDEO_ROUTE,
+                         bool requireSecurePort = false);
+    ///< \brief Create the BaseRouteSettings with the given route path.
+    ///< \param routePathPattern The regex pattern that this route
+    ///<        will handle.
+    ///< \param requireSecurePorttrue True if this route requires
+    ///<        communication on an SSL encrypted port.
+
     virtual ~IPVideoRouteSettings();
 
     void setMaxClientConnections(std::size_t maxClientConnections);
@@ -64,15 +71,26 @@ public:
     void setMaxStreamHeight(std::size_t maxStreamHeight);
     std::size_t getMaxStreamHeight() const;
 
+
+    enum
+    {
+        DEFAULT_MAX_CLIENT_CONNECTIONS = 5,
+        DEFAULT_MAX_CLIENT_BITRATE     = 1024,
+        DEFAULT_MAX_CLIENT_FRAMERATE   = 30,
+        DEFAULT_MAX_CLIENT_QUEUE_SIZE  = 10,
+    };
+
+
+    enum
+    {
+        DEFAULT_MAX_STREAM_WIDTH  = 1920,
+        DEFAULT_MAX_STREAM_HEIGHT = 1080,
+    };
+
+
     static const std::string DEFAULT_VIDEO_ROUTE;
-    static const std::size_t DEFAULT_MAX_CLIENT_CONNECTIONS;
-    static const std::size_t DEFAULT_MAX_CLIENT_BITRATE;
-    static const std::size_t DEFAULT_MAX_CLIENT_FRAMERATE;
-    static const std::size_t DEFAULT_MAX_CLIENT_QUEUE_SIZE;
     static const std::string DEFAULT_BOUNDARY_MARKER;
     static const Poco::Net::MediaType DEFAULT_MEDIA_TYPE;
-    static const std::size_t DEFAULT_MAX_STREAM_WIDTH;
-    static const std::size_t DEFAULT_MAX_STREAM_HEIGHT;
 
 private:
     std::size_t _maxClientConnections;

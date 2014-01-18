@@ -24,12 +24,8 @@
 
 #pragma once
 
+
 #include <queue>
-
-//#include "Poco/Condition.h"
-
-//#include "ofTypes.h"
-
 #include "ofx/HTTP/IPVideo/IPVideoFrame.h"
 #include "ofx/HTTP/IPVideo/IPVideoFrameSettings.h"
 
@@ -49,8 +45,11 @@ public:
     void push(IPVideoFrame::SharedPtr frame);
 
     std::size_t getMaxSize() const;
+
     void setMaxSize(std::size_t maxSize);
+
     std::size_t size() const;
+
     bool empty() const;
 
 private:

@@ -31,30 +31,20 @@ namespace HTTP {
 
 
 IPVideoRoute::IPVideoRoute(const Settings& settings):
-    _settings(settings)
+    BaseRoute_<IPVideoRouteSettings>(settings)
 {
 }
+
 
 IPVideoRoute::~IPVideoRoute()
 {
-}
-
-std::string IPVideoRoute::getRoutePathPattern() const
-{
-    return _settings.getRoutePathPattern();
-}
-
-bool IPVideoRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
-                                    bool isSecurePort) const
-{
-    return request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET &&
-           BaseRoute::canHandleRequest(request, isSecurePort);
 }
 
 Poco::Net::HTTPRequestHandler* IPVideoRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
 {
     return new IPVideoRouteHandler(*this);
 }
+
 
 void IPVideoRoute::send(ofPixels& pix)
 {
@@ -65,6 +55,7 @@ void IPVideoRoute::send(ofPixels& pix)
         ofPixels pixels(pix); // copy the pixels (const!)
         ofBuffer compressedPixels;
 
+        // TODO: turbo jpeg an option here?
         ofSaveImage(pixels, compressedPixels, OF_IMAGE_FORMAT_JPEG, OF_IMAGE_QUALITY_MEDIUM);
 
         ofScopedLock lock(_mutex);
@@ -75,7 +66,7 @@ void IPVideoRoute::send(ofPixels& pix)
 //
 //        settings.quality = settings.quality;
 
-        IPVideoFrame::SharedPtr frame = IPVideoFrame::makeShared(settings,timestamp,compressedPixels);
+        IPVideoFrame::SharedPtr frame = IPVideoFrame::makeShared(settings, timestamp, compressedPixels);
 
         while(iter != _connections.end())
         {
@@ -95,10 +86,6 @@ void IPVideoRoute::send(ofPixels& pix)
     }
 }
 
-IPVideoRouteSettings IPVideoRoute::getSettings() const
-{
-    return _settings;
-}
 
 void IPVideoRoute::addConnection(IPVideoRouteHandler* handler)
 {
@@ -106,17 +93,20 @@ void IPVideoRoute::addConnection(IPVideoRouteHandler* handler)
     _connections.push_back(handler);
 }
 
+
 void IPVideoRoute::removeConnection(IPVideoRouteHandler* handler)
 {
     ofScopedLock lock(_mutex);
     _connections.erase(std::remove(_connections.begin(), _connections.end(), handler), _connections.end());
 }
 
+
 std::size_t IPVideoRoute::getNumConnections() const
 {
     ofScopedLock lock(_mutex);
     return _connections.size();
 }
+
 
 void IPVideoRoute::stop()
 {
@@ -130,8 +120,6 @@ void IPVideoRoute::stop()
             }
         }
     }
-
-
 }
 
 

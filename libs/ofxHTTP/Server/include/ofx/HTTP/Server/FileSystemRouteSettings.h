@@ -37,7 +37,8 @@ namespace HTTP {
 class FileSystemRouteSettings: public BaseRouteSettings
 {
 public:
-    FileSystemRouteSettings(const std::string& routePathPattern = BaseRouteSettings::DEFAULT_ROUTE_PATH_PATTERN);
+    FileSystemRouteSettings(const std::string& routePathPattern = BaseRouteSettings::DEFAULT_ROUTE_PATH_PATTERN,
+                            bool requireSecurePort = false);
 
     virtual ~FileSystemRouteSettings();
 
@@ -53,10 +54,10 @@ public:
     //    html.addCompressionType(DEFLATE);
 
     void setDefaultIndex(const std::string& defaultIndex);
-    std::string getDefaultIndex() const;
+    const std::string& getDefaultIndex() const;
 
     void setDocumentRoot(const std::string& documentRoot);
-    std::string getDocumentRoot() const;
+    const std::string& getDocumentRoot() const;
 
     void setAutoCreateDocumentRoot(bool autoCreateDocumentRoot);
     bool getAutoCreateDocumentRoot() const;
@@ -66,7 +67,7 @@ public:
 
     static const std::string DEFAULT_DOCUMENT_ROOT;
     static const std::string DEFAULT_INDEX;
-    
+
 private:
     std::string _defaultIndex;
     std::string _documentRoot;

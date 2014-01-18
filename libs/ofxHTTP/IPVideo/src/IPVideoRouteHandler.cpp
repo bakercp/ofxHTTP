@@ -24,14 +24,18 @@
 
 
 #include "ofx/HTTP/IPVideo/IPVideoRouteHandler.h"
+#include "ofx/HTTP/IPVideo/IPVideoRoute.h"
+
+
+#undef min // for windows
+#undef max // for windows
 
 
 namespace ofx {
 namespace HTTP {
 
 
-IPVideoRouteHandler::IPVideoRouteHandler(IPVideoRouteInterface& parent):
-    BaseRouteHandler(parent),
+IPVideoRouteHandler::IPVideoRouteHandler(IPVideoRoute& parent):
     IPVideoFrameQueue(parent.getSettings().getMaxClientQueueSize()),
     _parent(parent),
     _isRunning(true),
@@ -45,9 +49,11 @@ IPVideoRouteHandler::IPVideoRouteHandler(IPVideoRouteInterface& parent):
 {
 }
 
+
 IPVideoRouteHandler::~IPVideoRouteHandler()
 {
 }
+
 
 void IPVideoRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
                                         Poco::Net::HTTPServerResponse& response)
@@ -57,6 +63,7 @@ void IPVideoRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
     {
         response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE,
                                     "Maximum client connections exceeded.  Please try again later.");
+
         _parent.handleRequest(request,response);
         return;
     }
@@ -222,21 +229,25 @@ void IPVideoRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
 
 }
 
+
 void IPVideoRouteHandler::stop()
 {
     _isRunning = false;
 }
+
 
 IPVideoFrameSettings IPVideoRouteHandler::getFrameSettings() const
 {
     return _frameSettings;
 }
 
+
 float IPVideoRouteHandler::getCurrentBitRate() const
 {
     ofScopedLock lock(_mutex);
     return (float)_bytesSent * 8.0f / (ofGetElapsedTimeMillis() - _startTime);
 }
+
 
 float IPVideoRouteHandler::getCurrentFrameRate() const
 {

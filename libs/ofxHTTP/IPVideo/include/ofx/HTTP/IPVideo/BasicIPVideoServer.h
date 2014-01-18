@@ -45,15 +45,13 @@ class BasicIPVideoServer: public BasicServer
 {
 public:
     typedef std::shared_ptr<BasicIPVideoServer> SharedPtr;
-    typedef std::weak_ptr<BasicIPVideoServer>   WeakPtr;
+    typedef std::weak_ptr<BasicIPVideoServer> WeakPtr;
     typedef BasicIPVideoServerSettings Settings;
 
     BasicIPVideoServer(const Settings& settings = Settings());
     virtual ~BasicIPVideoServer();
 
-
     void send(ofPixels& pix);
-
 
     std::size_t getNumConnections() const
     {

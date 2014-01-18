@@ -39,23 +39,28 @@ IPVideoFrame::IPVideoFrame(const Settings& settings,
 {
 }
 
+
 IPVideoFrame::~IPVideoFrame()
 {
 }
+
 
 IPVideoFrame::Settings IPVideoFrame::getSettings() const
 {
     return _settings;
 }
 
+
 unsigned long long IPVideoFrame::getTimestamp() const
 {
     return _timestamp;
 }
 
+
 ofBuffer& IPVideoFrame::getBufferRef()
 {
     return _buffer;
 }
+
 
 } } // namespace ofx::HTTP

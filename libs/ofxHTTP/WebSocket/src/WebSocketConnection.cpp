@@ -24,27 +24,31 @@
 
 
 #include "ofx/HTTP/WebSocket/WebSocketConnection.h"
+#include "ofx/HTTP/WebSocket/WebSocketRoute.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-WebSocketConnection::WebSocketConnection(WebSocketRouteInterface& parent):
+WebSocketConnection::WebSocketConnection(WebSocketRoute& parent):
     _parent(parent),
     _isConnected(false)
 {
+    _parent.registerWebSocketConnection(this);
 }
 
 
 WebSocketConnection::~WebSocketConnection()
 {
+    _parent.unregisterWebSocketConnection(this);
 }
 
 
 void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                                         Poco::Net::HTTPServerResponse& response)
 {
+
     try
     {
         // TODO: copy the request?
@@ -61,52 +65,52 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
 
         //////////////////////////////////////////////////////
 
-        Poco::Net::WebSocket ws(request,response);
+        Poco::Net::WebSocket ws(request, response);
         ws.setReceiveTimeout(_parent.getSettings().getReceiveTimeout());
         ws.setSendTimeout(_parent.getSettings().getSendTimeout());
         ws.setKeepAlive(_parent.getSettings().getKeepAlive());
 
-        setIsConnected(true);
+        _mutex.lock();
+        _isConnected = true;
+        _mutex.unlock();
 
 //        WebSocketEventArgs eventArgs(*this);
 //        ofNotifyEvent(_manager.events.onOpenEvent, eventArgs, this);
 
         ofLogNotice("ServerWebSocketRouteHandler::handleRequest") << "WebSocket connection established.";
 
-        const std::size_t bufferSize = _parent.getSettings().getBufferSize();
 
-        char buffer[bufferSize];
-        std::memset(buffer,0,bufferSize); // initialize to 0
+        Poco::Buffer<char> buffer(_parent.getSettings().getBufferSize());
 
         int flags = 0;
         int numBytesReceived = 0;
         //        int numBytesSent = 0;
 
         WebSocketEventArgs eventArgs(*this);
-        ofNotifyEvent(_parent.getSessionManagerRef().events.onOpenEvent, eventArgs, this);
+        ofNotifyEvent(_parent.events.onOpenEvent, eventArgs, this);
 
         do
         {
             if(ws.poll(_parent.getSettings().getPollTimeout(),Poco::Net::Socket::SELECT_READ))
             {
-                numBytesReceived = ws.receiveFrame(buffer,bufferSize,flags);
+                numBytesReceived = ws.receiveFrame(buffer.begin(), buffer.size(), flags);
 
                 if(numBytesReceived > 0)
                 {
-                    WebSocketFrame frame(buffer,numBytesReceived,flags);
+                    WebSocketFrame frame(buffer.begin(), numBytesReceived, flags);
 
                     if(_parent.getSettings().getAutoPingPongResponse())
                     {
                         if(frame.isPing())
                         {
-                            WebSocketFrame pongFrame(buffer,
+                            WebSocketFrame pongFrame(buffer.begin(),
                                                      numBytesReceived,
                                                      Poco::Net::WebSocket::FRAME_FLAG_FIN | Poco::Net::WebSocket::FRAME_OP_PONG);
                             sendFrame(pongFrame);
                         }
                         else if(frame.isPong())
                         {
-                            WebSocketFrame pingFrame(buffer,
+                            WebSocketFrame pingFrame(buffer.begin(),
                                                      numBytesReceived,
                                                      Poco::Net::WebSocket::FRAME_FLAG_FIN | Poco::Net::WebSocket::FRAME_OP_PING);
                             sendFrame(pingFrame);
@@ -116,13 +120,13 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                     frameReceived(frame);
 
                     WebSocketFrameEventArgs frameArgs(frame, *this);
-                    ofNotifyEvent(_parent.getSessionManagerRef().events.onFrameReceivedEvent, frameArgs, this);
+                    ofNotifyEvent(_parent.events.onFrameReceivedEvent, frameArgs, this);
 
                 }
                 else
                 {
                     // clean shutdown
-                    stop();
+                    close();
                 }
             }
 
@@ -131,7 +135,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
 
             if(ws.poll(_parent.getSettings().getPollTimeout(),Poco::Net::Socket::SELECT_ERROR))
             {
-                stop(); // locks!
+                close(); // locks!
                 //cout << "GOT ERROR KILLING IT!" << endl;
             }
 
@@ -143,7 +147,6 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
     }
     catch (const Poco::Net::WebSocketException& exc)
     {
-
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "WebSocketException: " << exc.code() << " Desc: " << exc.what();
 
         switch (exc.code())
@@ -166,37 +169,38 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                 response.setReason("WS_ERR_HANDSHAKE_NO_KEY");
                 break;
         }
+
         _parent.handleRequest(request,response);
         socketClosed();
 
         WebSocketEventArgs eventArgs(*this, (WebSocketError)exc.code());
 
-        ofNotifyEvent(_parent.getSessionManagerRef().events.onErrorEvent, eventArgs, this);
+        ofNotifyEvent(_parent.events.onErrorEvent, eventArgs, this);
     }
     catch (const Poco::TimeoutException& exc)
     {
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "TimeoutException: " << exc.code() << " Desc: " << exc.what();
         socketClosed();
-        WebSocketEventArgs eventArgs(*this,WS_ERR_TIMEOUT);
-        ofNotifyEvent(_parent.getSessionManagerRef().events.onErrorEvent, eventArgs, this);
+        WebSocketEventArgs eventArgs(*this, WS_ERR_TIMEOUT);
+        ofNotifyEvent(_parent.events.onErrorEvent, eventArgs, this);
         // response socket has already been closed (!?)
     }
     catch (const Poco::Net::NetException& exc)
     {
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "NetException: " << exc.code() << " Desc: " << exc.what();
         socketClosed();
-        WebSocketEventArgs eventArgs(*this,WS_ERR_NET_EXCEPTION);
-        ofNotifyEvent(_parent.getSessionManagerRef().events.onErrorEvent, eventArgs, this);
+        WebSocketEventArgs eventArgs(*this, WS_ERR_NET_EXCEPTION);
+        ofNotifyEvent(_parent.events.onErrorEvent, eventArgs, this);
         // response socket has already been closed (!?)
     }
     catch (const std::exception& exc)
     {
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "exception: " << exc.what();
         response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-        _parent.handleRequest(request,response);
+        _parent.handleRequest(request, response);
         socketClosed();
-        WebSocketEventArgs eventArgs(*this,WS_ERR_OTHER);
-        ofNotifyEvent(_parent.getSessionManagerRef().events.onErrorEvent, eventArgs, this);
+        WebSocketEventArgs eventArgs(*this, WS_ERR_OTHER);
+        ofNotifyEvent(_parent.events.onErrorEvent, eventArgs, this);
     }
     catch ( ... )
     {
@@ -204,20 +208,17 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
         response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         _parent.handleRequest(request,response);
         socketClosed();
-        WebSocketEventArgs eventArgs(*this,WS_ERR_OTHER);
-        ofNotifyEvent(_parent.getSessionManagerRef().events.onErrorEvent, eventArgs, this);
+        WebSocketEventArgs eventArgs(*this, WS_ERR_OTHER);
+        ofNotifyEvent(_parent.events.onErrorEvent, eventArgs, this);
     }
 
     WebSocketEventArgs eventArgs(*this);
-    ofNotifyEvent(_parent.getSessionManagerRef().events.onCloseEvent,eventArgs,this);
+    ofNotifyEvent(_parent.events.onCloseEvent, eventArgs, this);
 }
 
 
 void WebSocketConnection::frameReceived(const WebSocketFrame& frame)
 {
-//    WebSocketFrame _frame(frame);
-//    sendFrame(_frame); // echo
-//    sendFrame(frame);
 }
 
 
@@ -239,13 +240,11 @@ bool WebSocketConnection::sendFrame(const WebSocketFrame& frame) const
 void WebSocketConnection::frameSent(const WebSocketFrame& frame,
                                     std::size_t nBytesSent)
 {
-    ofLogVerbose("ServerWebSocketRouteHandler::frameSent") << frame.toString() << " nBytesSent=" << nBytesSent;
 }
 
 
 void WebSocketConnection::socketClosed()
 {
-    ofLogVerbose("ServerWebSocketRouteHandler::frameSent") << "Socket closed.";
 }
 
 
@@ -260,24 +259,27 @@ void WebSocketConnection::clearSendQueue()
 {
     ofScopedLock lock(_mutex);
     std::queue<WebSocketFrame> empty; // a way to clear queues.
-    std::swap(_frameQueue,empty);
+    std::swap(_frameQueue, empty);
 }
 
 
-void WebSocketConnection::stop()
+void WebSocketConnection::close()
 {
-    setIsConnected(false);
+    ofScopedLock lock(_mutex);
+    _isConnected = false;
 }
 
 
 Poco::Net::NameValueCollection WebSocketConnection::getRequestHeaders() const
 {
+    ofScopedLock lock(_mutex);
     return _requestHeaders;
 }
 
 
 Poco::Net::SocketAddress WebSocketConnection::getClientAddress() const
 {
+    ofScopedLock lock(_mutex);
     return _clientAddress;
 }
 
@@ -286,13 +288,6 @@ bool WebSocketConnection::isConnected() const
 {
     ofScopedLock lock(_mutex);
     return _isConnected;
-}
-
-
-void WebSocketConnection::setIsConnected(bool isConnected)
-{
-    ofScopedLock lock(_mutex);
-    _isConnected = isConnected;
 }
 
 
@@ -347,7 +342,7 @@ void WebSocketConnection::handleOrigin(Poco::Net::HTTPServerRequest& request,
     // http://en.wikipedia.org/wiki/Same_origin_policy
 
 //    _settings.getAllowCrossOriginConnections();
-//    Utils::dumpHeaders(request,OF_LOG_NOTICE);
+    Utils::dumpHeaders(request,OF_LOG_NOTICE);
     // Access-Control-Allow-Origin
 
     //    ofLogError("ServerRouteHandler::handleOrigin") << "TODO: handle/check origin";
@@ -432,7 +427,7 @@ void WebSocketConnection::processFrameQueue(Poco::Net::WebSocket& ws)
 
                 frameSent(frame, numBytesSent);
                 
-                ofNotifyEvent(_parent.getSessionManagerRef().events.onFrameSentEvent, eventArgs, this);
+                ofNotifyEvent(_parent.events.onFrameSentEvent, eventArgs, this);
             }
             
         }

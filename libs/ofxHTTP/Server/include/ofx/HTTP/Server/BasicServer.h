@@ -45,19 +45,30 @@ class BasicServer: public BaseServer_<BasicServerSettings>
 {
 public:
     typedef std::shared_ptr<BasicServer> SharedPtr;
+        ///< \brief A typedef for a shared pointer.
+
     typedef BasicServerSettings Settings;
+        ///< \brief A typedef for the BasicServerSettings.
+
 
     BasicServer(const Settings& settings = Settings());
-    virtual ~BasicServer();
+        ///< \brief Create a BasicServer with the provided Settings.
+        ///< \param settings The Settings used to configure the server.
 
-    // this method is a hack replacement for std::make_shared<BasicServer>(...);
+    virtual ~BasicServer();
+        ///< \brief Destroy the BasicServer.
+
     static SharedPtr makeShared(const Settings& settings = Settings())
+        ///< \brief Construct a shared pointer to this server.
+        ///< \param settings The Settings used to configure the server.
+        ///< \note This will be replaced with C++11 (std::make_shared<...>).
     {
         return SharedPtr(new BasicServer(settings));
     }
 
 private:
     FileSystemRoute::SharedPtr _fileSystemRoute;
+        ///< \brief The FileSystemRoute attached to this server.
 
 };
 

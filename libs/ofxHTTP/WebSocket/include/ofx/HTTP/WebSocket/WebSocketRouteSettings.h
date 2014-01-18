@@ -26,6 +26,7 @@
 #pragma once
 
 
+#include <set>
 #include <string>
 #include "Poco/Timespan.h"
 #include "ofx/HTTP/Server/BaseRouteSettings.h"
@@ -36,51 +37,87 @@ namespace HTTP {
 
 
 class WebSocketRouteSettings: public BaseRouteSettings
+    /// \brief Settings for a WebSocketRoute.
 {
 public:
-    WebSocketRouteSettings(const std::string& routePathPattern = DEFAULT_WEBSOCKET_ROUTE_PATH_PATTERN);
+    typedef std::set<std::string> SubprotocolSet;
+        ///< \breif A typedef for subprotocols.
+
+    typedef std::set<std::string> OriginSet;
+        ///< \brief A typedef for origins.
+
+    WebSocketRouteSettings(const std::string& routePathPattern = DEFAULT_WEBSOCKET_ROUTE_PATH_PATTERN,
+                           bool requireSecurePort = false);
+        ///< \param routePathPattern The regex pattern that this route
+        ///<        will handle.
+        ///< \param requireSecurePorttrue True if this route requires
+        ///<        communication on an SSL encrypted port.
 
     virtual ~WebSocketRouteSettings();
+        ///< \brief Destroy the WebSocketRouteSettings.
 
-    void setSubprotocol(const std::string& subprotocol);
-    std::string getSubprotocol() const;
+    void setValidSubprotcols(const SubprotocolSet& subprotocols);
+        ///< \brief Set the list of valid subprotocols.
+        ///< \param subprotocols A set of valid subprotocols.
+        ///< \note  An empty set means that any requested subprotocol will be
+        ///<        accepted.  A non-empty set means that the requested
+        ///<        subprotocol MUST be in the set.
 
-    void setAllowEmptySubprotocol(bool allowEmptySubprotocol);
-    bool getAllowEmptySubprotocol() const;
+    const SubprotocolSet& getValidSubprotocols() const;
+        ///< \returns The set of valid subprotocols.
+        ///< \note  If empty, all requested subprotocols will be accepted.
 
-    void setAllowCrossOriginConnections(bool allowCrossOriginConnections);
-    bool getAllowCrossOriginConnections() const;
+    void setValidOrigins(const OriginSet& origins);
+        ///< \brief Set the list of valid origins.
+        ///< \param origins A set of valid origins.
+        ///< \note  An empty set means that any Origin header in the request
+        ///<        will be accepted.  A non-empty set means that the request
+        ///<        origin MUST be in the set.
 
-    void setIsBinary(bool isBinary);
-    bool getIsBinary() const;
+    const OriginSet& getValidOrigins() const;
+        ///< \returns The set of valid origins.
+        ///< \note  If empty, all Origin headers will be accepted.
 
     void setAutoPingPongResponse(bool autoPingPongResponse);
+        ///< \param autoPingPongResponse If set to true, the WebSocket
+        ///<        connection will return all PINGs with a PONG
+
     bool getAutoPingPongResponse() const;
 
     void setKeepAlive(bool keepAlive);
+
     bool getKeepAlive() const;
 
     void setReceiveTimeout(const Poco::Timespan& receiveTimeout);
+
     Poco::Timespan getReceiveTimeout() const;
 
     void setSendTimeout(const Poco::Timespan& sendTimeout);
+
     Poco::Timespan getSendTimeout() const;
 
     void setPollTimeout(const Poco::Timespan& pollTimeout);
+
     Poco::Timespan getPollTimeout() const;
 
     void setBufferSize(std::size_t bufferSize);
+
     std::size_t getBufferSize() const;
 
     static const std::string DEFAULT_WEBSOCKET_ROUTE_PATH_PATTERN;
+    static const Poco::Timespan DEFAULT_RECEIVE_TIMEOUT;
+    static const Poco::Timespan DEFAULT_SEND_TIMEOUT;
+    static const Poco::Timespan DEFAULT_POLL_TIMEOUT;
+
+    enum
+    {
+        DEFAULT_BUFFER_SIZE = 1024
+    };
+
 
 private:
-    std::string _subprotocol;
-
-    bool _allowEmptySubprotocol;
-    bool _allowCrossOriginConnections;
-
-    bool _isBinary;
+    SubprotocolSet _validSubprotocols;
+    OriginSet _validOrigins;
 
     bool _autoPingPongResponse; // automatically return pong frames if true
     bool _keepAlive;
