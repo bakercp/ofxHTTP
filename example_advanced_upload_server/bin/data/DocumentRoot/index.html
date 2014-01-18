@@ -4,7 +4,7 @@
 <!-- Force latest IE rendering engine or ChromeFrame if installed -->
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><![endif]-->
 <meta charset="utf-8">
-<title>ofx::HTTP::BasicFileUploadServer</title>
+<title>ofx::HTTP::BasicPostServer</title>
 <meta name="description" content="">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="shortcut icon" href="img/favicon.ico">
@@ -20,16 +20,16 @@
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
-                <a class="navbar-brand" href="#">ofx::HTTP::BasicFileUploadServer Demo</a>
+                <a class="navbar-brand" href="#">ofx::HTTP::BasicPostServer Demo</a>
             </div>
         </div>
     </div>
     <div class="container">
-        <h1>File Upload Demo</h1>
+        <h1>Basic Post Server Demo</h1>
         <br>
         <blockquote>
         <p>
-            <code>ofx::HTTP:BasicFileUploadServer</code> is a simple server that implements both a standard file route and a standard upload route.  Upload settings can be configured using <code>ofx::HTTP::BasicFileUploadServerSettings</code>.  While the upload route can be used with a simple <code>POST</code> request, this demo uses <a href="http://getbootstrap.com/">Bootstrap</a> and <a href="https://github.com/blueimp/jQuery-File-Upload">jQuery-FileUpload</a>.
+            <code>ofx::HTTP:BasicPostServer</code> is a simple server that implements both a standard file route and a standard upload route.  Upload settings can be configured using <code>ofx::HTTP::BasicFileUploadServerSettings</code>.  While the upload route can be used with a simple <code>POST</code> request, this demo uses <a href="http://getbootstrap.com/">Bootstrap</a> and <a href="https://github.com/blueimp/jQuery-File-Upload">jQuery-FileUpload</a>.
         </p>
         <p>
             <a href="https://github.com/blueimp/jQuery-File-Upload">jQuery-FileUpload</a> works with multiple file selection, drag &amp; drop support, progress bar, validation and preview images, audio and video for jQuery.  It supports cross-domain, chunked and resumable file uploads and client-side image resizing.
@@ -95,7 +95,7 @@
 $(function () {
     'use strict';
     // Change this to the location of your server-side upload handler:
-    var url = '/upload',
+    var url = '/post',
         uploadButton = $('<button/>')
             .addClass('btn btn-primary')
             .prop('disabled', true)

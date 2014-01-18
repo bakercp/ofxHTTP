@@ -23,11 +23,32 @@
 // =============================================================================
 
 
-#include "ofApp.h"
+#pragma once
 
 
-int main()
+#include "ofMain.h"
+#include "ofxHTTP.h"
+
+
+using namespace ofx;
+
+
+class ofApp: public ofBaseApp
 {
-    ofSetupOpenGL(400,400,OF_WINDOW);
-    ofRunApp(new ofApp());
-}
+public:
+    void setup();
+    void draw();
+
+    bool onHTTPFormEvent(HTTP::HTTPFormEventArgs& args);
+    bool onHTTPRawFormEvent(HTTP::HTTPRawFormEventArgs& args);
+
+    bool onHTTPUploadStartedEvent(HTTP::HTTPUploadEventArgs& args);
+    bool onHTTPUploadProgressEvent(HTTP::HTTPUploadEventArgs& args);
+    bool onHTTPUploadFinishedEvent(HTTP::HTTPUploadEventArgs& args);
+
+    HTTP::BasicPostServer::SharedPtr server;
+
+    std::map<std::string,float> uploadProgress;
+
+};
+

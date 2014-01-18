@@ -50,7 +50,7 @@ void ofApp::draw()
     ofBackground(255);
     ofDrawBitmapStringHighlight("See " + server->getURL(), 10, 16);
 
-    ofDrawBitmapStringHighlight("Upload Progress:", 10, 45);
+    ofDrawBitmapStringHighlight("See the Console", 10, 45);
 
     int y = 70;
 

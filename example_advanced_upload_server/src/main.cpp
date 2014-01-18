@@ -23,30 +23,11 @@
 // =============================================================================
 
 
-#pragma once
+#include "ofApp.h"
 
 
-#include "ofMain.h"
-#include "BasicFileUploadServer.h"
-
-
-using ofx::HTTP::BasicFileUploadServer;
-using ofx::HTTP::BasicFileUploadServerSettings;
-using ofx::HTTP::FileUploadEventArgs;
-
-
-class ofApp: public ofBaseApp
+int main()
 {
-public:
-    void setup();
-    void draw();
-
-    void onFileUploadStarted(FileUploadEventArgs& args);
-    void onFileUploadProgress(FileUploadEventArgs& args);
-    void onFileUploadFinished(FileUploadEventArgs& args);
-
-    BasicFileUploadServer::SharedPtr server;
-
-    std::map<std::string,float> uploadProgress;
-
-};
+    ofSetupOpenGL(400, 400, OF_WINDOW);
+    ofRunApp(new ofApp());
+}

@@ -128,7 +128,10 @@ void PostRouteFileHandler::handlePart(const Poco::Net::MessageHeader& header,
                 {
                     if (sz > _parent.getSettings().getMaximumFileUploadSize())
                     {
-                        ofLogError("PostRouteFileHandler::handlePart") << "File upload size exceeded.";
+                        ofLogError("PostRouteFileHandler::handlePart") << "File upload size exceeded.  Removing file.";
+                        file.close();
+                        ofFile::removeFile(newFilename, false);
+
                         return;
                     }
 

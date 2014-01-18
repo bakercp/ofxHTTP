@@ -26,17 +26,18 @@
 #include "ofApp.h"
 
 
-//------------------------------------------------------------------------------
 void ofApp::setup()
 {
+    ofSetLogLevel(OF_LOG_NOTICE);
     ofSetFrameRate(30);
 
-    BasicFileUploadServerSettings settings;
+    HTTP::BasicPostServerSettings settings;
     settings.setPort(8998);
+    settings.setMaximumFileUploadSize(104857600); // 100 MB
 
-    server = BasicFileUploadServer::makeShared(settings);
+    server = HTTP::BasicPostServer::makeShared(settings);
 
-    server->getFileUploadRoute()->registerFileUploadEvents(this);
+    server->getPostRoute()->registerPostEvents(this);
 
     server->start();
 
@@ -44,7 +45,7 @@ void ofApp::setup()
     ofLaunchBrowser(server->getURL());
 }
 
-//------------------------------------------------------------------------------
+
 void ofApp::draw()
 {
     ofBackground(255);
@@ -78,28 +79,45 @@ void ofApp::draw()
         ofRect(8,y+10,progress*384,5);
 
         ofDrawBitmapStringHighlight(ofFilePath::getFileName(fileName),10,y);
-
+        
         y += 35;
         ++iter;
     }
+
 }
 
-//------------------------------------------------------------------------------
-void ofApp::onFileUploadStarted(FileUploadEventArgs& args)
+
+bool ofApp::onHTTPFormEvent(HTTP::HTTPFormEventArgs& args)
 {
-    uploadProgress[args.getFileName()] = 0;
+    ofLogNotice("ofApp::onHTTPFormEvent") << "";
+    HTTP::Utils::dumpNameValueCollection(args.form, ofGetLogLevel());
+    return true;
 }
 
-//------------------------------------------------------------------------------
-void ofApp::onFileUploadProgress(FileUploadEventArgs& args)
+bool ofApp::onHTTPRawFormEvent(HTTP::HTTPRawFormEventArgs& args)
 {
-    // get normalized progress
-    uploadProgress[args.getFileName()] = args.getNumBytesTransferred() / (float) args.getFileSize();
+    ofLogNotice("ofApp::onHTTPRawFormEvent") << "";
+    HTTP::Utils::dumpNameValueCollection(HTTP::Utils::splitTextPlainPost(args.form),
+                                         ofGetLogLevel());
+    return true;
 }
 
-//------------------------------------------------------------------------------
-void ofApp::onFileUploadFinished(FileUploadEventArgs& args)
+
+bool ofApp::onHTTPUploadStartedEvent(HTTP::HTTPUploadEventArgs& args)
 {
-    uploadProgress[args.getFileName()] = 1;
+    uploadProgress[args.getOriginalFilename()] = 0;
+    return true;
 }
 
+bool ofApp::onHTTPUploadProgressEvent(HTTP::HTTPUploadEventArgs& args)
+{
+    uploadProgress[args.getOriginalFilename()] = args.getNumBytesTransferred() / (float) args.getRequestContentLength();
+
+    return true;
+}
+
+bool ofApp::onHTTPUploadFinishedEvent(HTTP::HTTPUploadEventArgs& args)
+{
+    uploadProgress[args.getOriginalFilename()] = 1;
+    return true;
+}

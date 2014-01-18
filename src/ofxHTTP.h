@@ -28,7 +28,6 @@
 
 #include "ofx/HTTP/IPVideo/BasicIPVideoServer.h"
 
-#include "ofx/HTTP/Server/BasicFileUploadServer.h"
 #include "ofx/HTTP/Server/BasicPostServer.h"
 #include "ofx/HTTP/Server/BasicServer.h"
 
