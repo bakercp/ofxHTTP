@@ -34,7 +34,10 @@ void ofApp::setup()
     ofSetFrameRate(30);
 
     HTTP::BasicServerSettings settings;
-    settings.setPort(8998);
+    settings.setPort(4433);
+
+    // NOTE: the included private key / certificate
+    // should not be used for production purposes.
     settings.setUseSSL(true);
 
     server = HTTP::BasicServer::makeShared(settings);
@@ -63,8 +66,8 @@ void ofApp::onSSLServerVerificationError(Poco::Net::VerificationErrorArgs& args)
     // and set `args.setIgnoreError(true);` if they want to continue.
 
     args.setIgnoreError(true);
-
 }
+
 
 void ofApp::onSSLPrivateKeyPassphraseRequired(std::string& passphrase)
 {
@@ -72,5 +75,4 @@ void ofApp::onSSLPrivateKeyPassphraseRequired(std::string& passphrase)
     // passphrase to the `passphrase` argument.  For example:
 
     passphrase = ofSystemTextBoxDialog("Enter the Private Key Passphrase", "");
-    
 }

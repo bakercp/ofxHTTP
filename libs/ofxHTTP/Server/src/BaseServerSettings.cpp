@@ -36,7 +36,7 @@ const bool BaseServerSettings::DEFAULT_USE_SSL        = false;
 
 
 BaseServerSettings::BaseServerSettings(const std::string& host,
-                                       const unsigned short port,
+                                       unsigned short port,
                                        bool useSSL):
     _host(host),
     _port(port),

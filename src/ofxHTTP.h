@@ -26,6 +26,9 @@
 #pragma once
 
 
+#include "ofSSLManager.h"
+
+
 #include "ofx/HTTP/IPVideo/BasicIPVideoServer.h"
 
 #include "ofx/HTTP/Server/BasicPostServer.h"

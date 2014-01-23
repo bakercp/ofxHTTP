@@ -196,7 +196,7 @@ class BaseServerSettings: public HTTPServerParams
 {
 public:
     BaseServerSettings(const std::string& host = DEFAULT_HOST,
-                       const unsigned short port = DEFAULT_PORT,
+                       unsigned short port = DEFAULT_PORT,
                        bool useSSL = DEFAULT_USE_SSL);
     virtual ~BaseServerSettings();
 

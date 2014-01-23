@@ -39,6 +39,7 @@
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/KeyConsoleHandler.h"
 #include "Poco/Net/PrivateKeyPassphraseHandler.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/Net/SecureServerSocket.h"
 #include "Poco/Net/ServerSocket.h"
 #include "ofEvents.h"
@@ -46,6 +47,7 @@
 #include "ofx/HTTP/Server/BaseRoute.h"
 #include "ofx/HTTP/Server/BaseServerSettings.h"
 #include "ofx/HTTP/Types/ThreadErrorHandler.h"
+#include "ofSSLManager.h"
 
 
 namespace ofx {
@@ -120,6 +122,11 @@ public:
 
 protected:
     virtual Poco::ThreadPool& getThreadPoolRef();
+
+    enum
+    {
+        DEFAULT_BACKLOG = 63
+    };
 
 private:
     typedef std::shared_ptr<Poco::Net::HTTPServer> HTTPServerPtr;
@@ -201,17 +208,10 @@ void BaseServer_<SettingsType>::start()
         // we use the default thread pool
         try
         {
-            // TODO: refactor and allow configuration
-            Poco::Net::Context::Ptr context(new Poco::Net::Context(Poco::Net::Context::SERVER_USE,
-                                                                   "",
-                                                                   Poco::Net::Context::VERIFY_RELAXED,
-                                                                   9,
-                                                                   true,
-                                                                   "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"));
-
             socket = Poco::Net::SecureServerSocket(_settings.getPort(),
-                                                   64,
-                                                   context);
+                                                   DEFAULT_BACKLOG,
+                                                   ofSSLManager::getDefaultServerContext());
+
         }
         catch (const Poco::Exception& exc)
         {
@@ -224,6 +224,8 @@ void BaseServer_<SettingsType>::start()
     }
 
 
+    try
+    {
     _server = HTTPServerPtr(new Poco::Net::HTTPServer(new BaseServerHandle(*this),
                                                       getThreadPoolRef(),
                                                       socket,
@@ -238,6 +240,12 @@ void BaseServer_<SettingsType>::start()
 
     // start the http server
     _server->start();
+
+    }
+    catch(const Poco::Net::InvalidSocketException& exc)
+    {
+        ofLogError("BaseServer_<SettingsType>::start()") << exc.displayText();
+    }
 
 }
 
