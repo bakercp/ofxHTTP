@@ -39,11 +39,11 @@ class IPVideoRouteSettings: public BaseRouteSettings
 public:
     IPVideoRouteSettings(const std::string& routePathPattern = DEFAULT_VIDEO_ROUTE,
                          bool requireSecurePort = false);
-    ///< \brief Create the BaseRouteSettings with the given route path.
-    ///< \param routePathPattern The regex pattern that this route
-    ///<        will handle.
-    ///< \param requireSecurePorttrue True if this route requires
-    ///<        communication on an SSL encrypted port.
+        ///< \brief Create the IPVideoRouteSettings with the given route path.
+        ///< \param routePathPattern The regex pattern that this route
+        ///<        will handle.
+        ///< \param requireSecurePorttrue True if this route requires
+        ///<        communication on an SSL encrypted port.
 
     virtual ~IPVideoRouteSettings();
 
@@ -80,13 +80,11 @@ public:
         DEFAULT_MAX_CLIENT_QUEUE_SIZE  = 10,
     };
 
-
     enum
     {
         DEFAULT_MAX_STREAM_WIDTH  = 1920,
         DEFAULT_MAX_STREAM_HEIGHT = 1080,
     };
-
 
     static const std::string DEFAULT_VIDEO_ROUTE;
     static const std::string DEFAULT_BOUNDARY_MARKER;
