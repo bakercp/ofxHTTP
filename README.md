@@ -4,9 +4,10 @@ ofxHTTP
 ofxHTTP is designed to work best using Project Generator.
 
 
-NOTE: Requires the following addon:
+NOTE: Requires the following addons:
 
 - https://github.com/bakercp/ofxMediaType
+- https://github.com/bakercp/ofxSSLManager
 
 Some examples require:
 
