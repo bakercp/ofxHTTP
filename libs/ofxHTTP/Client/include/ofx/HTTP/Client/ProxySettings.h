@@ -28,7 +28,7 @@
 
 #include <string>
 #include <stdint.h>
-#include "ofx/HTTP/Credentials.h"
+#include "ofx/HTTP/Client/Credentials.h"
 
 
 namespace ofx {
@@ -41,12 +41,12 @@ public:
     ProxySettings();
 
     ProxySettings(const std::string& host,
-                  uint16_t port);
+                  unsigned short port);
 
     ProxySettings(const std::string& username,
                   const std::string& password,
                   const std::string& host,
-                  uint16_t port);
+                  unsigned short port);
 
     virtual ~ProxySettings();
     
@@ -55,17 +55,17 @@ public:
     std::string getHost() const;
     void setHost(const std::string& host);
 
-    uint16_t getPort() const;
-    void setPort(uint16_t port);
+    unsigned short getPort() const;
+    void setPort(unsigned short port);
 
 
     static const std::string    DEFAULT_PROXY_HOST;
-    static const uint16_t       DEFAULT_PROXY_PORT;
+    static const unsigned short DEFAULT_PROXY_PORT;
 
     
 protected:
     std::string _host;
-    uint16_t _port;
+    unsigned short _port;
 
 };
 
