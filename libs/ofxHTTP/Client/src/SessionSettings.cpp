@@ -41,7 +41,7 @@ SessionSettings::SessionSettings() :
     _userAgent(DEFAULT_USER_AGENT),
     _maxRedirects(DEFAULT_MAX_REDIRECTS),
     _keepAliveTimeout(DEFAULT_KEEPALIVE_TIMEOUT),
-    _bUseProxy(false),
+    _useProxy(false),
     _proxy(ProxySettings()),
     _useCookieStore(true),
     _useCredentialStore(true)
@@ -58,7 +58,7 @@ SessionSettings::SessionSettings(SessionSettings& that)
     _maxRedirects        = that._maxRedirects;
     _defaultHeaders      = that._defaultHeaders;
     _keepAliveTimeout    = that._keepAliveTimeout;
-    _bUseProxy           = that._bUseProxy;
+    _useProxy            = that._useProxy;
     _proxy               = that._proxy;
     _useCredentialStore  = that._useCredentialStore;
     _useCookieStore      = that._useCookieStore;
@@ -77,7 +77,7 @@ SessionSettings& SessionSettings::operator = (SessionSettings& that)
     _maxRedirects        = that._maxRedirects;
     _defaultHeaders      = that._defaultHeaders;
     _keepAliveTimeout    = that._keepAliveTimeout;
-    _bUseProxy           = that._bUseProxy;
+    _useProxy            = that._useProxy;
     _proxy               = that._proxy;
     _useCredentialStore  = that._useCredentialStore;
     _useCookieStore      = that._useCookieStore;
@@ -221,7 +221,7 @@ void SessionSettings::setProxyUsername(const std::string& username)
 {
     Poco::FastMutex::ScopedLock lock(_mutex);
     _proxy.setUsername(username);
-    _bUseProxy = true;
+    _useProxy = true;
 }
 
 
@@ -236,7 +236,7 @@ void SessionSettings::setProxyPassword(const std::string& password)
 {
     Poco::FastMutex::ScopedLock lock(_mutex);
     _proxy.setPassword(password);
-    _bUseProxy = true;
+    _useProxy = true;
 }
 
 
@@ -251,7 +251,7 @@ void SessionSettings::setProxyHost(const std::string& host)
 {
     Poco::FastMutex::ScopedLock lock(_mutex);
     _proxy.setHost(host);
-    _bUseProxy = true;
+    _useProxy = true;
 }
 
 
@@ -273,7 +273,7 @@ void SessionSettings::setProxyPort(uint16_t port)
 {
     Poco::FastMutex::ScopedLock lock(_mutex);
     _proxy.setPort(port);
-    _bUseProxy = true;
+    _useProxy = true;
 }
 
 
@@ -281,21 +281,21 @@ void SessionSettings::clearProxy()
 {
     Poco::FastMutex::ScopedLock lock(_mutex);
     _proxy.clear();
-    _bUseProxy = false;
+    _useProxy = true;
 }
 
 
 bool SessionSettings::isProxyEnabled() const
 {
     Poco::FastMutex::ScopedLock lock(_mutex);
-    return _bUseProxy;
+    return _useProxy;
 }
 
 
 bool SessionSettings::hasProxyCredentials() const
 {
     Poco::FastMutex::ScopedLock lock(_mutex);
-    return _bUseProxy && _proxy.hasCredentials();
+    return _useProxy && _proxy.hasCredentials();
 }
 
 

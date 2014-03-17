@@ -31,7 +31,7 @@
 #include "Poco/Net/NameValueCollection.h"
 #include "ofTypes.h"
 #include "ofx/HTTP/Client/ProxySettings.h"
-#include "ofx/HTTP/HeaderUtils.h"
+#include "ofx/HTTP/Utils/Utils.h"
 
 
 namespace ofx {
@@ -111,8 +111,8 @@ private:
 
     Poco::Timespan _keepAliveTimeout;
 
-    bool            _bUseProxy;
-    ProxySettings   _proxy;
+    bool _useProxy;
+    ProxySettings _proxy;
 
     bool _useCookieStore;
     bool _useCredentialStore;
