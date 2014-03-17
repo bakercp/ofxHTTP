@@ -30,8 +30,8 @@
 #include "Poco/ErrorHandler.h"
 
 
+/// \brief A ThreadErrorHandler to implement in-thread exception handling.
 class ThreadErrorHandler: public Poco::ErrorHandler
-    /// \brief A ThreadErrorHandler to implement in-thread exception handling.
 {
 public:
     ThreadErrorHandler(const std::string& threadName = "NONE"):
