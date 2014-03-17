@@ -31,8 +31,8 @@ namespace HTTP {
 namespace Client {
 
 
-ResponseStream::ResponseStream(HTTPResponse& httpResponseRef,
-                               HTTPResponseStream* pResponseStream,
+ResponseStream::ResponseStream(Poco::Net::HTTPResponse& httpResponseRef,
+                               Poco::Net::HTTPResponseStream* pResponseStream,
                                Poco::Exception* pException):
     _httpResponseRef(httpResponseRef),
     _pResponseStream(pResponseStream),
@@ -81,7 +81,7 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
 {
 
     // init default client ssl context if none exists
-    ofx::SSLManager::initializeClient();
+    ofSSLManager::initializeClient();
 
     HTTPResponse httpResponse;
 
@@ -100,7 +100,7 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
         {
             Poco::URI resolvedURI;
             Poco::URI redirectedProxyUri;
-            HTTPClientSession* pClientSession = 0;
+            Poco::Net::HTTPClientSession* pClientSession = 0;
             bool proxyRedirectRequested = false;
             bool authenticationRequested = false;
             // bool authenticationAttempted = false;
@@ -115,12 +115,12 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
 
                     if(httpRequest.getURI().getScheme() == "https")
                     {
-                        pClientSession = new HTTPSClientSession(httpRequest.getURI().getHost(),
+                        pClientSession = new Poco::Net::HTTPSClientSession(httpRequest.getURI().getHost(),
                                                                 httpRequest.getURI().getPort());
                     }
                     else
                     {
-                        pClientSession = new HTTPClientSession(httpRequest.getURI().getHost(),
+                        pClientSession = new Poco::Net::HTTPClientSession(httpRequest.getURI().getHost(),
                                                                httpRequest.getURI().getPort());
                     }
 
@@ -273,7 +273,7 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
                 {
                     ofLogVerbose("ResponseStream::createResponseStream") << "Got valid stream, returning.";
                     return ResponseStream::makeShared(httpResponse,
-                                                      new HTTPResponseStream(responseStream,
+                                                      new Poco::Net::HTTPResponseStream(responseStream,
                                                                              pClientSession),
                                                       0);
                 }
@@ -327,7 +327,7 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
                     ofLogVerbose("ResponseStream::createResponseStream") << "Received unhandled response " <<
                     httpResponse.getStatus() << " b/c " << httpResponse.getReason();
                     return ResponseStream::makeShared(httpResponse,
-                                                      new HTTPResponseStream(responseStream,
+                                                      new Poco::Net::HTTPResponseStream(responseStream,
                                                                              pClientSession),
                                                       new Poco::Exception(httpResponse.getReason(),
                                                                           resolvedURI.toString()));
@@ -344,7 +344,7 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
                                           0,
                                           exc.clone());
     }
-    catch(const HostNotFoundException& exc)
+    catch(const Poco::Net::HostNotFoundException& exc)
     {
         ofLogVerbose("ResponseStream::createResponseStream") << "Got exception " << exc.displayText();
         return ResponseStream::makeShared(httpResponse,

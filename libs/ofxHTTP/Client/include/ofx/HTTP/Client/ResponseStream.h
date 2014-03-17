@@ -39,11 +39,8 @@
 #include "ofSSLManager.h"
 #include "ofx/HTTP/Client/BaseRequest.h"
 #include "ofx/HTTP/Client/Context.h"
-#include "ofx/HTTP/StreamUtils.h"
+#include "ofx/HTTP/Types/StreamUtils.h"
 #include "ofTypes.h"
-
-
-using namespace Poco::Net;
 
 
 namespace ofx {
@@ -51,14 +48,14 @@ namespace HTTP {
 namespace Client {
 
 
-class ResponseStream: public HTTPResponse
+class ResponseStream: public Poco::Net::HTTPResponse
 {
 public:
     typedef std::shared_ptr<ResponseStream> SharedPtr;
     typedef std::weak_ptr<ResponseStream>   WeakPtr;
 
-    ResponseStream(HTTPResponse& httpResponseRef,
-                   HTTPResponseStream* pResponseStream,
+    ResponseStream(Poco::Net::HTTPResponse& httpResponseRef,
+                   Poco::Net::HTTPResponseStream* pResponseStream,
                    Poco::Exception* pException = 0);
 
     virtual ~ResponseStream();
@@ -74,13 +71,13 @@ public:
                                           Context::SharedPtr context);
 
 protected:
-    HTTPResponse& _httpResponseRef;
-    HTTPResponseStream* _pResponseStream;
+    Poco::Net::HTTPResponse& _httpResponseRef;
+    Poco::Net::HTTPResponseStream* _pResponseStream;
     Poco::Exception* _pException;
 
 
-    static SharedPtr makeShared(HTTPResponse& httpResponseRef,
-                                HTTPResponseStream* pResponseStream,
+    static SharedPtr makeShared(Poco::Net::HTTPResponse& httpResponseRef,
+                                Poco::Net::HTTPResponseStream* pResponseStream,
                                 Poco::Exception* pException = 0)
     {
         return SharedPtr(new ResponseStream(httpResponseRef,
