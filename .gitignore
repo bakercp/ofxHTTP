@@ -1,5 +1,7 @@
 docs/html
 docs/tagfile.xml
+example_basic_websocket_server_zeroconf
+example_basic_client
 
 .AppleDouble
 #bin
