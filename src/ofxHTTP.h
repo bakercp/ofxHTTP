@@ -41,3 +41,4 @@
 #include "ofx/HTTP/WebSocket/WebSocketFrame.h"
 #include "ofx/HTTP/WebSocket/WebSocketConnection.h"
 
+#include "ofx/HTTP/Client/Context.h"
