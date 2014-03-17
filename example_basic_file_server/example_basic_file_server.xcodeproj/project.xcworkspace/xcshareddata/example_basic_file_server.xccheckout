@@ -5,14 +5,16 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>90900B6E-327A-4012-BA8D-8CFD4C29C103</string>
+	<string>2EDF983D-6216-42ED-AC14-10CB5528AF32</string>
 	<key>IDESourceControlProjectName</key>
 	<string>example_basic_file_server</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
+		<key>010C5F07-CD0C-4178-B927-A832797C7454</key>
+		<string>ssh://github.com/bakercp/ofxSSLManager.git</string>
 		<key>3373589F-5267-4993-97F3-F59CADB37A20</key>
 		<string>ssh://github.com/bakercp/ofxMediaType.git</string>
-		<key>3B34514A-1075-456B-8AF0-DAEFD698200B</key>
+		<key>45B414AD-06FD-4497-9C7A-E1A33FADFECF</key>
 		<string>ssh://github.com/bakercp/openFrameworks.git</string>
 		<key>D43BE1A0-544F-450E-9FED-4EEF458203E0</key>
 		<string>ssh://github.com/bakercp/ofxHTTP.git</string>
@@ -21,19 +23,21 @@
 	<string>addons/ofxHTTP/example_basic_file_server/example_basic_file_server.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
+		<key>010C5F07-CD0C-4178-B927-A832797C7454</key>
+		<string>../../../../ofxSSLManager</string>
 		<key>3373589F-5267-4993-97F3-F59CADB37A20</key>
 		<string>../../../../ofxMediaType</string>
-		<key>3B34514A-1075-456B-8AF0-DAEFD698200B</key>
+		<key>45B414AD-06FD-4497-9C7A-E1A33FADFECF</key>
 		<string>../../../../..</string>
 		<key>D43BE1A0-544F-450E-9FED-4EEF458203E0</key>
 		<string>../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>ssh://github.com/bakercp/openFrameworks.git</string>
+	<string>ssh://github.com/bakercp/ofxHTTP.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>110</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>3B34514A-1075-456B-8AF0-DAEFD698200B</string>
+	<string>45B414AD-06FD-4497-9C7A-E1A33FADFECF</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
@@ -56,7 +60,15 @@
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>3B34514A-1075-456B-8AF0-DAEFD698200B</string>
+			<string>010C5F07-CD0C-4178-B927-A832797C7454</string>
+			<key>IDESourceControlWCCName</key>
+			<string>ofxSSLManager</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>45B414AD-06FD-4497-9C7A-E1A33FADFECF</string>
 			<key>IDESourceControlWCCName</key>
 			<string>openFrameworks</string>
 		</dict>

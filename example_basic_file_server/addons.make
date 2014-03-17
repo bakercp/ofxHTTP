@@ -1,2 +1,3 @@
 ofxHTTP
 ofxMediaType
+ofxSSLManager
