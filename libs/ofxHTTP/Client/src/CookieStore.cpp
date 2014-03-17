@@ -135,6 +135,8 @@ void CookieStore::addCookieWithExistingLock(const Cookie& cookie)
     CookiesIter iter = cookies.begin();
     while(iter != cookies.end())
     {
+        ofLogVerbose("CookieStore::addCookieWithExistingLock") << "Adding cookie: " << (*iter).toString();
+
         if((*iter).matches(cookie))
         {
             iter = cookies.erase(iter);

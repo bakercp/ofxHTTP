@@ -5,46 +5,58 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>DCC236A4-E078-47D9-A210-CF5BA8B07F39</string>
+	<string>AC05EB7E-1A06-4532-99B5-4DB2AFFECA8F</string>
 	<key>IDESourceControlProjectName</key>
 	<string>example_basic_post_server</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>6895C8F1-CBA5-42AF-ABB2-E82B62BB6D42</key>
+		<key>41CD0AC8-C6A0-45FF-A7CD-55759E2F7AE2</key>
+		<string>ssh://github.com/bakercp/ofxSSLManager.git</string>
+		<key>5BBE0376-ED6D-4579-9DB8-8C9A02FD0148</key>
 		<string>ssh://github.com/bakercp/ofxJSON.git</string>
-		<key>C07DD431-8E0D-48C4-8EAF-9A9803F15CE5</key>
+		<key>7BE14CF2-A1FC-423B-B024-B009F3D14943</key>
+		<string>ssh://github.com/bakercp/ofxIO.git</string>
+		<key>82FE4D57-71F5-4B0B-98F1-F0D56F98AD09</key>
 		<string>ssh://github.com/bakercp/openFrameworks.git</string>
-		<key>C1A6077D-4660-4620-8685-56941BC1E77C</key>
-		<string>ssh://github.com/bakercp/ofxMediaType.git</string>
-		<key>F767E06E-0405-41B3-AA5D-8BF4217A8B95</key>
+		<key>A22BCCE5-99F1-4095-940B-2816922A46CC</key>
 		<string>ssh://github.com/bakercp/ofxHTTP.git</string>
+		<key>A850F68A-ECF6-4C40-8246-259DC5ABD4F5</key>
+		<string>ssh://github.com/bakercp/ofxMediaType.git</string>
+		<key>ED46B08F-4F09-4CD9-9811-05FA6E943F8E</key>
+		<string>ssh://github.com/bakercp/ofxNetworkUtils.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>addons/ofxHTTP/example_basic_post_server/example_basic_post_server.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>6895C8F1-CBA5-42AF-ABB2-E82B62BB6D42</key>
+		<key>41CD0AC8-C6A0-45FF-A7CD-55759E2F7AE2</key>
+		<string>../../../../ofxSSLManager</string>
+		<key>5BBE0376-ED6D-4579-9DB8-8C9A02FD0148</key>
 		<string>../../../../ofxJSON</string>
-		<key>C07DD431-8E0D-48C4-8EAF-9A9803F15CE5</key>
+		<key>7BE14CF2-A1FC-423B-B024-B009F3D14943</key>
+		<string>../../../../ofxIO</string>
+		<key>82FE4D57-71F5-4B0B-98F1-F0D56F98AD09</key>
 		<string>../../../../..</string>
-		<key>C1A6077D-4660-4620-8685-56941BC1E77C</key>
-		<string>../../../../ofxMediaType</string>
-		<key>F767E06E-0405-41B3-AA5D-8BF4217A8B95</key>
+		<key>A22BCCE5-99F1-4095-940B-2816922A46CC</key>
 		<string>../../..</string>
+		<key>A850F68A-ECF6-4C40-8246-259DC5ABD4F5</key>
+		<string>../../../../ofxMediaType</string>
+		<key>ED46B08F-4F09-4CD9-9811-05FA6E943F8E</key>
+		<string>../../../../ofxNetworkUtils</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>ssh://github.com/bakercp/ofxHTTP.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>110</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>C07DD431-8E0D-48C4-8EAF-9A9803F15CE5</string>
+	<string>82FE4D57-71F5-4B0B-98F1-F0D56F98AD09</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>F767E06E-0405-41B3-AA5D-8BF4217A8B95</string>
+			<string>A22BCCE5-99F1-4095-940B-2816922A46CC</string>
 			<key>IDESourceControlWCCName</key>
 			<string>ofxHTTP</string>
 		</dict>
@@ -52,7 +64,15 @@
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>6895C8F1-CBA5-42AF-ABB2-E82B62BB6D42</string>
+			<string>7BE14CF2-A1FC-423B-B024-B009F3D14943</string>
+			<key>IDESourceControlWCCName</key>
+			<string>ofxIO</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>5BBE0376-ED6D-4579-9DB8-8C9A02FD0148</string>
 			<key>IDESourceControlWCCName</key>
 			<string>ofxJSON</string>
 		</dict>
@@ -60,7 +80,7 @@
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>C1A6077D-4660-4620-8685-56941BC1E77C</string>
+			<string>A850F68A-ECF6-4C40-8246-259DC5ABD4F5</string>
 			<key>IDESourceControlWCCName</key>
 			<string>ofxMediaType</string>
 		</dict>
@@ -68,7 +88,23 @@
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>C07DD431-8E0D-48C4-8EAF-9A9803F15CE5</string>
+			<string>ED46B08F-4F09-4CD9-9811-05FA6E943F8E</string>
+			<key>IDESourceControlWCCName</key>
+			<string>ofxNetworkUtils</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>41CD0AC8-C6A0-45FF-A7CD-55759E2F7AE2</string>
+			<key>IDESourceControlWCCName</key>
+			<string>ofxSSLManager</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>82FE4D57-71F5-4B0B-98F1-F0D56F98AD09</string>
 			<key>IDESourceControlWCCName</key>
 			<string>openFrameworks</string>
 		</dict>

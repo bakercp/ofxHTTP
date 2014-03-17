@@ -262,7 +262,7 @@ std::string SessionSettings::getProxyHost() const
 }
 
 
-uint16_t SessionSettings::getProxyPort() const
+unsigned short SessionSettings::getProxyPort() const
 {
     ofScopedLock lock(_mutex);
     return _proxy.getPort();

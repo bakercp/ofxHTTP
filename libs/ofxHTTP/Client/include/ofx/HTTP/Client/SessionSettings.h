@@ -79,8 +79,8 @@ public:
     void setProxyHost(const std::string& host);
     std::string getProxyHost() const;
     
-    void setProxyPort(uint16_t port);
-    uint16_t getProxyPort() const;
+    void setProxyPort(unsigned short port);
+    unsigned short getProxyPort() const;
     
     bool hasProxyCredentials() const;
     bool isProxyEnabled() const;

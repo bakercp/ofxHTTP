@@ -239,7 +239,7 @@ void AuthScope::clearPort()
 }
 
 
-uint16_t AuthScope::getPort() const
+unsigned short AuthScope::getPort() const
 {
     return _port;
 }

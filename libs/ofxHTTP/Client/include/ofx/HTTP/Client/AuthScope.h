@@ -68,7 +68,7 @@ public:
 
     bool hasPort() const;
     void clearPort();
-    void setPort(uint16_t port);
+    void setPort(unsigned short port);
     unsigned short getPort() const;
 
     bool hasRealm() const;

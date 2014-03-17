@@ -93,13 +93,16 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
 
     try
     {
-        ofLogVerbose("ResponseStream::createResponseStream") << "Beginning redirect loop. Max redirects = " <<
-        context->getSessionSettingsRef().getMaxRedirects() ;
+        ofLogVerbose("ResponseStream::createResponseStream") << "Beginning redirect loop. Max redirects = " << context->getSessionSettingsRef().getMaxRedirects() ;
+
+//        Poco::URI resolvedURI;
+        Poco::URI redirectedProxyUri;
+
+        Poco::URI requestURI(httpRequest.getURI());
 
         while (redirects < sessionSettings.getMaxRedirects())
         {
-            Poco::URI resolvedURI;
-            Poco::URI redirectedProxyUri;
+
             Poco::Net::HTTPClientSession* pClientSession = 0;
             bool proxyRedirectRequested = false;
             bool authenticationRequested = false;
@@ -112,16 +115,17 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
                 // pClientSession will be deleted if proxy is redirected
                 if (0 == pClientSession)
                 {
+                    ofLogVerbose("ResponseStream::createResponseStream") << "CREATING NEW CLIENT ";
 
-                    if(httpRequest.getURI().getScheme() == "https")
+                    if(requestURI.getScheme() == "https")
                     {
-                        pClientSession = new Poco::Net::HTTPSClientSession(httpRequest.getURI().getHost(),
-                                                                httpRequest.getURI().getPort());
+                        pClientSession = new Poco::Net::HTTPSClientSession(requestURI.getHost(),
+                                                                           requestURI.getPort());
                     }
                     else
                     {
-                        pClientSession = new Poco::Net::HTTPClientSession(httpRequest.getURI().getHost(),
-                                                               httpRequest.getURI().getPort());
+                        pClientSession = new Poco::Net::HTTPClientSession(requestURI.getHost(),
+                                                                          requestURI.getPort());
                     }
 
                     ofLogVerbose("ResponseStream::createResponseStream") << "New session created - host: " <<
@@ -171,7 +175,7 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
                 }
 
 
-                std::string path = httpRequest.getURI().getPathAndQuery();
+                std::string path = requestURI.getPathAndQuery();
 
                 if(path.empty())
                 {
@@ -179,13 +183,6 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
                 }
 
                 ofLogVerbose("ResponseStream::createResponseStream") << "Using path: " << path;
-
-//                Poco::Net::HTTPRequest httpRequest(request.getMethod(),
-//                                                   path,
-//                                                   request.getVersion());
-
-                
-
 
                 // apply defaults from the session first
                 // TODO: default headers could also include useragent, etc ...
@@ -223,9 +220,6 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
                 // call back into the request to pull the request data
                 ofLogVerbose("ResponseStream::createResponseStream") << "Preparing request.";
 
-//                httpRequest.prepareRequest(httpRequest);
-
-
                 NameValueCollection::ConstIterator iter = httpRequest.begin();
 
                 cout << "HEADERS-----" << endl;
@@ -236,7 +230,7 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
                 }
                 cout << "HEADERS-----" << endl;
 
-                cout << "URI: " << httpRequest.getURI().toString() << endl;
+                cout << "URI: " << requestURI.toString() << endl;
 
                 //////////////////////////////////////////////////////////////////
                 /////////////////////// -- SEND REQUEST -- ///////////////////////
@@ -245,7 +239,9 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
                 std::ostream& requestStream = pClientSession->sendRequest(httpRequest);
 
                 ofLogVerbose("ResponseStream::createResponseStream") << "Sending request body.";
+
                 httpRequest.sendRequestBody(requestStream); // upload, put etc
+
                 //////////////////////////////////////////////////////////////////
                 ///////////////////////// -- RESPONSE -- /////////////////////////
                 //////////////////////////////////////////////////////////////////
@@ -259,14 +255,17 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
                     httpResponse.getStatus() == HTTPResponse::HTTP_SEE_OTHER           ||
                     httpResponse.getStatus() == HTTPResponse::HTTP_TEMPORARY_REDIRECT)
                 {
-                    resolvedURI.resolve(httpResponse.get("Location"));
+                    requestURI.resolve(httpResponse.get("Location"));
+
+                    // Set it for the next go-around.
+                    httpRequest.setURI(requestURI.toString());
 
                     ++redirects;
 
                     delete pClientSession;
                     pClientSession = 0;
 
-                    ofLogVerbose("ResponseStream::createResponseStream") << "Redirecting to: " << resolvedURI.toString();
+                    ofLogVerbose("ResponseStream::createResponseStream") << "Redirecting to: " << requestURI.toString();
 
                 }
                 else if (httpResponse.getStatus() == HTTPResponse::HTTP_OK)
@@ -274,15 +273,13 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
                     ofLogVerbose("ResponseStream::createResponseStream") << "Got valid stream, returning.";
                     return ResponseStream::makeShared(httpResponse,
                                                       new Poco::Net::HTTPResponseStream(responseStream,
-                                                                             pClientSession),
-                                                      0);
+                                                                                        pClientSession),
+                                                      0); // No exception.
                 }
-                else if (httpResponse.getStatus() == HTTPResponse::HTTP_UNAUTHORIZED &&
-                         !authenticationRequested)
+                else if (httpResponse.getStatus() == HTTPResponse::HTTP_UNAUTHORIZED
+                         && !authenticationRequested)
                 {
                     authenticationRequested = true;
-
-//                    if(ofGetLogLevel() )
 
                     Poco::NullOutputStream nos;
 
@@ -328,9 +325,9 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
                     httpResponse.getStatus() << " b/c " << httpResponse.getReason();
                     return ResponseStream::makeShared(httpResponse,
                                                       new Poco::Net::HTTPResponseStream(responseStream,
-                                                                             pClientSession),
+                                                                                        pClientSession),
                                                       new Poco::Exception(httpResponse.getReason(),
-                                                                          resolvedURI.toString()));
+                                                                          requestURI.toString()));
                 }
 
             }
@@ -368,7 +365,7 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
     
     return ResponseStream::makeShared(httpResponse,
                                       0,
-                                      new Poco::IOException("Too many redirects while opening URI", httpRequest.getURI().toString()));
+                                      new Poco::IOException("Too many redirects while opening URI", httpRequest.getURI()));
     
 }
 

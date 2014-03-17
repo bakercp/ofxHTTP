@@ -31,37 +31,18 @@ namespace HTTP {
 
 
 enum AuthenticationType
-    {
-        NONE,
-        BASIC,
-        DIGEST
-    };
+{
+    NONE,
+    BASIC,
+    DIGEST
+};
 
-    enum AuthenticationStatus
-    {
-        OK,
-        UNAUTHORIZED,
-        NO_CREDENTIALS
-    };
-    
-//class Authentication
-//{
-//public:
-//    enum //Type
-//    {
-//        NONE,
-//        BASIC,
-//        DIGEST
-//    };
-//
-//    enum //Status
-//    {
-//        OK,
-//        UNAUTHORIZED,
-//        NO_CREDENTIALS
-//    };
-//
-//};
+enum AuthenticationStatus
+{
+    OK,
+    UNAUTHORIZED,
+    NO_CREDENTIALS
+};
 
 
 } } // namespace ofx::HTTP

@@ -200,7 +200,8 @@ void CredentialStore::clearCredentials(const Poco::URI& uri)
 bool CredentialStore::authenticate(const Poco::Net::HTTPClientSession& pSession,
                                    Poco::Net::HTTPRequest& pRequest)
 {
-    
+    cout << "AUTHENTICATION!!!" << endl;
+
     // first check and see if the request has any authentication headers
     // these could be added via default session headers
     if(pRequest.has(Poco::Net::HTTPRequest::AUTHORIZATION))
@@ -216,9 +217,8 @@ bool CredentialStore::authenticate(const Poco::Net::HTTPClientSession& pSession,
     Poco::FastMutex::ScopedLock lock(mutex);
 
     // mutex locking happens in getCredentials() and authenticateWithCache()
-    if(getCredentialsWithExistingLock(targetScope,matchingScope,matchingCredentials))
+    if(getCredentialsWithExistingLock(targetScope, matchingScope, matchingCredentials))
     {
-        
         // first search our digest credentials to see if we have a matching scope (preferred)
         HTTPDigestCredentialCacheMapIter iterDigest = digestCredentialCacheMap.find(matchingScope);
 
@@ -227,7 +227,7 @@ bool CredentialStore::authenticate(const Poco::Net::HTTPClientSession& pSession,
             (*iterDigest).second->updateAuthInfo(pRequest); // successfully updated auth info for matching scope
             return true;
         }
-        
+
         // if there are no digest credentials, search for basic credentials
         
         HTTPBasicCredentialCacheMapIter iterBasic = basicCredentialCacheMap.find(matchingScope);
@@ -318,10 +318,12 @@ bool CredentialStore::authenticate(const Poco::Net::HTTPClientSession& pSession,
                                               matchingScope,
                                               matchingCredentials))
             {
-                cout << "HAD CREDS FOR TARGET SCOPE   = " << targetScope.toString() << endl;
-                cout << "HAD CREDS FOR MATCHING SCOPE = " << matchingScope.toString() << endl;
+                ofLogVerbose("CredentialStore::authenticate") << "HAD CREDS FOR TARGET SCOPE   = " << targetScope.toString();
+                ofLogVerbose("CredentialStore::authenticate") << "HAD CREDS FOR MATCHING SCOPE = " << matchingScope.toString();
                 if(requestedAuthType == BASIC)
                 {
+                    ofLogVerbose("CredentialStore::authenticate") << "BASIC = " << matchingScope.toString();
+
                     // replace any old ones (probably means they failed and were updated somewhere)
                     basicCredentialCacheMap[matchingScope] = HTTPBasicCredentialsSharedPtr(new Poco::Net::HTTPBasicCredentials(matchingCredentials.getUsername(),matchingCredentials.getPassword()));
                     basicCredentialCacheMap[matchingScope].get()->authenticate(pRequest);
@@ -329,8 +331,10 @@ bool CredentialStore::authenticate(const Poco::Net::HTTPClientSession& pSession,
                 }
                 else if(requestedAuthType == DIGEST)
                 {
+                    ofLogVerbose("CredentialStore::authenticate") << "DIGEST = " << matchingScope.toString();
+
                     digestCredentialCacheMap[matchingScope] = HTTPDigestCredentialsSharedPtr(new Poco::Net::HTTPDigestCredentials(matchingCredentials.getUsername(),matchingCredentials.getPassword()));
-                    digestCredentialCacheMap[matchingScope].get()->authenticate(pRequest,pResponse);
+                    digestCredentialCacheMap[matchingScope].get()->authenticate(pRequest, pResponse);
                     return true;
                 }
                 else

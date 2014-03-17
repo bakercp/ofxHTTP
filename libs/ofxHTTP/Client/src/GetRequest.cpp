@@ -31,34 +31,14 @@ namespace HTTP {
 namespace Client {
 
 
-
-GetRequest::GetRequest(const Poco::URI& uri):
-    BaseRequest(Poco::Net::HTTPRequest::HTTP_GET, uri)
-{
-}
-
-
-GetRequest::GetRequest(const Poco::URI& uri, const std::string& httpVersion):
-    BaseRequest(Poco::Net::HTTPRequest::HTTP_GET,uri,httpVersion)
+GetRequest::GetRequest(const std::string& uri, const std::string& httpVersion):
+    BaseRequest(Poco::Net::HTTPRequest::HTTP_GET, uri, httpVersion)
 {
 }
 
 
 GetRequest::~GetRequest()
 {
-}
-
-
-void GetRequest::prepareRequest(Poco::Net::HTTPRequest& request) const
-{
-    // TODO: this is not the right place to do this.
-    Poco::Net::NameValueCollection::ConstIterator iter = _headers.begin();
-
-    while (iter != _headers.end())
-    {
-        request.set((*iter).first, (*iter).second);
-        ++iter;
-    }
 }
 
 

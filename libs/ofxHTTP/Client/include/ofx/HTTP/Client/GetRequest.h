@@ -27,8 +27,7 @@
 
 
 #include <string>
-#include "Poco/URI.h"
-#include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/HTTPMessage.h"
 #include "ofx/HTTP/Client/BaseRequest.h"
 
 
@@ -40,19 +39,10 @@ namespace Client {
 class GetRequest: public BaseRequest
 {
 public:
-    GetRequest(const Poco::URI& uri);
-    GetRequest(const Poco::URI& uri, const std::string& httpVersion);
+    GetRequest(const std::string& uri,
+               const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_0);
 
     virtual ~GetRequest();
-    
-    // TODO
-    // http://pocoproject.org/forum/viewtopic.php?f=12&t=5036
-    // resumable download example
-    
-protected:
-    virtual void prepareRequest(Poco::Net::HTTPRequest& request) const;
-
-    friend class BaseClient;
 
 };
 
