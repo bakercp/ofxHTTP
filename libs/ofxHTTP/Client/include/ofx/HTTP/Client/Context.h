@@ -28,10 +28,10 @@
 
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
-#include "CookieStore.h"
-#include "CredentialStore.h"
+#include "ofx/HTTP/Client/CookieStore.h"
+#include "ofx/HTTP/Client/CredentialStore.h"
 //#include "ofxHTTPCredentialStoreCache.h"
-#include "SessionSettings.h"
+#include "ofx/HTTP/Client/SessionSettings.h"
 
 // a thread-safe shared context
 // -- in theory all members are thread safe
