@@ -87,8 +87,8 @@ void WebSocketRoute::stop()
 }
 
 
-bool WebSocketRoute::sendFrame(const AbstractWebSocketConnection* connection,
-                                            const WebSocketFrame& frame)
+bool WebSocketRoute::sendFrame(const WebSocketConnection* connection,
+                               const WebSocketFrame& frame)
 {
     if(0 != connection)
     {
@@ -102,7 +102,7 @@ bool WebSocketRoute::sendFrame(const AbstractWebSocketConnection* connection,
 }
 
 
-void WebSocketRoute::close(AbstractWebSocketConnection* connection)
+void WebSocketRoute::close(WebSocketConnection* connection)
 {
     if(0 != connection)
     {
@@ -139,7 +139,7 @@ void WebSocketRoute::broadcast(const WebSocketFrame& frame)
 }
 
 
-void WebSocketRoute::registerWebSocketConnection(AbstractWebSocketConnection* connection)
+void WebSocketRoute::registerWebSocketConnection(WebSocketConnection* connection)
 {
     ofScopedLock lock(_mutex);
     if(!_connections.insert(connection).second)
@@ -149,7 +149,7 @@ void WebSocketRoute::registerWebSocketConnection(AbstractWebSocketConnection* co
 }
 
 
-void WebSocketRoute::unregisterWebSocketConnection(AbstractWebSocketConnection* connection)
+void WebSocketRoute::unregisterWebSocketConnection(WebSocketConnection* connection)
 {
     ofScopedLock lock(_mutex);
     // TODO: this will never return more than 1

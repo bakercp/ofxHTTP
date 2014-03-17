@@ -69,12 +69,12 @@ public:
 
     virtual void stop();
 
-    bool sendFrame(const AbstractWebSocketConnection* connection,
+    bool sendFrame(const WebSocketConnection* connection,
                    const WebSocketFrame& frame);
 
     void broadcast(const WebSocketFrame& frame);
 
-    void close(AbstractWebSocketConnection* connection);
+    void close(WebSocketConnection* connection);
 
     void close();
 
@@ -84,23 +84,27 @@ public:
     template<class ListenerClass>
     void unregisterWebSocketEvents(ListenerClass* listener);
 
-    void registerWebSocketConnection(AbstractWebSocketConnection* connection);
-    void unregisterWebSocketConnection(AbstractWebSocketConnection* connection);
-
     std::size_t getNumWebSocketConnections() const;
 
     WebSocketEvents events;
+        ///< \brief WebSocketEvents for WebSocket callbacks.
 
     static SharedPtr makeShared(const Settings& settings)
     {
         return SharedPtr(new WebSocketRoute(settings));
     }
 
+protected:
+    void registerWebSocketConnection(WebSocketConnection* connection);
+    void unregisterWebSocketConnection(WebSocketConnection* connection);
+
+    friend class WebSocketConnection;
+    
 private:
-    typedef std::set<AbstractWebSocketConnection*>              WebSocketConnections;
-    typedef std::set<AbstractWebSocketConnection*>::iterator    WebSocketConnectionsIter;
-    typedef std::map<std::string,WebSocketEvents>               EventMap;
-    typedef std::map<std::string,WebSocketEvents>::iterator     EventMapIter;
+    typedef std::set<WebSocketConnection*>          WebSocketConnections;
+    typedef WebSocketConnections::iterator          WebSocketConnectionsIter;
+    typedef std::map<std::string, WebSocketEvents>  EventMap;
+    typedef EventMap::iterator                      EventMapIter;
 
     WebSocketConnections _connections;
 

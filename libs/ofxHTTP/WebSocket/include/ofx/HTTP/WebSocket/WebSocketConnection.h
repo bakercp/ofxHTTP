@@ -49,31 +49,30 @@ namespace HTTP {
 class WebSocketRoute;
 
 
+/// \brief A thread safe WebSocketConnection represents a
+///         WebSocket connection with a single client.
+/// \details Frames can be sent across thread boundaries and are
+///         queued for sending during the WebSocketConnection's
+///         service loop.
 class WebSocketConnection: public AbstractWebSocketConnection
-    /// \brief A thread safe WebSocketConnection represents a
-    ///         WebSocket connection with a single client.
-    /// \details Frames can be sent across thread boundaries and are
-    ///         queued for sending during the WebSocketConnection's
-    ///         service loop.
 {
 public:
+    /// \brief Create a WebSocketConnection.
+    /// \param parent A reference to the parent WebSocketRoute.
     WebSocketConnection(WebSocketRoute& parent);
-        ///< \brief Create a WebSocketConnection.
-        ///< \param parent A reference to the parent WebSocketRoute.
 
+    /// \brief Destroy the WebSocketConnection.
     virtual ~WebSocketConnection();
-        ///< \brief Destroy the WebSocketConnection.
 
+    /// \brief Handle an HTTPServerRequest with an HTTPServerResponse.
+    /// \param request The HTTPServerRequest to handle.
+    /// \param response The HTTPServerResponse to return.
     virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
                                Poco::Net::HTTPServerResponse& response);
-        ///< \brief Handle an HTTPServerRequest with an HTTPServerResponse.
-        ///< \param request The HTTPServerRequest to handle.
-        ///< \param response The HTTPServerResponse to return.
 
+    /// \brief Queue a frame to be sent.
+    /// \returns false iff frame not queued
     bool sendFrame(const WebSocketFrame& frame) const;
-        ///< \brief Queue a frame to be sent.
-        ///< 
-        ///< \returns false if frame not queued
 
     void close();
 
@@ -98,7 +97,7 @@ public:
         ///<        establishing this connection.
 
     Poco::Net::SocketAddress getClientAddress() const;
-        ///< \returns the SocketAddress of the client that
+        ///< @returns the SocketAddress of the client that
         ///<        established this connection.
 
     bool isConnected() const;
@@ -136,7 +135,7 @@ private:
     mutable std::queue<WebSocketFrame> _frameQueue;
 
     mutable Poco::FastMutex _mutex;
-    
+
 };
 
 

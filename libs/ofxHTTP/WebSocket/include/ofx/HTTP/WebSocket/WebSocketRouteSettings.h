@@ -36,51 +36,60 @@ namespace ofx {
 namespace HTTP {
 
 
+/// \brief Settings for a WebSocketRoute.
 class WebSocketRouteSettings: public BaseRouteSettings
-    /// \brief Settings for a WebSocketRoute.
 {
 public:
+    /// \brief A typedef for subprotocols.
     typedef std::set<std::string> SubprotocolSet;
-        ///< \breif A typedef for subprotocols.
 
+    /// \brief A typedef for origins.
     typedef std::set<std::string> OriginSet;
-        ///< \brief A typedef for origins.
 
+    /// \brief Create a WebSocketRouteSettings.
+    /// \param routePathPattern The regex pattern that this route will handle.
+    /// \param requireSecurePorttrue True if this route requires communication
+    ///     on an SSL encrypted port.
     WebSocketRouteSettings(const std::string& routePathPattern = DEFAULT_WEBSOCKET_ROUTE_PATH_PATTERN,
                            bool requireSecurePort = false);
-        ///< \param routePathPattern The regex pattern that this route
-        ///<        will handle.
-        ///< \param requireSecurePorttrue True if this route requires
-        ///<        communication on an SSL encrypted port.
 
+    /// \brief Destroy the WebSocketRouteSettings.
     virtual ~WebSocketRouteSettings();
-        ///< \brief Destroy the WebSocketRouteSettings.
 
+    /// \brief Set the list of valid subprotocols.
+    ///
+    /// An empty set means that any requested subprotocol will be accepted.  A
+    /// non-empty set means that the requested subprotocol MUST be in the set.
+    ///
+    /// \param subprotocols A set of valid subprotocols.
     void setValidSubprotcols(const SubprotocolSet& subprotocols);
-        ///< \brief Set the list of valid subprotocols.
-        ///< \param subprotocols A set of valid subprotocols.
-        ///< \note  An empty set means that any requested subprotocol will be
-        ///<        accepted.  A non-empty set means that the requested
-        ///<        subprotocol MUST be in the set.
 
+    /// \brief Get a set of valid subprotocols.
+    ///
+    /// If empty, all requested subprotocols will be accepted.
+    ///
+    /// \returns The set of valid subprotocols.
     const SubprotocolSet& getValidSubprotocols() const;
-        ///< \returns The set of valid subprotocols.
-        ///< \note  If empty, all requested subprotocols will be accepted.
 
+    /// \brief Set the list of valid origins.
+    ///
+    /// An empty set means that any Origin header in the request will be
+    /// accepted.  A non-empty set means that the request origin MUST be in the
+    /// set.
+    ///
+    /// \param origins A set of valid origins.
     void setValidOrigins(const OriginSet& origins);
-        ///< \brief Set the list of valid origins.
-        ///< \param origins A set of valid origins.
-        ///< \note  An empty set means that any Origin header in the request
-        ///<        will be accepted.  A non-empty set means that the request
-        ///<        origin MUST be in the set.
 
+    /// \brief Get a set of valid origins.
+    ///
+    /// If empty, all Origin headers will be accepted.
+    ///
+    /// \returns The set of valid origins.
     const OriginSet& getValidOrigins() const;
-        ///< \returns The set of valid origins.
-        ///< \note  If empty, all Origin headers will be accepted.
 
+    /// \param autoPingPongResponse If set to true, the WebSocket connection
+    ///     will return all PINGs with a PONG.
     void setAutoPingPongResponse(bool autoPingPongResponse);
-        ///< \param autoPingPongResponse If set to true, the WebSocket
-        ///<        connection will return all PINGs with a PONG
 
     bool getAutoPingPongResponse() const;
 
@@ -119,7 +128,7 @@ private:
     SubprotocolSet _validSubprotocols;
     OriginSet _validOrigins;
 
-    bool _autoPingPongResponse; // automatically return pong frames if true
+    bool _autoPingPongResponse; ///< \brief Automatically return pong frames.
     bool _keepAlive;
 
     Poco::Timespan _receiveTimeout;
