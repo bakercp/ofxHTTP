@@ -35,41 +35,41 @@ namespace ofx {
 namespace HTTP {
 
 
+/// \brief Aggregate settings for a BasicWebSocketServer.
 class BasicWebSocketServerSettings:
     public WebSocketRouteSettings,
     public BasicServerSettings
-    /// \brief Aggregate settings for a BasicWebSocketServer.
 {
 };
 
 
+/// \brief A basic implementation of an HTTP Server supporting WebSockets.
 class BasicWebSocketServer: public BasicServer
-    /// \brief A basic implementation of an HTTP Server supporting WebSockets.
 {
 public:
+    /// \brief A typedef for a shared pointer.
     typedef std::shared_ptr<BasicWebSocketServer> SharedPtr;
-        ///< \brief A typedef for a shared pointer.
 
+    /// \brief A typedef for a weak pointer.
     typedef std::weak_ptr<BasicWebSocketServer> WeakPtr;
-        ///< \brief A typedef for a weak pointer.
 
+    /// \brief A typedef for the BasicWebSocketServerSettings.
     typedef BasicWebSocketServerSettings Settings;
-        ///< \brief A typedef for the BasicWebSocketServerSettings.
 
+    /// \brief Create a BasicWebSocketServer with the provided Settings.
+    /// \param settings The Settings used to configure the server.
     BasicWebSocketServer(const Settings& settings = Settings());
-        ///< \brief Create a BasicWebSocketServer with the provided Settings.
-        ///< \param settings The Settings used to configure the server.
 
+    /// \brief Destroy the BasicWebSocketServer.
     virtual ~BasicWebSocketServer();
-        ///< \brief Destroy the BasicWebSocketServer.
 
+    /// \returns the WebSocketRoute attached to this server.
     WebSocketRoute::SharedPtr getWebSocketRoute();
-        ///< \returns the WebSocketRoute attached to this server.
 
+    /// \brief Construct a shared pointer to this server.
+    /// \param settings The Settings used to configure the server.
+    /// \note This will be replaced with C++11 (std::make_shared<...>).
     static SharedPtr makeShared(const Settings& settings = Settings())
-        ///< \brief Construct a shared pointer to this server.
-        ///< \param settings The Settings used to configure the server.
-        ///< \note This will be replaced with C++11 (std::make_shared<...>).
     {
         return SharedPtr(new BasicWebSocketServer(settings));
     }

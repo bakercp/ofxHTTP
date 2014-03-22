@@ -86,10 +86,10 @@ public:
     bool isProxyEnabled() const;
     void clearProxy();
     
-    void setUseCredentialStore(bool bUseCredentialStore);
+    void setUseCredentialStore(bool useCredentialStore);
     bool useCredentialStore() const;
 
-    void setUseCookielStore(bool bUseCookieStore);
+    void setUseCookieStore(bool uxseCookieStore);
     bool useCookieStore() const;
     
     static const std::string    DEFAULT_USER_AGENT;

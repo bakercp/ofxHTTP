@@ -41,16 +41,16 @@ namespace ofx {
 namespace HTTP {
 
 
+/// \brief The base implmentation of a server route.
 template<typename SettingsType>
 class BaseRoute_: public AbstractRoute
-    /// \brief The base implmentation of a server route.
 {
 public:
+    /// \brief Create a BaseRoute.
     BaseRoute_(const SettingsType& settings = SettingsType());
-        ///< \brief Create a BaseRoute.
 
+    /// \brief Destroy a BaseRoute.
     virtual ~BaseRoute_();
-        ///< \brief Destroy a BaseRoute.
 
     virtual std::string getRoutePathPattern() const;
 
@@ -64,8 +64,8 @@ public:
 
     virtual void stop();
 
+    /// \returns the route's Settings.
     const SettingsType& getSettings() const;
-        ///< \returns the route's Settings.
 
 protected:
     SettingsType _settings;
@@ -78,8 +78,8 @@ private:
 };
 
 
+/// \brief A standard base route implementation.
 typedef BaseRoute_<BaseRouteSettings> BaseRoute;
-    ///< \brief A standard base route implementation.
 
 
 template<typename SettingsType>
@@ -104,23 +104,50 @@ std::string BaseRoute_<SettingsType>::getRoutePathPattern() const
 
 template<typename SettingsType>
 bool BaseRoute_<SettingsType>::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
-                                               bool isSecurePort) const
+                                                bool isSecurePort) const
 {
     // If this isn't a secure pot and we require that, reject it.
-    if(_settings.requireSecurePort() && !isSecurePort)
+    if (_settings.requireSecurePort() && !isSecurePort)
     {
         return false;
     }
-
 
     // Check the request method.
     const BaseRouteSettings::HTTPMethodSet& validHTTPMethods = _settings.getValidHTTPMethods();
 
     // If validHTTPMethods are defined, then the request must match.
-    if(!validHTTPMethods.empty() &&
+    if (!validHTTPMethods.empty() &&
        validHTTPMethods.find(request.getMethod()) == validHTTPMethods.end())
     {
         return false;
+    }
+
+    // Check the request content type.
+    const BaseRouteSettings::MediaTypeSet& validContentTypes = _settings.getValidContentTypes();
+
+    if (!validContentTypes.empty())
+    {
+        BaseRouteSettings::MediaTypeSet::iterator iter = validContentTypes.begin();
+
+        const std::string& contentType = request.getContentType();
+
+        bool foundMatch = false;
+
+        while (iter != validContentTypes.end())
+        {
+            if ((*iter).matchesRange(contentType))
+            {
+                foundMatch = true;
+                break;
+            }
+
+            ++iter;
+        }
+
+        if (!foundMatch)
+        {
+            return false;
+        }
     }
 
     // require a valid path
@@ -143,7 +170,7 @@ bool BaseRoute_<SettingsType>::canHandleRequest(const Poco::Net::HTTPServerReque
 
     try
     {
-        // TODO: cache this regex
+        // \todo cache this regex
         return Poco::RegularExpression(getRoutePathPattern()).match(path);
     }
     catch (const Poco::RegularExpressionException& exc)
@@ -151,6 +178,7 @@ bool BaseRoute_<SettingsType>::canHandleRequest(const Poco::Net::HTTPServerReque
         ofLogError("BaseRoute::canHandleRequest") << exc.what();
         return false;
     }
+
 }
 
 
@@ -163,8 +191,13 @@ Poco::Net::HTTPRequestHandler* BaseRoute_<SettingsType>::createRequestHandler(co
 
 template<typename SettingsType>
 void BaseRoute_<SettingsType>::handleRequest(Poco::Net::HTTPServerRequest& request,
-                                            Poco::Net::HTTPServerResponse& response)
+                                             Poco::Net::HTTPServerResponse& response)
 {
+    if (response.sent())
+    {
+        return;
+    }
+
     // We gave the handlers every opportunity to send a response.
     // Now we must conclude that there is a server error.
     try
@@ -214,7 +247,6 @@ const SettingsType& BaseRoute_<SettingsType>::getSettings() const
 {
     return _settings;
 }
-
 
 
 } } // namespace ofx::HTTP

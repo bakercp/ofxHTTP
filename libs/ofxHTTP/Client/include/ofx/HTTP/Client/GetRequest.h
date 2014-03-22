@@ -39,8 +39,8 @@ namespace Client {
 class GetRequest: public BaseRequest
 {
 public:
-    GetRequest(const std::string& uri,
-               const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_0);
+    GetRequest(const std::string& uri);
+    GetRequest(const std::string& uri, const std::string& httpVersion);
 
     virtual ~GetRequest();
 

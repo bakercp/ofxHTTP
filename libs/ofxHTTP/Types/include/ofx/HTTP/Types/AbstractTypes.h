@@ -73,9 +73,11 @@ public:
     }
 
     /// \brief Creates a new HTTPRequestHandler for the given request.
-    /// \details Before this is called, it is expected that the calling
-    ///        server has confirmed that this route is capable of handling
-    ///        the request by calling canHandleRequest().
+    ///
+    /// Before this is called, it is expected that the calling
+    /// server has confirmed that this route is capable of handling
+    /// the request by calling canHandleRequest().
+    ///
     /// \param request The HTTPServerRequest to be passed to the handler.
     /// \returns An HTTPRequestHandler that will handle the request.
     /// \note Redeclared here for documentation puposes.
@@ -85,8 +87,8 @@ public:
 
 
 /// \brief Defines an abstract HTTP route handler.
-/// \details Route handlers are invoked in route handling threads
-///         created by classes that inherit from AbstractRoute.
+/// Route handlers are invoked in route handling threads
+/// created by classes that inherit from AbstractRoute.
 class AbstractRouteHandler: public AbstractHTTPRequestHandler
 {
 public:
@@ -142,16 +144,15 @@ public:
     }
 
     /// \brief Get the route's regex path pattern.
-    /// \details The path pattern is used to match incoming
-    ///        server requests and allows requests to be
-    ///        routed to different routes based on their
-    ///        requested URI.
+    ///
+    /// The path pattern is used to match incoming server requests and allows
+    /// requests to be routed to different routes based on their requested URI.
+    ///
     /// \returns the regex path pattern.
     virtual std::string getRoutePathPattern() const = 0;
 
     /// \brief Determine if this route can handle the given request.
-    /// \param request The incoming Poco::Net::HTTPServerRequest to be
-    ///        tested.
+    /// \param request The incoming Poco::Net::HTTPServerRequest to be tested.
     /// \param isSecurePort true iff the connection is SSL encrypted.
     ///        Some implmenetations of this interface may choose to only
     ///        handle requests on secure ports.

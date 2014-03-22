@@ -50,25 +50,29 @@ namespace HTTP {
 class PostRoute;
 
 
+/// \brief A flexible POST route handler.
+///
+/// Form data must be encoded with "multipart/form-data" or
+/// "application/x-www-form-urlencoded".  "text/plain" form
+/// encoding is supported, but not parsed.
 class PostRouteHandler: public AbstractRouteHandler
-    /// \brief A flexible POST route handler.
-    /// \details Form data must be encoded with "multipart/form-data" or
-    ///         "application/x-www-form-urlencoded".  "text/plain"
-    ///         form encoding is supported, but not parsed.
 {
 public:
+    /// \brief A typedef for PostRouteSettings
     typedef PostRouteSettings Settings;
-        ///< \brief A typedef for PostRouteSettings
 
+    /// \brief Create a PostRouteHandler.
+    /// \param parent The parent PostRoute.
     PostRouteHandler(PostRoute& parent);
-        ///< \brief Create a PostRouteHandler.
-        ///< \param parent The parent PostRoute.
 
+    /// \brief Destroy the PostRouteHandler.
     virtual ~PostRouteHandler();
-        ///< \brief Destroy the PostRouteHandler.
-    
+
     void handleRequest(Poco::Net::HTTPServerRequest& request,
                        Poco::Net::HTTPServerResponse& response);
+
+    static const Poco::Net::MediaType POST_CONTENT_TYPE_TEXT_PLAIN;
+        ///< \brief A constant defining "text/plain".
 
     static const Poco::Net::MediaType POST_CONTENT_TYPE_MULTIPART;
         ///< \brief A constant defining "multipart/form-data".
@@ -76,8 +80,9 @@ public:
     static const Poco::Net::MediaType POST_CONTENT_TYPE_URLENCODED;
         ///< \brief A constant defining "application/x-www-form-urlencoded".
 
-    static const Poco::Net::MediaType POST_CONTENT_TYPE_TEXT_PLAIN;
-        ///< \brief A constant defining "text/plain".
+    static const Poco::Net::MediaType POST_CONTENT_TYPE_JSON;
+        ///< \brief A constant defining "application/json".
+
 
 private:
     PostRoute& _parent;

@@ -44,7 +44,12 @@ BaseRequest::~BaseRequest()
 }
 
 
-void BaseRequest::sendRequestBody(std::ostream& requestStream) const
+void BaseRequest::finalizeRequest()
+{
+    // Empty
+}
+
+void BaseRequest::writeRequestBody(std::ostream& requestStream)
 {
     // Empty
 }

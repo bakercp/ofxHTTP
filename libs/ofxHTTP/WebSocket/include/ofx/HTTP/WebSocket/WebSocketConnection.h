@@ -49,11 +49,11 @@ namespace HTTP {
 class WebSocketRoute;
 
 
-/// \brief A thread safe WebSocketConnection represents a
-///         WebSocket connection with a single client.
-/// \details Frames can be sent across thread boundaries and are
-///         queued for sending during the WebSocketConnection's
-///         service loop.
+/// \brief A class representing a WebSocket connection with a single client.
+///
+/// Frames can be sent across thread boundaries and are queued for sending
+/// during the WebSocketConnection's service loop.  All accessors are
+/// synchronized and thread-safe.
 class WebSocketConnection: public AbstractWebSocketConnection
 {
 public:
@@ -76,40 +76,41 @@ public:
 
     void close();
 
-    virtual void frameReceived(const WebSocketFrame& frame);
-        ///< \brief Called when a WebSocketFrame is received.
-        ///< \details Subclasses can implement this method.
-        ///< \param frame The WebSocketFrame that was received.
+//    /// \brief Called when a WebSocketFrame is received.
+//    /// \details Subclasses can implement this method.
+//    /// \param frame The WebSocketFrame that was received.
+//    virtual void frameReceived(const WebSocketFrame& frame);
+//
+//    /// \brief Called when a WebSocketFrame is sent.
+//    /// \details Subclasses can implement this method.
+//    /// \param frame The WebSocketFrame that was sent.
+//    /// \param numBytesSent The number of bytes sent in the WebSocketFrame.
+//    virtual void frameSent(const WebSocketFrame& frame,
+//                           std::size_t numBytesSent);
 
-    virtual void frameSent(const WebSocketFrame& frame,
-                           std::size_t numBytesSent);
-        ///< \brief Called when a WebSocketFrame is sent.
-        ///< \details Subclasses can implement this method.
-        ///< \param frame The WebSocketFrame that was sent.
-        ///< \param numBytesSent The number of bytes sent in the WebSocketFrame.
+    /// \brief Called when a WebSocketConnection is closed.
+    /// \details Subclasses can implement this method.
+//    virtual void socketClosed();
 
-    virtual void socketClosed();
-        ///< \brief Called when a WebSocketConnection is closed.
-        ///< \details Subclasses can implement this method.
-
+    /// \returns The request headers submitted when
+    ///         establishing this connection.
     Poco::Net::NameValueCollection getRequestHeaders() const;
-        ///< \returns The request headers submitted when
-        ///<        establishing this connection.
 
+    /// \returns the SocketAddress of the client that
+    ///          established this connection.
     Poco::Net::SocketAddress getClientAddress() const;
-        ///< @returns the SocketAddress of the client that
-        ///<        established this connection.
 
+    /// \returns true iff this WebSocketConnect is connected to a client.
     bool isConnected() const;
-        ///< \returns true iff this WebSocketConnect is connected to a client.
 
-//    std::string getSubprotocol() const;
-
+    /// \returns the size of the send queue.
     std::size_t getSendQueueSize() const;
-        ///< \returns the size of the send queue.
 
+    /// \brief Clears the send queue.
     void clearSendQueue();
-        ///< \brief Clears the send queue.
+
+    std::size_t getTotalBytesSent() const;
+    std::size_t getTotalBytesReceived() const;
 
 protected:
     WebSocketRoute& _parent;
@@ -119,11 +120,15 @@ private:
     void handleOrigin(Poco::Net::HTTPServerRequest& request,
                       Poco::Net::HTTPServerResponse& response);
     
+    void handleSubprotocols(Poco::Net::HTTPServerRequest& request,
+                            Poco::Net::HTTPServerResponse& response);
+
     void handleExtensions(Poco::Net::HTTPServerRequest& request,
                           Poco::Net::HTTPServerResponse& response);
-    
-    void processFrameQueue(Poco::Net::WebSocket& ws);
-    
+
+
+    std::size_t sendFrames(Poco::Net::WebSocket& ws);
+
     // this is all fixed in Poco 1.4.6 and 1.5.+
     void applyFirefoxHack(Poco::Net::HTTPServerRequest& request);
 
@@ -131,6 +136,8 @@ private:
     Poco::Net::SocketAddress _clientAddress;
 
     bool _isConnected;
+    std::size_t _totalBytesReceived;
+    std::size_t _totalBytesSent;
 
     mutable std::queue<WebSocketFrame> _frameQueue;
 

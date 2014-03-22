@@ -31,10 +31,9 @@ void ofApp::setup()
     ofSetLogLevel(OF_LOG_NOTICE);
     ofSetFrameRate(30);
 
-    HTTP::BasicPostServerSettings settings;
-    settings.setPort(8998);
+    BasicPostServerSettings settings;
 
-    server = HTTP::BasicPostServer::makeShared(settings);
+    server = BasicPostServer::makeShared(settings);
 
     server->getPostRoute()->registerPostEvents(this);
 
@@ -49,59 +48,47 @@ void ofApp::draw()
 {
     ofBackground(255);
     ofDrawBitmapStringHighlight("See " + server->getURL(), 10, 16);
-
     ofDrawBitmapStringHighlight("See the Console", 10, 45);
-
     int y = 70;
 
 }
 
 
-bool ofApp::onHTTPFormEvent(HTTP::HTTPFormEventArgs& args)
+void ofApp::onHTTPPostEvent(PostEventArgs& args)
+{
+    ofLogNotice("ofApp::onHTTPPostEvent") << "Data: " << args.data.getText();
+}
+
+
+void ofApp::onHTTPFormEvent(PostFormEventArgs& args)
 {
     ofLogNotice("ofApp::onHTTPFormEvent") << "";
-    HTTP::Utils::dumpNameValueCollection(args.form, ofGetLogLevel());
-    return true;
-}
-
-bool ofApp::onHTTPRawFormEvent(HTTP::HTTPRawFormEventArgs& args)
-{
-    ofLogNotice("ofApp::onHTTPRawFormEvent") << "";
-    HTTP::Utils::dumpNameValueCollection(HTTP::Utils::splitTextPlainPost(args.form),
-                                         ofGetLogLevel());
-    return true;
+    Utils::dumpNameValueCollection(args.form, ofGetLogLevel());
 }
 
 
-bool ofApp::onHTTPUploadStartedEvent(HTTP::HTTPUploadEventArgs& args)
+void ofApp::onHTTPUploadEvent(PostUploadEventArgs& args)
 {
-    ofLogNotice("ofApp::onHTTPUploadStartedEvent") << "";
+    std::string stateString = "";
+
+    switch (args.getState())
+    {
+        case PostUploadEventArgs::UPLOAD_STARTING:
+            stateString = "STARTING";
+            break;
+        case PostUploadEventArgs::UPLOAD_PROGRESS:
+            stateString = "PROGRESS";
+            break;
+        case PostUploadEventArgs::UPLOAD_FINISHED:
+            stateString = "FINISHED";
+            break;
+    }
+
+    ofLogNotice("ofApp::onHTTPUploadEvent") << "";
+    cout << "         state: " << stateString << endl;
     cout << " formFieldName: " << args.getFormFieldName() << endl;
     cout << "orig. filename: " << args.getOriginalFilename() << endl;
     cout << "      filename: " << args.getFilename() << endl;
     cout << "      fileType: " << args.getFileType().toString() << endl;
     cout << "# bytes xfer'd: " << args.getNumBytesTransferred() << endl;
-    return true;
-}
-
-bool ofApp::onHTTPUploadProgressEvent(HTTP::HTTPUploadEventArgs& args)
-{
-    ofLogNotice("ofApp::onHTTPUploadProgressEvent") << "";
-    cout << " formFieldName: " << args.getFormFieldName() << endl;
-    cout << "orig. filename: " << args.getOriginalFilename() << endl;
-    cout << "      filename: " << args.getFilename() << endl;
-    cout << "      fileType: " << args.getFileType().toString() << endl;
-    cout << "# bytes xfer'd: " << args.getNumBytesTransferred() << endl;
-    return true;
-}
-
-bool ofApp::onHTTPUploadFinishedEvent(HTTP::HTTPUploadEventArgs& args)
-{
-    ofLogNotice("ofApp::onHTTPUploadFinishedEvent") << "";
-    cout << " formFieldName: " << args.getFormFieldName() << endl;
-    cout << "orig. filename: " << args.getOriginalFilename() << endl;
-    cout << "      filename: " << args.getFilename() << endl;
-    cout << "      fileType: " << args.getFileType().toString() << endl;
-    cout << "# bytes xfer'd: " << args.getNumBytesTransferred() << endl;
-    return true;
 }

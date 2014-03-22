@@ -24,6 +24,8 @@
 
 
 #include "ofx/HTTP/Client/ResponseStream.h"
+#include "Poco/CountingStream.h"
+#include "Poco/TeeStream.h"
 
 
 namespace ofx {
@@ -70,7 +72,7 @@ Poco::Exception* ResponseStream::getException() const
 }
 
 
-std::istream& ResponseStream::getResponseStreamRef() const
+std::istream& ResponseStream::getResponseStreamRef()
 {
     return *_pResponseStream;
 }
@@ -85,7 +87,7 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
 
     HTTPResponse httpResponse;
 
-    SessionSettings& sessionSettings = context->getSessionSettingsRef();  // get a copy of the session settings
+    SessionSettings& sessionSettings = context->getSessionSettingsRef(); 
     CredentialStore& credentials     = context->getCredentialStoreRef();
     CookieStore&     cookies         = context->getCookieStoreRef();
 
@@ -95,7 +97,6 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
     {
         ofLogVerbose("ResponseStream::createResponseStream") << "Beginning redirect loop. Max redirects = " << context->getSessionSettingsRef().getMaxRedirects() ;
 
-//        Poco::URI resolvedURI;
         Poco::URI redirectedProxyUri;
 
         Poco::URI requestURI(httpRequest.getURI());
@@ -127,6 +128,10 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
                         pClientSession = new Poco::Net::HTTPClientSession(requestURI.getHost(),
                                                                           requestURI.getPort());
                     }
+
+//                    pClientSession->setTimeout(Poco::Timespan(20, 0));
+//                    pClientSession->setKeepAliveTimeout(Poco::Timespan(20, 0));
+//                    pClientSession->setKeepAlive(true);
 
                     ofLogVerbose("ResponseStream::createResponseStream") << "New session created - host: " <<
                     pClientSession->getHost() << " port: " << pClientSession->getPort();
@@ -217,6 +222,10 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
                     credentials.authenticate(*pClientSession, httpRequest);
                 }
 
+
+                /// Finalize the request
+                httpRequest.finalizeRequest();
+
                 // call back into the request to pull the request data
                 ofLogVerbose("ResponseStream::createResponseStream") << "Preparing request.";
 
@@ -232,15 +241,28 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
 
                 cout << "URI: " << requestURI.toString() << endl;
 
+                
                 //////////////////////////////////////////////////////////////////
                 /////////////////////// -- SEND REQUEST -- ///////////////////////
                 //////////////////////////////////////////////////////////////////
+
+
                 ofLogVerbose("ResponseStream::createResponseStream") << "Sending request.";
+
                 std::ostream& requestStream = pClientSession->sendRequest(httpRequest);
+
+                Poco::TeeOutputStream tee(requestStream);
+
+                Poco::CountingOutputStream cos;
+
+                tee.addStream(cos);
+                tee.addStream(std::cout);
 
                 ofLogVerbose("ResponseStream::createResponseStream") << "Sending request body.";
 
-                httpRequest.sendRequestBody(requestStream); // upload, put etc
+                httpRequest.writeRequestBody(tee); // upload, put etc
+
+                cout << "numchars written = " <<  cos.chars() << endl;
 
                 //////////////////////////////////////////////////////////////////
                 ///////////////////////// -- RESPONSE -- /////////////////////////
@@ -250,15 +272,33 @@ ResponseStream::SharedPtr ResponseStream::createResponseStream(BaseRequest& http
 
                 cookies.store(httpResponse);
 
-                if (httpResponse.getStatus() == HTTPResponse::HTTP_MOVED_PERMANENTLY   ||
-                    httpResponse.getStatus() == HTTPResponse::HTTP_FOUND               ||
-                    httpResponse.getStatus() == HTTPResponse::HTTP_SEE_OTHER           ||
-                    httpResponse.getStatus() == HTTPResponse::HTTP_TEMPORARY_REDIRECT)
+
+                if (httpResponse.getStatus() == HTTPResponse::HTTP_MOVED_PERMANENTLY) // 301
                 {
+                    // Set it for the next go-around.
+                    httpRequest.setURI(requestURI.toString());
+
+                    ++redirects;
+
+                    delete pClientSession;
+                    pClientSession = 0;
+
+                    ofLogVerbose("ResponseStream::createResponseStream") << "Redirecting to: " << requestURI.toString();
+                }
+                else if (httpResponse.getStatus() == HTTPResponse::HTTP_FOUND // 302
+                      || httpResponse.getStatus() == HTTPResponse::HTTP_SEE_OTHER // 303
+                      || httpResponse.getStatus() == HTTPResponse::HTTP_TEMPORARY_REDIRECT) // 307
+                {
+                    httpRequest.add("Referrer", requestURI.toString());
+                    httpRequest.setContentType("");
+
                     requestURI.resolve(httpResponse.get("Location"));
 
                     // Set it for the next go-around.
                     httpRequest.setURI(requestURI.toString());
+
+                    // TODO: TAKE CARE OF THE HEADERS ... CLEAN THEM OUT
+                    httpRequest.setMethod(Poco::Net::HTTPRequest::HTTP_GET);
 
                     ++redirects;
 

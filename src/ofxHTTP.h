@@ -28,12 +28,10 @@
 
 #include "ofSSLManager.h"
 
-
 #include "ofx/HTTP/IPVideo/BasicIPVideoServer.h"
 
 #include "ofx/HTTP/Server/BasicPostServer.h"
 #include "ofx/HTTP/Server/BasicServer.h"
-
 
 #include "ofx/HTTP/WebSocket/BasicWebSocketServer.h"
 #include "ofx/HTTP/WebSocket/WebSocketEvents.h"
@@ -44,3 +42,4 @@
 #include "ofx/HTTP/Client/ResponseStream.h"
 #include "ofx/HTTP/Client/Context.h"
 #include "ofx/HTTP/Client/GetRequest.h"
+#include "ofx/HTTP/Client/PostRequest.h"

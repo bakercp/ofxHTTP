@@ -37,6 +37,7 @@ namespace HTTP {
 const Poco::Net::MediaType PostRouteHandler::POST_CONTENT_TYPE_TEXT_PLAIN = Poco::Net::MediaType("text/plain");
 const Poco::Net::MediaType PostRouteHandler::POST_CONTENT_TYPE_MULTIPART  = Poco::Net::MediaType("multipart/form-data");
 const Poco::Net::MediaType PostRouteHandler::POST_CONTENT_TYPE_URLENCODED = Poco::Net::MediaType("application/x-www-form-urlencoded");
+const Poco::Net::MediaType PostRouteHandler::POST_CONTENT_TYPE_JSON = Poco::Net::MediaType("application/json");
 
 
 PostRouteHandler::PostRouteHandler(PostRoute& parent):
@@ -81,42 +82,40 @@ void PostRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
         form.setFieldLimit(_parent.getSettings().getFieldLimit());
         form.load(request, request.stream(), postRoutePartHandler);
 
-        HTTPFormEventArgs args(request,
+        PostFormEventArgs args(request,
+                               response,
                                formUUID.toString(),
                                form);
 
         ofNotifyEvent(_parent.events.onHTTPFormEvent, args, &_parent);
+
     }
-    else if (contentType.matches(POST_CONTENT_TYPE_TEXT_PLAIN))
+    else
     {
         // Poco::Net::HTMLForm, like php does not handle text/plain because
         // it cannot be unambiguously encoded.  Here we simply return
         // the raw text with the event.
 
         std::string result;
+
         Poco::StreamCopier::copyToString(request.stream(), result);
 
-        HTTPRawFormEventArgs args(request,
-                                  formUUID.toString(),
-                                  result);
+        ofBuffer buffer(result);
 
-        ofNotifyEvent(_parent.events.onHTTPRawFormEvent,
-                      args,
-                      &_parent);
+        PostEventArgs args(request, response, formUUID.toString(), buffer);
+
+        ofNotifyEvent(_parent.events.onHTTPPostEvent, args, &_parent);
+
     }
-    else
-    {
-        // error events are handled at a deeper level
-        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR,
-                                    "Unknown Content-Type: " + request.get("Content-Type"));
-        _parent.handleRequest(request, response);
 
+    if (response.sent())
+    {
         return;
     }
-
-    if(!_parent.getSettings().getUploadRedirect().empty())
+    else if(!_parent.getSettings().getUploadRedirect().empty())
     {
         response.redirect(_parent.getSettings().getUploadRedirect());
+        return;
     }
     else
     {
@@ -124,6 +123,7 @@ void PostRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
         response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentLength(0);
         response.send();
+        return;
     }
 
 }

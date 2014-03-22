@@ -87,4 +87,16 @@ const BaseRouteSettings::HTTPMethodSet& BaseRouteSettings::getValidHTTPMethods()
 }
 
 
+void BaseRouteSettings::setValidContentTypes(const MediaTypeSet& validContentTypes)
+{
+    _validContentTypes = validContentTypes;
+}
+
+
+const BaseRouteSettings::MediaTypeSet& BaseRouteSettings::getValidContentTypes() const
+{
+    return _validContentTypes;
+}
+
+
 } } // namespace ofx::HTTP

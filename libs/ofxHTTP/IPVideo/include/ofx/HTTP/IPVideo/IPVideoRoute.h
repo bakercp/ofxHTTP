@@ -71,8 +71,6 @@ protected:
 
     Connections _connections;
 
-//    Settings _settings;
-
     mutable ofMutex _mutex;
 
 };

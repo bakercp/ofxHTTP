@@ -37,23 +37,19 @@ namespace ofx {
 namespace HTTP {
 
 
+/// \brief Settings for a PostRoute.
 class PostRouteSettings: public BaseRouteSettings
-    /// \brief Settings for a PostRoute.
 {
 public:
-    typedef std::set<Poco::Net::MediaType> MediaTypeSet;
-        ///< \brief A typedef for a MediaTypeSet.
-
+    /// \brief Create PostRouteSettings.
+    /// \param routePathPattern The regex pattern that this route will handle.
+    /// \param requireSecurePort True if this route requires
+    ///        communication on an SSL encrypted port.
     PostRouteSettings(const std::string& routePathPattern = DEFAULT_POST_ROUTE,
                       bool requireSecurePort = false);
-        ///< \brief Create PostRouteSettings.
-        ///< \param routePathPattern The regex pattern that this route
-        ///<        will handle.
-        ///< \param requireSecurePort True if this route requires
-        ///<        communication on an SSL encrypted port.
 
+    /// \brief Destroy the PostRouteSetting.
     virtual ~PostRouteSettings();
-        ///< \brief Destroy the PostRouteSetting.
 
     void setUploadFolder(const std::string& uploadFolder);
     const std::string& getUploadFolder() const;
@@ -63,12 +59,6 @@ public:
 
     void setWriteBufferSize(std::size_t writeBufferSize);
     std::size_t getWriteBufferSize() const;
-
-    void setRequireValidContentType(bool requireValidContentType);
-    bool getRequireValidContentType() const;
-
-    void setValidContentTypes(const MediaTypeSet& valid);
-    const MediaTypeSet& getValidContentTypes() const;
 
     void setFieldLimit(std::size_t fieldLimit);
     std::size_t getFieldLimit() const;
@@ -80,14 +70,15 @@ public:
     static const std::string DEFAULT_POST_FOLDER;
     static const std::string DEFAULT_POST_REDIRECT;
 
-    enum
+    /// \briefs Default values.
+    enum Defaults
     {
         DEFAULT_POST_BUFFER_SIZE = 8192,
-            /// \brief File upload buffer.
+            ///< \brief File upload buffer.
         DEFAULT_FIELD_LIMIT = 100,
-            /// \brief Maximum number of form fields.
-        DEFAULT_MAXIMUM_FILE_UPLOAD_SIZE = 2097152 // 2 MB
-            /// \brief Maximum file upload size
+            ///< \brief Maximum number of form fields.
+        DEFAULT_MAXIMUM_FILE_UPLOAD_SIZE = 2097152
+            ///< \brief Maximum file upload size (2 MB)
     };
 
     static const std::string DEFAULT_POST_HTTP_METHODS_ARRAY[];
@@ -98,7 +89,6 @@ public:
     static const HTTPMethodSet DEFAULT_POST_HTTP_METHODS;
         ///< \brief The default HTTP methods for this route.
 
-
 private:
     bool _requireUploadFolderInDataFolder;
     std::string _uploadFolder;
@@ -107,8 +97,6 @@ private:
     std::size_t _writeBufferSize;
     std::size_t _fieldLimit;
     std::streamsize _maximumFileUploadSize;
-
-    MediaTypeSet _validContentTypes;
 
 };
 

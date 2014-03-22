@@ -90,13 +90,13 @@ void WebSocketRoute::stop()
 bool WebSocketRoute::sendFrame(const WebSocketConnection* connection,
                                const WebSocketFrame& frame)
 {
-    if(0 != connection)
+    if(connection)
     {
         return connection->sendFrame(frame);
     }
     else
     {
-        ofLogError("BaseWebSocketSessionManager::sendFrame") << "0 == handler";
+        ofLogError("WebSocketRoute::sendFrame") << "0 == handler";
         return false;
     }
 }
@@ -104,13 +104,13 @@ bool WebSocketRoute::sendFrame(const WebSocketConnection* connection,
 
 void WebSocketRoute::close(WebSocketConnection* connection)
 {
-    if(0 != connection)
+    if(connection)
     {
         connection->close();
     }
     else
     {
-        ofLogError("BaseWebSocketSessionManager::disconnect") << "0 == handler";
+        ofLogError("WebSocketRoute::close") << "0 == handler";
     }
 }
 

@@ -40,8 +40,8 @@ class WebSocketRouteHandler;
 class WebSocketConnection;
 
 
+/// \brief A collection of Websocket Errors
 enum WebSocketError
-    /// \brief A collection of Websocket Errors
 {
     WS_ERR_NONE                           = 0,
     WS_ERR_NO_HANDSHAKE                   = Poco::Net::WebSocket::WS_ERR_NO_HANDSHAKE,
@@ -71,34 +71,34 @@ enum WebSocketError
 };
 
 
+/// \brief The base WebSocket event arguments.
 class WebSocketEventArgs: public ofEventArgs
-    /// \brief The base WebSocket event arguments.
 {
 public:
+    /// \brief Create a WebSocketEventArgs object with the provided params.
+    /// \param connection A reference to the associated WebSocketConnection.
+    /// \param error An error, if any, associated with the event.
     WebSocketEventArgs(const WebSocketConnection& connection,
                        WebSocketError error = WS_ERR_NONE):
         _connection(connection),
         _error(error)
-        ///< \brief Create a WebSocketEventArgs object with the provided params.
-        ///< \param connection A reference to the associated WebSocketConnection.
-        ///< \param error An error, if any, associated with the event.
     {
     }
     
+    /// \returns true iff _error is not equal to WS_ERR_NONE.
     bool hasError() const
-        ///< \returns true iff _error is not equal to WS_ERR_NONE.
     {
         return _error != WS_ERR_NONE;
     }
 
+    /// \returns the error code.
     WebSocketError getError() const
-        ///< \returns the error code.
     {
         return _error;
     }
 
+    /// \returns A const reference to the WebSocketConnection.
     const WebSocketConnection& getConnectionRef() const
-        ///< \returns A const reference to the WebSocketConnection.
     {
         return _connection;
     }
@@ -115,22 +115,19 @@ private:
 class WebSocketFrameEventArgs: public WebSocketEventArgs
 {
 public:
+    /// \brief Create a WebSocketFrameEventArgs object.
+    /// \param connection A reference to the associated WebSocketConnection.
+    /// \param error An error, if any, associated with the event.
     WebSocketFrameEventArgs(const WebSocketFrame& frame,
                             const WebSocketConnection& connection,
                             WebSocketError error = WS_ERR_NONE):
         WebSocketEventArgs(connection, error),
         _frame(frame)
-            ///< \param connection A reference to the associated WebSocketConnection.
-            ///< \param error An error, if any, associated with the event.
-
-        ///< \brief Create a WebSocketFrameEventArgs object.
-        ///< \param
     {
     }
 
+    /// \returns A reference to the WebSocketFrame associated with the event.
     const WebSocketFrame& getFrameRef() const
-        ///< \returns A reference to the WebSocketFrame associated
-        ///<        with the event.
     {
         return _frame;
     }
@@ -138,7 +135,6 @@ public:
 private:
     const WebSocketFrame& _frame;
         ///< \brief A reference to the WebSocketFrame associated with the event.
-
 
 };
 

@@ -1,125 +1,145 @@
-//// =============================================================================
-////
-//// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
-////
-//// Permission is hereby granted, free of charge, to any person obtaining a copy
-//// of this software and associated documentation files (the "Software"), to deal
-//// in the Software without restriction, including without limitation the rights
-//// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//// copies of the Software, and to permit persons to whom the Software is
-//// furnished to do so, subject to the following conditions:
-////
-//// The above copyright notice and this permission notice shall be included in
-//// all copies or substantial portions of the Software.
-////
-//// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//// THE SOFTWARE.
-////
-//// =============================================================================
+// =============================================================================
 //
+// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
 //
-//#include "ofx/HTTP/Client/PostRequest.h"
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
-//namespace ofx {
-//namespace HTTP {
-//namespace Client {
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 //
-//    
-//
-//PostRequest::PostRequest(const Poco::URI& uri):
-//    BaseRequest(Poco::Net::HTTPRequest::HTTP_POST,uri)
-//{
-//}
-//
-//
-//PostRequest::PostRequest(const Poco::URI& uri, const std::string& httpVersion):
-//    BaseRequest(Poco::Net::HTTPRequest::HTTP_POST,uri,httpVersion)
-//{
-//}
-//
-//
-//PostRequest::~PostRequest()
-//{
-//}
-//
-//
-//void PostRequest::addFormFile(const std::string& fieldName, const std::string& filePath)
-//{
-//    _formFiles.add(fieldName, ofToDataPath(filePath));
-//}
-//
-//
-//void PostRequest::addFormFiles(const Poco::Net::NameValueCollection& nameValueMap)
-//{
-//    Poco::Net::NameValueCollection::ConstIterator iter = nameValueMap.begin();
-//
-//    while(iter != nameValueMap.end())
-//    {
-//        addFormFile((*iter).first,(*iter).second);
-//        ++iter;
-//    }
-//}
-//
-//
-//void PostRequest::addFormFiles(const std::map<std::string,std::string>& nameValueMap)
-//{
-//    std::map<std::string,std::string>::const_iterator iter = nameValueMap.begin();
-//
-//    while(iter != nameValueMap.end())
-//    {
-//        addFormFile((*iter).first,(*iter).second);
-//        ++iter;
-//    }
-//}
-//
-//
-//void PostRequest::addFormFiles(const multimap<string,string>&  nameValueMap)
-//{
-//    std::multimap<std::string,std::string>::const_iterator iter = nameValueMap.begin();
-//
-//    while(iter != nameValueMap.end())
-//    {
-//        addFormFile((*iter).first,(*iter).second);
-//        ++iter;
-//    }
-//}
-//
-//
-//bool PostRequest::hasFormFiles() const
-//{
-//    return !_formFiles.empty();
-//}
-//
-//
-//void PostRequest::clearFormFiles()
-//{
-//    _formFiles.clear();
-//}
-//
-//
-//const Poco::Net::NameValueCollection& PostRequest::getFormFiles() const
-//{
-//    return _formFiles;
-//}
-//
-//
-//void PostRequest::prepareRequest(Poco::Net::HTTPRequest& request) const
-//{
-//    // TODO: this is not the right place to do this.
-//    Poco::Net::NameValueCollection::ConstIterator iter = _headers.begin();
-//
-//    while (iter != _headers.end())
-//    {
-//        request.set((*iter).first, (*iter).second);
-//        ++iter;
-//    }
-//}
-//
-//
-//} } } // ofx::HTTP::Request
+// =============================================================================
+
+
+#include "ofx/HTTP/Client/PostRequest.h"
+#include "Poco/Net/FilePartSource.h"
+#include "Poco/Net/PartSource.h"
+#include "Poco/Net/StringPartSource.h"
+#include "ofUtils.h"
+
+
+namespace ofx {
+namespace HTTP {
+namespace Client {
+
+
+const std::string PostRequest::DEFAULT_MEDIA_TYPE = "application/octet-stream";
+
+
+PostRequest::PostRequest(const std::string& uri):
+    BaseRequest(Poco::Net::HTTPRequest::HTTP_POST,
+                uri,
+                Poco::Net::HTTPMessage::HTTP_1_0),
+    _form(std::shared_ptr<Poco::Net::HTMLForm>(new Poco::Net::HTMLForm()))
+{
+}
+
+
+PostRequest::PostRequest(const std::string& uri,
+                         const std::string& httpVersion):
+    BaseRequest(Poco::Net::HTTPRequest::HTTP_POST, uri, httpVersion),
+    _form(std::shared_ptr<Poco::Net::HTMLForm>(new Poco::Net::HTMLForm()))
+{
+}
+
+
+PostRequest::~PostRequest()
+{
+}
+
+
+void PostRequest::setFormEncoding(FormEncoding formEncoding)
+{
+    if (FORM_ENCODING_URL == formEncoding)
+    {
+        _form->setEncoding(Poco::Net::HTMLForm::ENCODING_URL);
+    }
+    else
+    {
+        _form->setEncoding(Poco::Net::HTMLForm::ENCODING_MULTIPART);
+    }
+}
+
+
+PostRequest::FormEncoding PostRequest::getFormEncoding() const
+{
+    if (_form->getEncoding().compare(Poco::Net::HTMLForm::ENCODING_URL) == 0)
+    {
+        return FORM_ENCODING_MULTIPART;
+    }
+    else
+    {
+        return FORM_ENCODING_URL;
+    }
+}
+
+
+void PostRequest::addField(const std::string& name,
+                           const std::string& value)
+{
+    _form->add(name, value);
+}
+
+
+void PostRequest::addFile(const std::string& name,
+                          const std::string& path,
+                          const std::string& mediaType)
+{
+
+    std::string absPath = ofToDataPath(path, true);
+
+    try
+    {
+        _form->addPart(name, new Poco::Net::FilePartSource(absPath, mediaType));
+        _form->setEncoding(Poco::Net::HTMLForm::ENCODING_MULTIPART);
+    }
+    catch (Poco::OpenFileException& exc)
+    {
+        ofLogError("PostRequest::addFile") << exc.displayText();
+    }
+}
+
+
+void PostRequest::addBuffer(const std::string& name,
+                            const ofBuffer& buffer,
+                            const std::string& mediaType)
+{
+    _form->addPart(name, new Poco::Net::StringPartSource(buffer.getText(),
+                                                         mediaType));
+    _form->setEncoding(Poco::Net::HTMLForm::ENCODING_MULTIPART);
+}
+
+
+void PostRequest::clear()
+{
+    _form = std::shared_ptr<Poco::Net::HTMLForm>(new Poco::Net::HTMLForm());
+}
+
+
+void PostRequest::finalizeRequest()
+{
+    _form->prepareSubmit(*this);
+}
+
+
+void PostRequest::writeRequestBody(std::ostream& requestStream)
+{
+    cout << "Writing request stream" << endl;
+    _form->write(requestStream);
+    clear();
+}
+
+
+} } } // ofx::HTTP::Request

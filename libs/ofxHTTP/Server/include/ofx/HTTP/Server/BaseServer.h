@@ -319,7 +319,7 @@ void BaseServer_<SettingsType>::addRoute(AbstractRoute::SharedPtr route)
 template <typename SettingsType>
 void BaseServer_<SettingsType>::removeRoute(AbstractRoute::SharedPtr route)
 {
-    _routes.erase(std::remove(_routes.begin(),_routes.end(),route),_routes.end());
+    _routes.erase(std::remove(_routes.begin(), _routes.end(), route), _routes.end());
 }
 
 
@@ -344,12 +344,14 @@ Poco::Net::HTTPRequestHandler* BaseServer_<SettingsType>::createRequestHandler(c
     // Thus, factories with overlapping routes should be
     // carefully ordered.
     Routes::const_reverse_iterator iter = _routes.rbegin();
+
     while(iter != _routes.rend())
     {
-        if((*iter)->canHandleRequest(request,_isSecurePort))
+        if((*iter)->canHandleRequest(request, _isSecurePort))
         {
             return (*iter)->createRequestHandler(request);
         }
+
         ++iter;
     }
 

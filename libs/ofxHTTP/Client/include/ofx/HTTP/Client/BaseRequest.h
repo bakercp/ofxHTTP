@@ -27,16 +27,7 @@
 
 
 #include <string>
-//#include "Poco/Exception.h"
-//#include "Poco/URI.h"
-//#include "Poco/Net/HTTPClientSession.h"
-//#include "Poco/Net/HTTPCredentials.h"
-//#include "Poco/Net/HTTPCookie.h"
 #include "Poco/Net/HTTPRequest.h"
-//#include "Poco/Net/HTTPResponse.h"
-//#include "Poco/Net/NameValueCollection.h"
-//#include "ofUtils.h"
-//#include "ofx/HTTP/Client/Cookie.h"
 
 
 namespace ofx {
@@ -54,7 +45,9 @@ public:
     virtual ~BaseRequest();
 
 protected:
-    virtual void sendRequestBody(std::ostream& requestStream) const;
+    virtual void finalizeRequest();
+    virtual void writeRequestBody(std::ostream& requestStream);
+
 
     friend class ResponseStream;
 };

@@ -37,13 +37,12 @@ namespace HTTP {
 class IPVideoRouteSettings: public BaseRouteSettings
 {
 public:
+    ///< \brief Create the IPVideoRouteSettings with the given route path.
+    /// \param routePathPattern The regex pattern that this route will handle.
+    /// \param requireSecurePorttrue True if this route requires
+    ///        communication on an SSL encrypted port.
     IPVideoRouteSettings(const std::string& routePathPattern = DEFAULT_VIDEO_ROUTE,
                          bool requireSecurePort = false);
-        ///< \brief Create the IPVideoRouteSettings with the given route path.
-        ///< \param routePathPattern The regex pattern that this route
-        ///<        will handle.
-        ///< \param requireSecurePorttrue True if this route requires
-        ///<        communication on an SSL encrypted port.
 
     virtual ~IPVideoRouteSettings();
 

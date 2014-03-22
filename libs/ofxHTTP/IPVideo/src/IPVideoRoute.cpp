@@ -70,7 +70,7 @@ void IPVideoRoute::send(ofPixels& pix)
 
         while(iter != _connections.end())
         {
-            if(0 != (*iter))
+            if(*iter)
             {
                 (*iter)->push(frame);
             }
@@ -114,7 +114,7 @@ void IPVideoRoute::stop()
     {
         for(std::size_t i = _connections.size() - 1; i > 0; --i)
         {
-            if(0 != _connections[i])
+            if(_connections[i])
             {
                 _connections[i]->stop();
             }

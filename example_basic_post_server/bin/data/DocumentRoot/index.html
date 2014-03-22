@@ -33,7 +33,7 @@
         <h3>Example Form Using <code>text/plain</code> Form Encoding</h3>
         <blockquote>
                 The following form is defined by <code>&lt;form role="form" action="/post" method="post" enctype="text/plain"&gt;</code>.
-                This for will send an event to the <code>bool onHTTPFormEvent(HTTP::HTTPFormEventArgs& args);</code> callback.
+                This for will send an event to the <code>bool onHTTPPostEvent(ofx::HTTP::PostEventArgs& evt);</code> callback.
                 In this case, the content cannot be reliably parsed so it is up to the user to extract name / value pairs.
         </blockquote>
         <form role="form" action="/post" method="post" enctype="text/plain">
@@ -55,7 +55,7 @@
         <br>
         <h3>Example Form Using <code>application/x-www-form-urlencoded</code> Form Encoding</h3>
         <blockquote>
-            The following form is defined by <code>&lt;class="form-inline" role="form" action="/post" method="post" enctype="application/x-www-form-urlencoded"&gt;</code>.  This will send en event to the <code>bool onHTTPRawFormEvent(HTTP::HTTPRawFormEventArgs& args);</code> callback.  
+            The following form is defined by <code>&lt;class="form-inline" role="form" action="/post" method="post" enctype="application/x-www-form-urlencoded"&gt;</code>.  This will send en event to the <code>bool onHTTPFormEvent(ofx::HTTP::PostFormEventArgs& evt);</code> callback.  
             In this case, the content will be parsed and returns as a set of name / value pairs.
         </blockquote>
         <form class="form-inline" role="form" action="/post" method="post" enctype="application/x-www-form-urlencoded">
@@ -78,13 +78,20 @@
         <h3>Example Form Using <code>multipart/form-data</code> Form Encoding</h3>
         <blockquote>
             The following form is defined by <code>&lt;role="form" action="/post" method="post" enctype="multipart/form-data"&gt;</code>.
-            This will send events to four callbacks.  If files are attached, each file will be processed in sequence and 
+            This will send events to three callbacks.  If files are attached, each file will be processed in sequence and 
             will send events at the beginning of the upload, during progress (as determined by the size of the upload buffer) 
-            and one upon completion.  The callbacks are as follows: <code>bool onHTTPUploadStartedEvent(HTTP::HTTPUploadEventArgs& args);</code>,
-            <code>bool onHTTPUploadProgressEvent(HTTP::HTTPUploadEventArgs& args);</code> and 
-            <code>bool onHTTPUploadFinishedEvent(HTTP::HTTPUploadEventArgs& args);</code>.  After file processing,
-            an event will be sent to the <code>bool onHTTPRawFormEvent(HTTP::HTTPRawFormEventArgs& args);</code> with the remaining
-            url-encoded parameters.
+            and one upon completion.  The callbacks are as follows: 
+            <ul>
+                <li>
+                    <code>bool onHTTPPostEvent(ofx::HTTP::PostEventArgs& evt);</code>
+                </li>
+                <li>
+                    <code>bool onHTTPFormEvent(ofx::HTTP::PostFormEventArgs& evt);</code>
+                </li>
+                <li>
+                    <code>bool onHTTPUploadEvent(ofx::HTTP::PostUploadEventArgs& evt);</code>
+                </li>
+            </ul>
         </pre>
         </blockquote>
         <form role="form" action="/post" method="post" enctype="multipart/form-data">

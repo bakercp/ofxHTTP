@@ -30,7 +30,7 @@
 #include "ofxHTTP.h"
 
 
-using namespace ofx;
+using namespace ofx::HTTP;
 
 
 class ofApp: public ofBaseApp
@@ -39,13 +39,10 @@ public:
     void setup();
     void draw();
 
-    bool onHTTPFormEvent(HTTP::HTTPFormEventArgs& args);
-    bool onHTTPRawFormEvent(HTTP::HTTPRawFormEventArgs& args);
+    void onHTTPPostEvent(PostEventArgs& evt);
+    void onHTTPFormEvent(PostFormEventArgs& evt);
+    void onHTTPUploadEvent(PostUploadEventArgs& evt);
 
-    bool onHTTPUploadStartedEvent(HTTP::HTTPUploadEventArgs& args);
-    bool onHTTPUploadProgressEvent(HTTP::HTTPUploadEventArgs& args);
-    bool onHTTPUploadFinishedEvent(HTTP::HTTPUploadEventArgs& args);
-
-    HTTP::BasicPostServer::SharedPtr server;
+    BasicPostServer::SharedPtr server;
 
 };

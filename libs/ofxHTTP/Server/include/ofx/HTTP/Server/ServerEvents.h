@@ -45,6 +45,10 @@ public:
     {
     }
 
+    virtual ~BaseHTTPServerRequestEventArgs()
+    {
+    }
+
     const Poco::Net::HTTPServerRequest& getRequest() const
     {
         return _request;
@@ -61,25 +65,30 @@ protected:
 };
 
 
-class BaseHTTPStatusEvent: public BaseHTTPServerRequestEventArgs
+
+class BaseHTTPServerRequestResponseEventArgs: public BaseHTTPServerRequestEventArgs
 {
 public:
-    BaseHTTPStatusEvent(const Poco::Net::HTTPServerRequest& request,
-                        Poco::Net::HTTPResponse::HTTPStatus code,
-                        const std::string& message):
+    BaseHTTPServerRequestResponseEventArgs(const Poco::Net::HTTPServerRequest& request,
+                                           Poco::Net::HTTPServerResponse& response):
         BaseHTTPServerRequestEventArgs(request),
-        code(code),
-        message(message)
+        response(response)
     {
     }
 
-    const Poco::Net::HTTPResponse::HTTPStatus code;
-    const std::string message;
-    
-};
-    
-    
+    virtual ~BaseHTTPServerRequestResponseEventArgs()
+    {
+    }
 
+
+    /// \brief Callbacks are permitted to set the response.
+    ///
+    /// \warning Before working with the response, the callback must check the
+    /// HTTPServerResponse::sent() method to ensure that the response stream
+    /// is still available available.
+    Poco::Net::HTTPServerResponse& response;
+
+};
 
 
 } } // namespace ofx::HTTP

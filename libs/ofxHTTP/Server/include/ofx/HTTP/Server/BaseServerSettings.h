@@ -36,7 +36,7 @@ namespace ofx {
 namespace HTTP {
 
 
-// This class mirrors Poco::Net::TCPServerParams, without ref counting.
+/// \brief This class mirrors Poco::Net::TCPServerParams, without ref counting.
 class TCPServerParams
 {
 public:
@@ -105,7 +105,7 @@ private:
 };
 
 
-// This class mirrors Poco::Net::HTTPServerParams, without ref counting.
+/// \brief This class mirrors Poco::Net::HTTPServerParams, without ref counting.
 class HTTPServerParams: public TCPServerParams
 {
 public:

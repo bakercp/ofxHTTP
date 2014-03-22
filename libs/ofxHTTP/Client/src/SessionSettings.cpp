@@ -313,7 +313,7 @@ bool SessionSettings::useCredentialStore() const
 }
 
 
-void SessionSettings::setUseCookielStore(bool useCookieStore)
+void SessionSettings::setUseCookieStore(bool useCookieStore)
 {
     Poco::FastMutex::ScopedLock lock(_mutex);
     _useCookieStore = useCookieStore;

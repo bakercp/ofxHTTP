@@ -31,6 +31,14 @@ namespace HTTP {
 namespace Client {
 
 
+GetRequest::GetRequest(const std::string& uri):
+    BaseRequest(Poco::Net::HTTPRequest::HTTP_GET,
+                uri,
+                Poco::Net::HTTPMessage::HTTP_1_0)
+{
+}
+
+
 GetRequest::GetRequest(const std::string& uri, const std::string& httpVersion):
     BaseRequest(Poco::Net::HTTPRequest::HTTP_GET, uri, httpVersion)
 {

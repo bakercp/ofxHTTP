@@ -39,21 +39,18 @@ namespace HTTP {
 class PostRoute: public BaseRoute_<PostRouteSettings>
 {
 public:
+    /// \brief A typedef for a shared pointer.
     typedef std::shared_ptr<PostRoute> SharedPtr;
-        ///< \brief A typedef for a shared pointer.
 
+    /// \brief A typedef for a weak pointer.
     typedef std::weak_ptr<PostRoute> WeakPtr;
-        ///< \brief A typedef for a weak pointer.
 
+    /// \brief A typedef for the WebSocketRouteSettings.
     typedef PostRouteSettings Settings;
-        ///< \brief A typedef for the WebSocketRouteSettings.
 
     PostRoute(const Settings& settings = Settings());
     
     virtual ~PostRoute();
-
-    bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
-                          bool isSecurePort) const;
 
     Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
 
@@ -78,24 +75,18 @@ public:
 template<class ListenerClass>
 void PostRoute::registerPostEvents(ListenerClass* listener)
 {
+    ofAddListener(events.onHTTPPostEvent, listener, &ListenerClass::onHTTPPostEvent);
     ofAddListener(events.onHTTPFormEvent, listener, &ListenerClass::onHTTPFormEvent);
-    ofAddListener(events.onHTTPRawFormEvent, listener, &ListenerClass::onHTTPRawFormEvent);
-
-    ofAddListener(events.onHTTPUploadStartedEvent, listener, &ListenerClass::onHTTPUploadStartedEvent);
-    ofAddListener(events.onHTTPUploadProgressEvent, listener, &ListenerClass::onHTTPUploadProgressEvent);
-    ofAddListener(events.onHTTPUploadFinishedEvent, listener, &ListenerClass::onHTTPUploadFinishedEvent);
+    ofAddListener(events.onHTTPUploadEvent, listener, &ListenerClass::onHTTPUploadEvent);
 }
 
 
 template<class ListenerClass>
 void PostRoute::unregisterPostEvents(ListenerClass* listener)
 {
+    ofRemoveListener(events.onHTTPPostEvent, listener, &ListenerClass::onHTTPPostEvent);
     ofRemoveListener(events.onHTTPFormEvent, listener, &ListenerClass::onHTTPFormEvent);
-    ofRemoveListener(events.onHTTPRawFormEvent, listener, &ListenerClass::onHTTPRawFormEvent);
-
-    ofRemoveListener(events.onHTTPUploadStartedEvent, listener, &ListenerClass::onHTTPUploadStartedEvent);
-    ofRemoveListener(events.onHTTPUploadProgressEvent, listener, &ListenerClass::onHTTPUploadProgressEvent);
-    ofRemoveListener(events.onHTTPUploadFinishedEvent, listener, &ListenerClass::onHTTPUploadFinishedEvent);
+    ofRemoveListener(events.onHTTPUploadEvent, listener, &ListenerClass::onHTTPUploadEvent);
 }
 
 

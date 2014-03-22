@@ -44,24 +44,23 @@ class BasicServerSettings:
 class BasicServer: public BaseServer_<BasicServerSettings>
 {
 public:
+    /// \brief A typedef for a shared pointer.
     typedef std::shared_ptr<BasicServer> SharedPtr;
-        ///< \brief A typedef for a shared pointer.
 
+    /// \brief A typedef for the BasicServerSettings.
     typedef BasicServerSettings Settings;
-        ///< \brief A typedef for the BasicServerSettings.
 
-
+    /// \brief Create a BasicServer with the provided Settings.
+    /// \param settings The Settings used to configure the server.
     BasicServer(const Settings& settings = Settings());
-        ///< \brief Create a BasicServer with the provided Settings.
-        ///< \param settings The Settings used to configure the server.
 
+    /// \brief Destroy the BasicServer.
     virtual ~BasicServer();
-        ///< \brief Destroy the BasicServer.
 
+    /// \brief Construct a shared pointer to this server.
+    /// \param settings The Settings used to configure the server.
+    /// \note This will be replaced with C++11 (std::make_shared<...>).
     static SharedPtr makeShared(const Settings& settings = Settings())
-        ///< \brief Construct a shared pointer to this server.
-        ///< \param settings The Settings used to configure the server.
-        ///< \note This will be replaced with C++11 (std::make_shared<...>).
     {
         return SharedPtr(new BasicServer(settings));
     }

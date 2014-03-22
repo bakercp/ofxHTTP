@@ -33,7 +33,9 @@ namespace HTTP {
 
 WebSocketConnection::WebSocketConnection(WebSocketRoute& parent):
     _parent(parent),
-    _isConnected(false)
+    _isConnected(false),
+    _totalBytesSent(0),
+    _totalBytesReceived(0)
 {
     _parent.registerWebSocketConnection(this);
 }
@@ -48,95 +50,139 @@ WebSocketConnection::~WebSocketConnection()
 void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                                         Poco::Net::HTTPServerResponse& response)
 {
+    // get a copy of the settings
+    WebSocketRouteSettings settings = _parent.getSettings();
+    WebSocketEvents& events = _parent.events;
 
     try
     {
-        // TODO: copy the request?
         _requestHeaders = request;
         _clientAddress = request.clientAddress();
 
-        applyFirefoxHack(request); // TODO: fix when poco is upgraded
+        /// \todo fix when poco is upgraded
+        applyFirefoxHack(request); //
 
-        //Utils::dumpHeaders(request,response);
+        // check origin headers
+        handleOrigin(request, response);
 
-        handleOrigin(request,response);
-//        handleSubprotocols(request,response);
-        handleExtensions(request,response);
+        // validate subprotocols
+        handleSubprotocols(request, response);
 
-        //////////////////////////////////////////////////////
+        // respond to extensions
+        handleExtensions(request, response);
 
         Poco::Net::WebSocket ws(request, response);
-        ws.setReceiveTimeout(_parent.getSettings().getReceiveTimeout());
-        ws.setSendTimeout(_parent.getSettings().getSendTimeout());
-        ws.setKeepAlive(_parent.getSettings().getKeepAlive());
+
+        ws.setReceiveTimeout(settings.getReceiveTimeout());
+        ws.setSendTimeout(settings.getSendTimeout());
+        ws.setKeepAlive(settings.getKeepAlive());
 
         _mutex.lock();
         _isConnected = true;
         _mutex.unlock();
 
-//        WebSocketEventArgs eventArgs(*this);
-//        ofNotifyEvent(_manager.events.onOpenEvent, eventArgs, this);
-
-        ofLogNotice("ServerWebSocketRouteHandler::handleRequest") << "WebSocket connection established.";
-
-
-        Poco::Buffer<char> buffer(_parent.getSettings().getBufferSize());
+        Poco::Buffer<char> buffer(settings.getBufferSize());
 
         int flags = 0;
-        int numBytesReceived = 0;
-        //        int numBytesSent = 0;
 
         WebSocketEventArgs eventArgs(*this);
-        ofNotifyEvent(_parent.events.onOpenEvent, eventArgs, this);
+        ofNotifyEvent(events.onOpenEvent, eventArgs, this);
 
         do
         {
-            if(ws.poll(_parent.getSettings().getPollTimeout(),Poco::Net::Socket::SELECT_READ))
-            {
-                numBytesReceived = ws.receiveFrame(buffer.begin(), buffer.size(), flags);
+            flags = 0; // clear
 
-                if(numBytesReceived > 0)
+            if (ws.poll(settings.getPollTimeout(), Poco::Net::Socket::SELECT_READ))
+            {
+                int numBytesReceived = ws.receiveFrame(buffer.begin(),
+                                                       buffer.size(),
+                                                       flags);
+
+                _totalBytesReceived += numBytesReceived;
+
+                if (numBytesReceived > 0)
                 {
                     WebSocketFrame frame(buffer.begin(), numBytesReceived, flags);
 
-                    if(_parent.getSettings().getAutoPingPongResponse())
+                    if (frame.isPing() || frame.isPong())
                     {
-                        if(frame.isPing())
+                        if (settings.getAutoPingPongResponse())
                         {
-                            WebSocketFrame pongFrame(buffer.begin(),
-                                                     numBytesReceived,
-                                                     Poco::Net::WebSocket::FRAME_FLAG_FIN | Poco::Net::WebSocket::FRAME_OP_PONG);
-                            sendFrame(pongFrame);
-                        }
-                        else if(frame.isPong())
-                        {
-                            WebSocketFrame pingFrame(buffer.begin(),
-                                                     numBytesReceived,
-                                                     Poco::Net::WebSocket::FRAME_FLAG_FIN | Poco::Net::WebSocket::FRAME_OP_PING);
-                            sendFrame(pingFrame);
+                            int frameFlag = Poco::Net::WebSocket::FRAME_FLAG_FIN;
+
+                            if (frame.isPing())
+                            {
+                                frameFlag |= Poco::Net::WebSocket::FRAME_OP_PONG;
+                            }
+                            else
+                            {
+                                frameFlag |= Poco::Net::WebSocket::FRAME_OP_PING;
+                            }
+
+                            WebSocketFrame frame(buffer.begin(), numBytesReceived, frameFlag);
+
+                            _mutex.lock();
+                            _frameQueue.push(frame);
+                            _mutex.unlock();
                         }
                     }
-
-                    frameReceived(frame);
-
-                    WebSocketFrameEventArgs frameArgs(frame, *this);
-                    ofNotifyEvent(_parent.events.onFrameReceivedEvent, frameArgs, this);
-
+                    else
+                    {
+                        WebSocketFrameEventArgs frameArgs(frame, *this);
+                        ofNotifyEvent(events.onFrameReceivedEvent, frameArgs, this);
+                    }
                 }
                 else
                 {
-                    // clean shutdown
+                    // clean shutdown if we read and no bytes were available.
                     close();
                 }
             }
 
-            // lock the queue while we work on it
-            processFrameQueue(ws);
-
-            if(ws.poll(_parent.getSettings().getPollTimeout(),Poco::Net::Socket::SELECT_ERROR))
+            // Send frames from _frameQueue.
+            while (getSendQueueSize() > 0) // lock
             {
-                close(); // locks!
-                //cout << "GOT ERROR KILLING IT!" << endl;
+                _mutex.lock();
+                WebSocketFrame frame = _frameQueue.front();
+                _frameQueue.pop();
+                _mutex.unlock();
+
+                if(frame.size() > 0)
+                {
+                    if(ws.poll(settings.getPollTimeout(), Poco::Net::Socket::SELECT_WRITE))
+                    {
+                        std::size_t numBytesSent = 0;
+
+                        numBytesSent = ws.sendFrame(frame.getBinaryBuffer(),
+                                                    frame.size(),
+                                                    frame.getFlags());
+
+                        _totalBytesSent += numBytesSent;
+
+                        WebSocketError error = WS_ERR_NONE;
+
+                        if(0 == numBytesSent)
+                        {
+                            ofLogWarning("ServerWebSocketRouteHandler::handleRequest") << "WebSocket numBytesSent == 0";
+                            error = WS_ERROR_ZERO_BYTE_FRAME_SENT;
+                        }
+                        else if(numBytesSent < frame.size())
+                        {
+                            ofLogWarning("ServerWebSocketRouteHandler::handleRequest") << "WebSocket numBytesSent < frame.size()";
+                            error = WS_ERROR_INCOMPLETE_FRAME_SENT;
+                        }
+                        
+                        WebSocketFrameEventArgs eventArgs(frame, *this, error);
+                        ofNotifyEvent(events.onFrameSentEvent, eventArgs, this);
+                    }
+                }
+            }
+
+            // Check for read error
+            if (ws.poll(settings.getPollTimeout(), Poco::Net::Socket::SELECT_ERROR))
+            {
+                ofScopedLock lock(_mutex);
+                _isConnected = false;
             }
 
         }
@@ -171,26 +217,25 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
         }
 
         _parent.handleRequest(request,response);
-        socketClosed();
-
         WebSocketEventArgs eventArgs(*this, (WebSocketError)exc.code());
-
         ofNotifyEvent(_parent.events.onErrorEvent, eventArgs, this);
     }
     catch (const Poco::TimeoutException& exc)
     {
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "TimeoutException: " << exc.code() << " Desc: " << exc.what();
-        socketClosed();
+        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        _parent.handleRequest(request, response);
         WebSocketEventArgs eventArgs(*this, WS_ERR_TIMEOUT);
-        ofNotifyEvent(_parent.events.onErrorEvent, eventArgs, this);
+        ofNotifyEvent(events.onErrorEvent, eventArgs, this);
         // response socket has already been closed (!?)
     }
     catch (const Poco::Net::NetException& exc)
     {
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "NetException: " << exc.code() << " Desc: " << exc.what();
-        socketClosed();
+        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        _parent.handleRequest(request, response);
         WebSocketEventArgs eventArgs(*this, WS_ERR_NET_EXCEPTION);
-        ofNotifyEvent(_parent.events.onErrorEvent, eventArgs, this);
+        ofNotifyEvent(events.onErrorEvent, eventArgs, this);
         // response socket has already been closed (!?)
     }
     catch (const std::exception& exc)
@@ -198,7 +243,6 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "exception: " << exc.what();
         response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         _parent.handleRequest(request, response);
-        socketClosed();
         WebSocketEventArgs eventArgs(*this, WS_ERR_OTHER);
         ofNotifyEvent(_parent.events.onErrorEvent, eventArgs, this);
     }
@@ -207,7 +251,6 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "... Unknown exception.";
         response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         _parent.handleRequest(request,response);
-        socketClosed();
         WebSocketEventArgs eventArgs(*this, WS_ERR_OTHER);
         ofNotifyEvent(_parent.events.onErrorEvent, eventArgs, this);
     }
@@ -217,14 +260,10 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
 }
 
 
-void WebSocketConnection::frameReceived(const WebSocketFrame& frame)
-{
-}
-
-
 bool WebSocketConnection::sendFrame(const WebSocketFrame& frame) const
 {
     ofScopedLock lock(_mutex);
+
     if(_isConnected)
     {
         _frameQueue.push(frame);
@@ -232,19 +271,9 @@ bool WebSocketConnection::sendFrame(const WebSocketFrame& frame) const
     }
     else
     {
+        ofLogError("WebSocketConnection::sendFrame") << "Not connected, frame not sent.";
         return false;
     }
-}
-
-
-void WebSocketConnection::frameSent(const WebSocketFrame& frame,
-                                    std::size_t nBytesSent)
-{
-}
-
-
-void WebSocketConnection::socketClosed()
-{
 }
 
 
@@ -279,7 +308,10 @@ Poco::Net::NameValueCollection WebSocketConnection::getRequestHeaders() const
 
 Poco::Net::SocketAddress WebSocketConnection::getClientAddress() const
 {
+    cout << "getting client address" << endl;
     ofScopedLock lock(_mutex);
+    cout << "got client address" << endl;
+
     return _clientAddress;
 }
 
@@ -290,13 +322,18 @@ bool WebSocketConnection::isConnected() const
     return _isConnected;
 }
 
+std::size_t WebSocketConnection::getTotalBytesSent() const
+{
+    ofScopedLock lock(_mutex);
+    return _totalBytesSent;
+}
 
-//
-//std::string WebSocketConnection::getSubprotocol() const
-//{
-//    ofScopedLock lock(_mutex);
-//    return _settings.getSubprotocol();
-//}
+
+std::size_t WebSocketConnection::getTotalBytesReceived() const
+{
+    ofScopedLock lock(_mutex);
+    return _totalBytesReceived;
+}
 
 
 //void WebSocketConnection::handleErrorResponse(Poco::Net::HTTPServerResponse& response)
@@ -338,20 +375,18 @@ bool WebSocketConnection::isConnected() const
 void WebSocketConnection::handleOrigin(Poco::Net::HTTPServerRequest& request,
                                        Poco::Net::HTTPServerResponse& response)
 {
-
     // http://en.wikipedia.org/wiki/Same_origin_policy
-
-//    _settings.getAllowCrossOriginConnections();
-    Utils::dumpHeaders(request,OF_LOG_NOTICE);
+    //    _settings.getAllowCrossOriginConnections();
+    //    Utils::dumpHeaders(request,OF_LOG_NOTICE);
     // Access-Control-Allow-Origin
-
     //    ofLogError("ServerRouteHandler::handleOrigin") << "TODO: handle/check origin";
 }
 
-//
-//void WebSocketConnection::handleSubprotocols(Poco::Net::HTTPServerRequest& request,
-//                                             Poco::Net::HTTPServerResponse& response)
-//{
+
+void WebSocketConnection::handleSubprotocols(Poco::Net::HTTPServerRequest& request,
+                                             Poco::Net::HTTPServerResponse& response)
+{
+//    SubprotocolSet& getValidSubprotocols()
 //    std::vector<std::string> proposedProtocols = ofSplitString(request.get("Sec-WebSocket-Protocol",""),
 //                                                               ",",
 //                                                               true,
@@ -373,67 +408,19 @@ void WebSocketConnection::handleOrigin(Poco::Net::HTTPServerRequest& request,
 //        // we don't send anything, which is equiv to null according to the spec
 //        // exchange.response.set("Sec-WebSocket-Protocol", "null");
 //    }
-//}
+}
 
 
 void WebSocketConnection::handleExtensions(Poco::Net::HTTPServerRequest& request,
                                            Poco::Net::HTTPServerResponse& response)
 {
-    if(request.has("Sec-WebSocket-Extensions"))
-    {
-        // TODO: support these
-        // http://tools.ietf.org/html/draft-tyoshino-hybi-websocket-perframe-deflate-05
-        // http://tools.ietf.org/html/draft-ietf-hybi-websocket-multiplexing-09
-    }
+//    if(request.has("Sec-WebSocket-Extensions"))
+//    {
+//        // TODO: support these
+//        // http://tools.ietf.org/html/draft-tyoshino-hybi-websocket-perframe-deflate-05
+//        // http://tools.ietf.org/html/draft-ietf-hybi-websocket-multiplexing-09
+//    }
 }
-
-
-void WebSocketConnection::processFrameQueue(Poco::Net::WebSocket& ws)
-{
-    int numBytesSent = 0;
-    
-    ofScopedLock lock(_mutex);
-    while(!_frameQueue.empty())
-    {
-        WebSocketFrame frame = _frameQueue.front();
-        _frameQueue.pop();
-        
-        if(frame.size() > 0)
-        {
-            if(ws.poll(_parent.getSettings().getPollTimeout(), Poco::Net::Socket::SELECT_WRITE))
-            {
-//                cout << "frame " << frame.getBinaryBuffer() << " sz=" << frame.size() << " flags=" << frame.getFlags() << endl;
-
-
-                numBytesSent = ws.sendFrame(frame.getBinaryBuffer(),
-                                            frame.size(),
-                                            frame.getFlags());
-                
-                WebSocketError error = WS_ERR_NONE;
-
-                if(numBytesSent <= 0)
-                {
-                    ofLogWarning("ServerWebSocketRouteHandler::handleRequest") << "WebSocket numBytesSent <= 0";
-                    error = WS_ERROR_ZERO_BYTE_FRAME_SENT;
-                }
-                else if(numBytesSent < frame.size())
-                {
-                    ofLogWarning("ServerWebSocketRouteHandler::handleRequest") << "WebSocket numBytesSent < frame.size()";
-                    WebSocketEventArgs eventArgs(*this);
-                    error = WS_ERROR_INCOMPLETE_FRAME_SENT;
-                }
-
-                WebSocketFrameEventArgs eventArgs(frame, *this, error);
-
-                frameSent(frame, numBytesSent);
-                
-                ofNotifyEvent(_parent.events.onFrameSentEvent, eventArgs, this);
-            }
-            
-        }
-    }
-}
-
 
 void WebSocketConnection::applyFirefoxHack(Poco::Net::HTTPServerRequest& request)
 {

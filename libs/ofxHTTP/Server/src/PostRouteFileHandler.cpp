@@ -101,15 +101,16 @@ void PostRouteFileHandler::handlePart(const Poco::Net::MessageHeader& header,
 
                 Poco::Net::MediaType contentType(header["Content-Type"]);
 
-                HTTPUploadEventArgs args(_request,
+                PostUploadEventArgs args(_request,
                                          _formUUID,
                                          formFieldName,
                                          formFileName,
                                          newFilename,
                                          contentType,
-                                         0);
+                                         0,
+                                         PostUploadEventArgs::UPLOAD_STARTING);
 
-                ofNotifyEvent(_parent.events.onHTTPUploadStartedEvent, args, &_parent);
+                ofNotifyEvent(_parent.events.onHTTPUploadEvent, args, &_parent);
 
                 ofLogVerbose("PostRouteFileHandler::handlePart") << "Writing file to absolute path : " << file.getAbsolutePath();
 
@@ -149,30 +150,33 @@ void PostRouteFileHandler::handlePart(const Poco::Net::MessageHeader& header,
                         n = 0;
                     }
 
-                    HTTPUploadEventArgs args(_request,
+
+                    PostUploadEventArgs args(_request,
                                              _formUUID,
                                              formFieldName,
                                              formFileName,
                                              newFilename,
                                              contentType,
-                                             sz);
+                                             sz,
+                                             PostUploadEventArgs::UPLOAD_PROGRESS);
 
-                    ofNotifyEvent(_parent.events.onHTTPUploadProgressEvent,
+                    ofNotifyEvent(_parent.events.onHTTPUploadEvent,
                                   args,
                                   &_parent);
                 }
 
                 file.close();
 
-                HTTPUploadEventArgs finishedArgs(_request,
+                PostUploadEventArgs finishedArgs(_request,
                                                  _formUUID,
                                                  formFieldName,
                                                  formFileName,
                                                  newFilename,
                                                  contentType,
-                                                 sz);
+                                                 sz,
+                                                 PostUploadEventArgs::UPLOAD_FINISHED);
 
-                ofNotifyEvent(_parent.events.onHTTPUploadFinishedEvent,
+                ofNotifyEvent(_parent.events.onHTTPUploadEvent,
                               finishedArgs,
                               &_parent);
 

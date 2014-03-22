@@ -38,104 +38,84 @@ namespace ofx {
 namespace HTTP {
 
 
-//class MultipartFormDataEventArgs: public BaseServerEvent
-//{
-//public:
-//    FormDataEventArgs(const Headers& requestHeaders):
-//        BaseServerEvent(requestHeaders)
-//    {
-//    }
-//
-//
-//};
-//
-//
-//class MultiPartDataEventArgs: public BaseServerEvent
-//{
-//public:
-//    FormDataEventArgs(const Headers& requestHeaders):
-//        BaseServerEvent(requestHeaders)
-//    {
-//    }
-//
-//    std::string getName() const
-//    {
-//        return _name;
-//    }
-//
-//private:
-//    Poco::Net::MediaType _mediaType;
-//    std::string _name;
-//
-//};
-//
-//
-//class FileFormDataEventArgs: public FormDataEventArgs
-//{
-//public:
-//    FormDataEventArgs(Poco::Net::MediaType mediaType,
-//                      std::string name):
-//    _mediaType(mediaType),
-//    _name(name)
-//    {
-//    }
-//
-//    Poco::Net::MediaType getMediaType() const
-//    {
-//        return _mediaType;
-//    }
-//
-//    std::string getName() const
-//    {
-//        return _name;
-//    }
-//    
-//private:
-//    Poco::Net::MediaType _mediaType;
-//    std::string _name;
-//    
-//};
-//
-//
-//
-
-class BaseFormEventArgs: public BaseHTTPServerRequestEventArgs
+class BasePostRequestEventArgs: public BaseHTTPServerRequestEventArgs
 {
 public:
-    BaseFormEventArgs(const Poco::Net::HTTPServerRequest& request,
-                      const std::string& formUUID):
+    BasePostRequestEventArgs(const Poco::Net::HTTPServerRequest& request,
+                             const std::string& postUUID):
         BaseHTTPServerRequestEventArgs(request),
-        formUUID(formUUID)
+        postUUID(postUUID)
     {
     }
 
-    const std::string formUUID;
-
-};
-
-class HTTPRawFormEventArgs: public BaseFormEventArgs
-{
-public:
-    HTTPRawFormEventArgs(const Poco::Net::HTTPServerRequest& request,
-                         const std::string& formUUID,
-                         const std::string& form):
-        BaseFormEventArgs(request, formUUID),
-        form(form)
+    virtual ~BasePostRequestEventArgs()
     {
     }
 
-    const std::string form;
+    const std::string postUUID;
+
 };
 
 
-class HTTPFormEventArgs: public BaseFormEventArgs
+class BasePostRequestResponseEventArgs: public BaseHTTPServerRequestResponseEventArgs
 {
 public:
-    HTTPFormEventArgs(const Poco::Net::HTTPServerRequest& request,
+    BasePostRequestResponseEventArgs(const Poco::Net::HTTPServerRequest& request,
+                                     Poco::Net::HTTPServerResponse& response,
+                                     const std::string& postUUID):
+        BaseHTTPServerRequestResponseEventArgs(request, response),
+        postUUID(postUUID)
+    {
+    }
+
+    virtual ~BasePostRequestResponseEventArgs()
+    {
+    }
+
+    const std::string postUUID;
+    
+};
+
+
+/// \brief A callback for raw HTTP POST forms.
+/// \note If either the response or headers are non-empty, a response with the
+/// contents of the buffer (even if empty) will be returned along with the
+/// headers.
+class PostEventArgs: public BasePostRequestResponseEventArgs
+{
+public:
+    PostEventArgs(const Poco::Net::HTTPServerRequest& request,
+                  Poco::Net::HTTPServerResponse& response,
+                  const std::string& postUUID,
+                  const ofBuffer& data):
+        BasePostRequestResponseEventArgs(request, response, postUUID),
+        data(data)
+    {
+    }
+
+    virtual ~PostEventArgs()
+    {
+    }
+
+    /// \brief The raw form data sent with the POST.
+    const ofBuffer& data;
+
+};
+
+
+class PostFormEventArgs: public BasePostRequestResponseEventArgs
+{
+public:
+    PostFormEventArgs(const Poco::Net::HTTPServerRequest& request,
+                      Poco::Net::HTTPServerResponse& response,
                       const std::string& formUUID,
                       const Poco::Net::NameValueCollection& form):
-        BaseFormEventArgs(request, formUUID),
+        BasePostRequestResponseEventArgs(request, response, formUUID),
         form(form)
+    {
+    }
+
+    virtual ~PostFormEventArgs()
     {
     }
 
@@ -143,22 +123,36 @@ public:
 };
 
 
-class HTTPUploadEventArgs: public BaseFormEventArgs
+class PostUploadEventArgs: public BasePostRequestEventArgs
 {
 public:
-    HTTPUploadEventArgs(const Poco::Net::HTTPServerRequest& request,
+    enum UploadState
+    {
+        UPLOAD_STARTING,
+        UPLOAD_PROGRESS,
+        UPLOAD_FINISHED
+    };
+
+    PostUploadEventArgs(const Poco::Net::HTTPServerRequest& request,
                         const std::string& formUUID,
                         const std::string& formFieldName,
                         const std::string& originalFilename,
                         const std::string& filename,
                         const Poco::Net::MediaType& contentType,
-                        std::streamsize numBytesTransferred):
-        BaseFormEventArgs(request, formUUID),
+                        std::streamsize numBytesTransferred,
+                        UploadState state):
+        BasePostRequestEventArgs(request, formUUID),
         _formFieldName(formFieldName),
         _originalFilename(originalFilename),
         _filename(filename),
         _contentType(contentType),
-        _numBytesTransferred(numBytesTransferred)
+        _numBytesTransferred(numBytesTransferred),
+        _state(state)
+    {
+    }
+
+
+    virtual ~PostUploadEventArgs()
     {
     }
 
@@ -192,26 +186,28 @@ public:
         return _numBytesTransferred;
     }
 
+    UploadState getState() const
+    {
+        return _state;
+    }
+
 private:
     const std::string& _formFieldName;
     const std::string& _originalFilename;
     const std::string& _filename;
     const Poco::Net::MediaType& _contentType;
     std::streamsize _numBytesTransferred;
+    UploadState _state;
 
 };
-
 
 
 class PostRouteEvents
 {
 public:
-    ofEvent<HTTPFormEventArgs> onHTTPFormEvent;
-    ofEvent<HTTPRawFormEventArgs> onHTTPRawFormEvent;
-
-    ofEvent<HTTPUploadEventArgs> onHTTPUploadStartedEvent;
-    ofEvent<HTTPUploadEventArgs> onHTTPUploadProgressEvent;
-    ofEvent<HTTPUploadEventArgs> onHTTPUploadFinishedEvent;
+    ofEvent<PostEventArgs> onHTTPPostEvent;
+    ofEvent<PostFormEventArgs> onHTTPFormEvent;
+    ofEvent<PostUploadEventArgs> onHTTPUploadEvent;
 
 };
 

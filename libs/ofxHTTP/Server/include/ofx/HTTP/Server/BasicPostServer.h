@@ -55,7 +55,8 @@ public:
 
     PostRoute::SharedPtr getPostRoute();
 
-    // this method is a hack replacement for std::make_shared<BasicServer>(...);
+    /// \brief this method is a hack replacement for
+    /// std::make_shared<BasicServer>(...);
     static SharedPtr makeShared(const Settings& settings = Settings())
     {
         return SharedPtr(new BasicPostServer(settings));

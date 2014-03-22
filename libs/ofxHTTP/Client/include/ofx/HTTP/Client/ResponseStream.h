@@ -61,7 +61,7 @@ public:
     virtual ~ResponseStream();
 
     bool hasResponseStream() const;
-    std::istream& getResponseStreamRef() const;
+    std::istream& getResponseStreamRef();
 
     bool hasException() const;
     Poco::Exception* getException() const;

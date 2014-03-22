@@ -37,33 +37,34 @@ namespace ofx {
 namespace HTTP {
 
 
+/// \brief A route for handling WebSockets.
 class WebSocketRoute: public BaseRoute_<WebSocketRouteSettings>
-    /// \brief A route for handling WebSockets.
 {
 public:
+    /// \brief A typedef for a shared pointer.
     typedef std::shared_ptr<WebSocketRoute> SharedPtr;
-        ///< \brief A typedef for a shared pointer.
 
+    /// \brief A typedef for a weak pointer.
     typedef std::weak_ptr<WebSocketRoute> WeakPtr;
-        ///< \brief A typedef for a weak pointer.
 
+    /// \brief A typedef for the WebSocketRouteSettings.
     typedef WebSocketRouteSettings Settings;
-        ///< \brief A typedef for the WebSocketRouteSettings.
 
+    /// \brief Create a WebSocketRoute with the given Settings.
+    /// \param settings The WebSocketRoute settings.
     WebSocketRoute(const Settings& settings);
-        ///< \brief Create a WebSocketRoute with the given Settings.
 
+    /// \brief Destroy the WebSocketRoute.
     virtual ~WebSocketRoute();
-        ///< \brief Destroy the WebSocketRoute.
 
+    /// \brief A custom canHandleRequest extends the BaseRoute to check
+    ///        for WebSocket upgrade headers.
+    /// \param request The HTTPServerRequest to test.
+    /// \param isSecurePort Indicates whether the request was passed on
+    ///        an SSL encrypted port.
+    /// \sa BaseRoute_<WebSocketRouteSettings>::canHandleRequest()
     virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
                                   bool isSecurePort) const;
-        ///< \brief A custom canHandleRequest extends the BaseRoute to check
-        ///<        for WebSocket upgrade headers.
-        ///< \param request The HTTPServerRequest to test.
-        ///< \param isSecurePort Indicates whether the request was passed on
-        ///<        an SSL encrypted port.
-        ///< \sa BaseRoute_<WebSocketRouteSettings>::canHandleRequest()
 
     virtual Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
 
@@ -103,12 +104,8 @@ protected:
 private:
     typedef std::set<WebSocketConnection*>          WebSocketConnections;
     typedef WebSocketConnections::iterator          WebSocketConnectionsIter;
-    typedef std::map<std::string, WebSocketEvents>  EventMap;
-    typedef EventMap::iterator                      EventMapIter;
 
     WebSocketConnections _connections;
-
-    EventMap _eventMap;
 
     mutable ofMutex _mutex; // locks the handlers set
 

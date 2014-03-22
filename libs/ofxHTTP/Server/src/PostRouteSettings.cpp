@@ -94,18 +94,6 @@ std::size_t PostRouteSettings::getWriteBufferSize() const
 }
 
 
-void PostRouteSettings::setValidContentTypes(const MediaTypeSet& validContentTypes)
-{
-    _validContentTypes = validContentTypes;
-}
-
-
-const PostRouteSettings::MediaTypeSet& PostRouteSettings::getValidContentTypes() const
-{
-    return _validContentTypes;
-}
-
-
 void PostRouteSettings::setFieldLimit(std::size_t fieldLimit)
 {
     _fieldLimit = fieldLimit;

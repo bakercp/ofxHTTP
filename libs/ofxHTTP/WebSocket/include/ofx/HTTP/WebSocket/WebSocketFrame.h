@@ -32,77 +32,75 @@
 
 using Poco::Net::WebSocket;
 
-// TODO:
-// - replace ofBuffer with Poco::FIFOBuffer or ofx::IO::ByteBuffer
 
 namespace ofx {
 namespace HTTP {
 
 
+/// \brief A WebSocketFrame frame.
+/// \todo replace ofBuffer with Poco::FIFOBuffer or ofx::IO::ByteBuffer
 class WebSocketFrame: public ofBuffer
-    /// \brief A WebSocketFrame frame.
 {
 public:
+    /// \brief Create a WebSocketFrame.
     WebSocketFrame(const ofBuffer& buffer,
                    int flags = WebSocket::FRAME_TEXT);
-        ///< \brief Create a WebSocketFrame.
 
+    /// \brief Create a WebSocketFrame.
     WebSocketFrame(const std::string& text,
                    int flags = WebSocket::FRAME_TEXT);
-        ///< \brief Create a WebSocketFrame.
 
+    /// \brief Create a WebSocketFrame.
     WebSocketFrame(const char* buffer,
                    std::size_t size,
                    int flags = WebSocket::FRAME_TEXT);
-        ///< \brief Create a WebSocketFrame.
 
+    /// \brief Create a WebSocketFrame.
     WebSocketFrame(const unsigned char* buffer,
                    std::size_t size,
                    int flags = WebSocket::FRAME_TEXT);
-        ///< \brief Create a WebSocketFrame.
 
+    /// \brief Destroy a WebSocketFrame.
     virtual ~WebSocketFrame();
-        ///< \brief Destroy a WebSocketFrame.
 
+    /// \returns the WebSockFrame flags.
     int getFlags() const;
-        ///< \returns the WebSockFrame flags.
-    
+
+    /// \returns true iff a continuation frame.
     bool isContinuation() const;
-        ///< \returns true iff a continuation frame.
 
+    /// \returns true iff a text frame.
     bool isText() const;
-        ///< \returns true iff a text frame.
 
+    /// \returns true iff a binary frame.
     bool isBinary() const;
-        ///< \returns true iff a binary frame.
 
+    /// \returns true iff a close frame.
     bool isClose() const;
-        ///< \returns true iff a close frame.
 
+    /// \returns true iff a ping frame.
     bool isPing() const;
-        ///< \returns true iff a ping frame.
 
+    /// \returns true iff a pong frame.
     bool isPong() const;
-        ///< \returns true iff a pong frame.
 
+    /// \returns true iff a final frame.
     bool isFinal() const;
-        ///< \returns true iff a final frame.
 
+    /// \returns true iff a RSV1 frame.
     bool isRSV1() const;
-        ///< \returns true iff a RSV1 frame.
 
+    /// \returns true iff a RSV2 frame.
     bool isRSV2() const;
-        ///< \returns true iff a RSV2 frame.
 
+    /// \returns true iff a RSV3 frame.
     bool isRSV3() const;
-        ///< \returns true iff a RSV3 frame.
 
+    /// \returns a string representing the WebSocketFrame.
     std::string toString() const;
-        ///< \returns a string representing the WebSocketFrame.
 
 protected:
-    int _flags;
-        ///< \brief the websocket flags for this frame.
+    int _flags; ///< \brief the websocket flags for this frame.
     
 };
 
