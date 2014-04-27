@@ -56,14 +56,14 @@ void ofApp::draw()
 
 void ofApp::onHTTPPostEvent(PostEventArgs& args)
 {
-    ofLogNotice("ofApp::onHTTPPostEvent") << "Data: " << args.data.getText();
+    ofLogNotice("ofApp::onHTTPPostEvent") << "Data: " << args.getBuffer().getText();
 }
 
 
 void ofApp::onHTTPFormEvent(PostFormEventArgs& args)
 {
     ofLogNotice("ofApp::onHTTPFormEvent") << "";
-    Utils::dumpNameValueCollection(args.form, ofGetLogLevel());
+    Utils::dumpNameValueCollection(args.getForm(), ofGetLogLevel());
 }
 
 
