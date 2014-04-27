@@ -58,10 +58,8 @@ public:
     unsigned short getPort() const;
     void setPort(unsigned short port);
 
-
     static const std::string    DEFAULT_PROXY_HOST;
     static const unsigned short DEFAULT_PROXY_PORT;
-
     
 protected:
     std::string _host;

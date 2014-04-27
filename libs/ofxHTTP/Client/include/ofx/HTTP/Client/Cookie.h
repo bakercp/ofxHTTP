@@ -46,25 +46,22 @@ public:
     virtual ~Cookie();
 
     Poco::Timestamp getCreatedAt() const;
-    bool isExpired(Poco::Timestamp expiredAt = Poco::Timestamp()) const;
-    bool isSession() const;
-    
-    bool matchesDomain(const Poco::URI& uri) const;
-    bool matchesPath(const Poco::URI& uri) const;
-    bool matchesURI(const Poco::URI& uri, bool matchSessionCookies = true) const;
-    // matches uri
-    // makes sure the cookie, makes sure 
-    
-    bool matches(const Cookie& cookie) const;
-    
-    std::string toString() const;
-    
+//    bool isExpired(Poco::Timestamp expiredAt = Poco::Timestamp()) const;
+//    bool isSession() const;
+//    
+//    bool matchesDomain(const Poco::URI& uri) const;
+//    bool matchesPath(const Poco::URI& uri) const;
+//    bool matchesURI(const Poco::URI& uri,
+//                    bool matchSessionCookies = true) const;
+//    // matches uri
+//    // makes sure the cookie
+//    bool matches(const Cookie& cookie) const;
+//    
+//    std::string toString() const;
+
 protected:
     Poco::Timestamp _createdAt;
       
-    bool static endsWith(const std::string& fullString, const std::string& ending);
-
-    friend class CookieStore;
 };
 
 

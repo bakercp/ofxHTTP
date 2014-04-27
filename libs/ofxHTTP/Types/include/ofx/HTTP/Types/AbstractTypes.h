@@ -167,4 +167,18 @@ public:
 };
 
 
+/// \brief Defines an abstract HTTP client Response Handler.
+class AbstractClientResponseHandler
+{
+public:
+    virtual ~AbstractClientResponseHandler()
+    {
+    }
+
+    virtual bool canHandleResponse(const Poco::Net::HTTPServerRequest& request,
+                                   bool isSecurePort) const = 0;
+
+};
+
+
 } } // namespace ofx::HTTP

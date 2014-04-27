@@ -41,6 +41,7 @@ class BasicServerSettings:
 {
 };
 
+    
 class BasicServer: public BaseServer_<BasicServerSettings>
 {
 public:

@@ -26,14 +26,8 @@
 #pragma once
 
 
-#include <map>
-#include <string>
-#include "Poco/URI.h"
-#include "Poco/Net/HTMLForm.h"
-//#include "Poco/Net/NameValueCollection.h"
-#include "ofTypes.h"
 #include "ofx/HTTP/Client/BaseRequest.h"
-#include "ofFileUtils.h"
+
 
 namespace ofx {
 namespace HTTP {
@@ -47,9 +41,9 @@ public:
     enum FormEncoding
     {
         FORM_ENCODING_URL,
-            ///< \brief Equivalent to application/x-www-form-urlencoded.
+        ///< \brief Equivalent to application/x-www-form-urlencoded.
         FORM_ENCODING_MULTIPART
-            ///< \brief Equivalent to multipart/form-data.
+        ///< \brief Equivalent to multipart/form-data.
     };
 
     /// \brief Construct a PostRequest with the given uri.
@@ -59,11 +53,37 @@ public:
     /// \brief Construct a PostRequest with a given uri and http version.
     /// \param uri the Post endpoint uri.
     /// \param httpVersion Either HTTP/1.0 or HTTP/1.1.
+    /// \param requestId A unique UUID for this request.
     PostRequest(const std::string& uri,
-                const std::string& httpVersion);
+                const std::string& httpVersion,
+                const Poco::UUID& requestId = generateUUID());
 
     /// \brief Destroy the PostRequest.
     virtual ~PostRequest();
+
+    /// \brief Add a name value pair to upload with this POST.
+    /// \param name The field name.
+    /// \param value The field value.
+    void addFormField(const std::string& name,
+                      const std::string& value);
+
+    /// \brief Add a file for upload with this POST.
+    /// \warning This method will sets the encoding to FORM_ENCODING_MULTIPART.
+    /// \param name The form name of the attachment.
+    /// \param path The path to the file.
+    /// \param mediaType The mime type to send with the file.
+    void addFormFile(const std::string& name,
+                     const std::string& path,
+                     const std::string& mediaType = DEFAULT_MEDIA_TYPE);
+
+    /// \brief Add a buffer of bytes for upload with this POST.
+    /// \warning This method will sets the encoding to FORM_ENCODING_MULTIPART.
+    /// \param name The form name of the attachment.
+    /// \param buffer The bytes to send.
+    /// \param mediaType The mime type to send with the file.
+    void addFormBuffer(const std::string& name,
+                       const ofBuffer& buffer,
+                       const std::string& mediaType = DEFAULT_MEDIA_TYPE);
 
     /// \brief Set the form's encoding.
     /// \warning If encoding is set to FORM_ENCODING_URL, files will not be
@@ -74,42 +94,14 @@ public:
     /// \returns the current form encoding.
     FormEncoding getFormEncoding() const;
 
-    /// \brief Add a name value pair to upload with this POST.
-    /// \param name The field name.
-    /// \param value The field value.
-    void addField(const std::string& name,
-                  const std::string& value);
-
-    /// \brief Add a file for upload with this POST.
-    /// \warning This method will sets the encoding to FORM_ENCODING_MULTIPART.
-    /// \param name The form name of the attachment.
-    /// \param path The path to the file.
-    /// \param mediaType The mime type to send with the file.
-    void addFile(const std::string& name,
-                 const std::string& path,
-                 const std::string& mediaType = DEFAULT_MEDIA_TYPE);
-
-    /// \brief Add a buffer of bytes for upload with this POST.
-    /// \warning This method will sets the encoding to FORM_ENCODING_MULTIPART.
-    /// \param name The form name of the attachment.
-    /// \param buffer The bytes to send.
-    /// \param mediaType The mime type to send with the file.
-    void addBuffer(const std::string& name,
-                   const ofBuffer& buffer,
-                   const std::string& mediaType = DEFAULT_MEDIA_TYPE);
-
-    /// \brief Clear all form data.
-    void clear();
-
-    /// \brief The default MIME type used for file parts.
-    static const std::string DEFAULT_MEDIA_TYPE;
+    void prepareRequest();
+    
+    void writeRequestBody(std::ostream& requestStream);
 
 protected:
-    virtual void finalizeRequest();
-    virtual void writeRequestBody(std::ostream& requestStream);
+    Poco::Net::HTMLForm _form;
 
-    std::shared_ptr<Poco::Net::HTMLForm> _form;
-
+    std::stringstream _outBuffer;
 };
 
 

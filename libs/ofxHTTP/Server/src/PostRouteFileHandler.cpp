@@ -34,9 +34,11 @@ namespace ofx {
 namespace HTTP {
 
 
-PostRouteFileHandler::PostRouteFileHandler(const Poco::Net::HTTPServerRequest& request,
+PostRouteFileHandler::PostRouteFileHandler(const Poco::UUID& sessionUUID,
+                                           const Poco::Net::HTTPServerRequest& request,
                                            PostRoute& parent,
-                                           const std::string& formUUID):
+                                           const Poco::UUID& formUUID):
+    _sessionUUID(sessionUUID),
     _request(request),
     _parent(parent),
     _formUUID(formUUID)
@@ -101,7 +103,8 @@ void PostRouteFileHandler::handlePart(const Poco::Net::MessageHeader& header,
 
                 Poco::Net::MediaType contentType(header["Content-Type"]);
 
-                PostUploadEventArgs args(_request,
+                PostUploadEventArgs args(_sessionUUID,
+                                         _request,
                                          _formUUID,
                                          formFieldName,
                                          formFileName,
@@ -137,7 +140,9 @@ void PostRouteFileHandler::handlePart(const Poco::Net::MessageHeader& header,
                     }
 
                     sz += n;
+                    
                     file.write(buffer.begin(), n);
+
                     if (stream && file)
                     {
                         stream.read(buffer.begin(),
@@ -150,8 +155,8 @@ void PostRouteFileHandler::handlePart(const Poco::Net::MessageHeader& header,
                         n = 0;
                     }
 
-
-                    PostUploadEventArgs args(_request,
+                    PostUploadEventArgs args(_sessionUUID,
+                                             _request,
                                              _formUUID,
                                              formFieldName,
                                              formFileName,
@@ -167,7 +172,8 @@ void PostRouteFileHandler::handlePart(const Poco::Net::MessageHeader& header,
 
                 file.close();
 
-                PostUploadEventArgs finishedArgs(_request,
+                PostUploadEventArgs finishedArgs(_sessionUUID,
+                                                 _request,
                                                  _formUUID,
                                                  formFieldName,
                                                  formFileName,
@@ -211,7 +217,11 @@ bool PostRouteFileHandler::isContentTypeValid(const std::string& contentType) co
 
     while(iter != validContentTypes.end())
     {
-        if((*iter).matchesRange(mediaType)) return true;
+        if((*iter).matchesRange(mediaType))
+        {
+            return true;
+        }
+
         ++iter;
     }
     

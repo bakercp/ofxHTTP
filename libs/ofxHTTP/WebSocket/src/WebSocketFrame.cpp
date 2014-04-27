@@ -47,7 +47,7 @@ WebSocketFrame::WebSocketFrame(const std::string& text, int flags):
 WebSocketFrame::WebSocketFrame(const unsigned char* buffer,
                                std::size_t size,
                                int flags):
-    ofBuffer(reinterpret_cast<const char*>(buffer),size),
+    ofBuffer(reinterpret_cast<const char*>(buffer), size),
     _flags(flags)
 {
 }
@@ -75,37 +75,37 @@ int WebSocketFrame::getFlags() const
 
 bool WebSocketFrame::isContinuation() const
 {
-    return (_flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_CONT;
+    return (_flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) == Poco::Net::WebSocket::FRAME_OP_CONT;
 }
 
 
 bool WebSocketFrame::isText() const
 {
-    return (_flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_TEXT;
+    return (_flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) == Poco::Net::WebSocket::FRAME_OP_TEXT;
 }
 
 
 bool WebSocketFrame::isBinary() const
 {
-    return (_flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_BINARY;
+    return (_flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) == Poco::Net::WebSocket::FRAME_OP_BINARY;
 }
 
 
 bool WebSocketFrame::isClose() const
 {
-    return (_flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_CLOSE;
+    return (_flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) == Poco::Net::WebSocket::FRAME_OP_CLOSE;
 }
 
 
 bool WebSocketFrame::isPing() const
 {
-    return (_flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_PING;
+    return (_flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) == Poco::Net::WebSocket::FRAME_OP_PING;
 }
 
 
 bool WebSocketFrame::isPong() const
 {
-    return (_flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_PONG;
+    return (_flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) == Poco::Net::WebSocket::FRAME_OP_PONG;
 }
 
 

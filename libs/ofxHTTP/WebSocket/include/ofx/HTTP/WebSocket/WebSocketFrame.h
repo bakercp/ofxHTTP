@@ -30,9 +30,6 @@
 #include "ofFileUtils.h"
 
 
-using Poco::Net::WebSocket;
-
-
 namespace ofx {
 namespace HTTP {
 
@@ -44,21 +41,21 @@ class WebSocketFrame: public ofBuffer
 public:
     /// \brief Create a WebSocketFrame.
     WebSocketFrame(const ofBuffer& buffer,
-                   int flags = WebSocket::FRAME_TEXT);
+                   int flags = Poco::Net::WebSocket::FRAME_TEXT);
 
     /// \brief Create a WebSocketFrame.
     WebSocketFrame(const std::string& text,
-                   int flags = WebSocket::FRAME_TEXT);
+                   int flags = Poco::Net::WebSocket::FRAME_TEXT);
 
     /// \brief Create a WebSocketFrame.
     WebSocketFrame(const char* buffer,
                    std::size_t size,
-                   int flags = WebSocket::FRAME_TEXT);
+                   int flags = Poco::Net::WebSocket::FRAME_TEXT);
 
     /// \brief Create a WebSocketFrame.
     WebSocketFrame(const unsigned char* buffer,
                    std::size_t size,
-                   int flags = WebSocket::FRAME_TEXT);
+                   int flags = Poco::Net::WebSocket::FRAME_TEXT);
 
     /// \brief Destroy a WebSocketFrame.
     virtual ~WebSocketFrame();

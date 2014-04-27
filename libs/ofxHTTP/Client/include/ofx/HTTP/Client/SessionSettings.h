@@ -42,9 +42,6 @@ class SessionSettings
 {
 public:
     SessionSettings();
-    SessionSettings(SessionSettings& that);
-	SessionSettings& operator = (SessionSettings& that);
-
     virtual ~SessionSettings();
 
     void setVirtualHost(const std::string& virtualHost);
@@ -56,66 +53,33 @@ public:
     void setUserAgent(const std::string& userAgent);
     std::string getUserAgent() const;
         
-    void setMaxRedirects(int maxRedirects);
-    int getMaxRedirects() const;
+    void setMaxRedirects(std::size_t maxRedirects);
+    std::size_t getMaxRedirects() const;
 
-    Poco::Net::NameValueCollection getDefaultHeaders() const;
-    void addDefaultHeader(const std::string& name, const std::string& value = "");
-    void addDefaultHeaders(const Poco::Net::NameValueCollection& headers);
-    bool hasDefaultHeaders() const;
-    bool hasDefaultHeader(const std::string& name);
-    void removeDefaultHeader(const std::string& name);
-    void clearDefaultHeaders();
-    
+    const Poco::Net::NameValueCollection& getDefaultHeaders() const;
+    void setDefaultHeaders(const Poco::Net::NameValueCollection& headers);
+
     void setKeepAliveTimeout(Poco::Timespan keepAliveTimeout);
     Poco::Timespan getKeepAliveTimeout() const;
-    
-    void setProxyUsername(const std::string& username);
-    std::string getProxyUsername() const;
 
-    void setProxyPassword(const std::string& password);
-    std::string getProxyPassword() const;
+    void setProxy(const ProxySettings& proxy);
+    const ProxySettings& getProxySettings() const;
 
-    void setProxyHost(const std::string& host);
-    std::string getProxyHost() const;
-    
-    void setProxyPort(unsigned short port);
-    unsigned short getProxyPort() const;
-    
-    bool hasProxyCredentials() const;
-    bool isProxyEnabled() const;
-    void clearProxy();
-    
-    void setUseCredentialStore(bool useCredentialStore);
-    bool useCredentialStore() const;
-
-    void setUseCookieStore(bool uxseCookieStore);
-    bool useCookieStore() const;
-    
     static const std::string    DEFAULT_USER_AGENT;
     static const int            DEFAULT_MAX_REDIRECTS;
     static const Poco::Timespan DEFAULT_KEEPALIVE_TIMEOUT;
 
 private:
-    SessionSettings(const SessionSettings& that);
-    SessionSettings& operator = (const SessionSettings& that);
-
-    mutable Poco::FastMutex _mutex;
-    
     std::string _virtualHost;
     std::string _defaultHost;
 
     std::string _userAgent;
 
-    int _maxRedirects;
+    std::size_t _maxRedirects;
 
     Poco::Timespan _keepAliveTimeout;
 
-    bool _useProxy;
     ProxySettings _proxy;
-
-    bool _useCookieStore;
-    bool _useCredentialStore;
 
     Poco::Net::NameValueCollection _defaultHeaders;
 

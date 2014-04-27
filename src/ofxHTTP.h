@@ -32,6 +32,7 @@
 
 #include "ofx/HTTP/Server/BasicPostServer.h"
 #include "ofx/HTTP/Server/BasicServer.h"
+#include "ofx/HTTP/Server/SessionCache.h"
 
 #include "ofx/HTTP/WebSocket/BasicWebSocketServer.h"
 #include "ofx/HTTP/WebSocket/WebSocketEvents.h"
@@ -43,3 +44,13 @@
 #include "ofx/HTTP/Client/Context.h"
 #include "ofx/HTTP/Client/GetRequest.h"
 #include "ofx/HTTP/Client/PostRequest.h"
+#include "ofx/HTTP/Client/PutRequest.h"
+#include "ofx/HTTP/Client/ClientEvents.h"
+#include "ofx/HTTP/Client/BaseClient.h"
+
+#include "ofx/HTTP/Client/DefaultSessionProvider.h"
+#include "ofx/HTTP/Client/DefaultProxyProcessor.h"
+#include "ofx/HTTP/Client/DefaultAuthenticationProcessor.h"
+#include "ofx/HTTP/Client/DefaultRedirectProcessor.h"
+#include "ofx/HTTP/Client/DefaultClientHeaders.h"
+#include "ofx/HTTP/Client/DefaultCookieProcessor.h"

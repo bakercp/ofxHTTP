@@ -61,10 +61,12 @@ public:
     {
         std::cerr << exc.displayText() << std::endl;
     }
+
     void exception(const std::exception& exc)
     {
         std::cerr << exc.what() << std::endl;
     }
+
     void exception()
     {
         std::cerr << "Unknown Exception" << std::endl;
@@ -88,6 +90,7 @@ public:
     {
         return _factory.createRequestHandler(request);
     }
+
 private:
     Poco::Net::HTTPRequestHandlerFactory& _factory;
 
@@ -195,7 +198,7 @@ void BaseServer_<SettingsType>::exit(ofEventArgs& args)
 template <typename SettingsType>
 void BaseServer_<SettingsType>::start()
 {
-    if(isRunning())
+    if (isRunning())
     {
         ofLogWarning("BaseServer_::start") << "Server is already running.  Call stop() to stop.";
         return;
@@ -203,7 +206,7 @@ void BaseServer_<SettingsType>::start()
 
     Poco::Net::ServerSocket socket;
 
-    if(_settings.getUseSSL())
+    if (_settings.getUseSSL())
     {
         // we use the default thread pool
         try
@@ -242,7 +245,7 @@ void BaseServer_<SettingsType>::start()
     _server->start();
 
     }
-    catch(const Poco::Net::InvalidSocketException& exc)
+    catch (const Poco::Net::InvalidSocketException& exc)
     {
         ofLogError("BaseServer_<SettingsType>::start()") << exc.displayText();
     }
@@ -253,14 +256,15 @@ void BaseServer_<SettingsType>::start()
 template <typename SettingsType>
 void BaseServer_<SettingsType>::stop()
 {
-    if(!isRunning())
+    if (!isRunning())
     {
         ofLogWarning("BaseServer_::stop") << "Server is not running.  Call start() to start.";
         return;
     }
 
     Routes::const_reverse_iterator iter = _routes.rbegin();
-    while(iter != _routes.rend())
+
+    while (iter != _routes.rend())
     {
         (*iter)->stop();
         ++iter;
@@ -345,9 +349,9 @@ Poco::Net::HTTPRequestHandler* BaseServer_<SettingsType>::createRequestHandler(c
     // carefully ordered.
     Routes::const_reverse_iterator iter = _routes.rbegin();
 
-    while(iter != _routes.rend())
+    while (iter != _routes.rend())
     {
-        if((*iter)->canHandleRequest(request, _isSecurePort))
+        if ((*iter)->canHandleRequest(request, _isSecurePort))
         {
             return (*iter)->createRequestHandler(request);
         }
@@ -372,7 +376,7 @@ Poco::Net::HTTPServerParams::Ptr BaseServer_<SettingsType>::getPocoHTTPServerPar
     // Poco::Net::HTTPServerParams::setMaxThreads() should be able to handle
     // a value of 0 (according to the documentation), but it is currently asserting
     // that the value must be > 0.
-    if(params.getMaxThreads() <= 0)
+    if (params.getMaxThreads() <= 0)
     {
         serverParams->setMaxThreads(getThreadPoolRef().capacity());
     }

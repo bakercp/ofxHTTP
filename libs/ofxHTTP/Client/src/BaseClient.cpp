@@ -24,13 +24,147 @@
 
 
 #include "ofx/HTTP/Client/BaseClient.h"
+#include "Poco/InflatingStream.h"
 
 
 namespace ofx {
 namespace HTTP {
-namespace Client {
 
 
+const std::string BaseClient::ACCEPT_ENCODING_HEADER = "Accept-Encoding";
+const std::string BaseClient::CONTENT_ENCODING_HEADER = "Content-Encoding";
 
 
-} } } // namespace ofx::HTTP::Client
+BaseClient::BaseClient(AbstractSessionProvider& sessionProvider,
+                       AbstractProxyProcessor& proxyProcessor,
+                       AbstractAuthenticationProcessor& authenticationProcessor,
+                       AbstractRedirectProcessor& redirectProcessor):
+    _isRunning(true),
+    _sessionProvider(sessionProvider),
+    _proxyProcessor(proxyProcessor),
+    _authenticationProcessor(authenticationProcessor),
+    _redirectProcessor(redirectProcessor),
+    _pDecodedResponseStream(0)
+{
+}
+
+
+BaseClient::~BaseClient()
+{
+    delete _pDecodedResponseStream;
+}
+
+
+std::istream& BaseClient::execute(Client::BaseRequest& request,
+                                  Poco::Net::HTTPResponse& response,
+                                  Context& context)
+{
+    request.prepareRequest();
+
+    context.setResolvedURI(Poco::URI(request.getURI()));
+
+    _sessionProvider.createSession(context.getResolvedURI(), context);
+
+    _proxyProcessor.processRequest(request, context);
+
+    _authenticationProcessor.processRequest(request, context);
+
+    processRequest(request, context);
+
+    // Set the headers indicating the encodings we can decode.
+    request.set(ACCEPT_ENCODING_HEADER, "gzip, deflate");
+
+    std::ostream& requestStream = context.getSession()->sendRequest(request);
+
+    request.writeRequestBody(requestStream);
+
+    std::istream& responseStream = context.getSession()->receiveResponse(response);
+
+    processResponse(request, response, context);
+
+    Poco::Net::HTTPResponse::HTTPStatus status = response.getStatus();
+
+    if (status == Poco::Net::HTTPResponse::HTTP_MOVED_PERMANENTLY   // 301
+     || status == Poco::Net::HTTPResponse::HTTP_FOUND               // 302
+     || status == Poco::Net::HTTPResponse::HTTP_SEE_OTHER           // 303
+     || status == Poco::Net::HTTPResponse::HTTP_TEMPORARY_REDIRECT) // 307
+    {
+        _redirectProcessor.processResponse(request,
+                                           response,
+                                           context);
+
+        return execute(request, response, context);
+    }
+    else if (status == Poco::Net::HTTPResponse::HTTP_USEPROXY)
+    {
+        _proxyProcessor.processResponse(request, response, context);
+        return execute(request, response, context);
+    }
+    else if (status == Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED) // 401
+    {
+        // consume because we are reusing the session.
+        std::streamsize n = Utils::consume(responseStream);
+
+        _authenticationProcessor.processResponse(request,
+                                                 response,
+                                                 context);
+
+        return execute(request, response, context);
+    }
+    else
+    {
+        delete _pDecodedResponseStream;
+        _pDecodedResponseStream = 0;
+
+        if (response.has(CONTENT_ENCODING_HEADER))
+        {
+            std::string contentEncoding = response.get(CONTENT_ENCODING_HEADER);
+
+            if (0 == contentEncoding.compare("gzip"))
+            {
+                _pDecodedResponseStream = new Poco::InflatingInputStream(responseStream, Poco::InflatingStreamBuf::STREAM_GZIP);
+                return *_pDecodedResponseStream;
+            }
+            else if (0 == contentEncoding.compare("deflate"))
+            {
+                _pDecodedResponseStream = new Poco::InflatingInputStream(responseStream, Poco::InflatingStreamBuf::STREAM_ZLIB);
+                return *_pDecodedResponseStream;
+            }
+            else
+            {
+                ofLogWarning() << "Returning with unknown content encoding: " << contentEncoding;
+                return responseStream;
+            }
+        }
+        else
+        {
+            return responseStream;
+        }
+    }
+}
+
+void BaseClient::execute(Client::BaseRequest& request,
+                         Poco::Net::HTTPResponse& response,
+                         Context& context,
+                         ofBuffer& buffer)
+{
+    std::istream& responseStream = execute(request, response, context);
+
+    buffer.clear();
+    buffer.set(responseStream);
+}
+
+
+bool BaseClient::isRunning() const
+{
+    return _isRunning;
+}
+
+    
+void BaseClient::cancel()
+{
+    _isRunning = false;
+}
+
+
+} } // namespace ofx::HTTP

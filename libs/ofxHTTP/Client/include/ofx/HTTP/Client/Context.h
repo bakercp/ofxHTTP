@@ -26,11 +26,13 @@
 #pragma once
 
 
+#include "Poco/Any.h"
+#include "Poco/URI.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/HTTPClientSession.h"
 #include "ofx/HTTP/Client/CookieStore.h"
 #include "ofx/HTTP/Client/CredentialStore.h"
-//#include "ofxHTTPCredentialStoreCache.h"
 #include "ofx/HTTP/Client/SessionSettings.h"
 
 // a thread-safe shared context
@@ -40,71 +42,88 @@
 // if you want a context with a new store, then you have to make one
 // via constructors
 
-
 namespace ofx {
 namespace HTTP {
-namespace Client {
 
 
 class Context
 {
 public:
-    typedef std::shared_ptr<Context> SharedPtr;
+    typedef std::shared_ptr<Poco::Net::HTTPClientSession> Session;
 
     Context();
-    
-    Context(SessionSettings& _settings);
-
-    Context(SessionSettings& _settings,
-            CredentialStore& _credentialStore);
-
-    Context(SessionSettings& _settings,
-            CredentialStore& _credentialStore,
-            CookieStore& _cookieStore);
-    
-    Context(Context& that);
-	Context& operator = (Context& that);
-    
     virtual ~Context();
    
-    SessionSettings getSessionSettings();
-    SessionSettings& getSessionSettingsRef();
-    
-    CookieStore  getCookieStore();
-    CookieStore& getCookieStoreRef();
-    
-    CredentialStore  getCredentialStore();
-    CredentialStore& getCredentialStoreRef();
-    
-//    bool canAuthenticate(HTTPRequest& request);
-//    bool canAuthenticate(HTTPRequest& request, HTTPResponse& response);
-//
-//    bool authenticate(HTTPRequest& request);
-//    bool authenticate(HTTPRequest& request, HTTPResponse& response);
-    
-//    void setCredentials(const URI& uri, const ofxHTTPCredentials& credentials);
-//    void setCredentials(const URI& uri, const string& username, const string& password);
-    
-//    static ClientContext::SharedPtr defaultClientContext();
+    void setSessionSettings(const SessionSettings& settings);
+    const SessionSettings& getSessionSettings() const;
 
-    static SharedPtr makeShared()
+//    void setCookieStore(CookieStore::SharedPtr cookieStore);
+//    CookieStore::WeakPtr getCookieStore();
+
+    void setCredentialStore(CredentialStore::SharedPtr credentialStore);
+    CredentialStore::WeakPtr getCredentialStore();
+
+    void setSession(Session session);
+    Session getSession();
+
+    void addRedirect(const Poco::URI& uri);
+    const std::vector<Poco::URI>& getRedirects() const;
+
+    void setResolvedURI(const Poco::URI& uri);
+    const Poco::URI& getResolvedURI() const;
+
+    void setProxyRedirectURI(const Poco::URI& uri);
+    const Poco::URI& getProxyRedirectURI() const;
+
+    const static std::string KEY_PREFIX_RESERVED;
+    const static std::string KEY_SESSION_SETTINGS;
+    const static std::string KEY_COOKIE_STORE;
+    const static std::string KEY_CREDENTIAL_STORE;
+    const static std::string KEY_RESOLVED_URI;
+    const static std::string KEY_PROXY_REDIRECT_URI;
+    const static std::string KEY_REDIRECTS;
+    const static std::string KEY_SESSION;
+
+    template<typename TypeName>
+    bool getValue(const std::string& key, TypeName& value) const
     {
-        return SharedPtr(new Context());
+        std::map<std::string, Poco::Any>::const_iterator iter = _map.find(key);
+
+        if (iter != _map.end())
+        {
+            try
+            {
+                value = Poco::AnyCast<TypeName>(iter->second);
+                return true;
+            }
+            catch (Poco::BadCastException& exc)
+            {
+                ofLogError("Context::getValue") << "Unable to cast value for key : " << key;
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
     }
 
-private:
-    Context(const Context& other);
-	Context& operator = (const Context& other);
 
-    // client settings (i.e. thread pools, # connections, etc).
-    // vs. context-settings (num redirects, auth handlers, etc).
-    
-    SessionSettings _sessionSettings;
-    CredentialStore _credentialStore;
-    
-    CookieStore _cookieStore;
+private:
+    std::map<std::string, Poco::Any> _map;
+
+    SessionSettings _settings;
+//    CookieStore::WeakPtr _cookieStore;
+    CredentialStore::WeakPtr _credentialStore;
+
+    std::vector<Poco::URI> _redirects;
+
+    Poco::URI _resolvedURI;
+    Poco::URI _proxyRedirectURI;
+
+    Session _session;
 
 };
 
 
-} } } // namespace ofx::HTTP::Client
+} } // namespace ofx::HTTP

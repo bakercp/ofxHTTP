@@ -28,6 +28,8 @@
 
 #include <string>
 #include <vector>
+#include "Poco/NullStream.h"
+#include "Poco/StreamCopier.h"
 #include "Poco/URI.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
@@ -61,27 +63,36 @@ public:
     /// \returns A map of the parameter names and their values.
     static Poco::Net::NameValueCollection getQueryMap(const Poco::URI& uri);
 
-    /// \brief Dump headers from both server requests and responses.
-    /// \param request the HTTPServerRequest request.
-    /// \param response the HTTPServerResponse response.
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                            const Poco::Net::HTTPServerResponse& response,
+    /// \brief Dump headers from both requests and responses.
+    /// \param request the HTTPRequest request.
+    /// \param response the HTTPResponse response.
+    static void dumpHeaders(const Poco::Net::HTTPRequest& request,
+                            const Poco::Net::HTTPResponse& response,
                             ofLogLevel logLevel = OF_LOG_VERBOSE);
 
     /// \brief Dump headers from a server request.
-    /// \param request the HTTPServerRequest request.
-    static void dumpHeaders(const Poco::Net::HTTPServerRequest& request,
+    /// \param request the HTTPRequest request.
+    static void dumpHeaders(const Poco::Net::HTTPRequest& request,
                             ofLogLevel logLevel = OF_LOG_VERBOSE);
 
     /// \brief Dump headers from a server response.
-    /// \param response the HTTPServerResponse response.
-    static void dumpHeaders(const Poco::Net::HTTPServerResponse& response,
+    /// \param response the HTTPResponse response.
+    static void dumpHeaders(const Poco::Net::HTTPResponse& response,
                             ofLogLevel logLevel = OF_LOG_VERBOSE);
 
     /// \brief Dump a name value collection from a server response.
     /// \param response the HTTPServerResponse response.
     static void dumpNameValueCollection(const Poco::Net::NameValueCollection& nvc,
                                         ofLogLevel logLevel = OF_LOG_VERBOSE);
+
+    /// \brief Consume a stream.
+    /// \warning This function will read a stream to the end.  This method will
+    ///          block until the entire stream is consumed.  Thus the stream
+    ///          must be of finite length or the this method will block
+    ///          indefinitely.
+    /// \param stream input stream.
+    /// \returns the number of bytes consumed.
+    static std::streamsize consume(std::istream& stream);
 
 };
 

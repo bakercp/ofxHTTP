@@ -27,7 +27,7 @@
 
 
 #include <string>
-#include "Poco/Net/HTTPMessage.h"
+//#include "Poco/Net/HTTPMessage.h"
 #include "ofx/HTTP/Client/BaseRequest.h"
 
 
@@ -40,7 +40,10 @@ class GetRequest: public BaseRequest
 {
 public:
     GetRequest(const std::string& uri);
-    GetRequest(const std::string& uri, const std::string& httpVersion);
+    
+    GetRequest(const std::string& uri,
+               const std::string& httpVersion,
+               const Poco::UUID& requestId = generateUUID());
 
     virtual ~GetRequest();
 

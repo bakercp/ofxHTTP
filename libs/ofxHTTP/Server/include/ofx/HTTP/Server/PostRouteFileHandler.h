@@ -41,9 +41,10 @@ class PostRoute;
 class PostRouteFileHandler: public Poco::Net::PartHandler
 {
 public:
-    PostRouteFileHandler(const Poco::Net::HTTPServerRequest& request,
+    PostRouteFileHandler(const Poco::UUID& sessionUUID,
+                         const Poco::Net::HTTPServerRequest& request,
                          PostRoute& parent,
-                         const std::string& formUUID);
+                         const Poco::UUID& formUUID);
 
     virtual ~PostRouteFileHandler();
 
@@ -55,7 +56,8 @@ public:
 private:
     const Poco::Net::HTTPServerRequest& _request;
     PostRoute& _parent;
-    const std::string& _formUUID;
+    const Poco::UUID& _formUUID;
+    const Poco::UUID& _sessionUUID;
 
 };
 

@@ -54,6 +54,10 @@ PostRouteHandler::~PostRouteHandler()
 void PostRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
                                      Poco::Net::HTTPServerResponse& response)
 {
+    Poco::UUID sessionId = _parent.getSessionId(request, response);
+
+
+    // this uuid helps us track form progress updates
     Poco::UUID formUUID = Poco::UUIDGenerator::defaultGenerator().createOne();
 
     // get the content type header (already checked in parent route)
@@ -76,15 +80,16 @@ void PostRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
             }
         }
 
-        PostRouteFileHandler postRoutePartHandler(request, _parent, formUUID.toString());
+        PostRouteFileHandler postRoutePartHandler(sessionId, request, _parent, formUUID);
 
         Poco::Net::HTMLForm form(contentType.toString());
         form.setFieldLimit(_parent.getSettings().getFieldLimit());
         form.load(request, request.stream(), postRoutePartHandler);
 
-        PostFormEventArgs args(request,
+        PostFormEventArgs args(sessionId,
+                               request,
                                response,
-                               formUUID.toString(),
+                               formUUID,
                                form);
 
         ofNotifyEvent(_parent.events.onHTTPFormEvent, args, &_parent);
@@ -102,7 +107,7 @@ void PostRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
 
         ofBuffer buffer(result);
 
-        PostEventArgs args(request, response, formUUID.toString(), buffer);
+        PostEventArgs args(sessionId, request, response, formUUID, buffer);
 
         ofNotifyEvent(_parent.events.onHTTPPostEvent, args, &_parent);
 

@@ -39,8 +39,10 @@ GetRequest::GetRequest(const std::string& uri):
 }
 
 
-GetRequest::GetRequest(const std::string& uri, const std::string& httpVersion):
-    BaseRequest(Poco::Net::HTTPRequest::HTTP_GET, uri, httpVersion)
+GetRequest::GetRequest(const std::string& uri,
+                       const std::string& httpVersion,
+                       const Poco::UUID& requestId):
+    BaseRequest(Poco::Net::HTTPRequest::HTTP_GET, uri, httpVersion, requestId)
 {
 }
 

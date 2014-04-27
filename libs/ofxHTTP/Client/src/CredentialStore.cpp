@@ -28,7 +28,6 @@
 
 namespace ofx {
 namespace HTTP {
-namespace Client {
 
 
 CredentialStore::CredentialStore()
@@ -197,20 +196,18 @@ void CredentialStore::clearCredentials(const Poco::URI& uri)
 }
 
 
-bool CredentialStore::authenticate(const Poco::Net::HTTPClientSession& pSession,
-                                   Poco::Net::HTTPRequest& pRequest)
+bool CredentialStore::updateAuthentication(const Poco::Net::HTTPClientSession& session,
+                                           Poco::Net::HTTPRequest& request)
 {
-    cout << "AUTHENTICATION!!!" << endl;
-
     // first check and see if the request has any authentication headers
     // these could be added via default session headers
-    if(pRequest.has(Poco::Net::HTTPRequest::AUTHORIZATION))
+    if(request.has(Poco::Net::HTTPRequest::AUTHORIZATION))
     {
         ofLogVerbose("CredentialStore::authenticate") << "HTTP Authorization headers already set.  Skipping authentication.";
         return false;
     }
 
-    AuthScope    targetScope(pSession.getHost(), pSession.getPort());
+    AuthScope    targetScope(session.getHost(), session.getPort());
     Credentials  matchingCredentials;
     AuthScope    matchingScope;
     
@@ -224,7 +221,8 @@ bool CredentialStore::authenticate(const Poco::Net::HTTPClientSession& pSession,
 
         if(iterDigest != digestCredentialCacheMap.end())
         {
-            (*iterDigest).second->updateAuthInfo(pRequest); // successfully updated auth info for matching scope
+            (*iterDigest).second->updateAuthInfo(request); // successfully updated auth info for matching scope
+            ofLogVerbose("CredentialStore::updateAuthentication") << "Found and updated digest credentials.";
             return true;
         }
 
@@ -234,11 +232,12 @@ bool CredentialStore::authenticate(const Poco::Net::HTTPClientSession& pSession,
 
         if(iterBasic != basicCredentialCacheMap.end())
         {
-            (*iterBasic).second->authenticate(pRequest); // successfully updated auth info for matching scope
+            (*iterBasic).second->authenticate(request); // successfully updated auth info for matching scope
+            ofLogVerbose("CredentialStore::updateAuthentication") << "Found and updated basic credentials.";
             return true;
         }
         
-        ofLogVerbose("CredentialStore::authenticate") << "Had no matching cached credentials for preemptive authentication.";
+        ofLogVerbose("CredentialStore::updateAuthentication") << "Had no matching cached credentials for preemptive authentication.";
         return false;
     }
     else
@@ -249,26 +248,24 @@ bool CredentialStore::authenticate(const Poco::Net::HTTPClientSession& pSession,
 }
 
 
-bool CredentialStore::authenticate(const Poco::Net::HTTPClientSession& pSession,
-                                   Poco::Net::HTTPRequest& pRequest,
-                                   Poco::Net::HTTPResponse& pResponse)
+bool CredentialStore::authenticate(const Poco::Net::HTTPClientSession& session,
+                                   Poco::Net::HTTPRequest& request,
+                                   Poco::Net::HTTPResponse& response)
 {
 
-    if(pResponse.getStatus() == Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED)
+    if(response.getStatus() == Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED)
     {
-        for(Poco::Net::HTTPResponse::ConstIterator iter = pResponse.find("WWW-Authenticate"); iter != pResponse.end(); ++iter)
+        for(Poco::Net::HTTPResponse::ConstIterator iter = response.find("WWW-Authenticate"); iter != response.end(); ++iter)
         {
             AuthenticationType requestedAuthType;
             
             if(Poco::Net::HTTPCredentials::isBasicCredentials(iter->second))
             {
                 requestedAuthType = BASIC;
-                cout << "AUTHENTICATING BASIC: " << iter->second << endl;
             }
             else if(Poco::Net::HTTPCredentials::isDigestCredentials(iter->second))
             {
                 requestedAuthType = DIGEST;
-                cout << "AUTHENTICATING DIGEST: " << iter->second << endl;
             }
             else
             {
@@ -281,7 +278,7 @@ bool CredentialStore::authenticate(const Poco::Net::HTTPClientSession& pSession,
             
             try
             {
-                params.fromResponse(pResponse);
+                params.fromResponse(response);
                 // it is very unlikely that any of the following exceptions will be thrown because we have already checked for most.
             }
             catch (const Poco::Net::NotAuthenticatedException& exc)
@@ -300,11 +297,11 @@ bool CredentialStore::authenticate(const Poco::Net::HTTPClientSession& pSession,
                 return false;
             }
 
-            std::string scheme = pSession.secure() ? "https" : "http";
+            std::string scheme = session.secure() ? "https" : "http";
             
             AuthScope targetScope(scheme,
-                                  pSession.getHost(),
-                                  pSession.getPort(),
+                                  session.getHost(),
+                                  session.getPort(),
                                   params.getRealm(),
                                   requestedAuthType);
 
@@ -318,23 +315,17 @@ bool CredentialStore::authenticate(const Poco::Net::HTTPClientSession& pSession,
                                               matchingScope,
                                               matchingCredentials))
             {
-                ofLogVerbose("CredentialStore::authenticate") << "HAD CREDS FOR TARGET SCOPE   = " << targetScope.toString();
-                ofLogVerbose("CredentialStore::authenticate") << "HAD CREDS FOR MATCHING SCOPE = " << matchingScope.toString();
-                if(requestedAuthType == BASIC)
+                if(BASIC == requestedAuthType)
                 {
-                    ofLogVerbose("CredentialStore::authenticate") << "BASIC = " << matchingScope.toString();
-
                     // replace any old ones (probably means they failed and were updated somewhere)
-                    basicCredentialCacheMap[matchingScope] = HTTPBasicCredentialsSharedPtr(new Poco::Net::HTTPBasicCredentials(matchingCredentials.getUsername(),matchingCredentials.getPassword()));
-                    basicCredentialCacheMap[matchingScope].get()->authenticate(pRequest);
+                    basicCredentialCacheMap[matchingScope] = HTTPBasicCredentialsSharedPtr(new Poco::Net::HTTPBasicCredentials(matchingCredentials.getUsername(), matchingCredentials.getPassword()));
+                    basicCredentialCacheMap[matchingScope].get()->authenticate(request);
                     return true;
                 }
-                else if(requestedAuthType == DIGEST)
+                else if(DIGEST == requestedAuthType)
                 {
-                    ofLogVerbose("CredentialStore::authenticate") << "DIGEST = " << matchingScope.toString();
-
                     digestCredentialCacheMap[matchingScope] = HTTPDigestCredentialsSharedPtr(new Poco::Net::HTTPDigestCredentials(matchingCredentials.getUsername(),matchingCredentials.getPassword()));
-                    digestCredentialCacheMap[matchingScope].get()->authenticate(pRequest, pResponse);
+                    digestCredentialCacheMap[matchingScope].get()->authenticate(request, response);
                     return true;
                 }
                 else
@@ -352,7 +343,6 @@ bool CredentialStore::authenticate(const Poco::Net::HTTPClientSession& pSession,
         
         ofLogVerbose("CredentialStore::authenticate") << "Response was unauthorized, but could not find WWW-Authenticate header.";
         return false;
-
     }
     else
     {
@@ -364,7 +354,7 @@ bool CredentialStore::authenticate(const Poco::Net::HTTPClientSession& pSession,
 
 
 bool CredentialStore::authenticateWithCache(const AuthScope& scope,
-                                            Poco::Net::HTTPRequest& pRequest)
+                                            Poco::Net::HTTPRequest& request)
 {
     // TODO:
     return true;
@@ -397,5 +387,5 @@ void ofxHTTPCredentialStore::dump() {
 }
 */
 
-} } }
 
+} } // namespace ofx::HTTP

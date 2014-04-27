@@ -23,7 +23,7 @@
 // =============================================================================
 
 
-#include "BaseRequest.h"
+#include "ofx/HTTP/Client/BaseRequest.h"
 
 
 namespace ofx {
@@ -31,10 +31,15 @@ namespace HTTP {
 namespace Client {
 
 
+const std::string BaseRequest::DEFAULT_MEDIA_TYPE = "application/octet-stream";
+
+
 BaseRequest::BaseRequest(const std::string& method,
                          const std::string& uri,
-                         const std::string& version):
-    Poco::Net::HTTPRequest(method, uri, version)
+                         const std::string& httpVersion,
+                         const Poco::UUID& requestId):
+    Poco::Net::HTTPRequest(method, uri, httpVersion),
+    _requestId(requestId)
 {
 }
 
@@ -44,10 +49,23 @@ BaseRequest::~BaseRequest()
 }
 
 
-void BaseRequest::finalizeRequest()
+const Poco::UUID& BaseRequest::getRequestId() const
+{
+    return _requestId;
+}
+
+
+Poco::UUID BaseRequest::generateUUID()
+{
+    return Poco::UUIDGenerator::defaultGenerator().createOne();
+}
+
+
+void BaseRequest::prepareRequest()
 {
     // Empty
 }
+
 
 void BaseRequest::writeRequestBody(std::ostream& requestStream)
 {

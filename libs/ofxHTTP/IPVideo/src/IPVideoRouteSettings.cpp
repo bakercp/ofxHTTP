@@ -49,85 +49,102 @@ IPVideoRouteSettings::IPVideoRouteSettings(const std::string& routePathPattern,
 {
 }
 
+
 IPVideoRouteSettings::~IPVideoRouteSettings()
 {
 }
+
 
 void IPVideoRouteSettings::setMaxClientConnections(std::size_t maxClientConnections)
 {
     _maxClientConnections = maxClientConnections;
 }
 
+
 std::size_t IPVideoRouteSettings::getMaxClientConnections() const
 {
     return _maxClientConnections;
 }
+
 
 void IPVideoRouteSettings::setMaxClientBitRate(std::size_t maxClientBitRate)
 {
     _maxClientBitRate = maxClientBitRate;
 }
 
+
 std::size_t IPVideoRouteSettings::getMaxClientBitRate() const
 {
     return _maxClientBitRate;
 }
+
 
 void IPVideoRouteSettings::setMaxClientFrameRate(std::size_t maxClientFrameRate)
 {
     _maxClientFrameRate = maxClientFrameRate;
 }
 
+
 void IPVideoRouteSettings::setMaxClientQueueSize(std::size_t maxClientQueueSize)
 {
     _maxClientQueueSize = maxClientQueueSize;
 }
+
 
 std::size_t IPVideoRouteSettings::getMaxClientQueueSize() const
 {
     return _maxClientQueueSize;
 }
 
+
 std::size_t IPVideoRouteSettings::getMaxClientFrameRate() const
 {
     return _maxClientFrameRate;
 }
+
 
 void IPVideoRouteSettings::setBoundaryMarker(const std::string& boundaryMarker)
 {
     _boundaryMarker = boundaryMarker;
 }
 
+
 std::string IPVideoRouteSettings::getBoundaryMarker() const
 {
     return _boundaryMarker;
 }
+
 
 void IPVideoRouteSettings::setMediaType(const Poco::Net::MediaType& mediaType)
 {
     _mediaType = mediaType;
 }
 
+
 Poco::Net::MediaType IPVideoRouteSettings::getMediaType() const
 {
     return _mediaType;
 }
+
 
 void IPVideoRouteSettings::setMaxStreamWidth(std::size_t maxStreamWidth)
 {
     _maxStreamWidth = maxStreamWidth;
 }
 
+
 std::size_t IPVideoRouteSettings::getMaxStreamWidth() const
 {
     return _maxStreamWidth;
 }
+
 
 void IPVideoRouteSettings::setMaxStreamHeight(std::size_t maxStreamHeight)
 {
     _maxStreamHeight = maxStreamHeight;
 }
 
+    
 std::size_t IPVideoRouteSettings::getMaxStreamHeight() const
 {
     return _maxStreamHeight;

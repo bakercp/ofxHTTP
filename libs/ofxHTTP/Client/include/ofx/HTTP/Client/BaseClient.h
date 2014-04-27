@@ -26,51 +26,55 @@
 #pragma once
 
 
-#include "Poco/Exception.h"
-#include "Poco/NullStream.h"
-#include "Poco/Thread.h"
-#include "Poco/ThreadPool.h"
-#include "Poco/StreamCopier.h"
-#include "Poco/URI.h"
-#include "Poco/Net/HTTPAuthenticationParams.h"
-#include "Poco/Net/NetException.h"
-#include "ofEvents.h"
-#include "ofx/HTTP/Types/AbstractTypes.h"
-#include "ofx/HTTP/Types/StreamUtils.h"
+#include "Poco/InflatingStream.h"
+#include "ofx/HTTP/Client/AbstractClientTypes.h"
+#include "ofx/HTTP/Client/BaseClientProcessors.h"
 #include "ofx/HTTP/Client/BaseRequest.h"
-#include "ofx/HTTP/Client/Context.h"
-#include "ofx/HTTP/Client/SessionSettings.h"
-
-
-using namespace Poco::Net;
 
 
 namespace ofx {
 namespace HTTP {
-namespace Client {
 
 
-//class BaseClient
-//{
-//public:
-//    typedef std::shared_ptr<BaseClient> SharedPtr;
-//    typedef std::weak_ptr<BaseClient>   WeakPtr;
-//
-//protected:
-//    static ResponseStream::SharedPtr openResponseStream(const BaseRequest& request, Context::SharedPtr context);
-//        
-////    Poco::Thread _syncThread; // thread for executing syncronous calls
-////                              // must always be immediately joined
-//
-////    Context::SharedPtr _context;
-////
-////    Poco::ThreadPool& _threadPoolRef; // thread pool for executing asynchronous calls
-//
-//
-////    ofThreadErrorHandler errorHandler;
-////    ErrorHandler* previousErrorHandler;
-//    
-//};
+class BaseClient: public BaseClientProcessors
+{
+public:
+    BaseClient(AbstractSessionProvider& sessionProvider,
+               AbstractProxyProcessor& proxyProcessor,
+               AbstractAuthenticationProcessor& authenticationProcessor,
+               AbstractRedirectProcessor& redirectProcessor);
+
+    virtual ~BaseClient();
+
+    std::istream& execute(Client::BaseRequest& request,
+                          Poco::Net::HTTPResponse& response,
+                          Context& context);
+
+    void execute(Client::BaseRequest& request,
+                 Poco::Net::HTTPResponse& response,
+                 Context& context,
+                 ofBuffer& buffer);
+
+    bool isRunning() const;
+    void cancel();
+
+private:
+    bool _isRunning;
+
+    AbstractSessionProvider& _sessionProvider;
+    AbstractProxyProcessor& _proxyProcessor;
+    AbstractAuthenticationProcessor& _authenticationProcessor;
+    AbstractRedirectProcessor& _redirectProcessor;
+
+    std::istream* _pDecodedResponseStream;
+
+    static const std::string ACCEPT_ENCODING_HEADER;
+    static const std::string CONTENT_ENCODING_HEADER;
+
+};
 
 
-} } } // namespace ofx::HTTP::Client
+typedef BaseClient DefaultClient;
+
+
+} } // namespace ofx::HTTP

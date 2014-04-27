@@ -23,7 +23,7 @@
 // =============================================================================
 
 
-#include "AuthScope.h"
+#include "ofx/HTTP/Client/AuthScope.h"
 
 
 namespace ofx {

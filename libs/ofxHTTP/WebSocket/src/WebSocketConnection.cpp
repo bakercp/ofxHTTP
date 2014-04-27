@@ -50,6 +50,8 @@ WebSocketConnection::~WebSocketConnection()
 void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                                         Poco::Net::HTTPServerResponse& response)
 {
+    Poco::UUID sessionId = _parent.getSessionId(request, response);
+
     // get a copy of the settings
     WebSocketRouteSettings settings = _parent.getSettings();
     WebSocketEvents& events = _parent.events;
@@ -85,7 +87,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
 
         int flags = 0;
 
-        WebSocketEventArgs eventArgs(*this);
+        WebSocketEventArgs eventArgs(sessionId, *this);
         ofNotifyEvent(events.onOpenEvent, eventArgs, this);
 
         do
@@ -128,7 +130,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                     }
                     else
                     {
-                        WebSocketFrameEventArgs frameArgs(frame, *this);
+                        WebSocketFrameEventArgs frameArgs(frame, sessionId, *this);
                         ofNotifyEvent(events.onFrameReceivedEvent, frameArgs, this);
                     }
                 }
@@ -151,7 +153,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                 {
                     if(ws.poll(settings.getPollTimeout(), Poco::Net::Socket::SELECT_WRITE))
                     {
-                        std::size_t numBytesSent = 0;
+                        std::size_t numBytesSent = 0; // TODO we use long because ofBuffer can have negative size.
 
                         numBytesSent = ws.sendFrame(frame.getBinaryBuffer(),
                                                     frame.size(),
@@ -172,7 +174,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                             error = WS_ERROR_INCOMPLETE_FRAME_SENT;
                         }
                         
-                        WebSocketFrameEventArgs eventArgs(frame, *this, error);
+                        WebSocketFrameEventArgs eventArgs(frame, sessionId, *this, error);
                         ofNotifyEvent(events.onFrameSentEvent, eventArgs, this);
                     }
                 }
@@ -217,7 +219,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
         }
 
         _parent.handleRequest(request,response);
-        WebSocketEventArgs eventArgs(*this, (WebSocketError)exc.code());
+        WebSocketEventArgs eventArgs(sessionId, *this, (WebSocketError)exc.code());
         ofNotifyEvent(_parent.events.onErrorEvent, eventArgs, this);
     }
     catch (const Poco::TimeoutException& exc)
@@ -225,7 +227,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "TimeoutException: " << exc.code() << " Desc: " << exc.what();
         response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         _parent.handleRequest(request, response);
-        WebSocketEventArgs eventArgs(*this, WS_ERR_TIMEOUT);
+        WebSocketEventArgs eventArgs(sessionId, *this, WS_ERR_TIMEOUT);
         ofNotifyEvent(events.onErrorEvent, eventArgs, this);
         // response socket has already been closed (!?)
     }
@@ -234,7 +236,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "NetException: " << exc.code() << " Desc: " << exc.what();
         response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         _parent.handleRequest(request, response);
-        WebSocketEventArgs eventArgs(*this, WS_ERR_NET_EXCEPTION);
+        WebSocketEventArgs eventArgs(sessionId, *this, WS_ERR_NET_EXCEPTION);
         ofNotifyEvent(events.onErrorEvent, eventArgs, this);
         // response socket has already been closed (!?)
     }
@@ -243,7 +245,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "exception: " << exc.what();
         response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         _parent.handleRequest(request, response);
-        WebSocketEventArgs eventArgs(*this, WS_ERR_OTHER);
+        WebSocketEventArgs eventArgs(sessionId, *this, WS_ERR_OTHER);
         ofNotifyEvent(_parent.events.onErrorEvent, eventArgs, this);
     }
     catch ( ... )
@@ -251,11 +253,11 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
         ofLogError("ServerWebSocketRouteHandler::handleRequest") << "... Unknown exception.";
         response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         _parent.handleRequest(request,response);
-        WebSocketEventArgs eventArgs(*this, WS_ERR_OTHER);
+        WebSocketEventArgs eventArgs(sessionId, *this, WS_ERR_OTHER);
         ofNotifyEvent(_parent.events.onErrorEvent, eventArgs, this);
     }
 
-    WebSocketEventArgs eventArgs(*this);
+    WebSocketEventArgs eventArgs(sessionId, *this);
     ofNotifyEvent(_parent.events.onCloseEvent, eventArgs, this);
 }
 

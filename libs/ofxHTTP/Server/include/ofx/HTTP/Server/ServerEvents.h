@@ -26,6 +26,7 @@
 #pragma once
 
 
+#include "Poco/UUID.h"
 #include "Poco/Net/MediaType.h"
 #include "Poco/Net/NameValueCollection.h"
 #include "Poco/Net/HTTPResponse.h"
@@ -37,44 +38,91 @@ namespace ofx {
 namespace HTTP {
 
 
-class BaseHTTPServerRequestEventArgs: public ofEventArgs
+/// \brief A base class describing 
+class BaseHTTPSessionEvent: public ofEventArgs
 {
 public:
-    BaseHTTPServerRequestEventArgs(const Poco::Net::HTTPServerRequest& request):
+    BaseHTTPSessionEvent(const Poco::UUID& sessionId):
+        _sessionId(sessionId)
+    {
+    }
+
+
+    virtual ~BaseHTTPSessionEvent()
+    {
+    }
+
+
+    /// \brief Get the session id associated with this event.
+    ///
+    /// The session id is established by the SessionCache.  If no SessionCache
+    /// is used, this will always return Poco::UUID::null.
+    ///
+    /// \returns the session id or Poco::UUID::null if not set.
+    const Poco::UUID& getSessionId() const
+    {
+        return _sessionId;
+    }
+
+protected:
+    Poco::UUID _sessionId;
+        ///< \brief The session id, if available.  Poco::UUID::null if null.
+
+};
+
+
+
+/// \brief ?
+class BaseHTTPServerRequestEventArgs: public BaseHTTPSessionEvent
+{
+public:
+    /// \brief Construct the BaseHTTPServerRequestEventArgs.
+    /// \param request the Poco::Net::HTTPServerRequest.
+    BaseHTTPServerRequestEventArgs(const Poco::UUID& sessionId,
+                                   const Poco::Net::HTTPServerRequest& request):
+        BaseHTTPSessionEvent(sessionId),
         _request(request)
     {
     }
 
+    /// \brief Destroy the BaseHTTPServerRequestEventArgs.
     virtual ~BaseHTTPServerRequestEventArgs()
     {
     }
 
+
+    /// \brief Return the Poco::Net::HTTPServerRequest.
+    /// \return the Poco::Net::HTTPServerRequest.
     const Poco::Net::HTTPServerRequest& getRequest() const
     {
         return _request;
     }
+
 
     std::streamsize getRequestContentLength() const
     {
         return _request.getContentLength();
     }
 
+
 protected:
     const Poco::Net::HTTPServerRequest& _request;
+        ///< \brief A const reference to the server request.
 
 };
-
 
 
 class BaseHTTPServerRequestResponseEventArgs: public BaseHTTPServerRequestEventArgs
 {
 public:
-    BaseHTTPServerRequestResponseEventArgs(const Poco::Net::HTTPServerRequest& request,
-                                           Poco::Net::HTTPServerResponse& response):
-        BaseHTTPServerRequestEventArgs(request),
-        response(response)
+    BaseHTTPServerRequestResponseEventArgs(const Poco::UUID& sessionId,
+                                           const Poco::Net::HTTPServerRequest& request,
+                                           Poco::Net::HTTPServerResponse& _response):
+        BaseHTTPServerRequestEventArgs(sessionId, request),
+        response(_response)
     {
     }
+
 
     virtual ~BaseHTTPServerRequestResponseEventArgs()
     {

@@ -1,80 +1,104 @@
-//// =============================================================================
-////
-//// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
-////
-//// Permission is hereby granted, free of charge, to any person obtaining a copy
-//// of this software and associated documentation files (the "Software"), to deal
-//// in the Software without restriction, including without limitation the rights
-//// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//// copies of the Software, and to permit persons to whom the Software is
-//// furnished to do so, subject to the following conditions:
-////
-//// The above copyright notice and this permission notice shall be included in
-//// all copies or substantial portions of the Software.
-////
-//// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//// THE SOFTWARE.
-////
-//// =============================================================================
+// =============================================================================
 //
+// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
 //
-//#include "ofx/HTTP/Client/PutRequest.h"
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
-//namespace ofx {
-//namespace HTTP {
-//namespace Client {
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 //
-//
-////------------------------------------------------------------------------------
-//PutRequest::PutRequest(const Poco::URI& uri):
-//    BaseRequest(Poco::Net::HTTPRequest::HTTP_PUT,uri)
-//{
-//}
-//
-////------------------------------------------------------------------------------
-//PutRequest::PutRequest(const Poco::URI& uri, const std::string& httpVersion):
-//    BaseRequest(Poco::Net::HTTPRequest::HTTP_PUT, uri, httpVersion)
-//{
-//}
-//
-////------------------------------------------------------------------------------
-//PutRequest::~PutRequest()
-//{
-//}
-//
-//
-//void PutRequest::addFile(const std::string& filename)
-//{
-//
-//}
-//
-//void PutRequest::setContentRange(std::size_t startByte)
-//{
-//
-//}
-//
-//void PutRequest::setContentRange(std::size_t startByte,
-//                     std::size_t endByte)
-//{
-//
-//}
-//
-//void PutRequest::setContentType(const std::string& contentType)
-//{
-//
-//}
-//
-//
-////------------------------------------------------------------------------------
-//void PutRequest::prepareRequest(Poco::Net::HTTPRequest& request) const
-//{
-//}
-//
-//
-//} } } // ofx::HTTP::Client
+// =============================================================================
+
+
+#include "ofx/HTTP/Client/PutRequest.h"
+
+
+namespace ofx {
+namespace HTTP {
+namespace Client {
+
+
+const std::string PutRequest::DEFAULT_MEDIA_TYPE = "application/octet-stream";
+
+
+PutRequest::PutRequest(const std::string& uri):
+    BaseRequest(Poco::Net::HTTPRequest::HTTP_PUT,
+                uri,
+                Poco::Net::HTTPMessage::HTTP_1_1),
+    _startByte(0),
+    _endByte(0),
+    _contentType(DEFAULT_MEDIA_TYPE)
+{
+}
+
+
+PutRequest::PutRequest(const std::string& uri,
+                       const std::string& httpVersion,
+                       const Poco::UUID& requestId):
+    BaseRequest(Poco::Net::HTTPRequest::HTTP_PUT, uri, httpVersion, requestId),
+    _startByte(0),
+    _endByte(0),
+    _contentType(DEFAULT_MEDIA_TYPE)
+{
+}
+    
+
+PutRequest::~PutRequest()
+{
+}
+
+
+void PutRequest::setPutFile(const std::string& filename)
+{
+    _buffer = ofBufferFromFile(filename);
+}
+
+
+void PutRequest::setPutBuffer(const ofBuffer& buffer)
+{
+    _buffer = buffer;
+}
+
+
+void PutRequest::setContentRange(std::size_t startByte)
+{
+
+}
+
+void PutRequest::setContentRange(std::size_t startByte,
+                                 std::size_t endByte)
+{
+
+}
+
+void PutRequest::setContentType(const std::string& contentType)
+{
+    _contentType = contentType;
+}
+
+
+void PutRequest::prepareSubmit()
+{
+
+}
+
+void PutRequest::writeRequestBody(std::ostream& requestStream)
+{
+    requestStream << _buffer;
+}
+
+
+} } } // ofx::HTTP::Client

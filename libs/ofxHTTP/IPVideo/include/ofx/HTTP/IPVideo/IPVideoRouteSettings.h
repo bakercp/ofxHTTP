@@ -37,7 +37,7 @@ namespace HTTP {
 class IPVideoRouteSettings: public BaseRouteSettings
 {
 public:
-    ///< \brief Create the IPVideoRouteSettings with the given route path.
+    /// \brief Create the IPVideoRouteSettings with the given route path.
     /// \param routePathPattern The regex pattern that this route will handle.
     /// \param requireSecurePorttrue True if this route requires
     ///        communication on an SSL encrypted port.
@@ -69,7 +69,6 @@ public:
 
     void setMaxStreamHeight(std::size_t maxStreamHeight);
     std::size_t getMaxStreamHeight() const;
-
 
     enum
     {

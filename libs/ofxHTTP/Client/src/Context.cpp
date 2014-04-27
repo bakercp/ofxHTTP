@@ -28,52 +28,20 @@
 
 namespace ofx {
 namespace HTTP {
-namespace Client {
+
+
+const std::string Context::KEY_PREFIX_RESERVED    = "HTTP_";
+const std::string Context::KEY_SESSION_SETTINGS   = "HTTP_SESSION_SETTINGS";
+const std::string Context::KEY_COOKIE_STORE       = "HTTP_COOKIE_STORE";
+const std::string Context::KEY_CREDENTIAL_STORE   = "HTTP_CREDENTIAL_STORE";
+const std::string Context::KEY_RESOLVED_URI       = "HTTP_RESOLVED_URI";
+const std::string Context::KEY_PROXY_REDIRECT_URI = "HTTP_PROXY_REDIRECT_URI";
+const std::string Context::KEY_REDIRECTS          = "HTTP_REDIRECTS";
+const std::string Context::KEY_SESSION            = "HTTP_SESSION";
 
     
 Context::Context()
 {
-}
-
-
-Context::Context(SessionSettings& sessionSettings):
-    _sessionSettings(sessionSettings)
-{
-}
-
-
-Context::Context(SessionSettings& sessionSettings,
-                 CredentialStore& credentialStore):
-    _sessionSettings(sessionSettings),
-    _credentialStore(credentialStore)
-{
-}
-
-
-Context::Context(SessionSettings& sessionSettings,
-                 CredentialStore& credentialStore,
-                 CookieStore& cookieStore):
-    _sessionSettings(sessionSettings),
-    _credentialStore(credentialStore),
-    _cookieStore(cookieStore)
-{
-}
-
-
-Context::Context(Context& other)
-{
-    _sessionSettings = other._sessionSettings;
-    _credentialStore = other._credentialStore;
-    _cookieStore     = other._cookieStore;
-}
-
-
-Context& Context::operator = (Context& other)
-{
-    _sessionSettings = other._sessionSettings;
-    _credentialStore = other._credentialStore;
-    _cookieStore     = other._cookieStore;
-   return *this;
 }
 
 
@@ -82,67 +50,87 @@ Context::~Context()
 }
 
 
-SessionSettings Context::getSessionSettings()
+void Context::setSessionSettings(const SessionSettings& settings)
 {
-    return _sessionSettings;
+    _settings = settings;
 }
 
 
-SessionSettings& Context::getSessionSettingsRef()
+const SessionSettings& Context::getSessionSettings() const
 {
-    return _sessionSettings;
+    return _settings;
 }
 
 
-CookieStore Context::getCookieStore()
-{
-    return _cookieStore;
-}
-
-
-CookieStore& Context::getCookieStoreRef()
-{
-    return _cookieStore;
-}
-
+//void Context::setCookieStore(CookieStore::SharedPtr cookieStore)
+//{
+//    _cookieStore = cookieStore;
+//}
 //
-//ClientContext::SharedPtr ClientContext::defaultClientContext() {
-//    static ClientContext::SharedPtr DefaultClientContext = ClientContext::SharedPtr(new ClientContext());
 //
-//    return DefaultClientContext;
+//CookieStore::WeakPtr Context::getCookieStore()
+//{
+//    return _cookieStore;
 //}
 
 
-CredentialStore Context::getCredentialStore()
+void Context::setCredentialStore(CredentialStore::SharedPtr credentialStore)
+{
+    _credentialStore = credentialStore;
+}
+
+
+CredentialStore::WeakPtr Context::getCredentialStore()
 {
     return _credentialStore;
 }
 
 
-CredentialStore& Context::getCredentialStoreRef()
+void Context::setSession(Session session)
 {
-    return _credentialStore;
+    _session = session;
 }
 
-//
-//bool ClientContext::canAuthenticate(HTTPRequest& request) {
-//    
-//}
-//
-//
-//bool ClientContext::canAuthenticate(HTTPRequest& request, HTTPResponse& response) {
-//    
-//}
-//
-//
-//bool ClientContext::authenticate(HTTPRequest& request) {
-//    
-//}
-//
-//
-//bool ClientContext::authenticate(HTTPRequest& request, HTTPResponse& response) {
-//
-//}
+
+Context::Session Context::getSession()
+{
+    return _session;
+}
+
+void Context::setResolvedURI(const Poco::URI& uri)
+{
+    _resolvedURI = uri;
+}
 
 
-} } } // namespace ofx::HTTP::Client
+const Poco::URI& Context::getResolvedURI() const
+{
+    return _resolvedURI;
+}
+
+
+void Context::addRedirect(const Poco::URI& uri)
+{
+    _redirects.push_back(uri);
+}
+
+
+const std::vector<Poco::URI>& Context::getRedirects() const
+{
+    return _redirects;
+}
+
+
+void Context::setProxyRedirectURI(const Poco::URI& uri)
+{
+    _proxyRedirectURI = uri;
+}
+
+
+const Poco::URI& Context::getProxyRedirectURI() const
+{
+    return _proxyRedirectURI;
+}
+
+
+} } // namespace ofx::HTTP::Client

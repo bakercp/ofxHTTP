@@ -23,7 +23,7 @@
 // =============================================================================
 
 
-#include "Compression.h"
+#include "ofx/HTTP/Types/Compression.h"
 
 
 namespace ofx {

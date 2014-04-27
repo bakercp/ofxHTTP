@@ -24,33 +24,33 @@
 
 
 #include "ofx/HTTP/Client/PostRequest.h"
+#include "Poco/CountingStream.h"
+#include "Poco/StreamCopier.h"
 #include "Poco/Net/FilePartSource.h"
 #include "Poco/Net/PartSource.h"
 #include "Poco/Net/StringPartSource.h"
-#include "ofUtils.h"
 
 
 namespace ofx {
 namespace HTTP {
 namespace Client {
 
-
-const std::string PostRequest::DEFAULT_MEDIA_TYPE = "application/octet-stream";
-
-
+    
 PostRequest::PostRequest(const std::string& uri):
     BaseRequest(Poco::Net::HTTPRequest::HTTP_POST,
                 uri,
-                Poco::Net::HTTPMessage::HTTP_1_0),
-    _form(std::shared_ptr<Poco::Net::HTMLForm>(new Poco::Net::HTMLForm()))
+                Poco::Net::HTTPMessage::HTTP_1_0)
 {
 }
 
 
 PostRequest::PostRequest(const std::string& uri,
-                         const std::string& httpVersion):
-    BaseRequest(Poco::Net::HTTPRequest::HTTP_POST, uri, httpVersion),
-    _form(std::shared_ptr<Poco::Net::HTMLForm>(new Poco::Net::HTMLForm()))
+                         const std::string& httpVersion,
+                         const Poco::UUID& requestId):
+    BaseRequest(Poco::Net::HTTPRequest::HTTP_POST,
+                uri,
+                httpVersion,
+                requestId)
 {
 }
 
@@ -64,46 +64,50 @@ void PostRequest::setFormEncoding(FormEncoding formEncoding)
 {
     if (FORM_ENCODING_URL == formEncoding)
     {
-        _form->setEncoding(Poco::Net::HTMLForm::ENCODING_URL);
+        _form.setEncoding(Poco::Net::HTMLForm::ENCODING_URL);
     }
     else
     {
-        _form->setEncoding(Poco::Net::HTMLForm::ENCODING_MULTIPART);
+        _form.setEncoding(Poco::Net::HTMLForm::ENCODING_MULTIPART);
     }
 }
 
 
 PostRequest::FormEncoding PostRequest::getFormEncoding() const
 {
-    if (_form->getEncoding().compare(Poco::Net::HTMLForm::ENCODING_URL) == 0)
-    {
-        return FORM_ENCODING_MULTIPART;
-    }
-    else
+    if (_form.getEncoding().compare(Poco::Net::HTMLForm::ENCODING_URL) == 0)
     {
         return FORM_ENCODING_URL;
     }
+    else
+    {
+        return FORM_ENCODING_MULTIPART;
+    }
 }
 
-
-void PostRequest::addField(const std::string& name,
-                           const std::string& value)
+    
+void PostRequest::addFormField(const std::string& name,
+                               const std::string& value)
 {
-    _form->add(name, value);
+    _form.add(name, value);
 }
 
 
-void PostRequest::addFile(const std::string& name,
-                          const std::string& path,
-                          const std::string& mediaType)
+void PostRequest::addFormFile(const std::string& name,
+                              const std::string& path,
+                              const std::string& mediaType)
 {
 
     std::string absPath = ofToDataPath(path, true);
 
     try
     {
-        _form->addPart(name, new Poco::Net::FilePartSource(absPath, mediaType));
-        _form->setEncoding(Poco::Net::HTMLForm::ENCODING_MULTIPART);
+        _form.addPart(name, new Poco::Net::FilePartSource(absPath, mediaType));
+        _form.setEncoding(Poco::Net::HTMLForm::ENCODING_MULTIPART);
+    }
+    catch (Poco::FileNotFoundException& exc)
+    {
+        ofLogError("PostRequest::addFile") << exc.displayText();
     }
     catch (Poco::OpenFileException& exc)
     {
@@ -112,33 +116,47 @@ void PostRequest::addFile(const std::string& name,
 }
 
 
-void PostRequest::addBuffer(const std::string& name,
-                            const ofBuffer& buffer,
-                            const std::string& mediaType)
+void PostRequest::addFormBuffer(const std::string& name,
+                                const ofBuffer& buffer,
+                                const std::string& mediaType)
 {
-    _form->addPart(name, new Poco::Net::StringPartSource(buffer.getText(),
-                                                         mediaType));
-    _form->setEncoding(Poco::Net::HTMLForm::ENCODING_MULTIPART);
+    _form.addPart(name, new Poco::Net::StringPartSource(buffer.getText(),
+                                                        mediaType));
+
+    _form.setEncoding(Poco::Net::HTMLForm::ENCODING_MULTIPART);
 }
 
 
-void PostRequest::clear()
+void PostRequest::prepareRequest()
 {
-    _form = std::shared_ptr<Poco::Net::HTMLForm>(new Poco::Net::HTMLForm());
-}
+    _form.prepareSubmit(*this);
 
-
-void PostRequest::finalizeRequest()
-{
-    _form->prepareSubmit(*this);
+    if (FORM_ENCODING_MULTIPART == getFormEncoding()
+    && Poco::Net::HTTPMessage::HTTP_1_0 == getVersion())
+    {
+        // If we are using 1.0 with file uploads, we must get a content
+        // length before sending the data.
+        _outBuffer.clear();
+        Poco::CountingOutputStream cos(_outBuffer);
+        _form.write(cos);
+        set("Content-Length", ofToString(cos.chars()));
+        setKeepAlive(false);
+        setChunkedTransferEncoding(false);
+    }
 }
 
 
 void PostRequest::writeRequestBody(std::ostream& requestStream)
 {
-    cout << "Writing request stream" << endl;
-    _form->write(requestStream);
-    clear();
+    if (FORM_ENCODING_MULTIPART == getFormEncoding()
+    && Poco::Net::HTTPMessage::HTTP_1_0 == getVersion())
+    {
+        Poco::StreamCopier::copyStream(_outBuffer, requestStream);
+    }
+    else
+    {
+        _form.write(requestStream);
+    }
 }
 
 

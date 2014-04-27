@@ -70,7 +70,7 @@ public:
     static const std::string DEFAULT_POST_FOLDER;
     static const std::string DEFAULT_POST_REDIRECT;
 
-    /// \briefs Default values.
+    /// \brief Default values.
     enum Defaults
     {
         DEFAULT_POST_BUFFER_SIZE = 8192,

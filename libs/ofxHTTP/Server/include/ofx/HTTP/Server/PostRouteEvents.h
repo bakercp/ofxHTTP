@@ -26,6 +26,7 @@
 #pragma once
 
 
+#include "Poco/UUID.h"
 #include "Poco/Net/MediaType.h"
 #include "Poco/Net/NameValueCollection.h"
 #include "ofEvents.h"
@@ -41,10 +42,11 @@ namespace HTTP {
 class BasePostRequestEventArgs: public BaseHTTPServerRequestEventArgs
 {
 public:
-    BasePostRequestEventArgs(const Poco::Net::HTTPServerRequest& request,
-                             const std::string& postUUID):
-        BaseHTTPServerRequestEventArgs(request),
-        postUUID(postUUID)
+    BasePostRequestEventArgs(const Poco::UUID& sessionId,
+                             const Poco::Net::HTTPServerRequest& request,
+                             const Poco::UUID& formId):
+        BaseHTTPServerRequestEventArgs(sessionId, request),
+        _formId(formId)
     {
     }
 
@@ -52,7 +54,19 @@ public:
     {
     }
 
-    const std::string postUUID;
+    /// \brief The post id.
+    ///
+    /// Each time a POST request, is processed it is assigned a unique id.
+    /// This id allows us to track post progress updates and multi-part posts.
+    ///
+    /// \returns the session id or Poco::UUID::null if not set.
+    const Poco::UUID& getPostId() const
+    {
+        return _formId;
+    }
+
+protected:
+    Poco::UUID _formId;
 
 };
 
@@ -60,20 +74,35 @@ public:
 class BasePostRequestResponseEventArgs: public BaseHTTPServerRequestResponseEventArgs
 {
 public:
-    BasePostRequestResponseEventArgs(const Poco::Net::HTTPServerRequest& request,
+    BasePostRequestResponseEventArgs(const Poco::UUID& sessionId,
+                                     const Poco::Net::HTTPServerRequest& request,
                                      Poco::Net::HTTPServerResponse& response,
-                                     const std::string& postUUID):
-        BaseHTTPServerRequestResponseEventArgs(request, response),
-        postUUID(postUUID)
+                                     const Poco::UUID& postId):
+        BaseHTTPServerRequestResponseEventArgs(sessionId, request, response),
+        _postId(postId)
     {
     }
+
 
     virtual ~BasePostRequestResponseEventArgs()
     {
     }
 
-    const std::string postUUID;
-    
+
+    /// \brief The post id.
+    ///
+    /// Each time a POST request, is processed it is assigned a unique id.
+    /// This id allows us to track post progress updates and multi-part posts.
+    ///
+    /// \returns the session id or Poco::UUID::null if not set.
+    const Poco::UUID& getPostId() const
+    {
+        return _postId;
+    }
+
+protected:
+    Poco::UUID _postId;
+
 };
 
 
@@ -84,12 +113,16 @@ public:
 class PostEventArgs: public BasePostRequestResponseEventArgs
 {
 public:
-    PostEventArgs(const Poco::Net::HTTPServerRequest& request,
+    PostEventArgs(const Poco::UUID& sessionId,
+                  const Poco::Net::HTTPServerRequest& request,
                   Poco::Net::HTTPServerResponse& response,
-                  const std::string& postUUID,
+                  const Poco::UUID& postId,
                   const ofBuffer& data):
-        BasePostRequestResponseEventArgs(request, response, postUUID),
-        data(data)
+        BasePostRequestResponseEventArgs(sessionId,
+                                         request,
+                                         response,
+                                         postId),
+        _data(data)
     {
     }
 
@@ -97,8 +130,15 @@ public:
     {
     }
 
-    /// \brief The raw form data sent with the POST.
-    const ofBuffer& data;
+
+    const ofBuffer& getBuffer() const
+    {
+        return _data;
+    }
+
+protected:
+    const ofBuffer& _data;
+        ///< \brief The raw form data sent with the POST.
 
 };
 
@@ -106,12 +146,16 @@ public:
 class PostFormEventArgs: public BasePostRequestResponseEventArgs
 {
 public:
-    PostFormEventArgs(const Poco::Net::HTTPServerRequest& request,
+    PostFormEventArgs(const Poco::UUID& sessionId,
+                      const Poco::Net::HTTPServerRequest& request,
                       Poco::Net::HTTPServerResponse& response,
-                      const std::string& formUUID,
+                      const Poco::UUID& postId,
                       const Poco::Net::NameValueCollection& form):
-        BasePostRequestResponseEventArgs(request, response, formUUID),
-        form(form)
+        BasePostRequestResponseEventArgs(sessionId,
+                                         request,
+                                         response,
+                                         postId),
+        _form(form)
     {
     }
 
@@ -119,7 +163,16 @@ public:
     {
     }
 
-    const Poco::Net::NameValueCollection form;
+
+    const Poco::Net::NameValueCollection& getForm() const
+    {
+        return _form;
+    }
+
+
+protected:
+    const Poco::Net::NameValueCollection _form;
+
 };
 
 
@@ -133,15 +186,16 @@ public:
         UPLOAD_FINISHED
     };
 
-    PostUploadEventArgs(const Poco::Net::HTTPServerRequest& request,
-                        const std::string& formUUID,
+    PostUploadEventArgs(const Poco::UUID& sessionId,
+                        const Poco::Net::HTTPServerRequest& request,
+                        const Poco::UUID& formId,
                         const std::string& formFieldName,
                         const std::string& originalFilename,
                         const std::string& filename,
                         const Poco::Net::MediaType& contentType,
                         std::streamsize numBytesTransferred,
                         UploadState state):
-        BasePostRequestEventArgs(request, formUUID),
+        BasePostRequestEventArgs(sessionId, request, formId),
         _formFieldName(formFieldName),
         _originalFilename(originalFilename),
         _filename(filename),
@@ -192,10 +246,10 @@ public:
     }
 
 private:
-    const std::string& _formFieldName;
-    const std::string& _originalFilename;
-    const std::string& _filename;
-    const Poco::Net::MediaType& _contentType;
+    const std::string _formFieldName;
+    const std::string _originalFilename;
+    const std::string _filename;
+    const Poco::Net::MediaType _contentType;
     std::streamsize _numBytesTransferred;
     UploadState _state;
 

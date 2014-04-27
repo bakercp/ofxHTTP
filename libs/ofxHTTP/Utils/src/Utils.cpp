@@ -99,8 +99,8 @@ Poco::Net::NameValueCollection Utils::getQueryMap(const Poco::URI& uri)
 }
 
 
-void Utils::dumpHeaders(const Poco::Net::HTTPServerRequest& request,
-                        const Poco::Net::HTTPServerResponse& response,
+void Utils::dumpHeaders(const Poco::Net::HTTPRequest& request,
+                        const Poco::Net::HTTPResponse& response,
                         ofLogLevel logLevel)
 {
     dumpNameValueCollection(request,logLevel);
@@ -108,14 +108,14 @@ void Utils::dumpHeaders(const Poco::Net::HTTPServerRequest& request,
 }
 
 
-void Utils::dumpHeaders(const Poco::Net::HTTPServerRequest& request,
+void Utils::dumpHeaders(const Poco::Net::HTTPRequest& request,
                         ofLogLevel logLevel)
 {
     dumpNameValueCollection(request, logLevel);
 }
 
 
-void Utils::dumpHeaders(const Poco::Net::HTTPServerResponse& response,
+void Utils::dumpHeaders(const Poco::Net::HTTPResponse& response,
                         ofLogLevel logLevel)
 {
     dumpNameValueCollection(response, logLevel);
@@ -136,6 +136,13 @@ void Utils::dumpNameValueCollection(const Poco::Net::NameValueCollection& nvc,
         }
         ofLog(logLevel) << "End NameValueCollection =================";
     }
+}
+
+
+std::streamsize Utils::consume(std::istream& stream)
+{
+    Poco::NullOutputStream nos;
+    return Poco::StreamCopier::copyStream(stream, std::cout);
 }
 
 

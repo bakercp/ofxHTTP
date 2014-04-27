@@ -27,7 +27,14 @@
 
 
 #include <string>
+#include "ofTypes.h"
+#include "ofLog.h"
+#include "ofFileUtils.h"
+#include "ofUtils.h"
 #include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/HTMLForm.h"
+#include "Poco/UUID.h"
+#include "Poco/UUIDGenerator.h"
 
 
 namespace ofx {
@@ -38,18 +45,37 @@ namespace Client {
 class BaseRequest: public Poco::Net::HTTPRequest
 {
 public:
+    /// \brief A shared pointer to a base request.
+    typedef std::shared_ptr<BaseRequest> SharedPtr;
+
+    /// \brief Construct a Request with the given information.
+    /// \param uri the endpoint uri.
+    /// \param verion Either HTTP/1.0 or HTTP/1.1.
+    /// \param requestId A unique UUID for this request.
 	BaseRequest(const std::string& method,
                 const std::string& uri,
-                const std::string& version);
+                const std::string& httpVersion,
+                const Poco::UUID& requestId = generateUUID());
 
+    /// \brief Destroy this BaseReuqest.
     virtual ~BaseRequest();
 
-protected:
-    virtual void finalizeRequest();
+    const Poco::UUID& getRequestId() const;
+
+    static Poco::UUID generateUUID();
+
+    /// \brief The default MIME type.
+    static const std::string DEFAULT_MEDIA_TYPE;
+
+    virtual void prepareRequest();
+
     virtual void writeRequestBody(std::ostream& requestStream);
 
+protected:
+    Poco::UUID _requestId;
 
-    friend class ResponseStream;
+    friend class BaseClient;
+
 };
 
 

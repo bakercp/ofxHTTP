@@ -26,9 +26,10 @@
 #pragma once
 
 
+#include "Poco/UUID.h"
+#include "Poco/Net/WebSocket.h"
 #include "ofEvents.h"
 #include "ofEventUtils.h"
-#include "Poco/Net/WebSocket.h"
 
 
 namespace ofx {
@@ -78,8 +79,10 @@ public:
     /// \brief Create a WebSocketEventArgs object with the provided params.
     /// \param connection A reference to the associated WebSocketConnection.
     /// \param error An error, if any, associated with the event.
-    WebSocketEventArgs(const WebSocketConnection& connection,
+    WebSocketEventArgs(const Poco::UUID& sessionId,
+                       const WebSocketConnection& connection,
                        WebSocketError error = WS_ERR_NONE):
+        _sessionId(sessionId),
         _connection(connection),
         _error(error)
     {
@@ -97,7 +100,12 @@ public:
         return _error;
     }
 
-    /// \returns A const reference to the WebSocketConnection.
+    /// \brief Get the session id associated with this event.
+    ///
+    /// The session id is established by the SessionCache.  If no SessionCache
+    /// is used, this will always return Poco::UUID::null.
+    ///
+    /// \returns the session id or Poco::UUID::null if not set.
     const WebSocketConnection& getConnectionRef() const
     {
         return _connection;
@@ -110,6 +118,9 @@ private:
     WebSocketError _error;
         ///< \brief The WebSocketError associated with the event, if any.
 
+    Poco::UUID _sessionId;
+        ///< \brief The session id, if available.  Poco::UUID::null if null.
+
 };
 
 class WebSocketFrameEventArgs: public WebSocketEventArgs
@@ -119,9 +130,10 @@ public:
     /// \param connection A reference to the associated WebSocketConnection.
     /// \param error An error, if any, associated with the event.
     WebSocketFrameEventArgs(const WebSocketFrame& frame,
+                            const Poco::UUID& sessionId,
                             const WebSocketConnection& connection,
                             WebSocketError error = WS_ERR_NONE):
-        WebSocketEventArgs(connection, error),
+        WebSocketEventArgs(sessionId, connection, error),
         _frame(frame)
     {
     }

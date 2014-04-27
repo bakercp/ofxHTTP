@@ -30,8 +30,8 @@ namespace ofx {
 namespace HTTP {
 
 
-const std::string    ProxySettings::DEFAULT_PROXY_HOST = "127.0.0.1";
-const unsigned short ProxySettings::DEFAULT_PROXY_PORT = 8909;
+const std::string    ProxySettings::DEFAULT_PROXY_HOST = "";
+const unsigned short ProxySettings::DEFAULT_PROXY_PORT = 0;
 
 
 ProxySettings::ProxySettings():
@@ -53,7 +53,7 @@ ProxySettings::ProxySettings(const std::string& username,
                              const std::string& password,
                              const std::string& host,
                              unsigned short port):
-    Credentials(username,password),
+    Credentials(username, password),
     _host(host),
     _port(port)
 {

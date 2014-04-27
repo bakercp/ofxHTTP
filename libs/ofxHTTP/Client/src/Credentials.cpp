@@ -23,7 +23,7 @@
 // =============================================================================
 
 
-#include "Credentials.h"
+#include "ofx/HTTP/Client/Credentials.h"
 
 
 namespace ofx {

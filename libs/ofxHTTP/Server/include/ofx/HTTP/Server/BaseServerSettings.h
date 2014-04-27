@@ -182,11 +182,11 @@ public:
     }
 
 private:
-    std::string    _serverName;
-    std::string    _softwareVersion;
+    std::string _serverName;
+    std::string _softwareVersion;
     Poco::Timespan _timeout;
-    bool           _keepAlive;
-    int            _maxKeepAliveRequests;
+    bool _keepAlive;
+    int _maxKeepAliveRequests;
     Poco::Timespan _keepAliveTimeout;
 
 };
@@ -211,14 +211,14 @@ public:
 
     Poco::URI getURI() const;
 
-    const static std::string    DEFAULT_HOST;
+    const static std::string DEFAULT_HOST;
     const static unsigned short DEFAULT_PORT;
-    const static bool           DEFAULT_USE_SSL;
+    const static bool DEFAULT_USE_SSL;
 
 private:
-    std::string      _host;
-    unsigned short   _port;
-    bool             _useSSL;
+    std::string _host;
+    unsigned short _port;
+    bool _useSSL;
 
 };
 
