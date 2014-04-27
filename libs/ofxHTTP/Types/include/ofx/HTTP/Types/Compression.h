@@ -36,42 +36,42 @@ namespace ofx {
 namespace HTTP {
 
 
-class Compression
-{
-public:
-    enum Type
-    {
-        DEFLATE,
-        GZIP
-    };
-
-    //    static compress(xxx, ofxHTTPCompressionType type);
-    //    static decompress(xxx, ofxHTTPCompressionType type);
-    // TODO
-
-};
-
-
-class CompressorEntry
-{
-public:
-    CompressorEntry(const Poco::Net::MediaType& mediaType);
-    virtual ~CompressorEntry();
-
-    void addCompressionType(Compression::Type compressionType);
-    void removeCompressionType(Compression::Type compressionType);
-
-    void clearCompressionTypes();
-    
-    Poco::Net::MediaType getMediaType() const;
-    std::vector<Compression::Type> getValidCompressionTypes() const;
-    std::string getValidCompressionTypesAsCSV() const;
-
-private:
-    Poco::Net::MediaType _mediaType;
-    std::vector<Compression::Type> _validCompressionTypes;
-    
-};
+//class Compression
+//{
+//public:
+//    enum Type
+//    {
+//        DEFLATE,
+//        GZIP
+//    };
+//
+//    //    static compress(xxx, ofxHTTPCompressionType type);
+//    //    static decompress(xxx, ofxHTTPCompressionType type);
+//    // TODO
+//
+//};
+//
+//
+//class CompressorEntry
+//{
+//public:
+//    CompressorEntry(const Poco::Net::MediaType& mediaType);
+//    virtual ~CompressorEntry();
+//
+//    void addCompressionType(Compression::Type compressionType);
+//    void removeCompressionType(Compression::Type compressionType);
+//
+//    void clearCompressionTypes();
+//    
+//    Poco::Net::MediaType getMediaType() const;
+//    std::vector<Compression::Type> getValidCompressionTypes() const;
+//    std::string getValidCompressionTypesAsCSV() const;
+//
+//private:
+//    Poco::Net::MediaType _mediaType;
+//    std::vector<Compression::Type> _validCompressionTypes;
+//    
+//};
 
 
 } } // namespace ofx::HTTP
