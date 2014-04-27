@@ -153,7 +153,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                 {
                     if(ws.poll(settings.getPollTimeout(), Poco::Net::Socket::SELECT_WRITE))
                     {
-                        std::size_t numBytesSent = 0; // TODO we use long because ofBuffer can have negative size.
+                        std::size_t numBytesSent = 0;
 
                         numBytesSent = ws.sendFrame(frame.getBinaryBuffer(),
                                                     frame.size(),
@@ -168,6 +168,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                             ofLogWarning("ServerWebSocketRouteHandler::handleRequest") << "WebSocket numBytesSent == 0";
                             error = WS_ERROR_ZERO_BYTE_FRAME_SENT;
                         }
+                        // TODO ofBuffer::size() returns long ... :/
                         else if(numBytesSent < frame.size())
                         {
                             ofLogWarning("ServerWebSocketRouteHandler::handleRequest") << "WebSocket numBytesSent < frame.size()";
