@@ -112,14 +112,14 @@ public:
     }
 
 private:
+    Poco::UUID _sessionId;
+        ///< \brief The session id, if available.  Poco::UUID::null if null.
+
     const WebSocketConnection& _connection;
         ///< \brief A reference to the WebSocketConnection.
 
     WebSocketError _error;
         ///< \brief The WebSocketError associated with the event, if any.
-
-    Poco::UUID _sessionId;
-        ///< \brief The session id, if available.  Poco::UUID::null if null.
 
 };
 
