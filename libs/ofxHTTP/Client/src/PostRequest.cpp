@@ -75,7 +75,7 @@ void PostRequest::setFormEncoding(FormEncoding formEncoding)
 
 PostRequest::FormEncoding PostRequest::getFormEncoding() const
 {
-    if (_form.getEncoding().compare(Poco::Net::HTMLForm::ENCODING_URL) == 0)
+    if (0 == Poco::UTF8::icompare(_form.getEncoding(), Poco::Net::HTMLForm::ENCODING_URL))
     {
         return FORM_ENCODING_URL;
     }

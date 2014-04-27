@@ -31,10 +31,12 @@
 #include "ofLog.h"
 #include "ofFileUtils.h"
 #include "ofUtils.h"
-#include "Poco/Net/HTTPRequest.h"
-#include "Poco/Net/HTMLForm.h"
+#include "Poco/String.h"
+#include "Poco/UTF8String.h"
 #include "Poco/UUID.h"
 #include "Poco/UUIDGenerator.h"
+#include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/HTMLForm.h"
 
 
 namespace ofx {

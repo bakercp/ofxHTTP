@@ -29,7 +29,9 @@
 //namespace ofx {
 //namespace HTTP {
 //
-//    
+//
+//  Poco::UTF8::icompare(contentEncoding, "use me")
+//
 //bool CookieUtils::equals(const std::string& thisString,
 //                         const std::string& otherString)
 //{

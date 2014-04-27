@@ -120,12 +120,12 @@ std::istream& BaseClient::execute(Client::BaseRequest& request,
         {
             std::string contentEncoding = response.get(CONTENT_ENCODING_HEADER);
 
-            if (0 == contentEncoding.compare("gzip"))
+            if (0 == Poco::UTF8::icompare(contentEncoding, "gzip"))
             {
                 _pDecodedResponseStream = new Poco::InflatingInputStream(responseStream, Poco::InflatingStreamBuf::STREAM_GZIP);
                 return *_pDecodedResponseStream;
             }
-            else if (0 == contentEncoding.compare("deflate"))
+            else if (0 == Poco::UTF8::icompare(contentEncoding, "deflate"))
             {
                 _pDecodedResponseStream = new Poco::InflatingInputStream(responseStream, Poco::InflatingStreamBuf::STREAM_ZLIB);
                 return *_pDecodedResponseStream;
