@@ -54,10 +54,10 @@ public:
     bool isContentTypeValid(const std::string& contentType) const;
 
 private:
+    const Poco::UUID& _sessionUUID;
     const Poco::Net::HTTPServerRequest& _request;
     PostRoute& _parent;
     const Poco::UUID& _formUUID;
-    const Poco::UUID& _sessionUUID;
 
 };
 
