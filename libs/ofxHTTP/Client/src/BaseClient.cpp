@@ -103,7 +103,7 @@ std::istream& BaseClient::execute(Client::BaseRequest& request,
     else if (status == Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED) // 401
     {
         // consume because we are reusing the session.
-        std::streamsize n = Utils::consume(responseStream);
+        Utils::consume(responseStream);
 
         _authenticationProcessor.processResponse(request,
                                                  response,
