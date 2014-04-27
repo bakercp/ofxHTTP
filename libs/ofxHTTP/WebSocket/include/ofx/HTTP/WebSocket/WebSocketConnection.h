@@ -136,8 +136,8 @@ private:
     Poco::Net::SocketAddress _clientAddress;
 
     bool _isConnected;
-    std::size_t _totalBytesReceived;
     std::size_t _totalBytesSent;
+    std::size_t _totalBytesReceived;
 
     mutable std::queue<WebSocketFrame> _frameQueue;
 
