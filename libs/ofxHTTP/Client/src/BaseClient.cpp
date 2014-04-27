@@ -56,7 +56,7 @@ BaseClient::~BaseClient()
 
 
 std::istream& BaseClient::execute(Client::BaseRequest& request,
-                                  Poco::Net::HTTPResponse& response,
+                                  Client::BaseResponse& response,
                                   Context& context)
 {
     request.prepareRequest();
@@ -144,7 +144,7 @@ std::istream& BaseClient::execute(Client::BaseRequest& request,
 }
 
 void BaseClient::execute(Client::BaseRequest& request,
-                         Poco::Net::HTTPResponse& response,
+                         Client::BaseResponse& response,
                          Context& context,
                          ofBuffer& buffer)
 {

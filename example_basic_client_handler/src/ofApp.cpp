@@ -31,17 +31,6 @@ void ofApp::setup()
     ofSetLogLevel(OF_LOG_VERBOSE);
     ofSSLManager::registerAllEvents(this);
 
-
-    twitterClient.login(consumerKey, consumerSecret, accessToken, accessKey);
-
-    std::string url = "https://api.twitter.com/1.1/search/tweets.json?q=love";
-
-    HTTP::Context context;
-
-    Poco::URI uri(url);
-
-    HTTP::Client::GetRequest request(url);
-
     HTTP::DefaultSessionProvider defaultSessionProvider;
     HTTP::DefaultProxyProcessor defaultProxyProcessor;
     HTTP::DefaultAuthenticationProcessor defaultAuthenticationProcessor;
@@ -54,7 +43,15 @@ void ofApp::setup()
 
     client.addRequestProcessor(&twitterClient);
 
-    Poco::Net::HTTPResponse response;
+    twitterClient.login(consumerKey, consumerSecret, accessToken, accessKey);
+
+    std::string url = "https://api.twitter.com/1.1/search/tweets.json?q=love";
+
+    HTTP::Context context;
+
+    HTTP::Client::GetRequest request(url);
+
+    HTTP::Client::BaseResponse response;
 
     try
     {
@@ -62,11 +59,11 @@ void ofApp::setup()
 
         client.execute(request, response, context, buffer);
 
-        ofxJSONElement json(buffer.getText());
+//        ofxJSONElement json(buffer.getText());
+//
+//        cout << json.toStyledString() << endl;
 
-        cout << json.toStyledString() << endl;
-
-        HTTP::Utils::dumpHeaders(request);
+//        HTTP::Utils::dumpHeaders(request);
         HTTP::Utils::dumpHeaders(response);
 
     }

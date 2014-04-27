@@ -23,50 +23,55 @@
 // =============================================================================
 
 
-#pragma once
-
-
-#include "Poco/StreamCopier.h"
-#include "ofConstants.h"
 #include "ofx/HTTP/Client/BaseResponse.h"
+//#include "Poco/CountingStream.h"
+//#include "Poco/TeeStream.h"
 
 
 namespace ofx {
 namespace HTTP {
-    
+namespace Client {
 
-//class StreamUtils
+
+BaseResponse::BaseResponse():
+    Poco::Net::HTTPResponse()
+{
+}
+
+
+BaseResponse::~BaseResponse()
+{
+//    // deleting a null pointer is a noop
+//    delete _pResponseStream; // cleans up the stream and the backing session
+//    _pResponseStream = 0;
+//
+//    delete _pException;
+//    _pException = 0;
+}
+
+
+//bool ResponseStream::hasResponseStream() const
 //{
-//public:
-//    static std::streamsize consume(ResponseStream& responseStream,
-//                                   std::size_t bufferSize = DEFAULT_BUFFER_SIZE);
+//    return 0 != _pResponseStream;
+//}
 //
-//    static std::streamsize consume(std::istream& istr,
-//                                   std::size_t bufferSize = DEFAULT_BUFFER_SIZE);
-//    
-//    static std::streamsize copyToString(ResponseStream& responseStream,
-//                                        std::string& str,
-//                                        std::size_t bufferSize = DEFAULT_BUFFER_SIZE);
 //
-//    static std::streamsize copyToString(std::istream& istr,
-//                                        std::string& str,
-//                                        std::size_t bufferSize = DEFAULT_BUFFER_SIZE);
-//    
-//    static std::streamsize copyTo(ResponseStream& responseStream,
-//                                  std::ostream& ostr,
-//                                  std::size_t bufferSize = DEFAULT_BUFFER_SIZE);
+//bool ResponseStream::hasException() const
+//{
+//    return 0 != _pException;
+//}
 //
-//    static std::streamsize copyTo(std::istream& istr,
-//                                  std::ostream& ostr,
-//                                  std::size_t bufferSize = DEFAULT_BUFFER_SIZE);
 //
-//protected:
-//    enum
-//    {
-//        DEFAULT_BUFFER_SIZE = 8192
-//    };
+//const Poco::Exception* ResponseStream::getException() const
+//{
+//    return _pException;
+//}
 //
-//};
+//
+//std::istream& ResponseStream::getResponseStreamRef()
+//{
+//    return *_pResponseStream;
+//}
 
-    
-} } // namespace ofx::HTTP
+
+} } } // namespace ofx::HTTP::Client

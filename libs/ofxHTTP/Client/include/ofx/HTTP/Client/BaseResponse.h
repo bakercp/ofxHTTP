@@ -26,56 +26,41 @@
 #pragma once
 
 
-#include "Poco/InflatingStream.h"
-#include "ofx/HTTP/Client/AbstractClientTypes.h"
-#include "ofx/HTTP/Client/BaseClientProcessors.h"
+#include <istream>
+#include "Poco/Exception.h"
+#include "Poco/NullStream.h"
+#include "Poco/Runnable.h"
+#include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/HTTPSClientSession.h"
+#include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/HTTPIOStream.h"
+#include "ofSSLManager.h"
 #include "ofx/HTTP/Client/BaseRequest.h"
-#include "ofx/HTTP/Client/BaseResponse.h"
+#include "ofx/HTTP/Client/Context.h"
+#include "ofx/HTTP/Types/StreamUtils.h"
+#include "ofTypes.h"
 
 
 namespace ofx {
 namespace HTTP {
+namespace Client {
 
 
-class BaseClient: public BaseClientProcessors
+class BaseResponse: public Poco::Net::HTTPResponse
 {
 public:
-    BaseClient(AbstractSessionProvider& sessionProvider,
-               AbstractProxyProcessor& proxyProcessor,
-               AbstractAuthenticationProcessor& authenticationProcessor,
-               AbstractRedirectProcessor& redirectProcessor);
+    BaseResponse();
+    virtual ~BaseResponse();
 
-    virtual ~BaseClient();
-
-    std::istream& execute(Client::BaseRequest& request,
-                          Client::BaseResponse& response,
-                          Context& context);
-
-    void execute(Client::BaseRequest& request,
-                 Client::BaseResponse& response,
-                 Context& context,
-                 ofBuffer& buffer);
-
-    bool isRunning() const;
-    void cancel();
-
-private:
-    bool _isRunning;
-
-    AbstractSessionProvider& _sessionProvider;
-    AbstractProxyProcessor& _proxyProcessor;
-    AbstractAuthenticationProcessor& _authenticationProcessor;
-    AbstractRedirectProcessor& _redirectProcessor;
-
-    std::istream* _pDecodedResponseStream;
-
-    static const std::string ACCEPT_ENCODING_HEADER;
-    static const std::string CONTENT_ENCODING_HEADER;
+//    bool hasResponseStream() const;
+//    std::istream& getResponseStreamRef();
+//
+//    bool hasException() const;
+//    const Poco::Exception* getException() const;
+//
+//    Poco::Exception _pException;
 
 };
 
 
-typedef BaseClient DefaultClient;
-
-
-} } // namespace ofx::HTTP
+} } } // namespace ofx::HTTP::Client

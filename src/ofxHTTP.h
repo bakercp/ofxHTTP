@@ -40,7 +40,8 @@
 #include "ofx/HTTP/WebSocket/WebSocketFrame.h"
 #include "ofx/HTTP/WebSocket/WebSocketConnection.h"
 
-#include "ofx/HTTP/Client/ResponseStream.h"
+#include "ofx/HTTP/Client/BaseResponse.h"
+#include "ofx/HTTP/Client/BaseRequest.h"
 #include "ofx/HTTP/Client/Context.h"
 #include "ofx/HTTP/Client/GetRequest.h"
 #include "ofx/HTTP/Client/PostRequest.h"
