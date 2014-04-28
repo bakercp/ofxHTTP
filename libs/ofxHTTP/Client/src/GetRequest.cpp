@@ -38,6 +38,15 @@ GetRequest::GetRequest(const std::string& uri):
 {
 }
 
+GetRequest::GetRequest(const std::string& uri,
+                       const Poco::Net::NameValueCollection queryParams):
+    BaseRequest(Poco::Net::HTTPRequest::HTTP_GET,
+                uri,
+                queryParams,
+                Poco::Net::HTTPMessage::HTTP_1_0)
+{
+}
+
 
 GetRequest::GetRequest(const std::string& uri,
                        const std::string& httpVersion,

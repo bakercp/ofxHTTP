@@ -40,7 +40,7 @@ DefaultProxyProcessor::~DefaultProxyProcessor()
 }
 
 
-void DefaultProxyProcessor::processRequest(Poco::Net::HTTPRequest& request,
+void DefaultProxyProcessor::processRequest(Client::BaseRequest& request,
                                            Context& context)
 {
     if (!context.getProxyRedirectURI().empty())
@@ -71,9 +71,9 @@ void DefaultProxyProcessor::processRequest(Poco::Net::HTTPRequest& request,
 }
 
 
-void DefaultProxyProcessor::processResponse(Poco::Net::HTTPRequest& request,
-                                            Poco::Net::HTTPResponse& response,
-                                            Context& context)
+bool DefaultProxyProcessor::handleResponse(Client::BaseRequest& request,
+                                           Client::BaseResponse& response,
+                                           Context& context)
 {
     // The requested resource MUST be accessed through the proxy
     // given by the Location field. The Location field gives the
@@ -98,10 +98,6 @@ void DefaultProxyProcessor::processResponse(Poco::Net::HTTPRequest& request,
         }
 
     }
-
-
-
-
 }
 
 

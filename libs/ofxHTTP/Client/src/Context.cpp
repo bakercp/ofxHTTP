@@ -40,7 +40,7 @@ const std::string Context::KEY_REDIRECTS          = "HTTP_REDIRECTS";
 const std::string Context::KEY_SESSION            = "HTTP_SESSION";
 
     
-Context::Context()
+Context::Context(): _resubmit(false)
 {
 }
 

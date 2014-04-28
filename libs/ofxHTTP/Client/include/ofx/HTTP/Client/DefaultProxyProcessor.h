@@ -26,25 +26,25 @@
 #pragma once
 
 
-#include "ofx/HTTP/Client/AbstractClientTypes.h"
+#include "ofx/HTTP/Client/BaseRequestResponseProcessor.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class DefaultProxyProcessor: public AbstractProxyProcessor
+class DefaultProxyProcessor: public BaseRequestResponseProcessor
 {
 public:
     DefaultProxyProcessor();
     virtual ~DefaultProxyProcessor();
 
-    virtual void processRequest(Poco::Net::HTTPRequest& request,
+    virtual void processRequest(Client::BaseRequest& request,
                                 Context& context);
 
-    virtual void processResponse(Poco::Net::HTTPRequest& request,
-                                 Poco::Net::HTTPResponse& response,
-                                 Context& context);
+    virtual bool handleResponse(Client::BaseRequest& request,
+                                Client::BaseResponse& response,
+                                Context& context);
 
 };
 

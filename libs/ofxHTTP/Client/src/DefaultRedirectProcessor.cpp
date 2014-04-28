@@ -32,6 +32,10 @@ namespace HTTP {
 
 DefaultRedirectProcessor::DefaultRedirectProcessor()
 {
+    _handledStatues.push_back(Poco::Net::HTTPResponse::HTTP_MOVED_PERMANENTLY);  // 301
+    _handledStatues.push_back(Poco::Net::HTTPResponse::HTTP_FOUND);              // 302
+    _handledStatues.push_back(Poco::Net::HTTPResponse::HTTP_SEE_OTHER);          // 303
+    _handledStatues.push_back(Poco::Net::HTTPResponse::HTTP_TEMPORARY_REDIRECT); // 307
 }
 
 
@@ -40,16 +44,19 @@ DefaultRedirectProcessor::~DefaultRedirectProcessor()
 }
 
 
-void DefaultRedirectProcessor::processResponse(Poco::Net::HTTPRequest& request,
-                                               Poco::Net::HTTPResponse& response,
-                                               Context& context)
+void DefaultRedirectProcessor::processRequest(Client::BaseRequest& request,
+                                              Context& context)
 {
+}
+
+bool DefaultRedirectProcessor::handleResponse(Client::BaseRequest& request,
+                                              Client::BaseResponse& response,
+                                              Context& context)
+{
+    // TODO: handle HTMLForm correctly
     Poco::Net::HTTPResponse::HTTPStatus status = response.getStatus();
 
-    if (status == Poco::Net::HTTPResponse::HTTP_MOVED_PERMANENTLY   // 301
-     || status == Poco::Net::HTTPResponse::HTTP_FOUND               // 302
-     || status == Poco::Net::HTTPResponse::HTTP_SEE_OTHER           // 303
-     || status == Poco::Net::HTTPResponse::HTTP_TEMPORARY_REDIRECT) // 307
+    if (isStatusHandled(status))
     {
         if (context.getRedirects().size() < context.getSessionSettings().getMaxRedirects())
         {

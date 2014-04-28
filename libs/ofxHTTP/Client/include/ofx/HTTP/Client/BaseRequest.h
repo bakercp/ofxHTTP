@@ -44,6 +44,7 @@ namespace HTTP {
 namespace Client {
 
 
+/// \brief A Custom Base HTTP Request.
 class BaseRequest: public Poco::Net::HTTPRequest
 {
 public:
@@ -51,7 +52,12 @@ public:
     typedef std::shared_ptr<BaseRequest> SharedPtr;
 
     /// \brief Construct a Request with the given information.
-    /// \param uri the endpoint uri.
+    ///
+    /// In this constructor, the uri is left untouched.  Query parameters that
+    /// must be signed or otherwise manipulated should be included as form
+    /// fields using the alternate constructor.
+    ///
+    /// \param uri the raw endpoint uri
     /// \param verion Either HTTP/1.0 or HTTP/1.1.
     /// \param requestId A unique UUID for this request.
 	BaseRequest(const std::string& method,
@@ -59,22 +65,50 @@ public:
                 const std::string& httpVersion,
                 const Poco::UUID& requestId = generateUUID());
 
+    /// \brief Construct a Request with the given information.
+    ///
+    /// In this constructor, the uri is left untouched.  Query parameters that
+    /// must be signed or otherwise manipulated should be included as form
+    /// fields in the formFields parameter.  For GET requests, the form fields
+    /// will be URL encoded and appended to the final URI during client
+    /// processing.
+    ///
+    /// \param uri the raw endpoint uri
+    /// \param formFields a collection of form fields to be processed.
+    /// \param verion Either HTTP/1.0 or HTTP/1.1.
+    /// \param requestId A unique UUID for this request.
+	BaseRequest(const std::string& method,
+                const std::string& uri,
+                const Poco::Net::NameValueCollection& formFields,
+                const std::string& httpVersion,
+                const Poco::UUID& requestId = generateUUID());
+
     /// \brief Destroy this BaseReuqest.
     virtual ~BaseRequest();
 
+    /// \brief Add a name value pair to upload with this POST.
+    /// \param name The field name.
+    /// \param value The field value.
+    void addFormField(const std::string& name,
+                      const std::string& value);
+
     const Poco::UUID& getRequestId() const;
+
+    const Poco::Net::HTMLForm& getForm() const;
 
     static Poco::UUID generateUUID();
 
-    /// \brief The default MIME type.
     static const std::string DEFAULT_MEDIA_TYPE;
+        ///< \brief The default MIME type.
 
+protected:
     virtual void prepareRequest();
 
     virtual void writeRequestBody(std::ostream& requestStream);
 
-protected:
     Poco::UUID _requestId;
+
+    Poco::Net::HTMLForm _form;
 
     friend class BaseClient;
 

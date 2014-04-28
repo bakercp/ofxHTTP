@@ -33,6 +33,8 @@
 #include "ofTypes.h"
 #include "ofx/HTTP/Client/Context.h"
 #include "ofx/HTTP/Client/Cookie.h"
+#include "ofx/HTTP/Client/BaseRequest.h"
+#include "ofx/HTTP/Client/BaseResponse.h"
 
 
 namespace ofx {
@@ -42,39 +44,37 @@ namespace HTTP {
 class AbstractRequestProcessor
 {
 public:
-    typedef std::shared_ptr<AbstractRequestProcessor> SharedPtr;
-
     virtual ~AbstractRequestProcessor()
     {
     }
 
-    virtual void processRequest(Poco::Net::HTTPRequest& request,
+    virtual void processRequest(Client::BaseRequest& request,
                                 Context& context) = 0;
 
 };
 
 
-class AbstractResponseProcessor
+class AbstractResponseHandler
 {
 public:
-    typedef std::shared_ptr<AbstractResponseProcessor> SharedPtr;
-
-    
-    virtual ~AbstractResponseProcessor()
+    virtual ~AbstractResponseHandler()
     {
     }
-
     
-    virtual void processResponse(Poco::Net::HTTPRequest& request,
-                                 Poco::Net::HTTPResponse& response,
-                                 Context& context) = 0;
+    virtual bool handleResponse(Client::BaseRequest& request,
+                                Client::BaseResponse& response,
+                                Context& context) = 0;
+
+    virtual std::vector<Poco::Net::HTTPResponse::HTTPStatus> getHandledStatuses() const = 0;
+
+    virtual bool isStatusHandled(Poco::Net::HTTPResponse::HTTPStatus status) const = 0;
 
 };
 
 
 class AbstractRequestResponseProcessor:
     public AbstractRequestProcessor,
-    public AbstractResponseProcessor
+    public AbstractResponseHandler
 {
 public:
     virtual ~AbstractRequestResponseProcessor()
@@ -96,44 +96,30 @@ public:
 };
 
 
-class AbstractRedirectProcessor: public AbstractResponseProcessor
+class AbstractRequestStreamFilter: public AbstractRequestProcessor
 {
 public:
-    virtual ~AbstractRedirectProcessor()
+    virtual ~AbstractRequestStreamFilter()
     {
     }
 
+    virtual std::ostream& filter(std::ostream& requestStream) = 0;
+    
 };
 
 
-class AbstractAuthenticationProcessor: public AbstractRequestResponseProcessor
+class AbstractResponseStreamFilter: public AbstractRequestResponseProcessor
 {
 public:
-    virtual ~AbstractAuthenticationProcessor()
-    {
-    }
-};
-
-
-class AbstractProxyProcessor: public AbstractRequestResponseProcessor
-{
-public:
-    virtual ~AbstractProxyProcessor()
+    virtual ~AbstractResponseStreamFilter()
     {
     }
 
-};
-
-
-class AbstractCookieProcessor: public AbstractRequestResponseProcessor
-
-{
-public:
-    virtual ~AbstractCookieProcessor()
-    {
-    }
+    virtual std::istream& filter(std::istream& responseStream) = 0;
 
 };
+    
+    
 
 
 } } // namespace ofx::HTTP

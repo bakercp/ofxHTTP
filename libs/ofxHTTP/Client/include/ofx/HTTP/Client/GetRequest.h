@@ -40,6 +40,9 @@ class GetRequest: public BaseRequest
 {
 public:
     GetRequest(const std::string& uri);
+
+    GetRequest(const std::string& uri,
+               const Poco::Net::NameValueCollection queryParams);
     
     GetRequest(const std::string& uri,
                const std::string& httpVersion,

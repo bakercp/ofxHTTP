@@ -23,51 +23,28 @@
 // =============================================================================
 
 
-#pragma once
-
-
-#include <istream>
-#include "Poco/Exception.h"
-#include "Poco/NullStream.h"
-#include "Poco/Runnable.h"
-#include "Poco/Net/HTTPClientSession.h"
-#include "Poco/Net/HTTPSClientSession.h"
-#include "Poco/Net/HTTPResponse.h"
-#include "Poco/Net/HTTPIOStream.h"
-#include "ofSSLManager.h"
-#include "ofx/HTTP/Client/BaseRequest.h"
-#include "ofx/HTTP/Client/Context.h"
-#include "ofx/HTTP/Types/StreamUtils.h"
-#include "ofTypes.h"
+#include "ofx/HTTP/Client/BaseRequestResponseProcessor.h"
 
 
 namespace ofx {
 namespace HTTP {
-namespace Client {
 
 
-class BaseResponse: public Poco::Net::HTTPResponse
+BaseRequestResponseProcessor::~BaseRequestResponseProcessor()
 {
-public:
-    BaseResponse();
-    virtual ~BaseResponse();
+}
+    
 
-    bool hasResponseStream() const;
-    std::istream& getResponseStream();
-    void setResponseStream(std::istream* pResponseStream);
-
-    bool hasException() const;
-    const Poco::Exception* getException() const;
-    void setException(Poco::Exception* pException);
+std::vector<Poco::Net::HTTPResponse::HTTPStatus> BaseRequestResponseProcessor::getHandledStatuses() const
+{
+    return _handledStatues;
+}
 
 
-private:
-    std::istream* _pResponseStream;
-    Poco::Exception* _pException;
-
-//    friend class ofx::HTTP::BaseClient;
-
-};
+bool BaseRequestResponseProcessor::isStatusHandled(Poco::Net::HTTPResponse::HTTPStatus status) const
+{
+    return std::find(_handledStatues.begin(), _handledStatues.end(), status) != _handledStatues.end();
+}
 
 
-} } } // namespace ofx::HTTP::Client
+} } // ofx::HTTP

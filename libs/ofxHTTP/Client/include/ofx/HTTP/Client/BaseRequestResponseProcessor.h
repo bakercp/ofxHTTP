@@ -26,57 +26,27 @@
 #pragma once
 
 
-#include "Poco/InflatingStream.h"
 #include "ofx/HTTP/Client/AbstractClientTypes.h"
-#include "ofx/HTTP/Client/BaseClientProcessors.h"
-#include "ofx/HTTP/Client/BaseRequest.h"
-#include "ofx/HTTP/Client/BaseResponse.h"
 
 
 namespace ofx {
 namespace HTTP {
-namespace Client {
 
 
-class BaseClient: public BaseClientProcessors
+class BaseRequestResponseProcessor: public AbstractRequestResponseProcessor
 {
 public:
-    BaseClient(AbstractSessionProvider& sessionProvider,
-               AbstractRequestResponseProcessor& proxyProcessor,
-               AbstractRequestResponseProcessor& authenticationProcessor,
-               AbstractRequestResponseProcessor& redirectProcessor);
+    /// \brief Destroy this BaseResponseProcessor.
+    virtual ~BaseRequestResponseProcessor();
 
-    virtual ~BaseClient();
+    std::vector<Poco::Net::HTTPResponse::HTTPStatus> getHandledStatuses() const;
 
-    std::istream& execute(Client::BaseRequest& request,
-                          Client::BaseResponse& response,
-                          Context& context);
+    bool isStatusHandled(Poco::Net::HTTPResponse::HTTPStatus status) const;
 
-    void execute(Client::BaseRequest& request,
-                 Client::BaseResponse& response,
-                 Context& context,
-                 ofBuffer& buffer);
-
-    bool isRunning() const;
-    void cancel();
-
-private:
-    bool _isRunning;
-
-    AbstractSessionProvider& _sessionProvider;
-    AbstractRequestResponseProcessor& _proxyProcessor;
-    AbstractRequestResponseProcessor& _authenticationProcessor;
-    AbstractRequestResponseProcessor& _redirectProcessor;
-
-//    std::istream* _pDecodedResponseStream;
-
-    static const std::string ACCEPT_ENCODING_HEADER;
-    static const std::string CONTENT_ENCODING_HEADER;
+protected:
+    std::vector<Poco::Net::HTTPResponse::HTTPStatus> _handledStatues;
 
 };
 
 
-typedef BaseClient DefaultClient;
-
-
-} } } // namespace ofx::HTTP::Client
+} } // namespace ofx::HTTP

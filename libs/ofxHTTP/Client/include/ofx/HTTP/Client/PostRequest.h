@@ -61,12 +61,6 @@ public:
     /// \brief Destroy the PostRequest.
     virtual ~PostRequest();
 
-    /// \brief Add a name value pair to upload with this POST.
-    /// \param name The field name.
-    /// \param value The field value.
-    void addFormField(const std::string& name,
-                      const std::string& value);
-
     /// \brief Add a file for upload with this POST.
     /// \warning This method will sets the encoding to FORM_ENCODING_MULTIPART.
     /// \param name The form name of the attachment.
@@ -94,14 +88,16 @@ public:
     /// \returns the current form encoding.
     FormEncoding getFormEncoding() const;
 
+    /// \brief Custom prepareRequest() to set the content length;
     void prepareRequest();
-    
+
+    /// \brief writes from the form buffer.
+    /// \param requestStream the stream to write the request body.
     void writeRequestBody(std::ostream& requestStream);
 
 protected:
-    Poco::Net::HTMLForm _form;
-
     std::stringstream _outBuffer;
+
 };
 
 

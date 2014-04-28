@@ -40,7 +40,7 @@ BaseClientProcessors::~BaseClientProcessors()
 }
 
     
-void BaseClientProcessors::processRequest(Poco::Net::HTTPRequest& request,
+void BaseClientProcessors::processRequest(Client::BaseRequest& request,
                                           Context& context)
 {
     RequestProcessors::iterator iter = _requestProcessors.begin();
@@ -53,15 +53,15 @@ void BaseClientProcessors::processRequest(Poco::Net::HTTPRequest& request,
 }
 
 
-void BaseClientProcessors::processResponse(Poco::Net::HTTPRequest& request,
-                                           Poco::Net::HTTPResponse& response,
+void BaseClientProcessors::processResponse(Client::BaseRequest& request,
+                                           Client::BaseResponse& response,
                                            Context& context)
 {
-    ResponseProcessor::iterator iter = _responseProcessors.begin();
+    ResponseHandlers::iterator iter = _responseHandlers.begin();
 
-    while (iter != _responseProcessors.end())
+    while (iter != _responseHandlers.end())
     {
-        (*iter)->processResponse(request, response, context);
+        (*iter)->handleResponse(request, response, context);
         ++iter;
     }
 }
@@ -73,9 +73,9 @@ void BaseClientProcessors::addRequestProcessor(AbstractRequestProcessor* process
 }
 
 
-void BaseClientProcessors::addResponseProcessor(AbstractResponseProcessor* processor)
+void BaseClientProcessors::addResponseHandler(AbstractResponseHandler* handler)
 {
-    _responseProcessors.push_back(processor);
+    _responseHandlers.push_back(handler);
 }
 
 
@@ -92,15 +92,15 @@ void BaseClientProcessors::removeRequestProcessor(AbstractRequestProcessor* proc
 }
 
 
-void BaseClientProcessors::removeResponseProcessor(AbstractResponseProcessor* processor)
+void BaseClientProcessors::removeResponseHandler(AbstractResponseHandler* handler)
 {
-    ResponseProcessor::iterator iter = std::find(_responseProcessors.begin(),
-                                                 _responseProcessors.end(),
-                                                 processor);
+    ResponseHandlers::iterator iter = std::find(_responseHandlers.begin(),
+                                                _responseHandlers.end(),
+                                                handler);
 
-    if (iter != _responseProcessors.end())
+    if (iter != _responseHandlers.end())
     {
-        _responseProcessors.erase(iter);
+        _responseHandlers.erase(iter);
     }
 }
 

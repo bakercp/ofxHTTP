@@ -108,6 +108,15 @@ public:
         }
     }
 
+    bool getResubmit() const
+    {
+        return _resubmit;
+    }
+
+    void setResubmit(bool resubmit)
+    {
+        _resubmit = resubmit;
+    }
 
 private:
     std::map<std::string, Poco::Any> _map;
@@ -122,6 +131,8 @@ private:
     Poco::URI _proxyRedirectURI;
 
     Session _session;
+
+    bool _resubmit;
 
 };
 

@@ -33,21 +33,21 @@ namespace ofx {
 namespace HTTP {
 
 
-class DefaultCookieProcessor: public AbstractCookieProcessor
-{
-public:
-    DefaultCookieProcessor();
-
-    virtual ~DefaultCookieProcessor();
-
-    virtual void processRequest(Poco::Net::HTTPRequest& request,
-                                Context& context);
-
-    virtual void processResponse(Poco::Net::HTTPRequest& request,
-                                 Poco::Net::HTTPResponse& response,
-                                 Context& context);
-
-};
+//class DefaultCookieProcessor: public AbstractCookieProcessor
+//{
+//public:
+//    DefaultCookieProcessor();
+//
+//    virtual ~DefaultCookieProcessor();
+//
+//    virtual void processRequest(Poco::Net::HTTPRequest& request,
+//                                Context& context);
+//
+//    virtual void processResponse(Poco::Net::HTTPRequest& request,
+//                                 Poco::Net::HTTPResponse& response,
+//                                 Context& context);
+//
+//};
 
 
 

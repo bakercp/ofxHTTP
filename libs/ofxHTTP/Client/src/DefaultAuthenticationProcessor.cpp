@@ -40,7 +40,7 @@ DefaultAuthenticationProcessor::~DefaultAuthenticationProcessor()
 }
 
 
-void DefaultAuthenticationProcessor::processRequest(Poco::Net::HTTPRequest& request,
+void DefaultAuthenticationProcessor::processRequest(Client::BaseRequest& request,
                                                     Context& context)
 {
     CredentialStore::SharedPtr store(context.getCredentialStore().lock());
@@ -51,9 +51,9 @@ void DefaultAuthenticationProcessor::processRequest(Poco::Net::HTTPRequest& requ
 }
 
 
-void DefaultAuthenticationProcessor::processResponse(Poco::Net::HTTPRequest& request,
-                                                     Poco::Net::HTTPResponse& response,
-                                                     Context& context)
+bool DefaultAuthenticationProcessor::handleResponse(Client::BaseRequest& request,
+                                                    Client::BaseResponse& response,
+                                                    Context& context)
 {
     CredentialStore::SharedPtr store(context.getCredentialStore().lock());
 

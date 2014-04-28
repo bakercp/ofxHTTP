@@ -40,25 +40,25 @@ public:
 
     virtual ~BaseClientProcessors();
 
-    virtual void processRequest(Poco::Net::HTTPRequest& request,
+    virtual void processRequest(Client::BaseRequest& request,
                                 Context& context);
 
-    virtual void processResponse(Poco::Net::HTTPRequest& request,
-                                 Poco::Net::HTTPResponse& response,
+    virtual void processResponse(Client::BaseRequest& request,
+                                 Client::BaseResponse& response,
                                  Context& context);
 
     void addRequestProcessor(AbstractRequestProcessor* processor);
-    void addResponseProcessor(AbstractResponseProcessor* processor);
+    void addResponseHandler(AbstractResponseHandler* handler);
 
     void removeRequestProcessor(AbstractRequestProcessor* processor);
-    void removeResponseProcessor(AbstractResponseProcessor* processor);
+    void removeResponseHandler(AbstractResponseHandler* handler);
 
 private:
     typedef std::vector<AbstractRequestProcessor*> RequestProcessors;
-    typedef std::vector<AbstractResponseProcessor*> ResponseProcessor;
+    typedef std::vector<AbstractResponseHandler*> ResponseHandlers;
 
     RequestProcessors _requestProcessors;
-    ResponseProcessor _responseProcessors;
+    ResponseHandlers _responseHandlers;
 
 };
 

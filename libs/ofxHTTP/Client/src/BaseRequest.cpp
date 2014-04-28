@@ -24,7 +24,7 @@
 
 
 #include "ofx/HTTP/Client/BaseRequest.h"
-
+#include "ofx/HTTP/Utils/Utils.h"
 
 namespace ofx {
 namespace HTTP {
@@ -44,14 +44,45 @@ BaseRequest::BaseRequest(const std::string& method,
 }
 
 
+BaseRequest::BaseRequest(const std::string& method,
+                         const std::string& uri,
+                         const Poco::Net::NameValueCollection& formFields,
+                         const std::string& httpVersion,
+                         const Poco::UUID& requestId):
+    Poco::Net::HTTPRequest(method, uri, httpVersion),
+    _requestId(requestId)
+{
+    Poco::Net::NameValueCollection::ConstIterator iter = formFields.begin();
+
+    while (iter != formFields.end())
+    {
+        _form.add(iter->first, iter->second);
+        ++iter;
+    }
+}
+
+
 BaseRequest::~BaseRequest()
 {
+}
+
+
+void BaseRequest::addFormField(const std::string& name,
+                               const std::string& value)
+{
+    _form.add(name, value);
 }
 
 
 const Poco::UUID& BaseRequest::getRequestId() const
 {
     return _requestId;
+}
+
+
+const Poco::Net::HTMLForm& BaseRequest::getForm() const
+{
+    return _form;
 }
 
 
@@ -63,13 +94,13 @@ Poco::UUID BaseRequest::generateUUID()
 
 void BaseRequest::prepareRequest()
 {
-    // Empty
+    _form.prepareSubmit(*this);
 }
 
 
 void BaseRequest::writeRequestBody(std::ostream& requestStream)
 {
-    // Empty
+    _form.write(requestStream);
 }
 
 

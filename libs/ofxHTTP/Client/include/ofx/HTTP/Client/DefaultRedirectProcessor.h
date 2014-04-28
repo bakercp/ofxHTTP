@@ -26,7 +26,7 @@
 #pragma once
 
 
-#include "ofx/HTTP/Client/AbstractClientTypes.h"
+#include "ofx/HTTP/Client/BaseRequestResponseProcessor.h"
 
 
 namespace ofx {
@@ -44,15 +44,19 @@ namespace HTTP {
 ///
 /// Additionally, this policy will will redirect content containing requests
 /// such as POST and PUT by converting their request type to a GET.
-class DefaultRedirectProcessor: public AbstractRedirectProcessor
+class DefaultRedirectProcessor: public BaseRequestResponseProcessor
 {
 public:
     DefaultRedirectProcessor();
+    
     virtual ~DefaultRedirectProcessor();
 
-    virtual void processResponse(Poco::Net::HTTPRequest& request,
-                                 Poco::Net::HTTPResponse& response,
-                                 Context& context);
+    virtual void processRequest(Client::BaseRequest& request,
+                                Context& context);
+
+    virtual bool handleResponse(Client::BaseRequest& request,
+                                Client::BaseResponse& response,
+                                Context& context);
 
 };
 

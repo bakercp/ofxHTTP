@@ -86,13 +86,6 @@ PostRequest::FormEncoding PostRequest::getFormEncoding() const
 }
 
     
-void PostRequest::addFormField(const std::string& name,
-                               const std::string& value)
-{
-    _form.add(name, value);
-}
-
-
 void PostRequest::addFormFile(const std::string& name,
                               const std::string& path,
                               const std::string& mediaType)
