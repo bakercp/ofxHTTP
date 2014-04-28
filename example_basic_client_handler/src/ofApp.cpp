@@ -36,35 +36,74 @@ void ofApp::setup()
     HTTP::DefaultAuthenticationProcessor defaultAuthenticationProcessor;
     HTTP::DefaultRedirectProcessor defaultRedirectProcessor;
 
-    HTTP::DefaultClient client(defaultSessionProvider,
-                               defaultProxyProcessor,
-                               defaultAuthenticationProcessor,
-                               defaultRedirectProcessor);
+    HTTP::Client::DefaultClient client(defaultSessionProvider,
+                                       defaultProxyProcessor,
+                                       defaultAuthenticationProcessor,
+                                       defaultRedirectProcessor);
 
     client.addRequestProcessor(&twitterClient);
 
+    consumerKey = "0temMq9KWLx8731GcTXevA";
+    consumerSecret = "7bI0ScK5gBN3dlGxaC9oTuVFQQXThC9prfD28nmrY";
+    accessToken = "526698210-VEBz3v06S2RZ21m6JWpYZEhd6mH3TqDYNiKMhN5f";
+    accessKey = "X922JPvQehFVpa7WujPHz58nkxcaHjHJmbn69bEEMmXAR";
+
+//    consumerKey = "5402922a022e48ef99a97dfe85c52716";
+//    consumerSecret = "bbda9ab73774451ea92b70aa45f5e507";
+//    accessToken = "4e6b759b252219a4d11ed95559bf667b";
+//    accessKey = "17efedea0975c2a3360ca20526eb9d83";
+
     twitterClient.login(consumerKey, consumerSecret, accessToken, accessKey);
 
-    std::string url = "https://api.twitter.com/1.1/search/tweets.json?q=love";
+    std::string url = "https://api.twitter.com/1.1/search/tweets.json";
+//    std::string url = "https://stream.twitter.com/1.1/statuses/filter.json";
+//    std::string url = "https://api.twitter.com/1.1/statuses/update_with_media.json";
+//                       /1.1/statuses/update_with_media.json
+//    std::string url = "https://api.twitter.com/1.1/statuses/update.json";
+
+//    std::string url = "https://api.fitbit.com/1/user/-/profile.json";
 
     HTTP::Context context;
 
-    HTTP::Client::GetRequest request(url);
+    Poco::Net::NameValueCollection nvc;
+    nvc.add("q", "love");
+
+    HTTP::Client::GetRequest request(url, nvc);
+//    HTTP::Client::PostRequest request(url, Poco::Net::HTTPMessage::HTTP_1_1);
+
+//    request.addFormFile("media[]", "openFrameworks.png");
+//    request.addFormField("status", "test from openFrameworks");
+
+//    request.addFormField("track", "twitter");
 
     HTTP::Client::BaseResponse response;
 
     try
     {
-        ofBuffer buffer;
+        std::cout << "here : " << std::endl;
 
-        client.execute(request, response, context, buffer);
+//        ofBuffer buffer;
+
+        std::istream& responseStream = client.execute(request, response, context);
+
+        std::cout << "1: here : " << std::endl;
+
+        Poco::StreamCopier::copyStream(responseStream, std::cout);
 
 //        ofxJSONElement json(buffer.getText());
-//
+////
 //        cout << json.toStyledString() << endl;
+//
+//        cout << "======" << endl;
+//        cout << buffer.getText() << endl;
+//        cout << "======" << endl;
 
-//        HTTP::Utils::dumpHeaders(request);
+        HTTP::Utils::dumpHeaders(request);
         HTTP::Utils::dumpHeaders(response);
+
+        cout << "URI = " << request.getURI() << endl;
+        cout << "STATUS = " << response.getStatus() << endl;
+        cout << "REASON = " << response.getReason() << endl;
 
     }
     catch(const Poco::SyntaxException& exc)

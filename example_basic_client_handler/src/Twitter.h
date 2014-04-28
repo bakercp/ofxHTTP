@@ -2,10 +2,10 @@
 
 
 #include "Poco/Net/HTMLForm.h"
-#include "ofx/HTTP/Client/AbstractClientTypes.h"
+#include "ofx/HTTP/Client/BaseRequestResponseProcessor.h"
 
 
-class Twitter: public ofx::HTTP::AbstractRequestProcessor
+class Twitter: public ofx::HTTP::BaseRequestResponseProcessor
 {
 public:
 	Twitter();
@@ -18,7 +18,11 @@ public:
 
 	static const std::string TWITTER_URI;
 
-    void processRequest(Poco::Net::HTTPRequest& request,
+    void processRequest(ofx::HTTP::Client::BaseRequest& request,
+                        ofx::HTTP::Context& context);
+
+    bool handleResponse(ofx::HTTP::Client::BaseRequest& request,
+                        ofx::HTTP::Client::BaseResponse& response,
                         ofx::HTTP::Context& context);
 
     /// Signs the given HTTP request according to OAuth 1.0a as used by the Twitter API.
@@ -26,7 +30,7 @@ public:
     /// See <https://dev.twitter.com/docs/auth/authorizing-request> and
     /// <https://dev.twitter.com/docs/auth/creating-signature> for more information.
 	void sign(Poco::Net::HTTPRequest& request,
-              const Poco::Net::NameValueCollection& params,
+              const Poco::Net::HTMLForm& params,
               const std::string& uri) const;
 
     /// Creates a nonce, which is basically a Base64-encoded 32 character random
@@ -36,7 +40,7 @@ public:
     /// Creates a OAuth signature for the given request and its parameters, according
     /// to <https://dev.twitter.com/docs/auth/creating-signature>.
 	std::string createSignature(Poco::Net::HTTPRequest& request,
-                                const Poco::Net::NameValueCollection& params,
+                                const Poco::Net::HTMLForm& params,
                                 const std::string& uri,
                                 const std::string& nonce,
                                 const std::string& timestamp) const;

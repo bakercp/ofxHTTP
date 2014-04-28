@@ -51,7 +51,9 @@
 #include <sstream>
 #include <map>
 
+#include "ofx/HTTP/Client/BaseRequest.h"
 #include "ofx/HTTP/Client/Context.h"
+
 
 Twitter::Twitter()
 {
@@ -75,24 +77,23 @@ void Twitter::login(const std::string& consumerKey,
 }
 
 
-void Twitter::processRequest(Poco::Net::HTTPRequest& request,
+void Twitter::processRequest(ofx::HTTP::Client::BaseRequest& request,
                              ofx::HTTP::Context& context)
 {
-    Poco::URI uri(request.getURI());
-
-    Poco::Net::NameValueCollection nvc;
-
-    if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET)
-    {
-        nvc = ofx::HTTP::Utils::getQueryMap(uri);
-    }
-
-    Poco::URI cleanPath(uri.getScheme(), uri.getAuthority(), uri.getPath());
-
-    sign(request, nvc, cleanPath.toString());
+//    Poco::URI uri(request.getURI());
+//    Poco::URI cleanPath(uri.getScheme(), uri.getAuthority(), uri.getPath());
+    sign(request, request.getForm(), request.getURI());
 }
 
-void Twitter::sign(Poco::Net::HTTPRequest& request, const Poco::Net::NameValueCollection& params, const std::string& uri) const
+
+bool Twitter::handleResponse(ofx::HTTP::Client::BaseRequest& request,
+                             ofx::HTTP::Client::BaseResponse& response,
+                             ofx::HTTP::Context& context)
+{
+}
+
+
+void Twitter::sign(Poco::Net::HTTPRequest& request, const Poco::Net::HTMLForm& params, const std::string& uri) const
 {
 	std::string nonce(createNonce());
 	std::string timestamp(Poco::NumberFormatter::format(Poco::Timestamp().epochTime()));
@@ -133,13 +134,8 @@ std::string Twitter::createNonce() const
 }
 
 
-std::string Twitter::createSignature(Poco::Net::HTTPRequest& request,
-                                     const Poco::Net::NameValueCollection& params,
-                                     const std::string& uri,
-                                     const std::string& nonce,
-                                     const std::string& timestamp) const
+std::string Twitter::createSignature(Poco::Net::HTTPRequest& request, const Poco::Net::HTMLForm& params, const std::string& uri, const std::string& nonce, const std::string& timestamp) const
 {
-
 	std::map<std::string, std::string> paramsMap;
 	paramsMap["oauth_consumer_key"]     = percentEncode(_consumerKey);
 	paramsMap["oauth_nonce"]            = percentEncode(nonce);
@@ -148,10 +144,13 @@ std::string Twitter::createSignature(Poco::Net::HTTPRequest& request,
 	paramsMap["oauth_token"]            = percentEncode(_token);
 	paramsMap["oauth_version"]          = "1.0";
 
-	for (Poco::Net::HTMLForm::ConstIterator it = params.begin(); it != params.end(); ++it)
-	{
-		paramsMap[percentEncode(it->first)] = percentEncode(it->second);
-	}
+    if (Poco::Net::HTMLForm::ENCODING_URL == params.getEncoding())
+    {
+        for (Poco::Net::HTMLForm::ConstIterator it = params.begin(); it != params.end(); ++it)
+        {
+            paramsMap[percentEncode(it->first)] = percentEncode(it->second);
+        }
+    }
 
 	std::string paramsString;
 	for (std::map<std::string, std::string>::const_iterator it = paramsMap.begin(); it != paramsMap.end(); ++it)

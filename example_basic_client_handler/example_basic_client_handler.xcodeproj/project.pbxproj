@@ -76,6 +76,7 @@
 		E7E077E515D3B63C0020DFD4 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7E077E415D3B63C0020DFD4 /* CoreVideo.framework */; };
 		E7E077E815D3B6510020DFD4 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7E077E715D3B6510020DFD4 /* QTKit.framework */; };
 		E7F985F815E0DEA3003869B5 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7F985F515E0DE99003869B5 /* Accelerate.framework */; };
+		FDC55D67190E87D1005132B4 /* BaseRequestResponseProcessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FDC55D66190E87D1005132B4 /* BaseRequestResponseProcessor.cpp */; };
 		ac3e1ecaf8468d12f86d867f93514433 /* SessionAuthenticationRoute.cpp in Sources */ = {isa = PBXBuildFile; fileRef = c586272d68f4dc5b337c8635b13dfe42 /* SessionAuthenticationRoute.cpp */; };
 		ae32f1807796b1050e082651a5fbf40d /* json_value.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0f867b04bf36a560c2493c097d84756e /* json_value.cpp */; };
 		b3e6d60405574847412d7441c2743467 /* HiddenFileFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = fcaf85b857266c511db50341e61e807d /* HiddenFileFilter.cpp */; };
@@ -298,6 +299,8 @@
 		E7E077E415D3B63C0020DFD4 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = /System/Library/Frameworks/CoreVideo.framework; sourceTree = "<absolute>"; };
 		E7E077E715D3B6510020DFD4 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		E7F985F515E0DE99003869B5 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = /System/Library/Frameworks/Accelerate.framework; sourceTree = "<absolute>"; };
+		FDC55D65190E87C0005132B4 /* BaseRequestResponseProcessor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BaseRequestResponseProcessor.h; path = ../libs/ofxHTTP/Client/include/ofx/HTTP/Client/BaseRequestResponseProcessor.h; sourceTree = "<group>"; };
+		FDC55D66190E87D1005132B4 /* BaseRequestResponseProcessor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BaseRequestResponseProcessor.cpp; path = ../libs/ofxHTTP/Client/src/BaseRequestResponseProcessor.cpp; sourceTree = "<group>"; };
 		a041419e9510439eb8cc398aa10f0556 /* PostRouteSettings.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = PostRouteSettings.h; path = ../../../addons/ofxHTTP/libs/ofxHTTP/Server/include/ofx/HTTP/Server/PostRouteSettings.h; sourceTree = SOURCE_ROOT; };
 		a31fb08f6660ce0dc758509eca7313e4 /* MediaTypeMap.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = MediaTypeMap.cpp; path = ../../../addons/ofxMediaType/libs/ofxMediaType/src/MediaTypeMap.cpp; sourceTree = SOURCE_ROOT; };
 		a60db4d20210f3d4aeae3501b3737536 /* FileSystemRoute.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = FileSystemRoute.cpp; path = ../../../addons/ofxHTTP/libs/ofxHTTP/Server/src/FileSystemRoute.cpp; sourceTree = SOURCE_ROOT; };
@@ -581,6 +584,7 @@
 		3673092f36e6d9f7d1c04bc62f29fd6a /* src */ = {
 			isa = PBXGroup;
 			children = (
+				FDC55D66190E87D1005132B4 /* BaseRequestResponseProcessor.cpp */,
 				4b0773ed3d9c70c5e47a0b91793e00ba /* AuthScope.cpp */,
 				7c1e147c9f02744893ef622af21b2c5a /* BaseClient.cpp */,
 				808460db6f4bbbb99dd641c389191660 /* BaseClientProcessors.cpp */,
@@ -1068,6 +1072,7 @@
 		a1a9377aa7e43a49ffea2bd2d2e24277 /* Client */ = {
 			isa = PBXGroup;
 			children = (
+				FDC55D65190E87C0005132B4 /* BaseRequestResponseProcessor.h */,
 				2102920f840d2929cf838e930ae232b3 /* AbstractClientTypes.h */,
 				81516834c4de060941798d6538b7be26 /* AuthScope.h */,
 				6e39355b80edab8f082ab504b4ea798e /* BaseClient.h */,
@@ -1449,6 +1454,7 @@
 				2e07536558310c298efbedec644baf47 /* AuthScope.cpp in Sources */,
 				f0da34b081435cf9edbfe3219ba29f55 /* BaseClient.cpp in Sources */,
 				0337866feceeafaf4cde47c4238504ab /* BaseClientProcessors.cpp in Sources */,
+				FDC55D67190E87D1005132B4 /* BaseRequestResponseProcessor.cpp in Sources */,
 				dc37046a12c7f635654be8288df8c11c /* BaseRequest.cpp in Sources */,
 				dae784dd30a1798496db0df68963c21d /* BaseResponseHandler.cpp in Sources */,
 				5babb7635c705bc5a1dfb4b6a335f7e6 /* ClientEvents.cpp in Sources */,
