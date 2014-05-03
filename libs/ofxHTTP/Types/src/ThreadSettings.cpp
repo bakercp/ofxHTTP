@@ -23,33 +23,12 @@
 // =============================================================================
 
 
-#pragma once
-
-
-#include "ofx/HTTP/Client/BaseRequestResponseProcessor.h"
+#include "ofx/HTTP/Client/ExecutorSettings.h"
 
 
 namespace ofx {
 namespace HTTP {
+namespace Client {
 
 
-class DefaultAuthenticationProcessor: public BaseRequestResponseProcessor
-{
-public:
-    DefaultAuthenticationProcessor();
-
-    virtual ~DefaultAuthenticationProcessor();
-
-    virtual void processRequest(Client::BaseRequest& request,
-                                Context& context);
-
-    virtual bool handleResponse(Client::BaseRequest& request,
-                                Client::BaseResponse& response,
-                                Context& context);
-
-
-};
-
-
-
-} } // namespace ofx::HTTP
+} } } // namespace ofx::HTTP::Client

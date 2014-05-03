@@ -26,19 +26,45 @@
 #pragma once
 
 
+#include <ios>
+#include "Poco/Mutex.h"
+
+
 namespace ofx {
 namespace HTTP {
-namespace Client {
 
 
-class BaseResponseHandler
+class ProgressMonitor
 {
 public:
-    BaseResponseHandler();
-    virtual ~BaseResponseHandler();
+    ProgressMonitor();
+    virtual ~ProgressMonitor();
+    
+    void update(std::streamsize totalBytesTransferred,
+                std::streamsize totalBytes,
+                std::size_t transferBufferSize,
+                unsigned long long lastUpdate);
 
+    std::streamsize getTotalBytesTranferred() const;
+    std::streamsize getTotalBytes() const;
+    
+    float getPercentageTransferred() const;
+    
+    std::size_t getTransferBufferSize() const;
+
+    void reset();
+    
+private:
+    std::streamsize _totalBytesTransferred;
+    std::streamsize _totalBytes;
+    std::size_t _transferBufferSize;
+
+    unsigned long long _lastUpdateTime;
+    float _bytesPerSecond;
+
+    mutable Poco::FastMutex _mutex;
 
 };
 
 
-} } } // namespace ofx::HTTP::Client
+} } // namespace ofx::HTTP

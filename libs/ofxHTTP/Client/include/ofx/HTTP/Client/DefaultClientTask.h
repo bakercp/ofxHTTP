@@ -23,28 +23,36 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/Client/BaseRequestResponseProcessor.h"
+#pragma once
+
+
+#include "ofx/HTTP/Client/BaseClient.h"
+#include "ofx/HTTP/Client/DefaultSessionProvider.h"
+#include "ofx/HTTP/Client/DefaultRedirectProcessor.h"
+#include "ofx/HTTP/Client/DefaultProxyProcessor.h"
+#include "ofx/HTTP/Client/CredentialStore.h"
+#include "ofx/HTTP/Client/DefaultResponseStreamFilter.h"
 
 
 namespace ofx {
 namespace HTTP {
+namespace Client {
 
 
-BaseRequestResponseProcessor::~BaseRequestResponseProcessor()
+class DefaultClient: public BaseClient
 {
-}
-    
+public:
+    DefaultClient();
+    virtual ~DefaultClient();
 
-std::vector<Poco::Net::HTTPResponse::HTTPStatus> BaseRequestResponseProcessor::getHandledStatuses() const
-{
-    return _handledStatues;
-}
+private:
+    DefaultProxyProcessor defaultProxyProcessor;
+    DefaultCredentialStore defaultAuthenticationProcessor;
+    DefaultSessionProvider defaultSessionProvider;
+    DefaultRedirectProcessor defaultRedirectProcessor;
+    DefaultResponseStreamFilter responseStreamFilter;
+
+};
 
 
-bool BaseRequestResponseProcessor::isStatusHandled(Poco::Net::HTTPResponse::HTTPStatus status) const
-{
-    return std::find(_handledStatues.begin(), _handledStatues.end(), status) != _handledStatues.end();
-}
-
-
-} } // ofx::HTTP
+} } } // namespace ofx::HTTP::Client

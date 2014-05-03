@@ -26,41 +26,33 @@
 #pragma once
 
 
-#include "ofx/HTTP/Client/AbstractClientTypes.h"
+#include "ofx/HTTP/Client/BaseClient.h"
+#include "ofx/HTTP/Client/DefaultSessionProvider.h"
+#include "ofx/HTTP/Client/DefaultRedirectProcessor.h"
+#include "ofx/HTTP/Client/DefaultProxyProcessor.h"
+#include "ofx/HTTP/Client/CredentialStore.h"
+#include "ofx/HTTP/Client/DefaultResponseStreamFilter.h"
 
 
 namespace ofx {
 namespace HTTP {
+namespace Client {
 
 
-class BaseClientProcessors
+class DefaultClient: public BaseClient
 {
 public:
-    BaseClientProcessors();
-
-    virtual ~BaseClientProcessors();
-
-    virtual void processRequest(Client::BaseRequest& request,
-                                Context& context);
-
-    virtual void processResponse(Client::BaseRequest& request,
-                                 Client::BaseResponse& response,
-                                 Context& context);
-
-    void addRequestProcessor(AbstractRequestProcessor* processor);
-    void addResponseHandler(AbstractResponseHandler* handler);
-
-    void removeRequestProcessor(AbstractRequestProcessor* processor);
-    void removeResponseHandler(AbstractResponseHandler* handler);
+    DefaultClient();
+    virtual ~DefaultClient();
 
 private:
-    typedef std::vector<AbstractRequestProcessor*> RequestProcessors;
-    typedef std::vector<AbstractResponseHandler*> ResponseHandlers;
-
-    RequestProcessors _requestProcessors;
-    ResponseHandlers _responseHandlers;
+    DefaultProxyProcessor defaultProxyProcessor;
+    DefaultCredentialStore defaultAuthenticationProcessor;
+    DefaultSessionProvider defaultSessionProvider;
+    DefaultRedirectProcessor defaultRedirectProcessor;
+    DefaultResponseStreamFilter responseStreamFilter;
 
 };
 
 
-} } // namespace ofx::HTTP
+} } } // namespace ofx::HTTP::Client

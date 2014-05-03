@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2014 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,22 +31,9 @@
 
 namespace ofx {
 namespace HTTP {
+namespace Client {
 
 
-class BaseRequestResponseProcessor: public AbstractRequestResponseProcessor
-{
-public:
-    /// \brief Destroy this BaseResponseProcessor.
-    virtual ~BaseRequestResponseProcessor();
-
-    std::vector<Poco::Net::HTTPResponse::HTTPStatus> getHandledStatuses() const;
-
-    bool isStatusHandled(Poco::Net::HTTPResponse::HTTPStatus status) const;
-
-protected:
-    std::vector<Poco::Net::HTTPResponse::HTTPStatus> _handledStatues;
-
-};
 
 
-} } // namespace ofx::HTTP
+} } } // namespace ofx::HTTP::Client

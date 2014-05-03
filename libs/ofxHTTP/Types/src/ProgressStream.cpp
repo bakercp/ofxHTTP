@@ -23,22 +23,73 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/Client/BaseResponseHandler.h"
+#include "ofx/HTTP/Types/ProgressMonitor.h"
 
 
 namespace ofx {
 namespace HTTP {
-namespace Client {
 
-    
-BaseResponseHandler::BaseResponseHandler()
+
+ProgressMonitor::ProgressMonitor() :
+    _totalBytesTransferred(-1),
+    _totalBytes(-1),
+    _transferBufferSize(0),
+    _lastUpdateTime(0),
+    _bytesPerSecond(0)
 {
 }
 
 
-BaseResponseHandler::~BaseResponseHandler()
+ProgressMonitor::~ProgressMonitor()
 {
 }
 
 
-} } } // namespace ofx::HTTP::Client
+void ProgressMonitor::update(std::streamsize totalBytesTransferred,
+                             std::streamsize totalBytes,
+                             std::size_t transferBufferSize,
+                             unsigned long long lastUpdate)
+{
+//    _totalBytesTransferred  = totalBytesTransferred;
+//    _totalBytes             = totalBytes;
+//    _transferBufferSize     = transferBufferSize;
+//    _lastUpdateTime         = lastUpdateTime;
+//    _bytesPerSecond         = bytesPerSecond;
+}
+
+
+std::streamsize ProgressMonitor::getTotalBytesTranferred() const
+{
+    return 0;
+}
+
+
+std::streamsize ProgressMonitor::getTotalBytes() const
+{
+    return 0;
+}
+
+
+float ProgressMonitor::getPercentageTransferred() const
+{
+    return 0;
+}
+
+
+std::size_t ProgressMonitor::getTransferBufferSize() const
+{
+    return 0;
+}
+
+
+void ProgressMonitor::reset()
+{
+    _totalBytesTransferred = -1;
+    _totalBytes            = -1;
+    _transferBufferSize    = 0;
+    _lastUpdateTime        = 0;
+    _bytesPerSecond        = 0;
+}
+
+
+} } // namespace ofx::HTTP
