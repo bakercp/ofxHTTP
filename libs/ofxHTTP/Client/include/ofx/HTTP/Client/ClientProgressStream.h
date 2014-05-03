@@ -29,8 +29,6 @@
 #include <ostream>
 #include <istream>
 #include <cctype>
-#include "Poco/Foundation.h"
-#include "Poco/Timestamp.h"
 #include "Poco/UnbufferedStreamBuf.h"
 #include "ofx/HTTP/Client/BaseRequest.h"
 #include "ofx/HTTP/Client/BaseResponse.h"
@@ -42,23 +40,24 @@ namespace HTTP {
 namespace Client {
 
 
-class AbstractRequestStreamProgressListener
+class AbstractRequestStreamListener
 {
 public:
-    virtual ~AbstractRequestStreamProgressListener()
+    virtual ~AbstractRequestStreamListener()
     {
     }
 
     virtual void progress(const BaseRequest& request,
                           Context& context,
                           std::streamsize total) = 0;
+
 };
 
 
-class AbstractResponseStreamProgressListener
+class AbstractResponseStreamListener
 {
 public:
-    virtual ~AbstractResponseStreamProgressListener()
+    virtual ~AbstractResponseStreamListener()
     {
     }
 
@@ -73,23 +72,18 @@ public:
 class ClientProgressStreamBuf: public Poco::UnbufferedStreamBuf
 {
 public:
-
-    virtual std::ostream& filter(std::ostream& requestStream,
-                                 const BaseRequest& request,
-                                 Context& context) = 0;
-
     ClientProgressStreamBuf();
 
     ClientProgressStreamBuf(std::ostream& ostr,
                             const BaseRequest& request,
                             Context& context,
-                            AbstractRequestStreamProgressListener& requestStreamListener);
+                            AbstractRequestStreamListener& listener);
 
     ClientProgressStreamBuf(std::istream& istr,
                             const BaseRequest& request,
                             const BaseResponse& response,
                             Context& context,
-                            AbstractResponseStreamProgressListener& responseStreamListener);
+                            AbstractResponseStreamListener& listener);
 
     ~ClientProgressStreamBuf();
 
@@ -100,68 +94,81 @@ protected:
     int writeToDevice(char c);
 
 private:
-    const* BaseRequest _request;
-    const* BaseResponse _response;
-    Context* _context;
+    const BaseRequest* _pRequest;
+    const BaseResponse* _pResponse;
+    Context* _pContext;
 
-    std::istream* _pIstr;
-    std::ostream* _pOstr;
+    std::ostream* _pRequestStream;
+    std::istream* _pResponseStream;
 
-    std::streamsize _inputStreamBytes;
-    std::streamsize _outputStreamBytes;
+    std::streamsize _requestStreamBytes;
+    std::streamsize _responseStreamBytes;
 
-    AbstractInputStreamProgressListener*  _pInputStreamListener;
-    AbstractOutputStreamProgressListener* _pOutputStreamListener;
+    AbstractRequestStreamListener*  _pRequestStreamListener;
+    AbstractResponseStreamListener* _pResponseStreamListener;
 
 };
 
 
-class ProgressIOS: public virtual std::ios
+class ClientProgressIOS: public virtual std::ios
 {
 public:
-    ProgressIOS();
-    ProgressIOS(std::istream& istr,
-                AbstractInputStreamProgressListener& inputStreamListener);
-    ProgressIOS(std::ostream& ostr,
-                AbstractOutputStreamProgressListener& outputStreamListener);
-    ~ProgressIOS();
+    ClientProgressIOS();
+
+    ClientProgressIOS(std::ostream& ostr,
+                      const BaseRequest& request,
+                      Context& context,
+                      AbstractRequestStreamListener& listener);
+
+    ClientProgressIOS(std::istream& istr,
+                      const BaseRequest& request,
+                      const BaseResponse& response,
+                      Context& context,
+                      AbstractResponseStreamListener& listener);
+
+    ~ClientProgressIOS();
 
     /// \brief Returns a pointer to the underlying streambuf.
-    ProgressStreamBuf* rdbuf();
+    ClientProgressStreamBuf* rdbuf();
 
 protected:
-    ProgressStreamBuf _buf;
+    ClientProgressStreamBuf _buf;
 
 };
 
 
-class ProgressInputStream: public ProgressIOS, public std::istream
+class ClientProgressRequestStream: public ClientProgressIOS, public std::ostream
+{
+public:
+    /// Creates an unconnected CountingOutputStream.
+    ClientProgressRequestStream();
+
+    /// Creates the CountingOutputStream and connects it
+    /// to the given input stream.
+    ClientProgressRequestStream(std::ostream& ostr,
+                                const BaseRequest& request,
+                                Context& context,
+                                AbstractRequestStreamListener& listener);
+
+    /// Destroys the ProgressOutputStream.
+    ~ClientProgressRequestStream();
+    
+};
+
+
+class ClientProgressResponseStream: public ClientProgressIOS, public std::istream
 {
 public:
     /// Creates the CountingInputStream and connects it
     /// to the given input stream.
-    ProgressInputStream(std::istream& istr,
-                        AbstractInputStreamProgressListener& inputStreamListener);
+    ClientProgressResponseStream(std::istream& istr,
+                                 const BaseRequest& request,
+                                 const BaseResponse& response,
+                                 Context& context,
+                                 AbstractResponseStreamListener& listener);
 
     /// Destroys the stream.
-    ~ProgressInputStream();
-
-};
-
-
-class ProgressOutputStream: public ProgressIOS, public std::ostream
-{
-public:
-    /// Creates an unconnected CountingOutputStream.
-    ProgressOutputStream();
-
-    /// Creates the CountingOutputStream and connects it
-    /// to the given input stream.
-    ProgressOutputStream(std::ostream& ostr,
-                         AbstractOutputStreamProgressListener& outputStreamListener);
-
-    /// Destroys the ProgressOutputStream.
-    ~ProgressOutputStream();
+    ~ClientProgressResponseStream();
 
 };
 

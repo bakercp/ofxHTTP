@@ -24,11 +24,14 @@
 
 
 #include "ofx/HTTP/Client/DefaultClientHeaders.h"
+#include "ofx/HTTP/Client/BaseRequest.h"
+#include "ofx/HTTP/Client/Context.h"
 
 
 namespace ofx {
 namespace HTTP {
-        
+namespace Client {
+
 
 DefaultClientHeaders::DefaultClientHeaders()
 {
@@ -40,8 +43,8 @@ DefaultClientHeaders::~DefaultClientHeaders()
 }
 
 
-void DefaultClientHeaders::processRequest(Poco::Net::HTTPRequest& request,
-                                          Context& context)
+void DefaultClientHeaders::filter(Client::BaseRequest& request,
+                                          Client::Context& context)
 {
     const SessionSettings& settings = context.getSessionSettings();
 
@@ -63,4 +66,4 @@ void DefaultClientHeaders::processRequest(Poco::Net::HTTPRequest& request,
 
 
 
-} } // namespace ofx::HTTP
+} } } // namespace ofx::HTTP::Client

@@ -36,21 +36,23 @@ const std::string BaseRequest::DEFAULT_MEDIA_TYPE = "application/octet-stream";
 
 BaseRequest::BaseRequest(const std::string& method,
                          const std::string& uri,
-                         const std::string& httpVersion,
-                         const Poco::UUID& requestId):
-    Poco::Net::HTTPRequest(method, uri, httpVersion),
-    _requestId(requestId)
-{
-}
-
-
-BaseRequest::BaseRequest(const std::string& method,
-                         const std::string& uri,
                          const Poco::Net::NameValueCollection& formFields,
                          const std::string& httpVersion,
                          const Poco::UUID& requestId):
     Poco::Net::HTTPRequest(method, uri, httpVersion),
     _requestId(requestId)
+{
+    addFormFields(formFields);
+}
+
+
+
+BaseRequest::~BaseRequest()
+{
+}
+
+
+void BaseRequest::addFormFields(const Poco::Net::NameValueCollection& formFields)
 {
     Poco::Net::NameValueCollection::ConstIterator iter = formFields.begin();
 
@@ -59,11 +61,6 @@ BaseRequest::BaseRequest(const std::string& method,
         _form.add(iter->first, iter->second);
         ++iter;
     }
-}
-
-
-BaseRequest::~BaseRequest()
-{
 }
 
 
@@ -81,6 +78,12 @@ const Poco::UUID& BaseRequest::getRequestId() const
 
 
 const Poco::Net::HTMLForm& BaseRequest::getForm() const
+{
+    return _form;
+}
+
+
+Poco::Net::HTMLForm& BaseRequest::getFormRef()
 {
     return _form;
 }

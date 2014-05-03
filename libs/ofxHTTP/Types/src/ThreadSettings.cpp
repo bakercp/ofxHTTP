@@ -23,12 +23,43 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/Client/ExecutorSettings.h"
+#include "ofx/HTTP/Types/ThreadSettings.h"
 
 
 namespace ofx {
 namespace HTTP {
-namespace Client {
 
 
-} } } // namespace ofx::HTTP::Client
+ThreadSettings::ThreadSettings(const std::string& name,
+                               const Poco::Thread::Priority& priority):
+    _name(name),
+    _priority(priority)
+{
+}
+
+
+std::string ThreadSettings::getName() const
+{
+    return _name;
+}
+
+
+void ThreadSettings::setName(const std::string& name)
+{
+    _name = name;
+}
+
+
+Poco::Thread::Priority ThreadSettings::getPriority() const
+{
+    return _priority;
+}
+
+
+void ThreadSettings::setPriority(const Poco::Thread::Priority& priority)
+{
+    _priority = priority;
+}
+
+
+} } // namespace ofx::HTTP

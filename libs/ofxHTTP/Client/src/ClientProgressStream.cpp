@@ -23,7 +23,7 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/Types/ClientProgressStream.h"
+#include "ofx/HTTP/Client/ClientProgressStream.h"
 
 
 namespace ofx {
@@ -32,154 +32,173 @@ namespace Client {
 
 
 ClientProgressStreamBuf::ClientProgressStreamBuf():
-    _request(0);
-    _response(0);
-    _context(0);
-    _pIstr(0),
-    _pOstr(0),
-    _inputStreamBytes(0),
-    _outputStreamBytes(0),
-    _pInputStreamListener(0),
-    _pOutputStreamListener(0)
+    _pRequest(0),
+    _pResponse(0),
+    _pContext(0),
+    _pRequestStream(0),
+    _pResponseStream(0),
+    _requestStreamBytes(0),
+    _responseStreamBytes(0),
+    _pRequestStreamListener(0),
+    _pResponseStreamListener(0)
 {
 }
 
 
-//    ClientProgressStreamBuf(std::ostream& ostr,
-//                            const BaseRequest& request,
-//                            Context& context,
-//                            AbstractRequestStreamProgressListener& requestStreamListener);
-//
-//    ClientProgressStreamBuf(std::istream& istr,
-//                            const BaseRequest& request,
-//                            const BaseResponse& response,
-//                            Context& context,
-//                            AbstractResponseStreamProgressListener& responseStreamListener);
-//    
-
+ClientProgressStreamBuf::ClientProgressStreamBuf(std::ostream& ostr,
+                                                 const BaseRequest& request,
+                                                 Context& context,
+                                                 AbstractRequestStreamListener& listener):
+    _pRequest(&request),
+    _pResponse(0),
+    _pContext(&context),
+    _pRequestStream(0),
+    _pResponseStream(0),
+    _requestStreamBytes(0),
+    _responseStreamBytes(0),
+    _pRequestStreamListener(&listener),
+    _pResponseStreamListener(0)
+{
+}
 
 
 ClientProgressStreamBuf::ClientProgressStreamBuf(std::istream& istr,
-                                                 AbstractInputStreamProgressListener& inputStreamListener):
-    _pIstr(&istr),
-    _pOstr(0),
-    _inputStreamBytes(0),
-    _outputStreamBytes(0),
-    _pInputStreamListener(&inputStreamListener),
-    _pOutputStreamListener(0)
+                                                 const BaseRequest& request,
+                                                 const BaseResponse& response,
+                                                 Context& context,
+                                                 AbstractResponseStreamListener& listener):
+    _pRequest(0),
+    _pResponse(&response),
+    _pContext(&context),
+    _pRequestStream(0),
+    _pResponseStream(0),
+    _requestStreamBytes(0),
+    _responseStreamBytes(0),
+    _pRequestStreamListener(),
+    _pResponseStreamListener(&listener)
 {
 }
 
 
-ProgressStreamBuf::ProgressStreamBuf(std::ostream& ostr,
-                                     AbstractOutputStreamProgressListener& outputStreamListener):
-    _pIstr(0),
-    _pOstr(&ostr),
-    _pInputStreamListener(0),
-    _pOutputStreamListener(&outputStreamListener)
+ClientProgressStreamBuf::~ClientProgressStreamBuf()
 {
 }
 
 
-ProgressStreamBuf::~ProgressStreamBuf()
+int ClientProgressStreamBuf::readFromDevice()
 {
-}
-
-
-int ProgressStreamBuf::readFromDevice()
-{
-    if (_pIstr)
+    if (_pResponseStream)
     {
-        int c = _pIstr->get();
+        int c = _pResponseStream->get();
 
         if (c != -1)
         {
-            ++_inputStreamBytes;
+            ++_responseStreamBytes;
+
+            _pResponseStreamListener->progress(*_pRequest,
+                                               *_pResponse,
+                                               *_pContext,
+                                               _responseStreamBytes);
         }
 
         return c;
     }
+
     return -1;
 }
 
 
-int ProgressStreamBuf::writeToDevice(char c)
+int ClientProgressStreamBuf::writeToDevice(char c)
 {
-    ++_outputStreamBytes;
-    if (_pOstr) _pOstr->put(c);
+    ++_requestStreamBytes;
+
+    _pRequestStreamListener->progress(*_pRequest,
+                                      *_pContext,
+                                      _requestStreamBytes);
+
+    if (_pRequestStream) _pRequestStream->put(c);
     return charToInt(c);
     return c;
 }
 
 
-void ProgressStreamBuf::reset()
+void ClientProgressStreamBuf::reset()
 {
-    _inputStreamBytes = 0;
-    _outputStreamBytes = 0;
+    _requestStreamBytes = 0;
+    _responseStreamBytes = 0;
 }
 
 
-ProgressIOS::ProgressIOS()
-{
-    poco_ios_init(&_buf);
-}
-
-
-ProgressIOS::ProgressIOS(std::istream& istr,
-                         AbstractInputStreamProgressListener& inputStreamListener):
-    _buf(istr, inputStreamListener)
+ClientProgressIOS::ClientProgressIOS()
 {
     poco_ios_init(&_buf);
 }
 
 
-ProgressIOS::ProgressIOS(std::ostream& ostr,
-                         AbstractOutputStreamProgressListener& outputStreamListener):
-    _buf(ostr, outputStreamListener)
+ClientProgressIOS::ClientProgressIOS(std::ostream& ostr,
+                                     const BaseRequest& request,
+                                     Context& context,
+                                     AbstractRequestStreamListener& listener):
+    _buf(ostr, request, context, listener)
 {
     poco_ios_init(&_buf);
 }
 
 
-ProgressIOS::~ProgressIOS()
+ClientProgressIOS::ClientProgressIOS(std::istream& istr,
+                                     const BaseRequest& request,
+                                     const BaseResponse& response,
+                                     Context& context,
+                                     AbstractResponseStreamListener& listener):
+    _buf(istr, request, response, context, listener)
+{
+    poco_ios_init(&_buf);
+}
+
+
+ClientProgressIOS::~ClientProgressIOS()
 {
 }
 
 
-ProgressStreamBuf* ProgressIOS::rdbuf()
+ClientProgressStreamBuf* ClientProgressIOS::rdbuf()
 {
     return &_buf;
 }
 
 
-ProgressInputStream::ProgressInputStream(std::istream& istr,
-                                         AbstractInputStreamProgressListener& inputStreamListener):
-    ProgressIOS(istr, inputStreamListener),
+ClientProgressRequestStream::ClientProgressRequestStream()
+{
+}
+
+
+ClientProgressRequestStream::ClientProgressRequestStream(std::ostream& ostr,
+                                                         const BaseRequest& request,
+                                                         Context& context,
+                                                         AbstractRequestStreamListener& listener):
+    ClientProgressIOS(ostr, request, context, listener),
+    std::ostream(&_buf)
+{
+}
+
+
+ClientProgressRequestStream::~ClientProgressRequestStream()
+{
+}
+
+
+ClientProgressResponseStream::ClientProgressResponseStream(std::istream& istr,
+                                                           const BaseRequest& request,
+                                                           const BaseResponse& response,
+                                                           Context& context,
+                                                           AbstractResponseStreamListener& listener):
+    ClientProgressIOS(istr, request, response, context, listener),
     std::istream(&_buf)
 {
 }
 
 
-ProgressInputStream::~ProgressInputStream()
-{
-}
-
-
-ProgressOutputStream::ProgressOutputStream():
-    std::ostream(&_buf)
-{
-}
-
-
-ProgressOutputStream::ProgressOutputStream(std::ostream& ostr,
-                                           AbstractOutputStreamProgressListener& outputStreamListener):
-    ProgressIOS(ostr, outputStreamListener),
-    std::ostream(&_buf)
-{
-}
-
-
-ProgressOutputStream::~ProgressOutputStream()
+ClientProgressResponseStream::~ClientProgressResponseStream()
 {
 }
 

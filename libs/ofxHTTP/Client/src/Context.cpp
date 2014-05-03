@@ -28,6 +28,7 @@
 
 namespace ofx {
 namespace HTTP {
+namespace Client {
 
 
 const std::string Context::KEY_PREFIX_RESERVED    = "HTTP_";
@@ -74,18 +75,6 @@ const SessionSettings& Context::getSessionSettings() const
 //}
 
 
-void Context::setCredentialStore(CredentialStore::SharedPtr credentialStore)
-{
-    _credentialStore = credentialStore;
-}
-
-
-CredentialStore::WeakPtr Context::getCredentialStore()
-{
-    return _credentialStore;
-}
-
-
 void Context::setSession(Session session)
 {
     _session = session;
@@ -97,16 +86,16 @@ Context::Session Context::getSession()
     return _session;
 }
 
-void Context::setResolvedURI(const Poco::URI& uri)
-{
-    _resolvedURI = uri;
-}
-
-
-const Poco::URI& Context::getResolvedURI() const
-{
-    return _resolvedURI;
-}
+//void Context::setResolvedURI(const Poco::URI& uri)
+//{
+//    _resolvedURI = uri;
+//}
+//
+//
+//const Poco::URI& Context::getResolvedURI() const
+//{
+//    return _resolvedURI;
+//}
 
 
 void Context::addRedirect(const Poco::URI& uri)
@@ -133,4 +122,4 @@ const Poco::URI& Context::getProxyRedirectURI() const
 }
 
 
-} } // namespace ofx::HTTP::Client
+} } } // namespace ofx::HTTP::Client

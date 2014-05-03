@@ -37,25 +37,33 @@ namespace Client {
 class PostRequest: public BaseRequest
 {
 public:
+    struct FormPart
+	{
+		std::string name;
+        Poco::Net::PartSource* pSource;
+	};
+
+    typedef std::vector<FormPart> FormParts;
+
     /// \brief An enumeration describing this POST's form encoding.
     enum FormEncoding
     {
         FORM_ENCODING_URL,
-        ///< \brief Equivalent to application/x-www-form-urlencoded.
+            ///< \brief Equivalent to application/x-www-form-urlencoded.
         FORM_ENCODING_MULTIPART
-        ///< \brief Equivalent to multipart/form-data.
+            ///< \brief Equivalent to multipart/form-data.
     };
-
-    /// \brief Construct a PostRequest with the given uri.
-    /// \param uri the Post endpoint uri.
-    PostRequest(const std::string& uri);
 
     /// \brief Construct a PostRequest with a given uri and http version.
     /// \param uri the Post endpoint uri.
+    /// \param formFields A collection of form fields.
+    /// \param formParts A collection of form parts.
     /// \param httpVersion Either HTTP/1.0 or HTTP/1.1.
     /// \param requestId A unique UUID for this request.
     PostRequest(const std::string& uri,
-                const std::string& httpVersion,
+                const Poco::Net::NameValueCollection formFields = Poco::Net::NameValueCollection(),
+                const FormParts formParts = FormParts(),
+                const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1,
                 const Poco::UUID& requestId = generateUUID());
 
     /// \brief Destroy the PostRequest.
@@ -88,6 +96,7 @@ public:
     /// \returns the current form encoding.
     FormEncoding getFormEncoding() const;
 
+protected:
     /// \brief Custom prepareRequest() to set the content length;
     void prepareRequest();
 
@@ -95,8 +104,9 @@ public:
     /// \param requestStream the stream to write the request body.
     void writeRequestBody(std::ostream& requestStream);
 
-protected:
+private:
     std::stringstream _outBuffer;
+
 
 };
 

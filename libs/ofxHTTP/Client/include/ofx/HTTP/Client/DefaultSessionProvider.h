@@ -34,17 +34,18 @@
 
 namespace ofx {
 namespace HTTP {
+namespace Client {
 
 
-class DefaultSessionProvider: public AbstractSessionProvider
+class DefaultSessionProvider: public AbstractRequestFilter
 {
 public:
     DefaultSessionProvider();
     virtual ~DefaultSessionProvider();
 
-    virtual void createSession(const Poco::URI& uri, Context& context);
+    virtual void filter(BaseRequest& request, Context& context);
 
 };
 
 
-} } // namespace ofx::HTTP
+} } } // namespace ofx::HTTP::Client

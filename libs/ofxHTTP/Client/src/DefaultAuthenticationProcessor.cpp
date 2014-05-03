@@ -24,10 +24,14 @@
 
 
 #include "ofx/HTTP/Client/DefaultAuthenticationProcessor.h"
+#include "ofx/HTTP/Client/BaseRequest.h"
+#include "ofx/HTTP/Client/BaseResponse.h"
+#include "ofx/HTTP/Client/Context.h"
 
 
 namespace ofx {
 namespace HTTP {
+namespace Client {
 
 
 DefaultAuthenticationProcessor::DefaultAuthenticationProcessor()
@@ -40,35 +44,61 @@ DefaultAuthenticationProcessor::~DefaultAuthenticationProcessor()
 }
 
 
-void DefaultAuthenticationProcessor::processRequest(Client::BaseRequest& request,
+void DefaultAuthenticationProcessor::processRequest(BaseRequest& request,
                                                     Context& context)
 {
+    Poco::URI uri(request.getURI());
+
+    if (!uri.getUserInfo())
+    {
+        std::string userInfo
+    }
+
     CredentialStore::SharedPtr store(context.getCredentialStore().lock());
 
-    if(store && store->updateAuthentication(*context.getSession(), request))
+    if (store && store->updateAuthentication(*context.getSession(), request))
     {
     }
+
+    
+
+//    Poco::URI uri(request.getURI());
+//
+//    std::string userInfo = uri.getUserInfo();
+//
+//    if (!userInfo.empty())
+//    {
+//        request.setCredentials("Basic", userInfo);
+//    }
 }
 
 
-bool DefaultAuthenticationProcessor::handleResponse(Client::BaseRequest& request,
-                                                    Client::BaseResponse& response,
+bool DefaultAuthenticationProcessor::handleResponse(BaseRequest& request,
+                                                    BaseResponse& response,
                                                     Context& context)
 {
-    CredentialStore::SharedPtr store(context.getCredentialStore().lock());
-
-    Poco::Net::HTTPResponse::HTTPStatus status = response.getStatus();
-
-    if (status == Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED)
+    if (canHandleResponse(request, response, context))
     {
-        if (request.has(Poco::Net::HTTPRequest::AUTHORIZATION)
-        || !store
-        || !store->authenticate(*context.getSession(), request, response))
+        CredentialStore::SharedPtr store(context.getCredentialStore().lock());
+
+        if (store && store->authenticate(*context.getSession(),
+                                         request,
+                                         response))
         {
-            throw Poco::Net::NotAuthenticatedException(response.getReasonForStatus(status), status);
+            context.setResubmit(true);
         }
     }
 }
 
 
-} } // namespace ofx::HTTP
+bool DefaultAuthenticationProcessor::canHandleResponse(BaseRequest& request,
+                                                       BaseResponse& response,
+                                                       Context& context) const
+{
+    return Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED == response.getStatus() &&
+            !request.has(Poco::Net::HTTPRequest::AUTHORIZATION);
+}
+
+
+
+} } } // namespace ofx::HTTP::Client

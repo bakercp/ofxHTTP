@@ -28,8 +28,9 @@
 
 #include "ofEvents.h"
 #include "ofFileUtils.h"
-#include "Poco/Net/HTTPClientSession.h"
 #include "ofx/HTTP/Client/BaseRequest.h"
+#include "ofx/HTTP/Client/BaseResponse.h"
+#include "ofx/HTTP/Client/Context.h"
 
 
 namespace ofx {
@@ -37,12 +38,128 @@ namespace HTTP {
 namespace Client {
 
 
-class BaseClientResponseArgs: public ofEventArgs
+class BaseClientRequestArgs: public ofEventArgs
+{
+public:
+    BaseClientRequestArgs(const BaseRequest& request,
+                          Context& context):
+        _request(request),
+        _context(context)
+    {
+    }
+
+
+    virtual ~BaseClientRequestArgs()
+    {
+    }
+
+
+    const BaseRequest& getRequest() const
+    {
+        return _request;
+    }
+
+    Context& getContextRef()
+    {
+        return _context;
+    }
+
+protected:
+    const BaseRequest& _request;
+    Context& _context;
+    
+};
+
+
+class BaseProgressArgs
+{
+public:
+    BaseProgressArgs(std::streamsize bytesTransferred):
+        _bytesTransferred(bytesTransferred)
+    {
+    }
+
+    virtual ~BaseProgressArgs()
+    {
+    }
+
+    virtual std::streamsize getContentLength() const = 0;
+
+
+    /// \brief Get the total number of bytes transferred during this request.
+    /// \returns the total number of bytes transferred.
+    std::streamsize getBytesTransferred() const
+    {
+        return _bytesTransferred;
+    }
+
+    /// \brief Get the progress of the request upload.
+    ///
+    /// If the total content length is unknown (e.g. during chunked-transfer)
+    /// progress of Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH will be
+    /// returned.
+    ///
+    /// \returns a value 0.0 - 1.0 iff the content length is known.  Otherwise
+    /// returns Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH.
+    float getProgress() const
+    {
+        std::streamsize contentLength = getContentLength();
+
+        if (Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH == contentLength)
+        {
+            return Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH;
+        }
+        else
+        {
+            return _bytesTransferred / (double)contentLength;
+        }
+    }
+
+protected:
+    std::streamsize _bytesTransferred;
+
+};
+
+
+class ClientRequestProgressArgs:
+    public BaseClientRequestArgs,
+    public BaseProgressArgs
+{
+public:
+    ClientRequestProgressArgs(const BaseRequest& request,
+                              Context& context,
+                              std::streamsize bytesTransferred):
+        BaseClientRequestArgs(request, context),
+        BaseProgressArgs(bytesTransferred)
+    {
+    }
+
+    virtual ~ClientRequestProgressArgs()
+    {
+    }
+
+    /// \brief Get the total content length associated with this request.
+    ///
+    /// If the total content length is unknown (e.g. during chunked-transfer)
+    /// Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH is returned.
+    ///
+    /// \returns the total length of the content in bytes iff the content length
+    /// is known.  Otherwise returns
+    /// Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH.
+    std::streamsize getContentLength() const
+    {
+        return _request.getContentLength();
+    }
+};
+
+
+class BaseClientResponseArgs: public BaseClientRequestArgs
 {
 public:
     BaseClientResponseArgs(const BaseRequest& request,
-                           const Poco::Net::HTTPResponse& response):
-        _request(request),
+                           const BaseResponse& response,
+                           Context& context):
+        BaseClientRequestArgs(request, context),
         _response(response)
     {
     }
@@ -53,32 +170,59 @@ public:
     }
 
 
-    const BaseRequest& getRequest() const
-    {
-        return _request;
-    }
-
-
-    const Poco::Net::HTTPResponse& getResponse() const
+    const BaseResponse& getResponse() const
     {
         return _response;
     }
 
-
-private:
-    const BaseRequest& _request;
-    const Poco::Net::HTTPResponse& _response;
+protected:
+    const BaseResponse& _response;
 
 };
+
+
+class ClientResponseProgressArgs:
+    public BaseClientResponseArgs,
+    public BaseProgressArgs
+{
+public:
+    ClientResponseProgressArgs(const BaseRequest& request,
+                               const BaseResponse& response,
+                               Context& context,
+                               std::streamsize bytesTransferred):
+        BaseClientResponseArgs(request, response, context),
+        BaseProgressArgs(bytesTransferred)
+    {
+    }
+
+    virtual ~ClientResponseProgressArgs()
+    {
+    }
+
+    /// \brief Get the total content length associated with this request.
+    ///
+    /// If the total content length is unknown (e.g. during chunked-transfer)
+    /// Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH is returned.
+    ///
+    /// \returns the total length of the content in bytes iff the content length
+    /// is known.  Otherwise returns
+    /// Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH.
+    std::streamsize getContentLength() const
+    {
+        return _response.getContentLength();
+    }
+};
+
 
 
 class ClientResponseEventArgs: public BaseClientResponseArgs
 {
 public:
-    ClientResponseEventArgs(const BaseRequest& request,
-                            const Poco::Net::HTTPResponse& response,
-                            std::istream& responseStream):
-        BaseClientResponseArgs(request, response),
+    ClientResponseEventArgs(std::istream& responseStream,
+                            const BaseRequest& request,
+                            const BaseResponse& response,
+                            Context& context):
+        BaseClientResponseArgs(request, response, context),
         _responseStream(responseStream)
     {
     }
@@ -86,17 +230,6 @@ public:
 
     virtual ~ClientResponseEventArgs()
     {
-    }
-
-    bool saveFile(const std::string& filename) const
-    {
-        ofBuffer buffer(_responseStream);
-        return ofBufferToFile(filename, buffer);
-    }
-
-    ofBuffer getBuffer() const
-    {
-        return ofBuffer(_responseStream);
     }
 
     std::istream& getResponseStream()
@@ -114,9 +247,10 @@ class ClientErrorEventArgs: public BaseClientResponseArgs
 {
 public:
     ClientErrorEventArgs(const BaseRequest& request,
-                         const Poco::Net::HTTPResponse& response,
+                         const BaseResponse& response,
+                         Context& context,
                          const Poco::Exception& exception):
-        BaseClientResponseArgs(request, response),
+        BaseClientResponseArgs(request, response, context),
         _exception(exception)
     {
     }
@@ -141,14 +275,15 @@ protected:
 class ClientEvents
 {
 public:
-    ofEvent<ClientErrorEventArgs> onHTTPClientErrorEvent;
+    ofEvent<BaseClientRequestArgs>   onHTTPClientRequestFilterEvent;
+    ofEvent<BaseClientResponseArgs>  onHTTPClientResponseFilterEvent;
+
+    ofEvent<ClientErrorEventArgs>    onHTTPClientErrorEvent;
     ofEvent<ClientResponseEventArgs> onHTTPClientResponseEvent;
 
+    ofEvent<ClientRequestProgressArgs> onHTTPClientRequestProgress;
+    ofEvent<ClientResponseProgressArgs> onHTTPClientResponseProgress;
 
-    //    ofEvent<PostEventArgs> onHTTPPostEvent;
-    //    ofEvent<PostFormEventArgs> onHTTPFormEvent;
-    //    ofEvent<PostUploadEventArgs> onHTTPUploadEvent;
-    
 };
 
 

@@ -58,7 +58,24 @@ AuthScope::AuthScope(const std::string& host):
     _authType(NONE)
 {
 }
-    
+
+
+AuthScope::AuthScope(const std::string& scheme,
+                     const std::string& host,
+                     unsigned short port):
+    _hasScheme(true),
+    _scheme(scheme),
+    _hasHost(true),
+    _host(host),
+    _hasPort(true),
+    _port(port),
+    _hasRealm(false),
+    _realm(""),
+    _hasAuthType(false),
+    _authType(NONE)
+{
+}
+
 
 AuthScope::AuthScope(const std::string& host, unsigned short port):
     _hasScheme(false),

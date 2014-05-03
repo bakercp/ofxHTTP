@@ -26,12 +26,11 @@
 #pragma once
 
 
-#include "ofx/HTTP/Client/BaseClient.h"
-#include "ofx/HTTP/Client/DefaultSessionProvider.h"
-#include "ofx/HTTP/Client/DefaultRedirectProcessor.h"
-#include "ofx/HTTP/Client/DefaultProxyProcessor.h"
-#include "ofx/HTTP/Client/CredentialStore.h"
-#include "ofx/HTTP/Client/DefaultResponseStreamFilter.h"
+#include "Poco/AtomicCounter.h"
+#include "Poco/Runnable.h"
+#include "ofx/HTTP/Client/ClientEvents.h"
+#include "ofx/HTTP/Client/DefaultClient.h"
+#include "ofx/HTTP/Types/ThreadSettings.h"
 
 
 namespace ofx {
@@ -39,18 +38,33 @@ namespace HTTP {
 namespace Client {
 
 
-class DefaultClient: public BaseClient
+class DefaultClientTask: public Poco::Runnable
 {
 public:
-    DefaultClient();
-    virtual ~DefaultClient();
+    DefaultClientTask(BaseRequest* request,
+                      BaseResponse* response,
+                      Context* context,
+                      ClientEvents& events,
+                      ThreadSettings threadSettings);
+
+    virtual ~DefaultClientTask();
+
+    virtual void run();
+
+    const ThreadSettings& getThreadSettings() const;
+
+    const Poco::UUID& getRequestId() const;
 
 private:
-    DefaultProxyProcessor defaultProxyProcessor;
-    DefaultCredentialStore defaultAuthenticationProcessor;
-    DefaultSessionProvider defaultSessionProvider;
-    DefaultRedirectProcessor defaultRedirectProcessor;
-    DefaultResponseStreamFilter responseStreamFilter;
+    ClientEvents& _events;
+
+    BaseRequest* _request;
+    BaseResponse* _response;
+    Context* _context;
+    ThreadSettings _threadSettings;
+
+    Poco::AtomicCounter _threadRunning;
+        ///< \brief Is the thread running?
 
 };
 

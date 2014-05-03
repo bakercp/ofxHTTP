@@ -49,23 +49,30 @@ namespace Client {
 class BaseResponse: public Poco::Net::HTTPResponse
 {
 public:
+    typedef std::shared_ptr<BaseResponse> SharedPtr;
+
     BaseResponse();
     virtual ~BaseResponse();
 
-    bool hasResponseStream() const;
-    std::istream& getResponseStream();
-    void setResponseStream(std::istream* pResponseStream);
+//    bool hasResponseStream() const;
+//    std::istream& getResponseStream();
+//
+//    bool hasException() const;
+//    const Poco::Exception* getException() const;
 
-    bool hasException() const;
-    const Poco::Exception* getException() const;
-    void setException(Poco::Exception* pException);
-
+    static SharedPtr makeShared()
+    {
+        return SharedPtr(new BaseResponse());
+    }
 
 private:
-    std::istream* _pResponseStream;
-    Poco::Exception* _pException;
+//    void setResponseStream(std::istream* pResponseStream);
+//    void setException(Poco::Exception* pException);
+//
+//    std::istream* _pResponseStream;
+//    Poco::Exception* _pException;
 
-//    friend class ofx::HTTP::BaseClient;
+    friend class BaseClient;
 
 };
 

@@ -28,6 +28,7 @@
 
 #include <string>
 //#include "Poco/Net/HTTPMessage.h"
+#include "ofx/HTTP/Utils/Utils.h"
 #include "ofx/HTTP/Client/BaseRequest.h"
 
 
@@ -39,14 +40,10 @@ namespace Client {
 class GetRequest: public BaseRequest
 {
 public:
-    GetRequest(const std::string& uri);
-
     GetRequest(const std::string& uri,
-               const Poco::Net::NameValueCollection queryParams);
-    
-    GetRequest(const std::string& uri,
-               const std::string& httpVersion,
-               const Poco::UUID& requestId = generateUUID());
+               const Poco::Net::NameValueCollection& formFields = Poco::Net::NameValueCollection(),
+               const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1,
+               const Poco::UUID& requestId = BaseRequest::generateUUID());
 
     virtual ~GetRequest();
 

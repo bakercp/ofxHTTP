@@ -36,23 +36,30 @@ namespace HTTP {
 namespace Client {
 
     
-PostRequest::PostRequest(const std::string& uri):
-    BaseRequest(Poco::Net::HTTPRequest::HTTP_POST,
-                uri,
-                Poco::Net::HTTPMessage::HTTP_1_0)
-{
-}
-
-
 PostRequest::PostRequest(const std::string& uri,
+                         const Poco::Net::NameValueCollection formFields,
+                         const FormParts formParts,
                          const std::string& httpVersion,
                          const Poco::UUID& requestId):
-    BaseRequest(Poco::Net::HTTPRequest::HTTP_POST,
+    BaseRequest(Poco::Net::HTTPRequest::HTTP_PUT,
                 uri,
+                formFields,
                 httpVersion,
                 requestId)
 {
+    if (!formParts.empty())
+    {
+        _form.setEncoding(Poco::Net::HTMLForm::ENCODING_MULTIPART);
+
+        FormParts::const_iterator iter = formParts.begin();
+
+        while (iter != formParts.end())
+        {
+            _form.addPart(iter->name, iter->pSource);
+        }
+    }
 }
+
 
 
 PostRequest::~PostRequest()
@@ -124,8 +131,8 @@ void PostRequest::prepareRequest()
 {
     _form.prepareSubmit(*this);
 
-    if (FORM_ENCODING_MULTIPART == getFormEncoding()
-    && Poco::Net::HTTPMessage::HTTP_1_0 == getVersion())
+    if (FORM_ENCODING_MULTIPART == getFormEncoding() &&
+        Poco::Net::HTTPMessage::HTTP_1_0 == getVersion())
     {
         // If we are using 1.0 with file uploads, we must get a content
         // length before sending the data.
@@ -141,8 +148,8 @@ void PostRequest::prepareRequest()
 
 void PostRequest::writeRequestBody(std::ostream& requestStream)
 {
-    if (FORM_ENCODING_MULTIPART == getFormEncoding()
-    && Poco::Net::HTTPMessage::HTTP_1_0 == getVersion())
+    if (FORM_ENCODING_MULTIPART == getFormEncoding() &&
+        Poco::Net::HTTPMessage::HTTP_1_0 == getVersion())
     {
         Poco::StreamCopier::copyStream(_outBuffer, requestStream);
     }

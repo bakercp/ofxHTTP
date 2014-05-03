@@ -40,10 +40,10 @@ namespace HTTP {
 //
 //    virtual ~DefaultCookieProcessor();
 //
-//    virtual void processRequest(Poco::Net::HTTPRequest& request,
+//    virtual void filter(Poco::Net::HTTPRequest& request,
 //                                Context& context);
 //
-//    virtual void processResponse(Poco::Net::HTTPRequest& request,
+//    virtual void filter(Poco::Net::HTTPRequest& request,
 //                                 Poco::Net::HTTPResponse& response,
 //                                 Context& context);
 //

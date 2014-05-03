@@ -24,10 +24,14 @@
 
 
 #include "ofx/HTTP/Client/DefaultSessionProvider.h"
+#include "ofx/HTTP/Client/BaseRequest.h"
+#include "ofx/HTTP/Client/BaseResponse.h"
+#include "ofx/HTTP/Client/Context.h"
 
 
 namespace ofx {
 namespace HTTP {
+namespace Client {
 
 
 DefaultSessionProvider::DefaultSessionProvider()
@@ -40,30 +44,34 @@ DefaultSessionProvider::~DefaultSessionProvider()
 }
 
 
-void DefaultSessionProvider::createSession(const Poco::URI& uri,
-                                           Context& context)
+void DefaultSessionProvider::filter(BaseRequest& request, Context& context)
 {
-    Context::Session session;
+    Context::Session session = context.getSession();
 
-    if(uri.getScheme() == "https")
+    if (!session)
     {
-        ofSSLManager::initializeClient(); // Initialize SSL context if needed.
+        Poco::URI uri(request.getURI());
 
-        session = Context::Session(new Poco::Net::HTTPSClientSession(uri.getHost(),
-                                                                     uri.getPort()));
-    }
-    else if (uri.getScheme() == "http")
-    {
-        session = Context::Session(new Poco::Net::HTTPClientSession(uri.getHost(),
-                                                                    uri.getPort()));
-    }
-    else
-    {
-        throw Poco::Exception("Unabled to create session.");
-    }
+        if(0 == uri.getScheme().compare("https"))
+        {
+            ofSSLManager::initializeClient(); // Initialize SSL context if needed.
 
-    context.setSession(session);
+            session = Context::Session(new Poco::Net::HTTPSClientSession(uri.getHost(),
+                                                                         uri.getPort()));
+        }
+        else if (0 == uri.getScheme().compare("http"))
+        {
+            session = Context::Session(new Poco::Net::HTTPClientSession(uri.getHost(),
+                                                                        uri.getPort()));
+        }
+        else
+        {
+            throw Poco::Exception("Unable to create session for the scheme: " + uri.getScheme());
+        }
+
+        context.setSession(session);
+    }
 }
 
 
-} } // namespace ofx::HTTP
+} } } // namespace ofx::HTTP::Client

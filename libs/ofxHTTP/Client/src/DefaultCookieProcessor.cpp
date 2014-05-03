@@ -40,7 +40,7 @@ namespace HTTP {
 //}
 //
 //
-//void DefaultCookieProcessor::processRequest(Poco::Net::HTTPRequest& request,
+//void DefaultCookieProcessor::filter(Poco::Net::HTTPRequest& request,
 //                                            Context& context)
 //{
 ////    CookieStore::SharedPtr store(context.getCookieStore().lock());
@@ -54,7 +54,7 @@ namespace HTTP {
 //}
 //
 //
-//void DefaultCookieProcessor::processResponse(Poco::Net::HTTPRequest& request,
+//void DefaultCookieProcessor::filter(Poco::Net::HTTPRequest& request,
 //                                             Poco::Net::HTTPResponse& response,
 //                                             Context& context)
 //{

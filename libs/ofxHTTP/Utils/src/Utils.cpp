@@ -37,6 +37,7 @@ Poco::Net::NameValueCollection Utils::splitTextPlainPost(const std::string& text
     Poco::Net::NameValueCollection nvc;
     std::string result;
     std::stringstream ss;
+
     ss << textPlain;
 
     while (std::getline(ss, result))
@@ -59,24 +60,31 @@ Poco::Net::NameValueCollection Utils::splitTextPlainPost(const std::string& text
 Poco::Net::NameValueCollection Utils::splitAndURLDecode(const std::string& encoded)
 {
     Poco::Net::NameValueCollection nvc;
+
     std::vector<std::string> arguments = ofSplitString(encoded, "&", true);
+
     std::vector<std::string>::const_iterator iter = arguments.begin();
+
     while(iter != arguments.end())
     {
         std::vector<std::string> tokens = ofSplitString(*iter, "=", true);
+
         if(tokens.size() > 0)
         {
             std::string key;
             Poco::URI::decode(tokens[0], key);
             std::string value = "";
+
             if(tokens.size() > 1)
             {
                 Poco::URI::decode(tokens[1], value);
             }
+
             nvc.add(key, value);
         }
         ++iter;
     }
+
     return nvc;
 }
 

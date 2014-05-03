@@ -26,27 +26,31 @@
 #pragma once
 
 
-#include "ofx/HTTP/Client/BaseRequestResponseProcessor.h"
+#include "ofx/HTTP/Client/AbstractClientTypes.h"
 
 
 namespace ofx {
 namespace HTTP {
+namespace Client {
 
 
-class DefaultProxyProcessor: public BaseRequestResponseProcessor
+class DefaultProxyProcessor: public AbstractRequestResponseFilter
 {
 public:
     DefaultProxyProcessor();
     virtual ~DefaultProxyProcessor();
 
-    virtual void processRequest(Client::BaseRequest& request,
-                                Context& context);
+    virtual void filter(BaseRequest& request, Context& context);
 
-    virtual bool handleResponse(Client::BaseRequest& request,
-                                Client::BaseResponse& response,
-                                Context& context);
+    virtual void filter(BaseRequest& request,
+                        BaseResponse& response,
+                        Context& context);
+
+    virtual bool canFilterResponse(BaseRequest& request,
+                                   BaseResponse& response,
+                                   Context& context) const;
 
 };
 
 
-} } // namespace ofx::HTTP
+} } } // namespace ofx::HTTP::Client

@@ -31,19 +31,20 @@
 
 namespace ofx {
 namespace HTTP {
+namespace Client {
 
 
-class DefaultClientHeaders: public AbstractRequestProcessor
+class DefaultClientHeaders: public AbstractRequestFilter
 {
 public:
     DefaultClientHeaders();
 
     virtual ~DefaultClientHeaders();
 
-    virtual void processRequest(Poco::Net::HTTPRequest& request,
-                                Context& context);
+    virtual void filter(BaseRequest& request,
+                        Context& context);
 
 };
 
 
-} } // namespace ofx::HTTP
+} } } // namespace ofx::HTTP::Client

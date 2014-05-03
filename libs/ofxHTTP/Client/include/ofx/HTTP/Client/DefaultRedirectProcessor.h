@@ -26,11 +26,12 @@
 #pragma once
 
 
-#include "ofx/HTTP/Client/BaseRequestResponseProcessor.h"
+#include "ofx/HTTP/Client/AbstractClientTypes.h"
 
 
 namespace ofx {
 namespace HTTP {
+namespace Client {
 
 
 /// \brief A simple default client redirect policy.
@@ -44,22 +45,25 @@ namespace HTTP {
 ///
 /// Additionally, this policy will will redirect content containing requests
 /// such as POST and PUT by converting their request type to a GET.
-class DefaultRedirectProcessor: public BaseRequestResponseProcessor
+class DefaultRedirectProcessor: public AbstractRequestResponseFilter
 {
 public:
     DefaultRedirectProcessor();
     
     virtual ~DefaultRedirectProcessor();
 
-    virtual void processRequest(Client::BaseRequest& request,
-                                Context& context);
+    virtual void filter(BaseRequest& request,
+                        Context& context);
 
-    virtual bool handleResponse(Client::BaseRequest& request,
-                                Client::BaseResponse& response,
-                                Context& context);
+    virtual void filter(BaseRequest& request,
+                        BaseResponse& response,
+                        Context& context);
+
+    virtual bool canFilterResponse(BaseRequest& request,
+                                   BaseResponse& response,
+                                   Context& context) const;
 
 };
 
 
-
-} } // namespace ofx::HTTP
+} } } // namespace ofx::HTTP::Client

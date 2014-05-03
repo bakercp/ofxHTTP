@@ -23,12 +23,30 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/Client/ExecutorSettings.h"
+#pragma once
 
 
-namespace ofx {
-namespace HTTP {
-namespace Client {
+#include "ofMain.h"
+#include "ofxHTTP.h"
+#include "ofxJSONElement.h"
 
 
-} } } // namespace ofx::HTTP::Client
+using namespace ofx;
+
+
+class ofApp: public ofBaseApp
+{
+public:
+    void setup();
+    void exit();
+    void update();
+    void draw();
+
+    void onSSLServerVerificationError(Poco::Net::VerificationErrorArgs& args);
+    void onSSLClientVerificationError(Poco::Net::VerificationErrorArgs& args);
+    void onSSLPrivateKeyPassphraseRequired(std::string& args);
+
+    bool onHTTPClientResponseEvent(HTTP::Client::ClientResponseEventArgs& args);
+    bool onHTTPClientErrorEvent(HTTP::Client::ClientErrorEventArgs& args);
+
+};

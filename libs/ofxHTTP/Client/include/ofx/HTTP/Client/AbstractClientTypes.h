@@ -31,95 +31,88 @@
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/URI.h"
 #include "ofTypes.h"
-#include "ofx/HTTP/Client/Context.h"
 #include "ofx/HTTP/Client/Cookie.h"
-#include "ofx/HTTP/Client/BaseRequest.h"
-#include "ofx/HTTP/Client/BaseResponse.h"
+//#include "ofx/HTTP/Client/BaseRequest.h"
+//#include "ofx/HTTP/Client/BaseResponse.h"
+//#include "ofx/HTTP/Client/Context.h"
 
 
 namespace ofx {
 namespace HTTP {
+namespace Client {
 
 
-class AbstractRequestProcessor
+class BaseRequest;
+class BaseResponse;
+class Context;
+
+
+class AbstractRequestFilter
 {
 public:
-    virtual ~AbstractRequestProcessor()
+    virtual ~AbstractRequestFilter()
     {
     }
 
-    virtual void processRequest(Client::BaseRequest& request,
-                                Context& context) = 0;
+    virtual void filter(BaseRequest& request,
+                        Context& context) = 0;
 
 };
 
 
-class AbstractResponseHandler
+class AbstractResponseFilter
 {
 public:
-    virtual ~AbstractResponseHandler()
+    virtual ~AbstractResponseFilter()
     {
     }
     
-    virtual bool handleResponse(Client::BaseRequest& request,
-                                Client::BaseResponse& response,
-                                Context& context) = 0;
-
-    virtual std::vector<Poco::Net::HTTPResponse::HTTPStatus> getHandledStatuses() const = 0;
-
-    virtual bool isStatusHandled(Poco::Net::HTTPResponse::HTTPStatus status) const = 0;
+    virtual void filter(BaseRequest& request,
+                        BaseResponse& response,
+                        Context& context) = 0;
 
 };
 
 
-class AbstractRequestResponseProcessor:
-    public AbstractRequestProcessor,
-    public AbstractResponseHandler
+class AbstractRequestResponseFilter:
+    public AbstractRequestFilter,
+    public AbstractResponseFilter
 {
 public:
-    virtual ~AbstractRequestResponseProcessor()
+    virtual ~AbstractRequestResponseFilter()
     {
     }
 
 };
 
 
-class AbstractSessionProvider
-{
-public:
-    virtual ~AbstractSessionProvider()
-    {
-    }
-
-    virtual void createSession(const Poco::URI& uri,
-                               Context& context) = 0;
-};
-
-
-class AbstractRequestStreamFilter: public AbstractRequestProcessor
+class AbstractRequestStreamFilter: public AbstractRequestFilter
 {
 public:
     virtual ~AbstractRequestStreamFilter()
     {
     }
 
-    virtual std::ostream& filter(std::ostream& requestStream) = 0;
+    virtual std::ostream& filter(std::ostream& requestStream,
+                                 const BaseRequest& request,
+                                 Context& context) = 0;
     
 };
 
 
-class AbstractResponseStreamFilter: public AbstractRequestResponseProcessor
+class AbstractResponseStreamFilter: public AbstractRequestResponseFilter
 {
 public:
     virtual ~AbstractResponseStreamFilter()
     {
     }
 
-    virtual std::istream& filter(std::istream& responseStream) = 0;
+    virtual std::istream& filter(std::istream& responseStream,
+                                 const BaseRequest& request,
+                                 const BaseResponse& response,
+                                 Context& context) = 0;
 
 };
-    
-    
 
 
-} } // namespace ofx::HTTP
+} } } // namespace ofx::HTTP::Client

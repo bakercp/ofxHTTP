@@ -31,27 +31,15 @@ namespace HTTP {
 namespace Client {
 
 
-GetRequest::GetRequest(const std::string& uri):
-    BaseRequest(Poco::Net::HTTPRequest::HTTP_GET,
-                uri,
-                Poco::Net::HTTPMessage::HTTP_1_0)
-{
-}
-
 GetRequest::GetRequest(const std::string& uri,
-                       const Poco::Net::NameValueCollection queryParams):
-    BaseRequest(Poco::Net::HTTPRequest::HTTP_GET,
-                uri,
-                queryParams,
-                Poco::Net::HTTPMessage::HTTP_1_0)
-{
-}
-
-
-GetRequest::GetRequest(const std::string& uri,
+                       const Poco::Net::NameValueCollection& formFields,
                        const std::string& httpVersion,
                        const Poco::UUID& requestId):
-    BaseRequest(Poco::Net::HTTPRequest::HTTP_GET, uri, httpVersion, requestId)
+    BaseRequest(Poco::Net::HTTPRequest::HTTP_GET,
+                uri,
+                formFields,
+                httpVersion,
+                requestId)
 {
 }
 

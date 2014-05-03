@@ -44,6 +44,7 @@
 
 namespace ofx {
 namespace HTTP {
+namespace Client {
 
 
 class Context
@@ -60,17 +61,14 @@ public:
 //    void setCookieStore(CookieStore::SharedPtr cookieStore);
 //    CookieStore::WeakPtr getCookieStore();
 
-    void setCredentialStore(CredentialStore::SharedPtr credentialStore);
-    CredentialStore::WeakPtr getCredentialStore();
-
     void setSession(Session session);
     Session getSession();
 
     void addRedirect(const Poco::URI& uri);
     const std::vector<Poco::URI>& getRedirects() const;
 
-    void setResolvedURI(const Poco::URI& uri);
-    const Poco::URI& getResolvedURI() const;
+//    void setResolvedURI(const Poco::URI& uri);
+//    const Poco::URI& getResolvedURI() const;
 
     void setProxyRedirectURI(const Poco::URI& uri);
     const Poco::URI& getProxyRedirectURI() const;
@@ -123,11 +121,10 @@ private:
 
     SessionSettings _settings;
 //    CookieStore::WeakPtr _cookieStore;
-    CredentialStore::WeakPtr _credentialStore;
 
     std::vector<Poco::URI> _redirects;
 
-    Poco::URI _resolvedURI;
+//    Poco::URI _resolvedURI;
     Poco::URI _proxyRedirectURI;
 
     Session _session;
@@ -137,4 +134,4 @@ private:
 };
 
 
-} } // namespace ofx::HTTP
+} } } // namespace ofx::HTTP::Client

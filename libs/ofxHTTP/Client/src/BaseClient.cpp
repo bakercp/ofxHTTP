@@ -32,27 +32,16 @@ namespace HTTP {
 namespace Client {
 
 
-const std::string BaseClient::ACCEPT_ENCODING_HEADER = "Accept-Encoding";
-const std::string BaseClient::CONTENT_ENCODING_HEADER = "Content-Encoding";
-
-
-BaseClient::BaseClient(AbstractSessionProvider& sessionProvider,
-                       AbstractRequestResponseProcessor& proxyProcessor,
-                       AbstractRequestResponseProcessor& authenticationProcessor,
-                       AbstractRequestResponseProcessor& redirectProcessor):
-    _isRunning(true),
-    _sessionProvider(sessionProvider),
-    _proxyProcessor(proxyProcessor),
-    _authenticationProcessor(authenticationProcessor),
-    _redirectProcessor(redirectProcessor)
-    //, _pDecodedResponseStream(0)
+BaseClient::BaseClient():
+    _requestStreamFilter(0),
+    _responseStreamFilter(0)
 {
 }
 
 
 BaseClient::~BaseClient()
 {
-//    delete _pDecodedResponseStream;
+    // we do not own the filter pointers.
 }
 
 
@@ -60,103 +49,170 @@ std::istream& BaseClient::execute(Client::BaseRequest& request,
                                   Client::BaseResponse& response,
                                   Context& context)
 {
-    context.setResolvedURI(Poco::URI(request.getURI()));
+    context.setResubmit(false);
 
-    _sessionProvider.createSession(context.getResolvedURI(), context);
+    RequestFilters::iterator requestFilterIter = _requestFilters.begin();
 
-    _proxyProcessor.processRequest(request, context);
-
-    _authenticationProcessor.processRequest(request, context);
-
-    processRequest(request, context);
+    while (requestFilterIter != _requestFilters.end())
+    {
+        (*requestFilterIter)->filter(request, context);
+        ++requestFilterIter;
+    }
 
     request.prepareRequest();
 
-    // Set the headers indicating the encodings we can decode.
-    // request.set(ACCEPT_ENCODING_HEADER, "gzip, deflate");
+    Context::Session session = context.getSession();
+
+    if (!session)
+    {
+        throw Poco::Exception("No session available for request.");
+    }
 
     std::ostream& requestStream = context.getSession()->sendRequest(request);
 
-    request.writeRequestBody(requestStream);
+//    Poco::TeeOutputStream requestStream(requestStream);
+//    outputStream.addStream(pos);
+
+    if (_requestStreamFilter)
+    {
+        request.writeRequestBody(_requestStreamFilter->filter(requestStream,
+                                                              request,
+                                                              context));
+    }
+    else
+    {
+        request.writeRequestBody(requestStream);
+    }
 
     std::istream& responseStream = context.getSession()->receiveResponse(response);
 
-    processResponse(request, response, context);
+    // apply response filters
 
-    Poco::Net::HTTPResponse::HTTPStatus status = response.getStatus();
+    ResponseFilters::iterator responseFilterIter = _responseFilters.begin();
 
-    if (status == Poco::Net::HTTPResponse::HTTP_MOVED_PERMANENTLY   // 301
-     || status == Poco::Net::HTTPResponse::HTTP_FOUND               // 302
-     || status == Poco::Net::HTTPResponse::HTTP_SEE_OTHER           // 303
-     || status == Poco::Net::HTTPResponse::HTTP_TEMPORARY_REDIRECT) // 307
+    while (responseFilterIter != _responseFilters.end())
     {
-        _redirectProcessor.handleResponse(request,
-                                          response,
-                                          context);
-
-        return execute(request, response, context);
+        (*responseFilterIter)->filter(request, response, context);
+        ++responseFilterIter;
     }
-    else if (status == Poco::Net::HTTPResponse::HTTP_USEPROXY)
+
+    if (context.getResubmit())
     {
-        _proxyProcessor.handleResponse(request, response, context);
-
-        return execute(request, response, context);
-    }
-    else if (status == Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED)
-    {
-        // consume because we are reusing the session.
-        Utils::consume(responseStream);
-
-        Utils::dumpHeaders(request, response);
-
-        _authenticationProcessor.handleResponse(request,
-                                                response,
-                                                context);
+        // If a response handler did not reset the session, then we must
+        // consume the stream in order to reuse the HTTP session.
+        if (session)
+        {
+            Utils::consume(responseStream);
+        }
 
         return execute(request, response, context);
     }
     else
     {
-//        delete _pDecodedResponseStream;
-//        _pDecodedResponseStream = 0;
-//
-//        if (response.has(CONTENT_ENCODING_HEADER))
-//        {
-//            std::string contentEncoding = response.get(CONTENT_ENCODING_HEADER);
-//
-//            if (0 == Poco::UTF8::icompare(contentEncoding, "gzip"))
-//            {
-//                _pDecodedResponseStream = new Poco::InflatingInputStream(responseStream, Poco::InflatingStreamBuf::STREAM_GZIP);
-//                return *_pDecodedResponseStream;
-//            }
-//            else if (0 == Poco::UTF8::icompare(contentEncoding, "deflate"))
-//            {
-//                _pDecodedResponseStream = new Poco::InflatingInputStream(responseStream, Poco::InflatingStreamBuf::STREAM_ZLIB);
-//                return *_pDecodedResponseStream;
-//            }
-//            else
-//            {
-//                ofLogWarning() << "Returning with unknown content encoding: " << contentEncoding;
-//                return responseStream;
-//            }
-//        }
-//        else
-//        {
+        if (_responseStreamFilter)
+        {
+            return _responseStreamFilter->filter(responseStream,
+                                                 request,
+                                                 response,
+                                                 context);
+        }
+        else
+        {
+
             return responseStream;
-//        }
+        }
     }
 }
 
 
-bool BaseClient::isRunning() const
+void BaseClient::addRequestFilter(AbstractRequestFilter* filter)
 {
-    return _isRunning;
+    _requestFilters.push_back(filter);
 }
 
-    
-void BaseClient::cancel()
+
+void BaseClient::addResponseFilter(AbstractResponseFilter* filter)
 {
-    _isRunning = false;
+    _responseFilters.push_back(filter);
+}
+
+
+void BaseClient::removeRequestFilter(AbstractRequestFilter* filter)
+{
+    RequestFilters::iterator iter = std::find(_requestFilters.begin(),
+                                              _requestFilters.end(),
+                                              filter);
+
+    if (iter != _requestFilters.end())
+    {
+        _requestFilters.erase(iter);
+    }
+}
+
+
+void BaseClient::removeResponseFilter(AbstractResponseFilter* handler)
+{
+    ResponseFilters::iterator iter = std::find(_responseFilters.begin(),
+                                                _responseFilters.end(),
+                                                handler);
+    
+    if (iter != _responseFilters.end())
+    {
+        _responseFilters.erase(iter);
+    }
+}
+
+void BaseClient::setRequestStreamFilter(AbstractRequestStreamFilter* requestStreamFilter)
+{
+    _requestStreamFilter = requestStreamFilter;
+    addRequestFilter(_requestStreamFilter);
+}
+
+
+void BaseClient::setResponseStreamFilter(AbstractResponseStreamFilter* responseStreamFilter)
+{
+    _responseStreamFilter = responseStreamFilter;
+    addRequestFilter(_responseStreamFilter);
+    addResponseFilter(_responseStreamFilter);
+}
+
+
+void BaseClient::removeRequestStreamFilter()
+{
+    if (_requestStreamFilter)
+    {
+        removeRequestFilter(_requestStreamFilter);
+    }
+
+    _requestStreamFilter = 0;
+}
+
+
+void BaseClient::removeResponseStreamFilter()
+{
+    if (_responseStreamFilter)
+    {
+        removeRequestFilter(_responseStreamFilter);
+        removeResponseFilter(_responseStreamFilter);
+    }
+
+    _responseStreamFilter = 0;
+}
+
+
+void BaseClient::progress(const BaseRequest& request,
+                          Context& context,
+                          std::streamsize total)
+{
+    // NOOP
+}
+
+void BaseClient::progress(const BaseRequest& request,
+                          const BaseResponse& response,
+                          Context& context,
+                          std::streamsize total)
+{
+    // NOOP
 }
 
 

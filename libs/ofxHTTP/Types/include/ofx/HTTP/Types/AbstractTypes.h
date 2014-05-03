@@ -175,7 +175,7 @@ public:
     {
     }
 
-    virtual bool canHandleResponse(const Poco::Net::HTTPServerRequest& request,
+    virtual bool canFilterResponse(const Poco::Net::HTTPServerRequest& request,
                                    bool isSecurePort) const = 0;
 
 };

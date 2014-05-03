@@ -26,12 +26,16 @@
 #pragma once
 
 
-#include "ofx/HTTP/Client/BaseClient.h"
-#include "ofx/HTTP/Client/DefaultSessionProvider.h"
-#include "ofx/HTTP/Client/DefaultRedirectProcessor.h"
-#include "ofx/HTTP/Client/DefaultProxyProcessor.h"
-#include "ofx/HTTP/Client/CredentialStore.h"
-#include "ofx/HTTP/Client/DefaultResponseStreamFilter.h"
+#include <deque>
+#include "Poco/Exception.h"
+#include "Poco/ThreadPool.h"
+#include "ofx/HTTP/Types/ThreadSettings.h"
+#include "ofx/HTTP/Client/DefaultClient.h"
+#include "ofx/HTTP/Client/DefaultClientTask.h"
+#include "ofx/HTTP/Client/ClientEvents.h"
+#include "ofx/HTTP/Client/BaseRequest.h"
+#include "ofx/HTTP/Client/GetRequest.h"
+#include "ofx/HTTP/Client/PostRequest.h"
 
 
 namespace ofx {
@@ -39,19 +43,91 @@ namespace HTTP {
 namespace Client {
 
 
-class DefaultClient: public BaseClient
+class DefaultClientPool
 {
 public:
-    DefaultClient();
-    virtual ~DefaultClient();
+    DefaultClientPool(std::size_t maxConnections = DEFAULT_MAXIMUM_CONNECTIONS,
+                      Poco::ThreadPool& threadPool = Poco::ThreadPool::defaultPool());
+    virtual ~DefaultClientPool();
+
+    void update(ofEventArgs& args);
+    void exit(ofEventArgs& args);
+
+    Poco::UUID get(const std::string& uri,
+                   const Poco::Net::NameValueCollection& formFields = Poco::Net::NameValueCollection(),
+                   const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1,
+                   const Poco::UUID& requestId = BaseRequest::generateUUID(),
+                   ThreadSettings threadSettings = ThreadSettings());
+
+    /// \brief Construct a PostRequest with a given uri and http version.
+    /// \param uri the Post endpoint uri.
+    /// \param formFields A collection of form fields.
+    /// \param formParts A collection of form parts.
+    /// \param httpVersion Either HTTP/1.0 or HTTP/1.1.
+    /// \param requestId A unique UUID for this request.
+    /// \returns a UUID associated with the BaseRequest.
+    Poco::UUID post(const std::string& uri,
+                    const Poco::Net::NameValueCollection formFields = Poco::Net::NameValueCollection(),
+                    const PostRequest::FormParts formParts = PostRequest::FormParts(),
+                    const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1,
+                    const Poco::UUID& requestId = BaseRequest::generateUUID(),
+                    ThreadSettings threadSettings = ThreadSettings());
+
+    /// \brief Submit a request.
+    ///
+    /// The DefaultClientPool will take ownership of the pointer and destroy
+    /// it after use.  Users must not attempt to modify the request after it
+    /// has been submitted.
+    ///
+    /// \returns a UUID associated with the BaseRequest.
+    Poco::UUID request(BaseRequest* pRequest,
+                       ThreadSettings threadSettings = ThreadSettings());
+
+
+    /// \brief Get the number of queued requests.
+    /// \returns the number of queued requests.
+    std::size_t getNumQueuedRequests() const;
+
+    /// \brief Get the number of active requests.
+    /// \returns the number of active requests.
+    std::size_t getNumActiveRequests() const;
+
+    /// \brief Cancel an existing task.
+    /// \param uuid The UUID returned with the initial task.
+    bool cancel(const Poco::UUID& uuid);
+
+    /// \brief Users subscribe to these events.
+    ClientEvents events;
+
+    enum
+    {
+        DEFAULT_MAXIMUM_CONNECTIONS = 4
+    };
 
 private:
-    DefaultProxyProcessor defaultProxyProcessor;
-    DefaultCredentialStore defaultAuthenticationProcessor;
-    DefaultSessionProvider defaultSessionProvider;
-    DefaultRedirectProcessor defaultRedirectProcessor;
-    DefaultResponseStreamFilter responseStreamFilter;
+    DefaultClientPool(const DefaultClientPool&);
+	DefaultClientPool& operator = (const DefaultClientPool&);
 
+    Context* createDefaultContext();
+    BaseResponse* createDefaultResponse();
+
+    /// \brief Subclasses can implement sorting, pruning etc.
+    ///
+    /// This is called before threads are executed.
+    virtual void processTaskQueue();
+
+    void enqueTask(DefaultClientTask* task);
+
+    typedef std::deque<DefaultClientTask*> TaskQueue;
+
+    TaskQueue _queuedRequests;
+    TaskQueue _activeRequests;
+
+    std::size_t _maxConnections;
+
+    Poco::ThreadPool& _threadPool;
+
+    mutable Poco::FastMutex _mutex;
 };
 
 

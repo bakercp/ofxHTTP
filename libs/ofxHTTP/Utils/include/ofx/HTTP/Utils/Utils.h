@@ -42,6 +42,7 @@ namespace HTTP {
 
 
 /// \brief A collection of HTTP utilities.
+/// \todo Remove ofLog / ofUtils dependencies.
 class Utils
 {
 public:
@@ -56,6 +57,7 @@ public:
     /// \brief Decode URL-encoded parameters names and their values.
     /// \param urlEncoded An URL-encoded string.
     /// \returns A map of the parameter names and their values.
+    /// \todo Remove ofSplitString in favor of Poco's string tokenizer.
     static Poco::Net::NameValueCollection splitAndURLDecode(const std::string& urlEncoded);
 
     /// \brief Decode URL-encoded parameters in a query.

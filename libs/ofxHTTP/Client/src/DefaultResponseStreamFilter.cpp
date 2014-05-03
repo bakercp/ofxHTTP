@@ -1,9 +1,111 @@
+// =============================================================================
 //
-//  DefaultResponseStreamFilter.cpp
-//  example_basic_client_handler
+// Copyright (c) 2014 Christopher Baker <http://christopherbaker.net>
 //
-//  Created by Christopher P. Baker on 5/1/14.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+// =============================================================================
 
-#include "DefaultResponseStreamFilter.h"
+
+#include "ofx/HTTP/Client/DefaultResponseStreamFilter.h"
+#include "ofx/HTTP/Client/BaseRequest.h"
+#include "ofx/HTTP/Client/BaseResponse.h"
+#include "ofx/HTTP/Client/Context.h"
+#include "Poco/InflatingStream.h"
+
+
+namespace ofx {
+namespace HTTP {
+namespace Client {
+
+
+const std::string DefaultResponseStreamFilter::ACCEPT_ENCODING_HEADER = "Accept-Encoding";
+const std::string DefaultResponseStreamFilter::CONTENT_ENCODING_HEADER = "Content-Encoding";
+
+
+DefaultResponseStreamFilter::DefaultResponseStreamFilter()
+{
+}
+
+
+DefaultResponseStreamFilter::~DefaultResponseStreamFilter()
+{
+}
+
+
+void DefaultResponseStreamFilter::filter(BaseRequest& request,
+                                                 Context& context)
+{
+    // Set the headers indicating the encodings we can decode.
+    request.set(ACCEPT_ENCODING_HEADER, "gzip, deflate");
+}
+
+
+void DefaultResponseStreamFilter::filter(BaseRequest& request,
+                                         BaseResponse& response,
+                                         Context& context)
+{
+}
+
+
+bool DefaultResponseStreamFilter::canFilterResponse(BaseRequest& request,
+                                                    BaseResponse& response,
+                                                    Context& context) const
+{
+    return true;
+}
+
+
+std::istream& DefaultResponseStreamFilter::filter(std::istream& responseStream,
+                                                  const BaseRequest& request,
+                                                  const BaseResponse& response,
+                                                  Context& context)
+{
+    _pResponseStream.reset();
+
+    if (response.has(CONTENT_ENCODING_HEADER))
+    {
+        std::string contentEncoding = response.get(CONTENT_ENCODING_HEADER);
+
+        if (0 == Poco::UTF8::icompare(contentEncoding, "gzip"))
+        {
+            _pResponseStream = std::shared_ptr<std::istream>(new Poco::InflatingInputStream(responseStream,
+                                                                                            Poco::InflatingStreamBuf::STREAM_GZIP));
+            return *_pResponseStream;
+        }
+        else if (0 == Poco::UTF8::icompare(contentEncoding, "deflate"))
+        {
+            _pResponseStream = std::shared_ptr<std::istream>(new Poco::InflatingInputStream(responseStream,
+                                                                                            Poco::InflatingStreamBuf::STREAM_ZLIB));
+            return *_pResponseStream;
+        }
+        else
+        {
+            ofLogWarning() << "Returning with unknown content encoding: " << contentEncoding;
+            return responseStream;
+        }
+    }
+    else
+    {
+        return responseStream;
+    }
+}
+
+
+} } } // namespace ofx::HTTP::Client

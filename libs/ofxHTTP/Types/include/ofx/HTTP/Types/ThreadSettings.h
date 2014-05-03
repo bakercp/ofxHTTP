@@ -32,38 +32,20 @@
 
 namespace ofx {
 namespace HTTP {
-namespace Client {
 
 
 class ThreadSettings
 {
 public:
     ThreadSettings(const std::string& name = "default",
-                   const Poco::Thread::Priority& priority = Poco::Thread::PRIO_NORMAL):
-    _name(name),
-    _priority(priority)
-    {
-    }
+                   const Poco::Thread::Priority& priority = Poco::Thread::PRIO_NORMAL);
 
-    std::string getName() const
-    {
-        return _name;
-    }
+    virtual ~ThreadSettings();
 
-    void setName(const std::string& name)
-    {
-        _name = name;
-    }
-
-    Poco::Thread::Priority getPriority() const
-    {
-        return _priority;
-    }
-
-    void setPriority(const Poco::Thread::Priority& priority)
-    {
-        _priority = priority;
-    }
+    std::string getName() const;
+    void setName(const std::string& name);
+    Poco::Thread::Priority getPriority() const;
+    void setPriority(const Poco::Thread::Priority& priority);
 
 protected:
     std::string _name;
@@ -72,4 +54,4 @@ protected:
 };
 
 
-} } } // namespace ofx::HTTP::Client
+} } // namespace ofx::HTTP

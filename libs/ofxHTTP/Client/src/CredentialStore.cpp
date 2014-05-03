@@ -24,42 +24,27 @@
 
 
 #include "ofx/HTTP/Client/CredentialStore.h"
+#include "ofx/HTTP/Client/BaseRequest.h"
+#include "ofx/HTTP/Client/BaseResponse.h"
 
 
 namespace ofx {
 namespace HTTP {
+namespace Client {
 
 
-CredentialStore::CredentialStore()
+DefaultCredentialStore::DefaultCredentialStore()
 {
 }
 
 
-CredentialStore::CredentialStore(CredentialStore& that)
-{
-    Poco::FastMutex::ScopedLock thatLock(that.mutex);
-    credentialMap = that.credentialMap;
-    // cache is not copied
-}
-
-
-CredentialStore& CredentialStore::operator = (CredentialStore& that)
-{
-    Poco::FastMutex::ScopedLock thisLock(mutex);
-    Poco::FastMutex::ScopedLock thatLock(that.mutex);
-    credentialMap = that.credentialMap;
-    // cache is not copied
-    return *this;
-}
-
-
-CredentialStore::~CredentialStore()
+DefaultCredentialStore::~DefaultCredentialStore()
 {
 }
 
 
-void CredentialStore::setCredentials(const AuthScope& scope,
-                                     const Credentials& credentials)
+void DefaultCredentialStore::setCredentials(const AuthScope& scope,
+                                            const Credentials& credentials)
 {
     if(!credentials.hasCredentials())
     {
@@ -74,7 +59,7 @@ void CredentialStore::setCredentials(const AuthScope& scope,
 }
 
 
-void CredentialStore::setCredentialsFromURI(const Poco::URI& uri)
+void DefaultCredentialStore::setCredentialsFromURI(const Poco::URI& uri)
 {
     std::string username;
     std::string password;
@@ -94,18 +79,20 @@ void CredentialStore::setCredentialsFromURI(const Poco::URI& uri)
 		password.clear();
 	}
 
+    std::cout << uri.toString() << " / " << username << " / " << password << std::endl;
+
     setCredentials(uri, username, password);
 }
 
 
-void CredentialStore::setCredentials(const Poco::URI& uri,
+void DefaultCredentialStore::setCredentials(const Poco::URI& uri,
                                      const Credentials& credentials)
 {
     setCredentials(AuthScope(uri), credentials);
 }
 
 
-void CredentialStore::setCredentials(const Poco::URI& uri,
+void DefaultCredentialStore::setCredentials(const Poco::URI& uri,
                                      const string& username,
                                      const string& password)
 {
@@ -113,7 +100,7 @@ void CredentialStore::setCredentials(const Poco::URI& uri,
 }
 
 
-bool CredentialStore::hasCredentials(const AuthScope& targetScope) const
+bool DefaultCredentialStore::hasCredentials(const AuthScope& targetScope) const
 {
     Credentials matchingCredentials;
     AuthScope   matchingScope;
@@ -121,7 +108,7 @@ bool CredentialStore::hasCredentials(const AuthScope& targetScope) const
 }
 
 
-bool CredentialStore::getCredentials(const AuthScope& targetScope,
+bool DefaultCredentialStore::getCredentials(const AuthScope& targetScope,
                                      AuthScope& matchingScope,
                                      Credentials& matchingCredentials) const
 {
@@ -130,7 +117,7 @@ bool CredentialStore::getCredentials(const AuthScope& targetScope,
 }
 
 
-bool CredentialStore::getCredentialsWithExistingLock(const AuthScope& targetScope,
+bool DefaultCredentialStore::getCredentialsWithExistingLock(const AuthScope& targetScope,
                                                      AuthScope& matchingScope,
                                                      Credentials& matchingCredentials) const
 {
@@ -181,7 +168,7 @@ bool CredentialStore::getCredentialsWithExistingLock(const AuthScope& targetScop
 }
 
 
-void CredentialStore::clearCredentials(const AuthScope& scope)
+void DefaultCredentialStore::clearCredentials(const AuthScope& scope)
 {
     Poco::FastMutex::ScopedLock lock(mutex);
     credentialMap.erase(scope);
@@ -190,14 +177,14 @@ void CredentialStore::clearCredentials(const AuthScope& scope)
 }
 
 
-void CredentialStore::clearCredentials(const Poco::URI& uri)
+void DefaultCredentialStore::clearCredentials(const Poco::URI& uri)
 {
     clearCredentials(AuthScope(uri));
 }
 
 
-bool CredentialStore::updateAuthentication(const Poco::Net::HTTPClientSession& session,
-                                           Poco::Net::HTTPRequest& request)
+void DefaultCredentialStore::filter(BaseRequest& request,
+                                    Context& context)
 {
     // first check and see if the request has any authentication headers
     // these could be added via default session headers
@@ -207,7 +194,10 @@ bool CredentialStore::updateAuthentication(const Poco::Net::HTTPClientSession& s
         return false;
     }
 
-    AuthScope    targetScope(session.getHost(), session.getPort());
+    Poco::URI uri(request.getURI());
+
+
+    AuthScope    targetScope(uri.getHost(), uri.getPort());
     Credentials  matchingCredentials;
     AuthScope    matchingScope;
     
@@ -248,15 +238,17 @@ bool CredentialStore::updateAuthentication(const Poco::Net::HTTPClientSession& s
 }
 
 
-bool CredentialStore::authenticate(const Poco::Net::HTTPClientSession& session,
-                                   Poco::Net::HTTPRequest& request,
-                                   Poco::Net::HTTPResponse& response)
+void DefaultCredentialStore::filter(BaseRequest& request,
+                                    BaseResponse& response,
+                                    Context& context)
 {
 
     if(response.getStatus() == Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED)
     {
         for(Poco::Net::HTTPResponse::ConstIterator iter = response.find("WWW-Authenticate"); iter != response.end(); ++iter)
         {
+            Poco::URI uri(request.getURI());
+
             AuthenticationType requestedAuthType;
             
             if(Poco::Net::HTTPCredentials::isBasicCredentials(iter->second))
@@ -297,11 +289,9 @@ bool CredentialStore::authenticate(const Poco::Net::HTTPClientSession& session,
                 return false;
             }
 
-            std::string scheme = session.secure() ? "https" : "http";
-            
-            AuthScope targetScope(scheme,
-                                  session.getHost(),
-                                  session.getPort(),
+            AuthScope targetScope(uri.getScheme(),
+                                  uri.getHost(),
+                                  uri.getPort(),
                                   params.getRealm(),
                                   requestedAuthType);
 
@@ -353,7 +343,17 @@ bool CredentialStore::authenticate(const Poco::Net::HTTPClientSession& session,
 }
 
 
-bool CredentialStore::authenticateWithCache(const AuthScope& scope,
+bool DefaultCredentialStore::canFilterResponse(BaseRequest& request,
+                                               BaseResponse& response,
+                                               Context& context) const
+{
+    // TODO
+    return true;
+}
+
+
+
+bool DefaultCredentialStore::authenticateWithCache(const AuthScope& scope,
                                             Poco::Net::HTTPRequest& request)
 {
     // TODO:
@@ -361,7 +361,7 @@ bool CredentialStore::authenticateWithCache(const AuthScope& scope,
 }
 
 
-void CredentialStore::clear()
+void DefaultCredentialStore::clear()
 {
     Poco::FastMutex::ScopedLock lock(mutex);
     credentialMap.clear();
@@ -388,4 +388,4 @@ void ofxHTTPCredentialStore::dump() {
 */
 
 
-} } // namespace ofx::HTTP
+} } } // namespace ofx::HTTP::Client

@@ -34,21 +34,16 @@ namespace Client {
 const std::string PutRequest::DEFAULT_MEDIA_TYPE = "application/octet-stream";
 
 
-PutRequest::PutRequest(const std::string& uri):
-    BaseRequest(Poco::Net::HTTPRequest::HTTP_PUT,
-                uri,
-                Poco::Net::HTTPMessage::HTTP_1_1),
-    _startByte(0),
-    _endByte(0),
-    _contentType(DEFAULT_MEDIA_TYPE)
-{
-}
-
 
 PutRequest::PutRequest(const std::string& uri,
+                       const Poco::Net::NameValueCollection formFields,
                        const std::string& httpVersion,
                        const Poco::UUID& requestId):
-    BaseRequest(Poco::Net::HTTPRequest::HTTP_PUT, uri, httpVersion, requestId),
+    BaseRequest(Poco::Net::HTTPRequest::HTTP_PUT,
+                uri,
+                formFields,
+                httpVersion,
+                requestId),
     _startByte(0),
     _endByte(0),
     _contentType(DEFAULT_MEDIA_TYPE)

@@ -42,22 +42,25 @@
 #include "ofx/HTTP/Client/AuthScope.h"
 #include "ofx/HTTP/Client/Credentials.h"
 #include "ofx/HTTP/Utils/Utils.h"
+#include "ofx/HTTP/Client/AbstractClientTypes.h"
 
 
 namespace ofx {
 namespace HTTP {
+namespace Client {
+
+
+class BaseRequest;
+class BaseResponse;
+class Context;
 
     
-// thread-safe credential store
-class CredentialStore
+/// \brief Default credential store.
+class DefaultCredentialStore: public AbstractRequestResponseFilter
 {
 public:
-    typedef std::shared_ptr<CredentialStore> SharedPtr;
-    typedef std::weak_ptr<CredentialStore> WeakPtr;
-    typedef std::shared_ptr<Poco::Net::HTTPBasicCredentials>  HTTPBasicCredentialsSharedPtr;
-    typedef std::shared_ptr<Poco::Net::HTTPDigestCredentials> HTTPDigestCredentialsSharedPtr;
-
-    virtual ~CredentialStore();
+    DefaultCredentialStore();
+    virtual ~DefaultCredentialStore();
 
     bool hasCredentials(const AuthScope& targetScope) const;
     
@@ -73,20 +76,20 @@ public:
     
     void clearCredentials(const AuthScope& scope);
     void clearCredentials(const Poco::URI& uri);
-    
-    bool updateAuthentication(const Poco::Net::HTTPClientSession& session,
-                              Poco::Net::HTTPRequest& request);
-    
-    bool authenticate(const Poco::Net::HTTPClientSession& session,
-                      Poco::Net::HTTPRequest& request,
-                      Poco::Net::HTTPResponse& response);
-    
-    void clear();
 
-    static SharedPtr makeShared()
-    {
-        return SharedPtr(new CredentialStore());
-    }
+
+    void filter(BaseRequest& request,
+                Context& context);
+
+    void filter(BaseRequest& request,
+                BaseResponse& response,
+                Context& context);
+
+    bool canFilterResponse(BaseRequest& request,
+                           BaseResponse& response,
+                           Context& context) const;
+
+    void clear();
 
 protected:
     bool authenticateWithCache(const AuthScope& scope,
@@ -97,15 +100,16 @@ protected:
                                         Credentials& matchingCredentials) const;
     
 private:
-    CredentialStore();
-    CredentialStore(CredentialStore& that);
-	CredentialStore& operator = (CredentialStore& that);
-    CredentialStore(const CredentialStore& c);
-    CredentialStore& operator = (const CredentialStore& c);
+	DefaultCredentialStore(const DefaultCredentialStore&);
+	DefaultCredentialStore& operator = (const DefaultCredentialStore&);
+
+    typedef std::shared_ptr<Poco::Net::HTTPBasicCredentials>  HTTPBasicCredentialsSharedPtr;
+    typedef std::shared_ptr<Poco::Net::HTTPDigestCredentials> HTTPDigestCredentialsSharedPtr;
 
     typedef std::map<AuthScope, Credentials>                    CredentialMap;
     typedef std::map<AuthScope, HTTPBasicCredentialsSharedPtr>  BasicCredentialCacheMap;
     typedef std::map<AuthScope, HTTPDigestCredentialsSharedPtr> DigestCredentialCacheMap;
+
 
     typedef CredentialMap::const_iterator      HTTPCredentialMapIter;
     typedef BasicCredentialCacheMap::iterator  HTTPBasicCredentialCacheMapIter;
@@ -120,4 +124,4 @@ private:
 };
 
 
-} } // namespace ofx::HTTP
+} } } // namespace ofx::HTTP

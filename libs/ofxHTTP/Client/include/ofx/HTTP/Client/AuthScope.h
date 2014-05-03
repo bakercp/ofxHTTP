@@ -47,6 +47,10 @@ public:
 
     AuthScope(const std::string& host, unsigned short port);
 
+    AuthScope(const std::string& scheme,
+              const std::string& host,
+              unsigned short port);
+
     AuthScope(const std::string& host,
               AuthenticationType authType);
 

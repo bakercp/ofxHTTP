@@ -34,60 +34,61 @@ namespace Client {
 
 
 BaseResponse::BaseResponse():
-    Poco::Net::HTTPResponse(),
-    _pResponseStream(0),
-    _pException(0)
+    Poco::Net::HTTPResponse()//,
+//    _pResponseStream(0),
+//    _pException(0)
 {
 }
 
 
 BaseResponse::~BaseResponse()
 {
-    // deleting a null pointer is a noop
-    delete _pResponseStream; // cleans up the stream and the backing session
-    _pResponseStream = 0;
-
-    delete _pException;
-    _pException = 0;
+//    // deleting a null pointer is a noop
+//    delete _pResponseStream; // cleans up the stream and the backing session
+//    _pResponseStream = 0;
+//
+//    delete _pException;
+//    _pException = 0;
 }
 
 
-bool BaseResponse::hasResponseStream() const
-{
-    return 0 != _pResponseStream;
-}
-
-std::istream& BaseResponse::getResponseStream()
-{
-    poco_assert(_pResponseStream);
-    return *_pResponseStream;
-}
-
-
-void BaseResponse::setResponseStream(std::istream* pResponseStream)
-{
-    delete _pResponseStream;
-    _pResponseStream = pResponseStream;
-}
-
-
-bool BaseResponse::hasException() const
-{
-    return 0 != _pException;
-}
-
-
-const Poco::Exception* BaseResponse::getException() const
-{
-    return _pException;
-}
-
-
-void BaseResponse::setException(Poco::Exception* pException)
-{
-    delete _pException;
-    _pException = pException;
-}
+//bool BaseResponse::hasResponseStream() const
+//{
+//    return 0 != _pResponseStream;
+//}
+//
+//std::istream& BaseResponse::getResponseStream()
+//{
+//    poco_assert(_pResponseStream);
+//    
+//    return *_pResponseStream;
+//}
+//
+//
+//void BaseResponse::setResponseStream(std::istream* pResponseStream)
+//{
+//    delete _pResponseStream;
+//    _pResponseStream = pResponseStream;
+//}
+//
+//
+//bool BaseResponse::hasException() const
+//{
+//    return 0 != _pException;
+//}
+//
+//
+//const Poco::Exception* BaseResponse::getException() const
+//{
+//    return _pException;
+//}
+//
+//
+//void BaseResponse::setException(Poco::Exception* pException)
+//{
+//    delete _pException;
+//    _pException = pException;
+//}
 
 
 } } } // namespace ofx::HTTP::Client

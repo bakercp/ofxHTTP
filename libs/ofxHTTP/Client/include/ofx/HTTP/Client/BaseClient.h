@@ -26,9 +26,10 @@
 #pragma once
 
 
-#include "Poco/InflatingStream.h"
+#include "Poco/TeeStream.h"
+#include "ofx/HTTP/Client/ClientProgressStream.h"
 #include "ofx/HTTP/Client/AbstractClientTypes.h"
-#include "ofx/HTTP/Client/BaseClientProcessors.h"
+#include "ofx/HTTP/Client/ClientEvents.h"
 #include "ofx/HTTP/Client/BaseRequest.h"
 #include "ofx/HTTP/Client/BaseResponse.h"
 
@@ -38,45 +39,56 @@ namespace HTTP {
 namespace Client {
 
 
-class BaseClient: public BaseClientProcessors
+class BaseClient:
+    public AbstractRequestStreamListener,
+    public AbstractResponseStreamListener
 {
 public:
-    BaseClient(AbstractSessionProvider& sessionProvider,
-               AbstractRequestResponseProcessor& proxyProcessor,
-               AbstractRequestResponseProcessor& authenticationProcessor,
-               AbstractRequestResponseProcessor& redirectProcessor);
+    BaseClient();
 
     virtual ~BaseClient();
 
-    std::istream& execute(Client::BaseRequest& request,
-                          Client::BaseResponse& response,
+    std::istream& execute(BaseRequest& request,
+                          BaseResponse& response,
                           Context& context);
 
-    void execute(Client::BaseRequest& request,
-                 Client::BaseResponse& response,
-                 Context& context,
-                 ofBuffer& buffer);
+    void addRequestFilter(AbstractRequestFilter* filter);
+    void addResponseFilter(AbstractResponseFilter* filter);
 
-    bool isRunning() const;
-    void cancel();
+    void removeRequestFilter(AbstractRequestFilter* filter);
+    void removeResponseFilter(AbstractResponseFilter* filter);
+
+    void setRequestStreamFilter(AbstractRequestStreamFilter* filter);
+    void setResponseStreamFilter(AbstractResponseStreamFilter* filter);
+
+    void removeRequestStreamFilter();
+    void removeResponseStreamFilter();
+
+    ClientEvents events;
 
 private:
-    bool _isRunning;
+    typedef std::vector<AbstractRequestFilter*> RequestFilters;
+    typedef std::vector<AbstractResponseFilter*> ResponseFilters;
 
-    AbstractSessionProvider& _sessionProvider;
-    AbstractRequestResponseProcessor& _proxyProcessor;
-    AbstractRequestResponseProcessor& _authenticationProcessor;
-    AbstractRequestResponseProcessor& _redirectProcessor;
+    RequestFilters _requestFilters;
+    ResponseFilters _responseFilters;
 
-//    std::istream* _pDecodedResponseStream;
+    ClientProgressRequestStream* _pClientProgressRequestStream;
+    ClientProgressResponseStream* _pClientProgressResponseStream;
 
-    static const std::string ACCEPT_ENCODING_HEADER;
-    static const std::string CONTENT_ENCODING_HEADER;
+    AbstractRequestStreamFilter* _requestStreamFilter;
+    AbstractResponseStreamFilter* _responseStreamFilter;
+
+    void progress(const BaseRequest& request,
+                  Context& context,
+                  std::streamsize total);
+
+    void progress(const BaseRequest& request,
+                  const BaseResponse& response,
+                  Context& context,
+                  std::streamsize total);
 
 };
-
-
-typedef BaseClient DefaultClient;
 
 
 } } } // namespace ofx::HTTP::Client

@@ -33,6 +33,7 @@
 #include "ofUtils.h"
 #include "Poco/String.h"
 #include "Poco/UTF8String.h"
+#include "Poco/URI.h"
 #include "Poco/UUID.h"
 #include "Poco/UUIDGenerator.h"
 #include "Poco/Net/HTTPRequest.h"
@@ -48,39 +49,25 @@ namespace Client {
 class BaseRequest: public Poco::Net::HTTPRequest
 {
 public:
-    /// \brief A shared pointer to a base request.
-    typedef std::shared_ptr<BaseRequest> SharedPtr;
-
-    /// \brief Construct a Request with the given information.
+    /// \brief Construct an HTTPRequest
     ///
-    /// In this constructor, the uri is left untouched.  Query parameters that
-    /// must be signed or otherwise manipulated should be included as form
-    /// fields using the alternate constructor.
+    /// This simple constructor passes the raw URI as is with the HTTPRequest.
+    /// query and fragment parameters included in the URI will not be available
+    /// for additional processing (e.g. for use in OAuth signatures).  Any
+    /// query parameters / form fields added later using the addField() method
+    /// will be processed separately according to the provided HTTP method (e.g.
+    /// form fields added to a GET requests will be URL-encoded and added to the
+    /// request URI before submission).
     ///
-    /// \param uri the raw endpoint uri
-    /// \param verion Either HTTP/1.0 or HTTP/1.1.
-    /// \param requestId A unique UUID for this request.
-	BaseRequest(const std::string& method,
-                const std::string& uri,
-                const std::string& httpVersion,
-                const Poco::UUID& requestId = generateUUID());
-
-    /// \brief Construct a Request with the given information.
-    ///
-    /// In this constructor, the uri is left untouched.  Query parameters that
-    /// must be signed or otherwise manipulated should be included as form
-    /// fields in the formFields parameter.  For GET requests, the form fields
-    /// will be URL encoded and appended to the final URI during client
-    /// processing.
-    ///
-    /// \param uri the raw endpoint uri
+    /// \param method the HTTP method (e.g. GET, POST, PUT, etc).
+    /// \param uri the endpoint uri
     /// \param formFields a collection of form fields to be processed.
     /// \param verion Either HTTP/1.0 or HTTP/1.1.
     /// \param requestId A unique UUID for this request.
 	BaseRequest(const std::string& method,
                 const std::string& uri,
-                const Poco::Net::NameValueCollection& formFields,
-                const std::string& httpVersion,
+                const Poco::Net::NameValueCollection& formFields = Poco::Net::NameValueCollection(),
+                const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1,
                 const Poco::UUID& requestId = generateUUID());
 
     /// \brief Destroy this BaseReuqest.
@@ -92,9 +79,13 @@ public:
     void addFormField(const std::string& name,
                       const std::string& value);
 
+    void addFormFields(const Poco::Net::NameValueCollection& formFields);
+
     const Poco::UUID& getRequestId() const;
 
     const Poco::Net::HTMLForm& getForm() const;
+
+    Poco::Net::HTMLForm& getFormRef();
 
     static Poco::UUID generateUUID();
 
@@ -106,8 +97,10 @@ protected:
 
     virtual void writeRequestBody(std::ostream& requestStream);
 
+    /// \brief A unique request id generated for this request.
     Poco::UUID _requestId;
 
+    /// \brief A form with all query terms / form parameters.
     Poco::Net::HTMLForm _form;
 
     friend class BaseClient;

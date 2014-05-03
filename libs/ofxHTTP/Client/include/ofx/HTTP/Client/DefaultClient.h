@@ -26,9 +26,12 @@
 #pragma once
 
 
-#include "ofx/HTTP/Client/AbstractClientTypes.h"
-#include "ofx/HTTP/Client/BaseRequest.h"
-#include "ofx/HTTP/Client/BaseResponse.h"
+#include "ofx/HTTP/Client/BaseClient.h"
+#include "ofx/HTTP/Client/DefaultSessionProvider.h"
+#include "ofx/HTTP/Client/DefaultRedirectProcessor.h"
+#include "ofx/HTTP/Client/DefaultProxyProcessor.h"
+#include "ofx/HTTP/Client/CredentialStore.h"
+#include "ofx/HTTP/Client/DefaultResponseStreamFilter.h"
 
 
 namespace ofx {
@@ -36,43 +39,20 @@ namespace HTTP {
 namespace Client {
 
 
-class BaseClient
+class DefaultClient: public BaseClient
 {
 public:
-    BaseClient();
-
-    virtual ~BaseClient();
-
-    std::istream& execute(BaseRequest& request,
-                          BaseResponse& response,
-                          Context& context);
-
-    void addRequestProcessor(AbstractRequestProcessor* processor);
-    void addResponseHandler(AbstractResponseHandler* handler);
-
-    void removeRequestProcessor(AbstractRequestProcessor* processor);
-    void removeResponseHandler(AbstractResponseHandler* handler);
-
-    void setRequestStreamFilter(AbstractRequestStreamFilter* filter);
-    void setResponseStreamFilter(AbstractResponseStreamFilter* filter);
-
-    void removeRequestStreamFilter();
-    void removeResponseStreamFilter();
+    DefaultClient();
+    virtual ~DefaultClient();
 
 private:
-    typedef std::vector<AbstractRequestProcessor*> RequestProcessors;
-    typedef std::vector<AbstractResponseHandler*> ResponseHandlers;
-
-    RequestProcessors _requestProcessors;
-    ResponseHandlers _responseHandlers;
-
-    AbstractRequestStreamFilter* _requestStreamFilter;
-    AbstractResponseStreamFilter* _responseStreamFilter;
+    DefaultProxyProcessor defaultProxyProcessor;
+    DefaultCredentialStore defaultAuthenticationProcessor;
+    DefaultSessionProvider defaultSessionProvider;
+    DefaultRedirectProcessor defaultRedirectProcessor;
+    DefaultResponseStreamFilter responseStreamFilter;
 
 };
-
-
-typedef BaseClient DefaultClient;
 
 
 } } } // namespace ofx::HTTP::Client

@@ -51,7 +51,10 @@
 
 #include "ofx/HTTP/Client/DefaultSessionProvider.h"
 #include "ofx/HTTP/Client/DefaultProxyProcessor.h"
-#include "ofx/HTTP/Client/DefaultAuthenticationProcessor.h"
 #include "ofx/HTTP/Client/DefaultRedirectProcessor.h"
 #include "ofx/HTTP/Client/DefaultClientHeaders.h"
 #include "ofx/HTTP/Client/DefaultCookieProcessor.h"
+#include "ofx/HTTP/Client/DefaultRequestStreamFilter.h"
+#include "ofx/HTTP/Client/DefaultResponseStreamFilter.h"
+#include "ofx/HTTP/Client/DefaultClient.h"
+

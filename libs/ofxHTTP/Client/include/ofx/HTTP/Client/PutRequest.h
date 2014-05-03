@@ -37,16 +37,13 @@ namespace Client {
 class PutRequest: public BaseRequest
 {
 public:
-    /// \brief Construct a PutRequest with the given uri.
-    /// \param uri the Post endpoint uri.
-    PutRequest(const std::string& uri);
-
     /// \brief Construct a PutRequest with a given uri and http version.
     /// \param uri the Put endpoint uri.
     /// \param httpVersion Either HTTP/1.0 or HTTP/1.1.
     /// \param requestId A unique UUID for this request.
     PutRequest(const std::string& uri,
-               const std::string& httpVersion,
+               const Poco::Net::NameValueCollection formFields = Poco::Net::NameValueCollection(),
+               const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1,
                const Poco::UUID& requestId = generateUUID());
 
     virtual ~PutRequest();
