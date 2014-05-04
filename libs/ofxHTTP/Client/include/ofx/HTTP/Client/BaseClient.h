@@ -27,11 +27,12 @@
 
 
 #include "Poco/TeeStream.h"
-#include "ofx/HTTP/Client/ClientProgressStream.h"
 #include "ofx/HTTP/Client/AbstractClientTypes.h"
 #include "ofx/HTTP/Client/ClientEvents.h"
-#include "ofx/HTTP/Client/BaseRequest.h"
-#include "ofx/HTTP/Client/BaseResponse.h"
+#include "ofx/HTTP/Client/ClientProgressStream.h"
+//#include "ofx/HTTP/Client/BaseRequest.h"
+//#include "ofx/HTTP/Client/BaseResponse.h"
+
 
 
 namespace ofx {
@@ -44,13 +45,21 @@ class BaseClient:
     public AbstractResponseStreamListener
 {
 public:
-    BaseClient();
+    typedef std::vector<AbstractRequestFilter*> RequestFilters;
+    typedef std::vector<AbstractResponseFilter*> ResponseFilters;
+
+    BaseClient(RequestFilters requestFilters,
+               ResponseFilters responseFilters);
 
     virtual ~BaseClient();
 
     std::istream& execute(BaseRequest& request,
                           BaseResponse& response,
                           Context& context);
+
+    void submit(BaseRequest& request,
+                BaseResponse& response,
+                Context& context);
 
     void addRequestFilter(AbstractRequestFilter* filter);
     void addResponseFilter(AbstractResponseFilter* filter);
@@ -64,31 +73,107 @@ public:
     void removeRequestStreamFilter();
     void removeResponseStreamFilter();
 
+    template<class ListenerClass>
+    void registerClientEvents(ListenerClass* listener);
+
+    template<class ListenerClass>
+    void unregisterClientEvents(ListenerClass* listener);
+
+    template<class ListenerClass>
+    void registerClientProgressEvents(ListenerClass* listener);
+
+    template<class ListenerClass>
+    void unregisterClientProgressEvents(ListenerClass* listener);
+
+    template<class ListenerClass>
+    void registerClientFilterEvents(ListenerClass* listener);
+
+    template<class ListenerClass>
+    void unregisterClientFilterEvents(ListenerClass* listener);
+
     ClientEvents events;
 
-private:
-    typedef std::vector<AbstractRequestFilter*> RequestFilters;
-    typedef std::vector<AbstractResponseFilter*> ResponseFilters;
-
+protected:
     RequestFilters _requestFilters;
     ResponseFilters _responseFilters;
 
-    ClientProgressRequestStream* _pClientProgressRequestStream;
-    ClientProgressResponseStream* _pClientProgressResponseStream;
+private:
+    std::shared_ptr<std::ostream> _pClientProgressRequestStream;
+    std::shared_ptr<std::istream> _pClientProgressResponseStream;
 
-    AbstractRequestStreamFilter* _requestStreamFilter;
-    AbstractResponseStreamFilter* _responseStreamFilter;
+    AbstractRequestStreamFilter* _pRequestStreamFilter;
+    AbstractResponseStreamFilter* _pResponseStreamFilter;
+
+    void filter(BaseRequest& request, Context& context);
+
+    void filter(BaseRequest& request,
+                BaseResponse& response,
+                Context& context);
+
+    std::ostream& send(BaseRequest& request, Context& context);
+
+    std::istream& receive(BaseRequest& request,
+                          BaseResponse& response,
+                          Context& context);
 
     void progress(const BaseRequest& request,
                   Context& context,
-                  std::streamsize total);
+                  std::streamsize totalBytesTransferred);
 
     void progress(const BaseRequest& request,
                   const BaseResponse& response,
                   Context& context,
-                  std::streamsize total);
+                  std::streamsize totalBytesTransferred);
 
 };
+
+
+template<class ListenerClass>
+void BaseClient::registerClientEvents(ListenerClass* listener)
+{
+    ofAddListener(events.onHTTPClientErrorEvent, listener, &ListenerClass::onHTTPClientErrorEvent);
+    ofAddListener(events.onHTTPClientResponseEvent, listener, &ListenerClass::onHTTPClientResponseEvent);
+}
+
+
+template<class ListenerClass>
+void BaseClient::unregisterClientEvents(ListenerClass* listener)
+{
+    ofRemoveListener(events.onHTTPClientErrorEvent, listener, &ListenerClass::onHTTPClientErrorEvent);
+    ofRemoveListener(events.onHTTPClientResponseEvent, listener, &ListenerClass::onHTTPClientResponseEvent);
+}
+
+
+template<class ListenerClass>
+void BaseClient::registerClientProgressEvents(ListenerClass* listener)
+{
+    ofAddListener(events.onHTTPClientRequestProgress, listener, &ListenerClass::onHTTPClientRequestProgress);
+    ofAddListener(events.onHTTPClientResponseProgress, listener, &ListenerClass::onHTTPClientResponseProgress);
+}
+
+
+template<class ListenerClass>
+void BaseClient::unregisterClientProgressEvents(ListenerClass* listener)
+{
+    ofRemoveListener(events.onHTTPClientRequestProgress, listener, &ListenerClass::onHTTPClientRequestProgress);
+    ofRemoveListener(events.onHTTPClientResponseProgress, listener, &ListenerClass::onHTTPClientResponseProgress);
+}
+
+
+template<class ListenerClass>
+void BaseClient::registerClientFilterEvents(ListenerClass* listener)
+{
+    ofAddListener(events.onHTTPClientRequestFilterEvent, listener, &ListenerClass::onHTTPClientRequestFilterEvent);
+    ofAddListener(events.onHTTPClientResponseFilterEvent, listener, &ListenerClass::onHTTPClientResponseFilterEvent);
+}
+
+
+template<class ListenerClass>
+void BaseClient::unregisterClientFilterEvents(ListenerClass* listener)
+{
+    ofRemoveListener(events.onHTTPClientRequestFilterEvent, listener, &ListenerClass::onHTTPClientRequestFilterEvent);
+    ofRemoveListener(events.onHTTPClientResponseFilterEvent, listener, &ListenerClass::onHTTPClientResponseFilterEvent);
+}
 
 
 } } } // namespace ofx::HTTP::Client

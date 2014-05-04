@@ -31,7 +31,8 @@ namespace HTTP {
 namespace Client {
 
 
-DefaultClient::DefaultClient()
+DefaultClient::DefaultClient():
+    BaseClient(RequestFilters(), ResponseFilters())
 {
     addRequestFilter(&defaultSessionProvider);
     addRequestFilter(&defaultProxyProcessor);

@@ -49,7 +49,7 @@ public:
 
     virtual void progress(const BaseRequest& request,
                           Context& context,
-                          std::streamsize total) = 0;
+                          std::streamsize totalBytesTransferred) = 0;
 
 };
 
@@ -64,7 +64,7 @@ public:
     virtual void progress(const BaseRequest& request,
                           const BaseResponse& response,
                           Context& context,
-                          std::streamsize total) = 0;
+                          std::streamsize totalBytesTransferred) = 0;
     
 };
 

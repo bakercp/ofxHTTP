@@ -49,4 +49,13 @@ public:
     bool onHTTPClientResponseEvent(HTTP::Client::ClientResponseEventArgs& args);
     bool onHTTPClientErrorEvent(HTTP::Client::ClientErrorEventArgs& args);
 
+    bool onHTTPClientRequestProgress(HTTP::Client::ClientRequestProgressArgs& args);
+    bool onHTTPClientResponseProgress(HTTP::Client::ClientResponseProgressArgs& args);
+
+    bool onHTTPClientRequestFilterEvent(HTTP::Client::MutableClientRequestArgs& args);
+    bool onHTTPClientResponseFilterEvent(HTTP::Client::MutableClientResponseArgs& args);
+
+    HTTP::Client::Context context;
+    HTTP::Client::DefaultClient client;
+
 };

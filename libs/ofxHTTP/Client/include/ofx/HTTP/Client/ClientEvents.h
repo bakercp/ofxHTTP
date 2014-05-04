@@ -38,6 +38,68 @@ namespace HTTP {
 namespace Client {
 
 
+class MutableClientRequestArgs: public ofEventArgs
+{
+public:
+    MutableClientRequestArgs(BaseRequest& request,
+                             Context& context):
+        _request(request),
+        _context(context)
+    {
+    }
+
+
+    virtual ~MutableClientRequestArgs()
+    {
+    }
+
+
+    BaseRequest& getRequestRef() const
+    {
+        return _request;
+    }
+
+    Context& getContextRef()
+    {
+        return _context;
+    }
+    
+protected:
+    BaseRequest& _request;
+    Context& _context;
+    
+};
+
+
+class MutableClientResponseArgs: public MutableClientRequestArgs
+{
+public:
+    MutableClientResponseArgs(BaseRequest& request,
+                              BaseResponse& response,
+                              Context& context):
+        MutableClientRequestArgs(request, context),
+        _response(response)
+    {
+    }
+
+
+    virtual ~MutableClientResponseArgs()
+    {
+    }
+
+
+    BaseResponse& getResponseRef()
+    {
+        return _response;
+    }
+    
+protected:
+    BaseResponse& _response;
+    
+};
+
+
+
 class BaseClientRequestArgs: public ofEventArgs
 {
 public:
@@ -74,8 +136,8 @@ protected:
 class BaseProgressArgs
 {
 public:
-    BaseProgressArgs(std::streamsize bytesTransferred):
-        _bytesTransferred(bytesTransferred)
+    BaseProgressArgs(std::streamsize totalBytesTransferred):
+        _totalBytesTransferred(totalBytesTransferred)
     {
     }
 
@@ -88,9 +150,9 @@ public:
 
     /// \brief Get the total number of bytes transferred during this request.
     /// \returns the total number of bytes transferred.
-    std::streamsize getBytesTransferred() const
+    std::streamsize getTotalBytesTransferred() const
     {
-        return _bytesTransferred;
+        return _totalBytesTransferred;
     }
 
     /// \brief Get the progress of the request upload.
@@ -111,12 +173,12 @@ public:
         }
         else
         {
-            return _bytesTransferred / (double)contentLength;
+            return _totalBytesTransferred / (double)contentLength;
         }
     }
 
 protected:
-    std::streamsize _bytesTransferred;
+    std::streamsize _totalBytesTransferred;
 
 };
 
@@ -128,9 +190,9 @@ class ClientRequestProgressArgs:
 public:
     ClientRequestProgressArgs(const BaseRequest& request,
                               Context& context,
-                              std::streamsize bytesTransferred):
+                              std::streamsize totalBytesTransferred):
         BaseClientRequestArgs(request, context),
-        BaseProgressArgs(bytesTransferred)
+        BaseProgressArgs(totalBytesTransferred)
     {
     }
 
@@ -275,8 +337,8 @@ protected:
 class ClientEvents
 {
 public:
-    ofEvent<BaseClientRequestArgs>   onHTTPClientRequestFilterEvent;
-    ofEvent<BaseClientResponseArgs>  onHTTPClientResponseFilterEvent;
+    ofEvent<MutableClientRequestArgs>   onHTTPClientRequestFilterEvent;
+    ofEvent<MutableClientResponseArgs>  onHTTPClientResponseFilterEvent;
 
     ofEvent<ClientErrorEventArgs>    onHTTPClientErrorEvent;
     ofEvent<ClientResponseEventArgs> onHTTPClientResponseEvent;

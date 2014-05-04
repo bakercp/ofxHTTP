@@ -150,7 +150,7 @@ void Utils::dumpNameValueCollection(const Poco::Net::NameValueCollection& nvc,
 std::streamsize Utils::consume(std::istream& stream)
 {
     Poco::NullOutputStream nos;
-    return Poco::StreamCopier::copyStream(stream, std::cout);
+    return Poco::StreamCopier::copyStream(stream, nos);
 }
 
 

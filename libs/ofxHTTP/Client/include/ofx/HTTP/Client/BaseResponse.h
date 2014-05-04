@@ -56,7 +56,7 @@ public:
 
 //    bool hasResponseStream() const;
 //    std::istream& getResponseStream();
-//
+
 //    bool hasException() const;
 //    const Poco::Exception* getException() const;
 

@@ -24,7 +24,6 @@
 
 
 #include "ofx/HTTP/Client/BaseClient.h"
-#include "Poco/InflatingStream.h"
 
 
 namespace ofx {
@@ -32,9 +31,12 @@ namespace HTTP {
 namespace Client {
 
 
-BaseClient::BaseClient():
-    _requestStreamFilter(0),
-    _responseStreamFilter(0)
+BaseClient::BaseClient(RequestFilters requestFilters,
+                       ResponseFilters responseFilters):
+    _requestFilters(requestFilters),
+    _responseFilters(responseFilters),
+    _pRequestStreamFilter(0),
+    _pResponseStreamFilter(0)
 {
 }
 
@@ -45,62 +47,29 @@ BaseClient::~BaseClient()
 }
 
 
-std::istream& BaseClient::execute(Client::BaseRequest& request,
-                                  Client::BaseResponse& response,
+std::istream& BaseClient::execute(BaseRequest& request,
+                                  BaseResponse& response,
                                   Context& context)
 {
     context.setResubmit(false);
 
-    RequestFilters::iterator requestFilterIter = _requestFilters.begin();
-
-    while (requestFilterIter != _requestFilters.end())
-    {
-        (*requestFilterIter)->filter(request, context);
-        ++requestFilterIter;
-    }
+    filter(request, context);
 
     request.prepareRequest();
 
-    Context::Session session = context.getSession();
+    std::ostream& requestStream = send(request, context);
 
-    if (!session)
-    {
-        throw Poco::Exception("No session available for request.");
-    }
+    request.writeRequestBody(requestStream);
 
-    std::ostream& requestStream = context.getSession()->sendRequest(request);
+    std::istream& responseStream = receive(request, response, context);
 
-//    Poco::TeeOutputStream requestStream(requestStream);
-//    outputStream.addStream(pos);
-
-    if (_requestStreamFilter)
-    {
-        request.writeRequestBody(_requestStreamFilter->filter(requestStream,
-                                                              request,
-                                                              context));
-    }
-    else
-    {
-        request.writeRequestBody(requestStream);
-    }
-
-    std::istream& responseStream = context.getSession()->receiveResponse(response);
-
-    // apply response filters
-
-    ResponseFilters::iterator responseFilterIter = _responseFilters.begin();
-
-    while (responseFilterIter != _responseFilters.end())
-    {
-        (*responseFilterIter)->filter(request, response, context);
-        ++responseFilterIter;
-    }
+    filter(request, response, context);
 
     if (context.getResubmit())
     {
         // If a response handler did not reset the session, then we must
         // consume the stream in order to reuse the HTTP session.
-        if (session)
+        if (context.getSession())
         {
             Utils::consume(responseStream);
         }
@@ -109,18 +78,53 @@ std::istream& BaseClient::execute(Client::BaseRequest& request,
     }
     else
     {
-        if (_responseStreamFilter)
-        {
-            return _responseStreamFilter->filter(responseStream,
-                                                 request,
-                                                 response,
-                                                 context);
-        }
-        else
-        {
+        return responseStream;
+    }
+}
 
-            return responseStream;
-        }
+
+void BaseClient::submit(BaseRequest& request,
+                        BaseResponse& response,
+                        Context& context)
+{
+    try
+    {
+        std::istream& responseStream = execute(request,
+                                               response,
+                                               context);
+
+        ClientResponseEventArgs evt(responseStream,
+                                    request,
+                                    response,
+                                    context);
+
+        ofNotifyEvent(events.onHTTPClientResponseEvent, evt);
+    }
+    catch(const Poco::SyntaxException& exc)
+    {
+        ClientErrorEventArgs evt(request, response, context, exc);
+        ofNotifyEvent(events.onHTTPClientErrorEvent, evt);
+    }
+    catch(const Poco::Net::HostNotFoundException& exc)
+    {
+        ClientErrorEventArgs evt(request, response, context, exc);
+        ofNotifyEvent(events.onHTTPClientErrorEvent, evt);
+    }
+    catch(const Poco::Net::HTTPException& exc)
+    {
+        ClientErrorEventArgs evt(request, response, context, exc);
+        ofNotifyEvent(events.onHTTPClientErrorEvent, evt);
+    }
+    catch(const Poco::Exception& exc)
+    {
+        ClientErrorEventArgs evt(request, response, context, exc);
+        ofNotifyEvent(events.onHTTPClientErrorEvent, evt);
+    }
+    catch(...)
+    {
+        Poco::Exception exc("Unknown exception.");
+        ClientErrorEventArgs evt(request, response, context, exc);
+        ofNotifyEvent(events.onHTTPClientErrorEvent, evt);
     }
 }
 
@@ -162,57 +166,160 @@ void BaseClient::removeResponseFilter(AbstractResponseFilter* handler)
     }
 }
 
-void BaseClient::setRequestStreamFilter(AbstractRequestStreamFilter* requestStreamFilter)
+void BaseClient::setRequestStreamFilter(AbstractRequestStreamFilter* pRequestStreamFilter)
 {
-    _requestStreamFilter = requestStreamFilter;
-    addRequestFilter(_requestStreamFilter);
+    _pRequestStreamFilter = pRequestStreamFilter;
+    addRequestFilter(_pRequestStreamFilter);
 }
 
 
-void BaseClient::setResponseStreamFilter(AbstractResponseStreamFilter* responseStreamFilter)
+void BaseClient::setResponseStreamFilter(AbstractResponseStreamFilter* pResponseStreamFilter)
 {
-    _responseStreamFilter = responseStreamFilter;
-    addRequestFilter(_responseStreamFilter);
-    addResponseFilter(_responseStreamFilter);
+    _pResponseStreamFilter = pResponseStreamFilter;
+    addRequestFilter(_pResponseStreamFilter);
+    addResponseFilter(_pResponseStreamFilter);
 }
 
 
 void BaseClient::removeRequestStreamFilter()
 {
-    if (_requestStreamFilter)
+    if (_pRequestStreamFilter)
     {
-        removeRequestFilter(_requestStreamFilter);
+        removeRequestFilter(_pRequestStreamFilter);
     }
 
-    _requestStreamFilter = 0;
+    _pRequestStreamFilter = 0;
 }
 
 
 void BaseClient::removeResponseStreamFilter()
 {
-    if (_responseStreamFilter)
+    if (_pResponseStreamFilter)
     {
-        removeRequestFilter(_responseStreamFilter);
-        removeResponseFilter(_responseStreamFilter);
+        removeRequestFilter(_pResponseStreamFilter);
+        removeResponseFilter(_pResponseStreamFilter);
     }
 
-    _responseStreamFilter = 0;
+    _pResponseStreamFilter = 0;
 }
+
+
+void BaseClient::filter(BaseRequest& request, Context& context)
+{
+    RequestFilters::iterator requestFilterIter = _requestFilters.begin();
+
+    while (requestFilterIter != _requestFilters.end())
+    {
+        (*requestFilterIter)->filter(request, context);
+        ++requestFilterIter;
+    }
+
+    MutableClientRequestArgs requestFilterEvent(request, context);
+    ofNotifyEvent(events.onHTTPClientRequestFilterEvent, requestFilterEvent);
+}
+
+
+void BaseClient::filter(BaseRequest& request,
+                        BaseResponse& response,
+                        Context& context)
+{
+    // Apply attached filters.
+    ResponseFilters::iterator responseFilterIter = _responseFilters.begin();
+
+    while (responseFilterIter != _responseFilters.end())
+    {
+        (*responseFilterIter)->filter(request, response, context);
+        ++responseFilterIter;
+    }
+
+    // Apply event based filters.
+    MutableClientResponseArgs responseFilterEvent(request, response, context);
+    ofNotifyEvent(events.onHTTPClientResponseFilterEvent, responseFilterEvent);
+}
+
+
+std::ostream& BaseClient::send(BaseRequest& request, Context& context)
+{
+    Context::Session session = context.getSession();
+
+    if (!session)
+    {
+        throw Poco::Exception("No session available for request.");
+    }
+
+    std::ostream& rawRequestStream = session->sendRequest(request);
+
+    _pClientProgressRequestStream = std::shared_ptr<std::ostream>(new ClientProgressRequestStream(rawRequestStream,
+                                                                                                  request,
+                                                                                                  context,
+                                                                                                  *this));
+    if (_pRequestStreamFilter)
+    {
+        return _pRequestStreamFilter->filter(*_pClientProgressRequestStream,
+                                             request,
+                                             context);
+    }
+    else
+    {
+        return *_pClientProgressRequestStream;
+    }
+}
+
+
+std::istream& BaseClient::receive(BaseRequest& request,
+                                  BaseResponse& response,
+                                  Context& context)
+{
+    Context::Session session = context.getSession();
+
+    if (!session)
+    {
+        throw Poco::Exception("No session available for request.");
+    }
+
+    std::istream& rawResponseStream = session->receiveResponse(response);
+
+    _pClientProgressResponseStream = std::shared_ptr<std::istream>(new ClientProgressResponseStream(rawResponseStream,
+                                                                                                    request,
+                                                                                                    response,
+                                                                                                    context,
+                                                                                                    *this));
+    if (_pResponseStreamFilter)
+    {
+        return _pResponseStreamFilter->filter(*_pClientProgressResponseStream,
+                                              request,
+                                              response,
+                                              context);
+    }
+    else
+    {
+
+        return *_pClientProgressResponseStream;
+    }
+}
+
 
 
 void BaseClient::progress(const BaseRequest& request,
                           Context& context,
-                          std::streamsize total)
+                          std::streamsize totalBytesTransferred)
 {
-    // NOOP
+    ClientRequestProgressArgs evt(request, context, totalBytesTransferred);
+
+    ofNotifyEvent(events.onHTTPClientRequestProgress, evt);
 }
 
 void BaseClient::progress(const BaseRequest& request,
                           const BaseResponse& response,
                           Context& context,
-                          std::streamsize total)
+                          std::streamsize totalBytesTransferred)
 {
-    // NOOP
+    ClientResponseProgressArgs evt(request,
+                                   response,
+                                   context,
+                                   totalBytesTransferred);
+
+    ofNotifyEvent(events.onHTTPClientResponseProgress, evt);
 }
 
 
