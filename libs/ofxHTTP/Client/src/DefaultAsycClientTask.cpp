@@ -23,48 +23,45 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/Types/ThreadSettings.h"
+#include "ofx/HTTP/Client/DefaultAsycClientTask.h"
 
 
 namespace ofx {
 namespace HTTP {
+namespace Client {
 
 
-ThreadSettings::ThreadSettings(const std::string& name,
-                               const Poco::Thread::Priority& priority):
-    _name(name),
-    _priority(priority)
+DefaultAsycClientTask::DefaultAsycClientTask(BaseRequest* request,
+                                             BaseResponse* response,
+                                             Context* context):
+    DefaultClient(),
+    _request(request),
+    _response(response),
+    _context(context)
 {
 }
 
 
-ThreadSettings::~ThreadSettings()
+DefaultAsycClientTask::~DefaultAsycClientTask()
 {
+    std::cout << "DESTROYED ..." << std::endl;
+    delete _request;
+    delete _response;
+    delete _context;
 }
 
 
-std::string ThreadSettings::getName() const
+void DefaultAsycClientTask::run()
 {
-    return _name;
+    submit(*_request, *_response, *_context);
 }
 
 
-void ThreadSettings::setName(const std::string& name)
+const Poco::UUID& DefaultAsycClientTask::getRequestId() const
 {
-    _name = name;
+    poco_assert(_request);
+    return _request->getRequestId();
 }
 
 
-Poco::Thread::Priority ThreadSettings::getPriority() const
-{
-    return _priority;
-}
-
-
-void ThreadSettings::setPriority(const Poco::Thread::Priority& priority)
-{
-    _priority = priority;
-}
-
-
-} } // namespace ofx::HTTP
+} } } // namespace ofx::HTTP::Client

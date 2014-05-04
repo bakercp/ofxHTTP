@@ -31,7 +31,7 @@
 #include "Poco/ThreadPool.h"
 #include "ofx/HTTP/Types/ThreadSettings.h"
 #include "ofx/HTTP/Client/DefaultClient.h"
-#include "ofx/HTTP/Client/DefaultClientTask.h"
+#include "ofx/HTTP/Client/DefaultAsycClientTask.h"
 #include "ofx/HTTP/Client/ClientEvents.h"
 #include "ofx/HTTP/Client/BaseRequest.h"
 #include "ofx/HTTP/Client/GetRequest.h"
@@ -43,12 +43,13 @@ namespace HTTP {
 namespace Client {
 
 
-class DefaultClientPool
+class DefaultAsycClient
 {
 public:
-    DefaultClientPool(std::size_t maxConnections = DEFAULT_MAXIMUM_CONNECTIONS,
+    DefaultAsycClient(std::size_t maxConnections = DEFAULT_MAXIMUM_CONNECTIONS,
                       Poco::ThreadPool& threadPool = Poco::ThreadPool::defaultPool());
-    virtual ~DefaultClientPool();
+
+    virtual ~DefaultAsycClient();
 
     void update(ofEventArgs& args);
     void exit(ofEventArgs& args);
@@ -97,16 +98,25 @@ public:
     bool cancel(const Poco::UUID& uuid);
 
     /// \brief Users subscribe to these events.
-    ClientEvents events;
+    // ClientEvents events;
 
     enum
     {
         DEFAULT_MAXIMUM_CONNECTIONS = 4
     };
 
+    bool onHTTPClientResponseEvent(ClientResponseEventArgs& args);
+    bool onHTTPClientErrorEvent(ClientErrorEventArgs& args);
+
+    bool onHTTPClientRequestProgress(ClientRequestProgressArgs& args);
+    bool onHTTPClientResponseProgress(ClientResponseProgressArgs& args);
+
+    bool onHTTPClientRequestFilterEvent(MutableClientRequestArgs& args);
+    bool onHTTPClientResponseFilterEvent(MutableClientResponseArgs& args);
+
 private:
-    DefaultClientPool(const DefaultClientPool&);
-	DefaultClientPool& operator = (const DefaultClientPool&);
+    DefaultAsycClient(const DefaultAsycClient&);
+	DefaultAsycClient& operator = (const DefaultAsycClient&);
 
     Context* createDefaultContext();
     BaseResponse* createDefaultResponse();
@@ -116,12 +126,13 @@ private:
     /// This is called before threads are executed.
     virtual void processTaskQueue();
 
-    void enqueTask(DefaultClientTask* task);
+    void enqueTask(DefaultAsycClientTask::SharedPtr task);
 
-    typedef std::deque<DefaultClientTask*> TaskQueue;
+    typedef std::deque<DefaultAsycClientTask::SharedPtr> TaskQueue;
 
     TaskQueue _queuedRequests;
     TaskQueue _activeRequests;
+    TaskQueue _completedRequests;
 
     std::size_t _maxConnections;
 

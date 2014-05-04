@@ -57,4 +57,4 @@
 #include "ofx/HTTP/Client/DefaultRequestStreamFilter.h"
 #include "ofx/HTTP/Client/DefaultResponseStreamFilter.h"
 #include "ofx/HTTP/Client/DefaultClient.h"
-
+#include "ofx/HTTP/Client/DefaultAsycClient.h"

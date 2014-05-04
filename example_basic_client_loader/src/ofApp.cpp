@@ -43,10 +43,13 @@ void ofApp::setup()
 //
 //    HTTP::Client::GetRequest request("https://www.google.com/search", nvc);
 
-    HTTP::Client::GetRequest request("http://127.0.0.1:5000/headers");
-    HTTP::Client::BaseResponse response;
+//    HTTP::Client::GetRequest request("http://127.0.0.1:5000/headers");
+//    HTTP::Client::BaseResponse response;
+//
+    asynClient.get("http://127.0.0.1:5000/headers");
 
-    client.submit(request, response, context);
+
+//    client.submit(request, response, context);
 
 }
 

@@ -38,33 +38,35 @@ namespace HTTP {
 namespace Client {
 
 
-class DefaultClientTask: public Poco::Runnable
+class DefaultAsycClientTask:
+    public DefaultClient,
+    public Poco::Runnable
 {
 public:
-    DefaultClientTask(BaseRequest* request,
-                      BaseResponse* response,
-                      Context* context,
-                      ClientEvents& events,
-                      ThreadSettings threadSettings);
+    typedef std::shared_ptr<DefaultAsycClientTask> SharedPtr;
 
-    virtual ~DefaultClientTask();
+    DefaultAsycClientTask(BaseRequest* request,
+                          BaseResponse* response,
+                          Context* context);
+
+    virtual ~DefaultAsycClientTask();
 
     virtual void run();
 
-    const ThreadSettings& getThreadSettings() const;
-
     const Poco::UUID& getRequestId() const;
 
-private:
-    ClientEvents& _events;
+    static SharedPtr makeShared(BaseRequest* request,
+                                BaseResponse* response,
+                                Context* context)
+    {
+        return SharedPtr(new DefaultAsycClientTask(request, response, context));
+    }
 
+
+private:
     BaseRequest* _request;
     BaseResponse* _response;
     Context* _context;
-    ThreadSettings _threadSettings;
-
-    Poco::AtomicCounter _threadRunning;
-        ///< \brief Is the thread running?
 
 };
 

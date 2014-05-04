@@ -28,7 +28,6 @@
 
 #include "ofMain.h"
 #include "ofxHTTP.h"
-#include "ofxJSONElement.h"
 
 
 using namespace ofx;
@@ -57,5 +56,7 @@ public:
 
     HTTP::Client::Context context;
     HTTP::Client::DefaultClient client;
+
+    HTTP::Client::DefaultAsycClient asynClient;
 
 };
