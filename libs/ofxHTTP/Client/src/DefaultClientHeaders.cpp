@@ -53,6 +53,9 @@ void DefaultClientHeaders::filter(Client::BaseRequest& request,
         request.set("User-Agent", context.getSessionSettings().getUserAgent());
     }
 
+//    request.set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+//    request.set("Accept-Language", "en-US,en;q=0.8");
+
     const Poco::Net::NameValueCollection& defaultHeaders = settings.getDefaultHeaders();
 
     Poco::Net::NameValueCollection::ConstIterator iter = defaultHeaders.begin();

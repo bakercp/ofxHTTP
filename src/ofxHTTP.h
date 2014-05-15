@@ -28,6 +28,9 @@
 
 #include "ofSSLManager.h"
 
+#include "ofx/HTTP/Utils/Utils.h"
+#include "ofx/HTTP/Utils/URIBuilder.h"
+
 #include "ofx/HTTP/IPVideo/BasicIPVideoServer.h"
 
 #include "ofx/HTTP/Server/BasicPostServer.h"

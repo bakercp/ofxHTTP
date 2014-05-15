@@ -98,6 +98,16 @@ Poco::UUID BaseRequest::generateUUID()
 void BaseRequest::prepareRequest()
 {
     _form.prepareSubmit(*this);
+
+    // Remove a trailing question mark appended by the prepareSubmit method that
+    // can occur when dealing with query parameters passed with the URI rather
+    // than the name value collection.
+    std::string uri = getURI();
+
+    if (!uri.empty() && '?' == uri[uri.size() - 1])
+    {
+        setURI(uri.substr(0, uri.size() - 1));
+    }
 }
 
 

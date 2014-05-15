@@ -47,7 +47,7 @@ namespace HTTP {
 class BaseRouteSettings
 {
 public:
-    ///< \brief A typedef for HTTPMethodSet.
+    /// \brief A typedef for HTTPMethodSet.
     typedef std::set<std::string> HTTPMethodSet;
 
     /// \brief A typedef for a MediaTypeSet.
@@ -117,20 +117,20 @@ public:
     static const HTTPMethodSet DEFAULT_HTTP_METHODS;
 
 private:
+    /// \brief the route's regex route pattern.
     std::string _routePathPattern;
-        ///< \brief the route's regex route pattern.
 
+    /// \brief true if route requires requests on an SSL encrypted port.
     bool _requireSecurePort;
-        ///< \brief true if route requires requests on an SSL encrypted port.
 
+    /// \brief A set of valid HTTP methods.
     HTTPMethodSet _validHTTPMethods;
-        ///< \brief A set of valid HTTP methods.
 
+    /// \brief A set of valid Content-Type variables.
     MediaTypeSet _validContentTypes;
-        ///< \brief A set of valid Content-Type variables.
 
+    /// \brief A session key for this route.
     std::string _routeSessionKey;
-        ///< \brief A session key for this route.
 
 };
 

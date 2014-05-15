@@ -34,6 +34,4 @@ namespace HTTP {
 namespace Client {
 
 
-
-
 } } } // namespace ofx::HTTP::Client

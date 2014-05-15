@@ -71,22 +71,22 @@ public:
     void handleRequest(Poco::Net::HTTPServerRequest& request,
                        Poco::Net::HTTPServerResponse& response);
 
+    /// \brief A constant defining "text/plain".
     static const Poco::Net::MediaType POST_CONTENT_TYPE_TEXT_PLAIN;
-        ///< \brief A constant defining "text/plain".
 
+    /// \brief A constant defining "multipart/form-data".
     static const Poco::Net::MediaType POST_CONTENT_TYPE_MULTIPART;
-        ///< \brief A constant defining "multipart/form-data".
 
+    /// \brief A constant defining "application/x-www-form-urlencoded".
     static const Poco::Net::MediaType POST_CONTENT_TYPE_URLENCODED;
-        ///< \brief A constant defining "application/x-www-form-urlencoded".
 
+    /// \brief A constant defining "application/json".
     static const Poco::Net::MediaType POST_CONTENT_TYPE_JSON;
-        ///< \brief A constant defining "application/json".
 
 
 private:
+    /// \brief The parent PostRoute reference.
     PostRoute& _parent;
-        ///< \brief The parent PostRoute reference.
 
 };
 

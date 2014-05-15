@@ -41,8 +41,7 @@ public:
 
     virtual ~DefaultClientHeaders();
 
-    virtual void filter(BaseRequest& request,
-                        Context& context);
+    virtual void filter(BaseRequest& request, Context& context);
 
 };
 

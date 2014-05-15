@@ -75,9 +75,9 @@ public:
     }
 
 private:
+    /// \brief The WebSocketRoute attached to this server.
     WebSocketRoute::SharedPtr _webSocketRoute;
-        ///< \brief The WebSocketRoute attached to this server.
-    
+
 };
 
     

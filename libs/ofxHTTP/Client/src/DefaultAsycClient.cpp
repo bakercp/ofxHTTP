@@ -67,8 +67,19 @@ void DefaultAsycClient::update(ofEventArgs& args)
         }
     }
 
-    // We clear this outside of the callback.
-    _completedRequests.clear();
+    TaskQueue::iterator iter = _activeRequests.begin();
+
+    while (iter != _activeRequests.end())
+    {
+        if ((*iter)->isThreadFinished())
+        {
+            iter = _activeRequests.erase(iter);
+        }
+        else
+        {
+            ++iter;
+        }
+    }
 }
 
 
@@ -84,10 +95,13 @@ Poco::UUID DefaultAsycClient::get(const std::string& uri,
                                   const Poco::UUID& requestId,
                                   ThreadSettings threadSettings)
 {
-    return request(new GetRequest(uri,
-                                  formFields,
-                                  httpVersion,
-                                  requestId),
+
+    GetRequest* req = new GetRequest(uri,
+                   formFields,
+                   httpVersion,
+                   requestId);
+
+    return request(req,
                    threadSettings);
 }
 
@@ -111,6 +125,8 @@ Poco::UUID DefaultAsycClient::post(const std::string& uri,
 Poco::UUID DefaultAsycClient::request(BaseRequest* pRequest,
                                       ThreadSettings threadSettings)
 {
+
+
     DefaultAsycClientTask::SharedPtr task = DefaultAsycClientTask::makeShared(pRequest,
                                                                               createDefaultResponse(),
                                                                               createDefaultContext());
@@ -190,9 +206,10 @@ void DefaultAsycClient::enqueTask(DefaultAsycClientTask::SharedPtr task)
 
 bool DefaultAsycClient::onHTTPClientResponseEvent(ClientResponseEventArgs& args)
 {
-    std::cout << "ofApp::onHTTPClientResponseEvent" << std::endl;
-    Poco::StreamCopier::copyStream(args.getResponseStream(), std::cout);
-    std::cout << std::endl;
+//    std::cout << "ofApp::onHTTPClientResponseEvent" << std::endl;
+//    Poco::StreamCopier::copyStream(args.getResponseStream(), std::cout);
+//    std::cout << std::endl;
+
     return true;
 }
 
@@ -201,9 +218,9 @@ bool DefaultAsycClient::onHTTPClientErrorEvent(ClientErrorEventArgs& args)
 {
     
 
-    std::cout << "ofApp::onHTTPClientErrorEvent:" << std::endl;
-    std::cout << args.getRequest().getRequestId().toString() << endl;
-    std::cout << args.getException().displayText() << std::endl;
+//    std::cout << "ofApp::onHTTPClientErrorEvent:" << std::endl;
+//    std::cout << args.getRequest().getRequestId().toString() << endl;
+//    std::cout << args.getException().displayText() << std::endl;
     return true;
 }
 

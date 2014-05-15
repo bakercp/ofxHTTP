@@ -87,11 +87,11 @@ public:
 
 
 protected:
+    /// \brief The settings.
     const SettingsType _settings;
-        ///< \brief The settings.
 
+    /// \brief a pointer to the session cache;
     SessionCache::SharedPtr _sessionCache;
-        ///< \brief a pointer to the session cache;
 
 private:
     BaseRoute_(const BaseRoute_&);

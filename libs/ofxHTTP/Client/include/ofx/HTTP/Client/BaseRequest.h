@@ -89,8 +89,8 @@ public:
 
     static Poco::UUID generateUUID();
 
+    /// \brief The default MIME type.
     static const std::string DEFAULT_MEDIA_TYPE;
-        ///< \brief The default MIME type.
 
 protected:
     virtual void prepareRequest();

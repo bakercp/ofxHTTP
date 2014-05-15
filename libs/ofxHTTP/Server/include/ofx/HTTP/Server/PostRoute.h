@@ -36,6 +36,7 @@ namespace ofx {
 namespace HTTP {
 
 
+/// \brief A route for handing HTTP POST requests. 
 class PostRoute: public BaseRoute_<PostRouteSettings>
 {
 public:

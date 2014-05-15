@@ -92,12 +92,10 @@ public:
     /// \details Subclasses can implement this method.
 //    virtual void socketClosed();
 
-    /// \returns The request headers submitted when
-    ///         establishing this connection.
+    /// \returns The original http request headers.
     Poco::Net::NameValueCollection getRequestHeaders() const;
 
-    /// \returns the SocketAddress of the client that
-    ///          established this connection.
+    /// \returns the client's SocketAddress.
     Poco::Net::SocketAddress getClientAddress() const;
 
     /// \returns true iff this WebSocketConnect is connected to a client.
@@ -109,12 +107,17 @@ public:
     /// \brief Clears the send queue.
     void clearSendQueue();
 
+    /// \brief Get the total bytes sent to the client.
+    /// \returns the total bytes sent to the client.
     std::size_t getTotalBytesSent() const;
+
+    /// \brief Get the total bytes received from the client.
+    /// \returns the total bytes received from the client.
     std::size_t getTotalBytesReceived() const;
 
 protected:
+    /// \brief A reference to the parent WebSocketRoute.
     WebSocketRoute& _parent;
-        ///< \brief A reference to the parent WebSocketRoute.
 
 private:
     void handleOrigin(Poco::Net::HTTPServerRequest& request,

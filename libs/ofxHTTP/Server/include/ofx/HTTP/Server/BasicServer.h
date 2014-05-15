@@ -41,7 +41,8 @@ class BasicServerSettings:
 {
 };
 
-    
+
+/// \brief A basic file server implementation.
 class BasicServer: public BaseServer_<BasicServerSettings>
 {
 public:
@@ -67,8 +68,8 @@ public:
     }
 
 private:
+    /// \brief The FileSystemRoute attached to this server.
     FileSystemRoute::SharedPtr _fileSystemRoute;
-        ///< \brief The FileSystemRoute attached to this server.
 
 };
 

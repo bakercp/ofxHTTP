@@ -171,10 +171,15 @@ public:
 class AbstractClientResponseHandler
 {
 public:
+    /// \brief Destroy the AbstractClientResponseHandler.
     virtual ~AbstractClientResponseHandler()
     {
     }
 
+    /// \brief Determine if a given request can be handled.
+    /// \param request The request to test.
+    /// \param isSecurePort true of the request was made on an ssl socket.
+    /// \returns true iff the AbstractClientResponseHandler can handle the request.
     virtual bool canFilterResponse(const Poco::Net::HTTPServerRequest& request,
                                    bool isSecurePort) const = 0;
 

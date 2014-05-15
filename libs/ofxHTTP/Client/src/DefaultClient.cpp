@@ -38,6 +38,7 @@ DefaultClient::DefaultClient():
     addRequestFilter(&defaultProxyProcessor);
     addRequestFilter(&defaultAuthenticationProcessor);
     addRequestFilter(&defaultRedirectProcessor);
+    addRequestFilter(&defaultClientHeaders);
 
     // response processors
     addResponseFilter(&defaultProxyProcessor);

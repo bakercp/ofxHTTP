@@ -45,24 +45,23 @@ class WebSocketConnection;
 enum WebSocketError
 {
     WS_ERR_NONE                           = 0,
+    /// \brief No Connection: Upgrade or Upgrade:
+    ///        websocket header in handshake request.
     WS_ERR_NO_HANDSHAKE                   = Poco::Net::WebSocket::WS_ERR_NO_HANDSHAKE,
-        ///< \brief No Connection: Upgrade or Upgrade:
-        ///<        websocket header in handshake request.
+    /// \brief No Sec-WebSocket-Version header in handshake request.
     WS_ERR_HANDSHAKE_NO_VERSION           = Poco::Net::WebSocket::WS_ERR_HANDSHAKE_NO_VERSION,
-        ///< \brief No Sec-WebSocket-Version header in handshake request.
+    /// \brief Unsupported WebSocket version requested by client.
     WS_ERR_HANDSHAKE_UNSUPPORTED_VERSION  = Poco::Net::WebSocket::WS_ERR_HANDSHAKE_UNSUPPORTED_VERSION,
-        ///< \brief Unsupported WebSocket version requested by client.
+    /// \brief No Sec-WebSocket-Key header in handshake request.
     WS_ERR_HANDSHAKE_NO_KEY               = Poco::Net::WebSocket::WS_ERR_HANDSHAKE_NO_KEY,
-        ///< \brief No Sec-WebSocket-Key header in handshake request.
+    /// \brief No Sec-WebSocket-Accept header or wrong value.
     WS_ERR_HANDSHAKE_ACCEPT               = Poco::Net::WebSocket::WS_ERR_HANDSHAKE_ACCEPT,
-        ///< \brief No Sec-WebSocket-Accept header or wrong value.
+    /// \brief The server rejected the username or password for authentication.
     WS_ERR_UNAUTHORIZED                   = Poco::Net::WebSocket::WS_ERR_UNAUTHORIZED,
-        ///< \brief The server rejected the username or password
-        ///<        for authentication.
+    /// \brief Payload too big for supplied buffer.
     WS_ERR_PAYLOAD_TOO_BIG                = Poco::Net::WebSocket::WS_ERR_PAYLOAD_TOO_BIG,
-        ///< \brief Payload too big for supplied buffer.
+    /// \brief Incomplete frame received.
     WS_ERR_INCOMPLETE_FRAME               = Poco::Net::WebSocket::WS_ERR_INCOMPLETE_FRAME,
-        ///< \brief Incomplete frame received.
     WS_ERROR_INCOMPLETE_FRAME_SENT        = 15,
     WS_ERROR_ZERO_BYTE_FRAME_SENT         = 15,
     WS_ERR_TIMEOUT                        = 20,
@@ -112,14 +111,14 @@ public:
     }
 
 private:
+    /// \brief The session id, if available.  Poco::UUID::null if null.
     Poco::UUID _sessionId;
-        ///< \brief The session id, if available.  Poco::UUID::null if null.
 
+    /// \brief A reference to the WebSocketConnection.
     const WebSocketConnection& _connection;
-        ///< \brief A reference to the WebSocketConnection.
 
+    /// \brief The WebSocketError associated with the event, if any.
     WebSocketError _error;
-        ///< \brief The WebSocketError associated with the event, if any.
 
 };
 
@@ -145,8 +144,8 @@ public:
     }
 
 private:
+    /// \brief A reference to the WebSocketFrame associated with the event.
     const WebSocketFrame& _frame;
-        ///< \brief A reference to the WebSocketFrame associated with the event.
 
 };
 

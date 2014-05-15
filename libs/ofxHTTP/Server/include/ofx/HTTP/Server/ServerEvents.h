@@ -42,12 +42,15 @@ namespace HTTP {
 class BaseHTTPSessionEvent: public ofEventArgs
 {
 public:
+    /// \brief Create a BaseHTTPSessionEvent with a sessionId.
+    /// \param sessionId the session id associated with this event.
     BaseHTTPSessionEvent(const Poco::UUID& sessionId):
         _sessionId(sessionId)
     {
     }
 
 
+    /// \brief Destroy the BaseHTTPSessionEvent.
     virtual ~BaseHTTPSessionEvent()
     {
     }
@@ -65,18 +68,19 @@ public:
     }
 
 protected:
+    /// \brief The session id, if available.  Poco::UUID::null if null.
     Poco::UUID _sessionId;
-        ///< \brief The session id, if available.  Poco::UUID::null if null.
 
 };
 
 
 
-/// \brief ?
+/// \brief An event describing a server request.
 class BaseHTTPServerRequestEventArgs: public BaseHTTPSessionEvent
 {
 public:
     /// \brief Construct the BaseHTTPServerRequestEventArgs.
+    /// \param sessionId the session id associated with this event.
     /// \param request the Poco::Net::HTTPServerRequest.
     BaseHTTPServerRequestEventArgs(const Poco::UUID& sessionId,
                                    const Poco::Net::HTTPServerRequest& request):
@@ -98,7 +102,8 @@ public:
         return _request;
     }
 
-
+    /// \brief Get the request's content length.
+    /// \returns the Request's content lenght in bytes.
     std::streamsize getRequestContentLength() const
     {
         return _request.getContentLength();
@@ -106,15 +111,20 @@ public:
 
 
 protected:
+    /// \brief A const reference to the server request.
     const Poco::Net::HTTPServerRequest& _request;
-        ///< \brief A const reference to the server request.
 
 };
 
 
+/// \brief An event describing a server response.
 class BaseHTTPServerRequestResponseEventArgs: public BaseHTTPServerRequestEventArgs
 {
 public:
+    /// \brief Construct the BaseHTTPServerRequestResponseEventArgs.
+    /// \param sessionId the session id associated with this event.
+    /// \param request the Poco::Net::HTTPServerRequest.
+    /// \param response the Poco::Net::HTTPServerResponse to be modified.
     BaseHTTPServerRequestResponseEventArgs(const Poco::UUID& sessionId,
                                            const Poco::Net::HTTPServerRequest& request,
                                            Poco::Net::HTTPServerResponse& _response):
@@ -123,7 +133,7 @@ public:
     {
     }
 
-
+    /// \brief Destroy the BaseHTTPServerRequestResponseEventArgs.
     virtual ~BaseHTTPServerRequestResponseEventArgs()
     {
     }

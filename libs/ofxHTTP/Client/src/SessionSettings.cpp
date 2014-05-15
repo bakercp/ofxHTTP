@@ -40,6 +40,7 @@ SessionSettings::SessionSettings():
     _defaultHost(""),
     _userAgent(DEFAULT_USER_AGENT),
     _maxRedirects(DEFAULT_MAX_REDIRECTS),
+    _keepAlive(true),
     _keepAliveTimeout(DEFAULT_KEEPALIVE_TIMEOUT)
 {
 }
@@ -107,6 +108,18 @@ const Poco::Net::NameValueCollection& SessionSettings::getDefaultHeaders() const
 void SessionSettings::setDefaultHeaders(const Poco::Net::NameValueCollection& headers)
 {
     _defaultHeaders = headers;
+}
+
+
+void SessionSettings::setkeepAlive(bool keepAlive)
+{
+    _keepAlive = keepAlive;
+}
+
+
+bool SessionSettings::getKeepAlive() const
+{
+    return _keepAlive;
 }
 
 

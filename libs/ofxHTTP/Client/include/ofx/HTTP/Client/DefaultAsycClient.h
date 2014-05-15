@@ -105,18 +105,18 @@ public:
         DEFAULT_MAXIMUM_CONNECTIONS = 4
     };
 
-    bool onHTTPClientResponseEvent(ClientResponseEventArgs& args);
-    bool onHTTPClientErrorEvent(ClientErrorEventArgs& args);
+    virtual bool onHTTPClientResponseEvent(ClientResponseEventArgs& args);
+    virtual bool onHTTPClientErrorEvent(ClientErrorEventArgs& args);
 
-    bool onHTTPClientRequestProgress(ClientRequestProgressArgs& args);
-    bool onHTTPClientResponseProgress(ClientResponseProgressArgs& args);
+    virtual bool onHTTPClientRequestProgress(ClientRequestProgressArgs& args);
+    virtual bool onHTTPClientResponseProgress(ClientResponseProgressArgs& args);
 
-    bool onHTTPClientRequestFilterEvent(MutableClientRequestArgs& args);
-    bool onHTTPClientResponseFilterEvent(MutableClientResponseArgs& args);
+    virtual bool onHTTPClientRequestFilterEvent(MutableClientRequestArgs& args);
+    virtual bool onHTTPClientResponseFilterEvent(MutableClientResponseArgs& args);
 
 private:
     DefaultAsycClient(const DefaultAsycClient&);
-	DefaultAsycClient& operator = (const DefaultAsycClient&);
+    DefaultAsycClient& operator = (const DefaultAsycClient&);
 
     Context* createDefaultContext();
     BaseResponse* createDefaultResponse();
@@ -132,7 +132,6 @@ private:
 
     TaskQueue _queuedRequests;
     TaskQueue _activeRequests;
-    TaskQueue _completedRequests;
 
     std::size_t _maxConnections;
 

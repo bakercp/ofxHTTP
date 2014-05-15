@@ -30,6 +30,7 @@
 #include "ofx/HTTP/Client/DefaultSessionProvider.h"
 #include "ofx/HTTP/Client/DefaultRedirectProcessor.h"
 #include "ofx/HTTP/Client/DefaultProxyProcessor.h"
+#include "ofx/HTTP/Client/DefaultClientHeaders.h"
 #include "ofx/HTTP/Client/CredentialStore.h"
 #include "ofx/HTTP/Client/DefaultResponseStreamFilter.h"
 
@@ -46,9 +47,10 @@ public:
     virtual ~DefaultClient();
 
 private:
+    DefaultSessionProvider defaultSessionProvider;
+    DefaultClientHeaders defaultClientHeaders;
     DefaultProxyProcessor defaultProxyProcessor;
     DefaultCredentialStore defaultAuthenticationProcessor;
-    DefaultSessionProvider defaultSessionProvider;
     DefaultRedirectProcessor defaultRedirectProcessor;
     DefaultResponseStreamFilter responseStreamFilter;
 

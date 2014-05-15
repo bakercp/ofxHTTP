@@ -97,7 +97,8 @@ public:
     std::string toString() const;
 
 protected:
-    int _flags; ///< \brief the websocket flags for this frame.
+    /// \brief the websocket flags for this frame.
+    int _flags;
     
 };
 

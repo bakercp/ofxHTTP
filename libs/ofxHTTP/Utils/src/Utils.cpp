@@ -30,7 +30,6 @@ namespace ofx {
 namespace HTTP {
 
 
-
 Poco::Net::NameValueCollection Utils::splitTextPlainPost(const std::string& textPlain)
 {
     // Here we handle
@@ -59,6 +58,8 @@ Poco::Net::NameValueCollection Utils::splitTextPlainPost(const std::string& text
 
 Poco::Net::NameValueCollection Utils::splitAndURLDecode(const std::string& encoded)
 {
+    // TODO use code from Poco::Net::HTMLForm
+
     Poco::Net::NameValueCollection nvc;
 
     std::vector<std::string> arguments = ofSplitString(encoded, "&", true);
@@ -72,8 +73,9 @@ Poco::Net::NameValueCollection Utils::splitAndURLDecode(const std::string& encod
         if(tokens.size() > 0)
         {
             std::string key;
+            std::string value;
+
             Poco::URI::decode(tokens[0], key);
-            std::string value = "";
 
             if(tokens.size() > 1)
             {
@@ -104,6 +106,28 @@ Poco::Net::NameValueCollection Utils::getQueryMap(const Poco::URI& uri)
     }
 
     return splitAndURLDecode(query);
+}
+
+
+
+std::string Utils::makeQueryString(const Poco::Net::NameValueCollection& query)
+{
+    std::stringstream ostr;
+
+    Poco::Net::NameValueCollection::ConstIterator it = query.begin();
+
+    while (it != query.end())
+    {
+		if (it != query.begin()) ostr << "&";
+        std::string name;
+        Poco::URI::encode(it->first, "=&+;", name);
+        std::string value;
+        Poco::URI::encode(it->second, "=&+;", value);
+        ostr << name << "=" << value;
+        ++it;
+    }
+
+    return ostr.str();
 }
 
 

@@ -87,8 +87,8 @@ public:
 
     std::size_t getNumWebSocketConnections() const;
 
+    /// \brief WebSocketEvents for WebSocket callbacks.
     WebSocketEvents events;
-        ///< \brief WebSocketEvents for WebSocket callbacks.
 
     static SharedPtr makeShared(const Settings& settings)
     {

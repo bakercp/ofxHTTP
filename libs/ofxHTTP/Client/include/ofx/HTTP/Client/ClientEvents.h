@@ -59,6 +59,7 @@ public:
         return _request;
     }
 
+
     Context& getContextRef()
     {
         return _context;
@@ -124,6 +125,11 @@ public:
     Context& getContextRef()
     {
         return _context;
+    }
+
+    const Poco::UUID getRequestId() const
+    {
+        return _request.getRequestId();
     }
 
 protected:
@@ -293,6 +299,7 @@ public:
     virtual ~ClientResponseEventArgs()
     {
     }
+
 
     std::istream& getResponseStream()
     {

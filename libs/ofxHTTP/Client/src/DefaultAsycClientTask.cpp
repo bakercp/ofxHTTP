@@ -37,14 +37,14 @@ DefaultAsycClientTask::DefaultAsycClientTask(BaseRequest* request,
     DefaultClient(),
     _request(request),
     _response(response),
-    _context(context)
+    _context(context),
+    _threadFinished(false)
 {
 }
 
 
 DefaultAsycClientTask::~DefaultAsycClientTask()
 {
-    std::cout << "DESTROYED ..." << std::endl;
     delete _request;
     delete _response;
     delete _context;
@@ -54,6 +54,14 @@ DefaultAsycClientTask::~DefaultAsycClientTask()
 void DefaultAsycClientTask::run()
 {
     submit(*_request, *_response, *_context);
+
+    _threadFinished = true;
+}
+
+    
+bool DefaultAsycClientTask::isThreadFinished() const
+{
+    return _threadFinished;
 }
 
 

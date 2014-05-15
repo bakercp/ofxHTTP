@@ -23,40 +23,72 @@
 // =============================================================================
 
 
-#pragma once
-
-
-#include "ofx/HTTP/Server/BaseRoute.h"
-#include "ofx/HTTP/Server/FileSystemRouteHandler.h"
-#include "ofx/HTTP/Server/FileSystemRouteSettings.h"
+#include "ofx/HTTP/Utils/URIBuilder.h"
+#include "ofx/HTTP/Utils/Utils.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-/// \brief A route for serving files from the file system.
-class FileSystemRoute: public BaseRoute_<FileSystemRouteSettings>
+URIBuilder::URIBuilder()
 {
-public:
-    typedef std::shared_ptr<FileSystemRoute> SharedPtr;
-    typedef std::weak_ptr<FileSystemRoute> WeakPtr;
-    typedef FileSystemRouteSettings Settings;
+}
 
-    FileSystemRoute(const Settings& settings);
-    virtual ~FileSystemRoute();
 
-    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
-                               Poco::Net::HTTPServerResponse& response);
+URIBuilder::URIBuilder(const Poco::URI& uri):
+    Poco::Net::NameValueCollection(Utils::getQueryMap(uri))
+{
+    _uri.setScheme(uri.getScheme());
+    _uri.setAuthority(uri.getAuthority());
+    _uri.setPath(uri.getPath());
+    _uri.setFragment(uri.getFragment());
+}
 
-    Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
 
-    static SharedPtr makeShared(const Settings& settings)
+URIBuilder::~URIBuilder()
+{
+}
+
+
+Poco::URI URIBuilder::toURI() const
+{
+    Poco::URI uri(_uri);
+    uri.setRawQuery(Utils::makeQueryString(*this));
+    return uri;
+}
+
+
+void URIBuilder::set(const std::string& key, bool value, bool numerical)
+{
+    if (numerical)
     {
-        return SharedPtr(new FileSystemRoute(settings));
+        Poco::Net::NameValueCollection::set(key, value ? "1" : "0");
     }
+    else
+    {
+        Poco::Net::NameValueCollection::set(key, value ? "true" : "false");
+    }
+}
 
-};
 
-    
+void URIBuilder::add(const std::string& key, bool value, bool numerical)
+{
+    if (numerical)
+    {
+        Poco::Net::NameValueCollection::add(key, value ? "1" : "0");
+    }
+    else
+    {
+        Poco::Net::NameValueCollection::add(key, value ? "true" : "false");
+    }
+}
+
+
+std::string URIBuilder::toString() const
+{
+    return toURI().toString();
+}
+
+
 } } // namespace ofx::HTTP

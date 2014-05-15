@@ -58,8 +58,8 @@ public:
 
     bool has(const std::string& hashKey) const;
     void put(const std::string& hashKey, const Poco::Any& hashValue);
-    Poco::Any get(const std::string& hashKey) const;
 
+    Poco::Any get(const std::string& hashKey) const;
 
     static SharedPtr makeShared(const Poco::UUID& uuid = Poco::UUIDGenerator::defaultGenerator().createRandom(),
                                 const Poco::Timestamp& lastModified = Poco::Timestamp())

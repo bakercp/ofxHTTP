@@ -79,7 +79,7 @@ void DefaultCredentialStore::setCredentialsFromURI(const Poco::URI& uri)
 		password.clear();
 	}
 
-    std::cout << uri.toString() << " / " << username << " / " << password << std::endl;
+//    std::cout << uri.toString() << " / " << username << " / " << password << std::endl;
 
     setCredentials(uri, username, password);
 }

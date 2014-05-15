@@ -59,6 +59,9 @@ public:
     const Poco::Net::NameValueCollection& getDefaultHeaders() const;
     void setDefaultHeaders(const Poco::Net::NameValueCollection& headers);
 
+    void setkeepAlive(bool keepAlive);
+    bool getKeepAlive() const;
+
     void setKeepAliveTimeout(Poco::Timespan keepAliveTimeout);
     Poco::Timespan getKeepAliveTimeout() const;
 
@@ -77,6 +80,7 @@ private:
 
     std::size_t _maxRedirects;
 
+    bool _keepAlive;
     Poco::Timespan _keepAliveTimeout;
 
     ProxySettings _proxy;

@@ -57,6 +57,7 @@ std::istream& BaseClient::execute(BaseRequest& request,
 
     request.prepareRequest();
 
+
     std::ostream& requestStream = send(request, context);
 
     request.writeRequestBody(requestStream);
@@ -120,9 +121,15 @@ void BaseClient::submit(BaseRequest& request,
         ClientErrorEventArgs evt(request, response, context, exc);
         ofNotifyEvent(events.onHTTPClientErrorEvent, evt);
     }
+    catch(std::exception& exception)
+    {
+        Poco::Exception exc(exception.what());
+        ClientErrorEventArgs evt(request, response, context, exc);
+        ofNotifyEvent(events.onHTTPClientErrorEvent, evt);
+    }
     catch(...)
     {
-        Poco::Exception exc("Unknown exception.");
+        Poco::Exception exc("Completely Unknown Exception");
         ClientErrorEventArgs evt(request, response, context, exc);
         ofNotifyEvent(events.onHTTPClientErrorEvent, evt);
     }

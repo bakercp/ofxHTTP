@@ -65,6 +65,11 @@ public:
     /// \returns A map of the parameter names and their values.
     static Poco::Net::NameValueCollection getQueryMap(const Poco::URI& uri);
 
+    /// \brief Encode query parameters.
+    /// \param query The query paramaters as a map.
+    /// \returns An URL-encoded query string.
+    static std::string makeQueryString(const Poco::Net::NameValueCollection& query);
+
     /// \brief Dump headers from both requests and responses.
     /// \param request the HTTPRequest request.
     /// \param response the HTTPResponse response.

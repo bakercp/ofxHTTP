@@ -69,6 +69,9 @@ void DefaultSessionProvider::filter(BaseRequest& request, Context& context)
             throw Poco::Exception("Unable to create session for the scheme: " + uri.getScheme());
         }
 
+        session->setKeepAlive(context.getSessionSettings().getKeepAlive());
+        session->setKeepAliveTimeout(context.getSessionSettings().getKeepAliveTimeout());
+
         context.setSession(session);
     }
 }

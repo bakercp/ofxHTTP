@@ -73,21 +73,21 @@ public:
     /// \brief Default values.
     enum Defaults
     {
+        /// \brief File upload buffer.
         DEFAULT_POST_BUFFER_SIZE = 8192,
-            ///< \brief File upload buffer.
+        /// \brief Maximum number of form fields.
         DEFAULT_FIELD_LIMIT = 100,
-            ///< \brief Maximum number of form fields.
+        /// \brief Maximum file upload size (2 MB)
         DEFAULT_MAXIMUM_FILE_UPLOAD_SIZE = 2097152
-            ///< \brief Maximum file upload size (2 MB)
     };
 
+    /// \brief An unfortunate compromise until C++11.
+    /// \note C++ is not able to initialize static collections until
+    ///        after C++11.  This is a compromise until then.
     static const std::string DEFAULT_POST_HTTP_METHODS_ARRAY[];
-        ///< \brief An unfortunate compromise until C++11.
-        ///< \note C++ is not able to initialize static collections until
-        ///<        after C++11.  This is a compromise until then.
 
+    /// \brief The default HTTP methods for this route.
     static const HTTPMethodSet DEFAULT_POST_HTTP_METHODS;
-        ///< \brief The default HTTP methods for this route.
 
 private:
     bool _requireUploadFolderInDataFolder;

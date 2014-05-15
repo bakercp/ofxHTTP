@@ -54,26 +54,6 @@ namespace ofx {
 namespace HTTP {
 
 
-class MyErrorHandler: public Poco::ErrorHandler
-{
-public:
-    void exception(const Poco::Exception& exc)
-    {
-        std::cerr << exc.displayText() << std::endl;
-    }
-
-    void exception(const std::exception& exc)
-    {
-        std::cerr << exc.what() << std::endl;
-    }
-
-    void exception()
-    {
-        std::cerr << "Unknown Exception" << std::endl;
-    }
-};
-
-
 class BaseServerHandle: public Poco::Net::HTTPRequestHandlerFactory
 {
 public:
@@ -153,7 +133,7 @@ private:
 
     Poco::ThreadPool& _threadPoolRef;
 
-    MyErrorHandler eh;
+    ThreadErrorHandler eh;
     Poco::ErrorHandler* pOldEH;
     
 };

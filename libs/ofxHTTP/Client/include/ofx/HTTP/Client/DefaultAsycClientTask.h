@@ -53,6 +53,8 @@ public:
 
     virtual void run();
 
+    bool isThreadFinished() const;
+
     const Poco::UUID& getRequestId() const;
 
     static SharedPtr makeShared(BaseRequest* request,
@@ -64,6 +66,8 @@ public:
 
 
 private:
+    Poco::AtomicCounter _threadFinished;
+
     BaseRequest* _request;
     BaseResponse* _response;
     Context* _context;

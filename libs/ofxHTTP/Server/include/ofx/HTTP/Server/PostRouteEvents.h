@@ -137,8 +137,8 @@ public:
     }
 
 protected:
+    /// \brief The raw form data sent with the POST.
     const ofBuffer& _data;
-        ///< \brief The raw form data sent with the POST.
 
 };
 
