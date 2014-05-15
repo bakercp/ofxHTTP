@@ -135,15 +135,25 @@ private:
     // this is all fixed in Poco 1.4.6 and 1.5.+
     void applyFirefoxHack(Poco::Net::HTTPServerRequest& request);
 
+    /// \brief The original request headers for reference.
     Poco::Net::NameValueCollection _requestHeaders;
+
+    /// \brief The client's SocketAddress for reference.
     Poco::Net::SocketAddress _clientAddress;
 
+    /// \brief True iff the WebSocketConnection is connected to a client.
     bool _isConnected;
+
+    /// \brief The total number of bytes sent to the client.
     std::size_t _totalBytesSent;
+
+    /// \brief The total number of bytes received from the client.
     std::size_t _totalBytesReceived;
 
+    /// \brief A queue of the WebSocketFrames scheduled for delivery.
     mutable std::queue<WebSocketFrame> _frameQueue;
 
+    /// \brief A mutex for threadsafe access to the frame queue, etc.
     mutable Poco::FastMutex _mutex;
 
 };

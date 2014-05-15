@@ -113,6 +113,7 @@ public:
 
     std::size_t getBufferSize() const;
 
+    /// \brief The default WebSocketRoute path pattern.
     static const std::string DEFAULT_WEBSOCKET_ROUTE_PATH_PATTERN;
     static const Poco::Timespan DEFAULT_RECEIVE_TIMEOUT;
     static const Poco::Timespan DEFAULT_SEND_TIMEOUT;
@@ -128,7 +129,8 @@ private:
     SubprotocolSet _validSubprotocols;
     OriginSet _validOrigins;
 
-    bool _autoPingPongResponse; ///< \brief Automatically return pong frames.
+    /// \brief Automatically return pong frames.
+    bool _autoPingPongResponse;
     bool _keepAlive;
 
     Poco::Timespan _receiveTimeout;
