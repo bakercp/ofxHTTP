@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2012-2013 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,35 +26,54 @@
 #pragma once
 
 
-#include "ofSSLManager.h"
+#include <algorithm>
+#include "ofImage.h"
+#include "ofx/HTTP/BaseRoute.h"
+#include "ofx/HTTP/IPVideoRouteHandler.h"
+#include "ofx/HTTP/IPVideoRouteSettings.h"
+#include "ofx/HTTP/IPVideoFrameQueue.h"
 #include "ofx/HTTP/Utils.h"
-#include "ofx/HTTP/URIBuilder.h"
-#include "ofx/HTTP/BasicIPVideoServer.h"
-#include "ofx/HTTP/BasicPostServer.h"
-#include "ofx/HTTP/BasicServer.h"
-#include "ofx/HTTP/SessionCache.h"
-#include "ofx/HTTP/BasicWebSocketServer.h"
-#include "ofx/HTTP/WebSocketEvents.h"
-#include "ofx/HTTP/WebSocketRoute.h"
-#include "ofx/HTTP/WebSocketFrame.h"
-#include "ofx/HTTP/WebSocketConnection.h"
-#include "ofx/HTTP/BaseResponse.h"
-#include "ofx/HTTP/BaseRequest.h"
-#include "ofx/HTTP/Context.h"
-#include "ofx/HTTP/GetRequest.h"
-#include "ofx/HTTP/PostRequest.h"
-#include "ofx/HTTP/PutRequest.h"
-#include "ofx/HTTP/ClientEvents.h"
-#include "ofx/HTTP/BaseClient.h"
-#include "ofx/HTTP/DefaultSessionProvider.h"
-#include "ofx/HTTP/DefaultProxyProcessor.h"
-#include "ofx/HTTP/DefaultRedirectProcessor.h"
-#include "ofx/HTTP/DefaultClientHeaders.h"
-#include "ofx/HTTP/DefaultCookieProcessor.h"
-#include "ofx/HTTP/DefaultRequestStreamFilter.h"
-#include "ofx/HTTP/DefaultResponseStreamFilter.h"
-#include "ofx/HTTP/DefaultClient.h"
-#include "ofx/HTTP/DefaultAsycClient.h"
 
 
-namespace ofxHTTP = ofx::HTTP;
+namespace ofx {
+namespace HTTP {
+
+
+class IPVideoRoute: public BaseRoute_<IPVideoRouteSettings>
+{
+public:
+    typedef std::shared_ptr<IPVideoRoute> SharedPtr;
+    typedef std::weak_ptr<IPVideoRoute> WeakPtr;
+    typedef IPVideoRouteSettings Settings;
+
+    IPVideoRoute(const Settings& settings);
+    virtual ~IPVideoRoute();
+
+    Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
+
+    void send(ofPixels& pix);
+
+    void addConnection(IPVideoRouteHandler* handler);
+    void removeConnection(IPVideoRouteHandler* handler);
+
+    std::size_t getNumConnections() const;
+
+    virtual void stop();
+
+    static SharedPtr makeShared(const Settings& settings)
+    {
+        return SharedPtr(new IPVideoRoute(settings));
+    }
+
+protected:
+    typedef std::vector<IPVideoRouteHandler*>           Connections;
+    typedef std::vector<IPVideoRouteHandler*>::iterator ConnectionsIter;
+
+    Connections _connections;
+
+    mutable ofMutex _mutex;
+
+};
+
+
+} } // namespace ofx::HTTP

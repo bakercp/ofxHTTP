@@ -26,35 +26,37 @@
 #pragma once
 
 
-#include "ofSSLManager.h"
-#include "ofx/HTTP/Utils.h"
-#include "ofx/HTTP/URIBuilder.h"
-#include "ofx/HTTP/BasicIPVideoServer.h"
-#include "ofx/HTTP/BasicPostServer.h"
-#include "ofx/HTTP/BasicServer.h"
-#include "ofx/HTTP/SessionCache.h"
-#include "ofx/HTTP/BasicWebSocketServer.h"
-#include "ofx/HTTP/WebSocketEvents.h"
-#include "ofx/HTTP/WebSocketRoute.h"
-#include "ofx/HTTP/WebSocketFrame.h"
-#include "ofx/HTTP/WebSocketConnection.h"
-#include "ofx/HTTP/BaseResponse.h"
-#include "ofx/HTTP/BaseRequest.h"
-#include "ofx/HTTP/Context.h"
-#include "ofx/HTTP/GetRequest.h"
-#include "ofx/HTTP/PostRequest.h"
-#include "ofx/HTTP/PutRequest.h"
-#include "ofx/HTTP/ClientEvents.h"
-#include "ofx/HTTP/BaseClient.h"
-#include "ofx/HTTP/DefaultSessionProvider.h"
-#include "ofx/HTTP/DefaultProxyProcessor.h"
-#include "ofx/HTTP/DefaultRedirectProcessor.h"
-#include "ofx/HTTP/DefaultClientHeaders.h"
-#include "ofx/HTTP/DefaultCookieProcessor.h"
-#include "ofx/HTTP/DefaultRequestStreamFilter.h"
-#include "ofx/HTTP/DefaultResponseStreamFilter.h"
-#include "ofx/HTTP/DefaultClient.h"
-#include "ofx/HTTP/DefaultAsycClient.h"
+#include "ofx/HTTP/BaseRoute.h"
+#include "ofx/HTTP/FileSystemRouteHandler.h"
+#include "ofx/HTTP/FileSystemRouteSettings.h"
 
 
-namespace ofxHTTP = ofx::HTTP;
+namespace ofx {
+namespace HTTP {
+
+
+/// \brief A route for serving files from the file system.
+class FileSystemRoute: public BaseRoute_<FileSystemRouteSettings>
+{
+public:
+    typedef std::shared_ptr<FileSystemRoute> SharedPtr;
+    typedef std::weak_ptr<FileSystemRoute> WeakPtr;
+    typedef FileSystemRouteSettings Settings;
+
+    FileSystemRoute(const Settings& settings);
+    virtual ~FileSystemRoute();
+
+    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
+                               Poco::Net::HTTPServerResponse& response);
+
+    Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
+
+    static SharedPtr makeShared(const Settings& settings)
+    {
+        return SharedPtr(new FileSystemRoute(settings));
+    }
+
+};
+
+    
+} } // namespace ofx::HTTP

@@ -25,36 +25,55 @@
 
 #pragma once
 
-
-#include "ofSSLManager.h"
-#include "ofx/HTTP/Utils.h"
-#include "ofx/HTTP/URIBuilder.h"
-#include "ofx/HTTP/BasicIPVideoServer.h"
-#include "ofx/HTTP/BasicPostServer.h"
-#include "ofx/HTTP/BasicServer.h"
-#include "ofx/HTTP/SessionCache.h"
-#include "ofx/HTTP/BasicWebSocketServer.h"
-#include "ofx/HTTP/WebSocketEvents.h"
-#include "ofx/HTTP/WebSocketRoute.h"
-#include "ofx/HTTP/WebSocketFrame.h"
-#include "ofx/HTTP/WebSocketConnection.h"
-#include "ofx/HTTP/BaseResponse.h"
+#include "ofFileUtils.h"
 #include "ofx/HTTP/BaseRequest.h"
-#include "ofx/HTTP/Context.h"
-#include "ofx/HTTP/GetRequest.h"
-#include "ofx/HTTP/PostRequest.h"
-#include "ofx/HTTP/PutRequest.h"
-#include "ofx/HTTP/ClientEvents.h"
-#include "ofx/HTTP/BaseClient.h"
-#include "ofx/HTTP/DefaultSessionProvider.h"
-#include "ofx/HTTP/DefaultProxyProcessor.h"
-#include "ofx/HTTP/DefaultRedirectProcessor.h"
-#include "ofx/HTTP/DefaultClientHeaders.h"
-#include "ofx/HTTP/DefaultCookieProcessor.h"
-#include "ofx/HTTP/DefaultRequestStreamFilter.h"
-#include "ofx/HTTP/DefaultResponseStreamFilter.h"
-#include "ofx/HTTP/DefaultClient.h"
-#include "ofx/HTTP/DefaultAsycClient.h"
 
 
-namespace ofxHTTP = ofx::HTTP;
+namespace ofx {
+namespace HTTP {
+
+
+class PutRequest: public BaseRequest
+{
+public:
+    /// \brief Construct a PutRequest with a given uri and http version.
+    /// \param uri the Put endpoint uri.
+    /// \param httpVersion Either HTTP/1.0 or HTTP/1.1.
+    /// \param requestId A unique UUID for this request.
+    PutRequest(const std::string& uri,
+               const Poco::Net::NameValueCollection formFields = Poco::Net::NameValueCollection(),
+               const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1,
+               const Poco::UUID& requestId = generateUUID());
+
+    virtual ~PutRequest();
+    
+    void setPutFile(const std::string& filename);
+
+    void setPutBuffer(const ofBuffer& buffer);
+
+    void setContentRange(std::size_t startByte);
+
+    void setContentRange(std::size_t startByte,
+                         std::size_t endByte);
+
+    void setContentType(const std::string& contentType);
+
+    /// \brief The default MIME type used for file parts.
+    static const std::string DEFAULT_MEDIA_TYPE;
+
+    virtual void prepareSubmit();
+    
+    virtual void writeRequestBody(std::ostream& requestStream);
+
+protected:
+    std::size_t _startByte;
+    std::size_t _endByte;
+
+    std::string _contentType;
+    
+    ofBuffer _buffer;
+
+};
+
+    
+} } // namespace ofx::HTTP

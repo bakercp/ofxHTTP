@@ -23,38 +23,71 @@
 // =============================================================================
 
 
-#pragma once
-
-
-#include "ofSSLManager.h"
-#include "ofx/HTTP/Utils.h"
-#include "ofx/HTTP/URIBuilder.h"
-#include "ofx/HTTP/BasicIPVideoServer.h"
-#include "ofx/HTTP/BasicPostServer.h"
-#include "ofx/HTTP/BasicServer.h"
-#include "ofx/HTTP/SessionCache.h"
-#include "ofx/HTTP/BasicWebSocketServer.h"
-#include "ofx/HTTP/WebSocketEvents.h"
-#include "ofx/HTTP/WebSocketRoute.h"
-#include "ofx/HTTP/WebSocketFrame.h"
-#include "ofx/HTTP/WebSocketConnection.h"
 #include "ofx/HTTP/BaseResponse.h"
-#include "ofx/HTTP/BaseRequest.h"
-#include "ofx/HTTP/Context.h"
-#include "ofx/HTTP/GetRequest.h"
-#include "ofx/HTTP/PostRequest.h"
-#include "ofx/HTTP/PutRequest.h"
-#include "ofx/HTTP/ClientEvents.h"
-#include "ofx/HTTP/BaseClient.h"
-#include "ofx/HTTP/DefaultSessionProvider.h"
-#include "ofx/HTTP/DefaultProxyProcessor.h"
-#include "ofx/HTTP/DefaultRedirectProcessor.h"
-#include "ofx/HTTP/DefaultClientHeaders.h"
-#include "ofx/HTTP/DefaultCookieProcessor.h"
-#include "ofx/HTTP/DefaultRequestStreamFilter.h"
-#include "ofx/HTTP/DefaultResponseStreamFilter.h"
-#include "ofx/HTTP/DefaultClient.h"
-#include "ofx/HTTP/DefaultAsycClient.h"
+//#include "Poco/CountingStream.h"
+//#include "Poco/TeeStream.h"
 
 
-namespace ofxHTTP = ofx::HTTP;
+namespace ofx {
+namespace HTTP {
+
+
+BaseResponse::BaseResponse():
+    Poco::Net::HTTPResponse()//,
+//    _pResponseStream(0),
+//    _pException(0)
+{
+}
+
+
+BaseResponse::~BaseResponse()
+{
+//    // deleting a null pointer is a noop
+//    delete _pResponseStream; // cleans up the stream and the backing session
+//    _pResponseStream = 0;
+//
+//    delete _pException;
+//    _pException = 0;
+}
+
+
+//bool BaseResponse::hasResponseStream() const
+//{
+//    return 0 != _pResponseStream;
+//}
+//
+//std::istream& BaseResponse::getResponseStream()
+//{
+//    poco_assert(_pResponseStream);
+//    
+//    return *_pResponseStream;
+//}
+//
+//
+//void BaseResponse::setResponseStream(std::istream* pResponseStream)
+//{
+//    delete _pResponseStream;
+//    _pResponseStream = pResponseStream;
+//}
+//
+//
+//bool BaseResponse::hasException() const
+//{
+//    return 0 != _pException;
+//}
+//
+//
+//const Poco::Exception* BaseResponse::getException() const
+//{
+//    return _pException;
+//}
+//
+//
+//void BaseResponse::setException(Poco::Exception* pException)
+//{
+//    delete _pException;
+//    _pException = pException;
+//}
+
+
+} } // namespace ofx::HTTP

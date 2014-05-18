@@ -26,35 +26,54 @@
 #pragma once
 
 
+#include <istream>
+#include "Poco/Exception.h"
+#include "Poco/NullStream.h"
+#include "Poco/Runnable.h"
+#include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/HTTPSClientSession.h"
+#include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/HTTPIOStream.h"
 #include "ofSSLManager.h"
-#include "ofx/HTTP/Utils.h"
-#include "ofx/HTTP/URIBuilder.h"
-#include "ofx/HTTP/BasicIPVideoServer.h"
-#include "ofx/HTTP/BasicPostServer.h"
-#include "ofx/HTTP/BasicServer.h"
-#include "ofx/HTTP/SessionCache.h"
-#include "ofx/HTTP/BasicWebSocketServer.h"
-#include "ofx/HTTP/WebSocketEvents.h"
-#include "ofx/HTTP/WebSocketRoute.h"
-#include "ofx/HTTP/WebSocketFrame.h"
-#include "ofx/HTTP/WebSocketConnection.h"
-#include "ofx/HTTP/BaseResponse.h"
 #include "ofx/HTTP/BaseRequest.h"
 #include "ofx/HTTP/Context.h"
-#include "ofx/HTTP/GetRequest.h"
-#include "ofx/HTTP/PostRequest.h"
-#include "ofx/HTTP/PutRequest.h"
-#include "ofx/HTTP/ClientEvents.h"
-#include "ofx/HTTP/BaseClient.h"
-#include "ofx/HTTP/DefaultSessionProvider.h"
-#include "ofx/HTTP/DefaultProxyProcessor.h"
-#include "ofx/HTTP/DefaultRedirectProcessor.h"
-#include "ofx/HTTP/DefaultClientHeaders.h"
-#include "ofx/HTTP/DefaultCookieProcessor.h"
-#include "ofx/HTTP/DefaultRequestStreamFilter.h"
-#include "ofx/HTTP/DefaultResponseStreamFilter.h"
-#include "ofx/HTTP/DefaultClient.h"
-#include "ofx/HTTP/DefaultAsycClient.h"
+#include "ofx/HTTP/StreamUtils.h"
+#include "ofTypes.h"
 
 
-namespace ofxHTTP = ofx::HTTP;
+namespace ofx {
+namespace HTTP {
+
+
+class BaseResponse: public Poco::Net::HTTPResponse
+{
+public:
+    typedef std::shared_ptr<BaseResponse> SharedPtr;
+
+    BaseResponse();
+    virtual ~BaseResponse();
+
+//    bool hasResponseStream() const;
+//    std::istream& getResponseStream();
+
+//    bool hasException() const;
+//    const Poco::Exception* getException() const;
+
+    static SharedPtr makeShared()
+    {
+        return SharedPtr(new BaseResponse());
+    }
+
+private:
+//    void setResponseStream(std::istream* pResponseStream);
+//    void setException(Poco::Exception* pException);
+//
+//    std::istream* _pResponseStream;
+//    Poco::Exception* _pException;
+
+    friend class BaseClient;
+
+};
+
+
+} } // namespace ofx::HTTP

@@ -23,38 +23,72 @@
 // =============================================================================
 
 
-#pragma once
-
-
-#include "ofSSLManager.h"
-#include "ofx/HTTP/Utils.h"
 #include "ofx/HTTP/URIBuilder.h"
-#include "ofx/HTTP/BasicIPVideoServer.h"
-#include "ofx/HTTP/BasicPostServer.h"
-#include "ofx/HTTP/BasicServer.h"
-#include "ofx/HTTP/SessionCache.h"
-#include "ofx/HTTP/BasicWebSocketServer.h"
-#include "ofx/HTTP/WebSocketEvents.h"
-#include "ofx/HTTP/WebSocketRoute.h"
-#include "ofx/HTTP/WebSocketFrame.h"
-#include "ofx/HTTP/WebSocketConnection.h"
-#include "ofx/HTTP/BaseResponse.h"
-#include "ofx/HTTP/BaseRequest.h"
-#include "ofx/HTTP/Context.h"
-#include "ofx/HTTP/GetRequest.h"
-#include "ofx/HTTP/PostRequest.h"
-#include "ofx/HTTP/PutRequest.h"
-#include "ofx/HTTP/ClientEvents.h"
-#include "ofx/HTTP/BaseClient.h"
-#include "ofx/HTTP/DefaultSessionProvider.h"
-#include "ofx/HTTP/DefaultProxyProcessor.h"
-#include "ofx/HTTP/DefaultRedirectProcessor.h"
-#include "ofx/HTTP/DefaultClientHeaders.h"
-#include "ofx/HTTP/DefaultCookieProcessor.h"
-#include "ofx/HTTP/DefaultRequestStreamFilter.h"
-#include "ofx/HTTP/DefaultResponseStreamFilter.h"
-#include "ofx/HTTP/DefaultClient.h"
-#include "ofx/HTTP/DefaultAsycClient.h"
+#include "ofx/HTTP/Utils.h"
 
 
-namespace ofxHTTP = ofx::HTTP;
+namespace ofx {
+namespace HTTP {
+
+
+URIBuilder::URIBuilder()
+{
+}
+
+
+URIBuilder::URIBuilder(const Poco::URI& uri):
+    Poco::Net::NameValueCollection(Utils::getQueryMap(uri))
+{
+    _uri.setScheme(uri.getScheme());
+    _uri.setAuthority(uri.getAuthority());
+    _uri.setPath(uri.getPath());
+    _uri.setFragment(uri.getFragment());
+}
+
+
+URIBuilder::~URIBuilder()
+{
+}
+
+
+Poco::URI URIBuilder::toURI() const
+{
+    Poco::URI uri(_uri);
+    uri.setRawQuery(Utils::makeQueryString(*this));
+    return uri;
+}
+
+
+void URIBuilder::set(const std::string& key, bool value, bool numerical)
+{
+    if (numerical)
+    {
+        Poco::Net::NameValueCollection::set(key, value ? "1" : "0");
+    }
+    else
+    {
+        Poco::Net::NameValueCollection::set(key, value ? "true" : "false");
+    }
+}
+
+
+void URIBuilder::add(const std::string& key, bool value, bool numerical)
+{
+    if (numerical)
+    {
+        Poco::Net::NameValueCollection::add(key, value ? "1" : "0");
+    }
+    else
+    {
+        Poco::Net::NameValueCollection::add(key, value ? "true" : "false");
+    }
+}
+
+
+std::string URIBuilder::toString() const
+{
+    return toURI().toString();
+}
+
+
+} } // namespace ofx::HTTP

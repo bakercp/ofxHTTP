@@ -26,35 +26,43 @@
 #pragma once
 
 
-#include "ofSSLManager.h"
-#include "ofx/HTTP/Utils.h"
-#include "ofx/HTTP/URIBuilder.h"
-#include "ofx/HTTP/BasicIPVideoServer.h"
-#include "ofx/HTTP/BasicPostServer.h"
-#include "ofx/HTTP/BasicServer.h"
-#include "ofx/HTTP/SessionCache.h"
-#include "ofx/HTTP/BasicWebSocketServer.h"
-#include "ofx/HTTP/WebSocketEvents.h"
-#include "ofx/HTTP/WebSocketRoute.h"
-#include "ofx/HTTP/WebSocketFrame.h"
-#include "ofx/HTTP/WebSocketConnection.h"
-#include "ofx/HTTP/BaseResponse.h"
-#include "ofx/HTTP/BaseRequest.h"
-#include "ofx/HTTP/Context.h"
-#include "ofx/HTTP/GetRequest.h"
-#include "ofx/HTTP/PostRequest.h"
-#include "ofx/HTTP/PutRequest.h"
-#include "ofx/HTTP/ClientEvents.h"
-#include "ofx/HTTP/BaseClient.h"
-#include "ofx/HTTP/DefaultSessionProvider.h"
-#include "ofx/HTTP/DefaultProxyProcessor.h"
-#include "ofx/HTTP/DefaultRedirectProcessor.h"
-#include "ofx/HTTP/DefaultClientHeaders.h"
-#include "ofx/HTTP/DefaultCookieProcessor.h"
-#include "ofx/HTTP/DefaultRequestStreamFilter.h"
-#include "ofx/HTTP/DefaultResponseStreamFilter.h"
-#include "ofx/HTTP/DefaultClient.h"
-#include "ofx/HTTP/DefaultAsycClient.h"
+#include "ofx/HTTP/AbstractClientTypes.h"
 
 
-namespace ofxHTTP = ofx::HTTP;
+namespace ofx {
+namespace HTTP {
+
+
+/// \brief A simple default client redirect policy.
+///
+/// This redirect policy will attempt to redirect response codes:
+///
+///     - 301 Moved Permanently
+///     - 302 Found
+///     - 303 See Other
+///     - 307 Temporary Redirect
+///
+/// Additionally, this policy will will redirect content containing requests
+/// such as POST and PUT by converting their request type to a GET.
+class DefaultRedirectProcessor: public AbstractRequestResponseFilter
+{
+public:
+    DefaultRedirectProcessor();
+    
+    virtual ~DefaultRedirectProcessor();
+
+    virtual void filter(BaseRequest& request,
+                        Context& context);
+
+    virtual void filter(BaseRequest& request,
+                        BaseResponse& response,
+                        Context& context);
+
+    virtual bool canFilterResponse(BaseRequest& request,
+                                   BaseResponse& response,
+                                   Context& context) const;
+
+};
+
+
+} } // namespace ofx::HTTP
