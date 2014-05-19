@@ -311,10 +311,7 @@ Poco::Net::NameValueCollection WebSocketConnection::getRequestHeaders() const
 
 Poco::Net::SocketAddress WebSocketConnection::getClientAddress() const
 {
-    cout << "getting client address" << endl;
     ofScopedLock lock(_mutex);
-    cout << "got client address" << endl;
-
     return _clientAddress;
 }
 
