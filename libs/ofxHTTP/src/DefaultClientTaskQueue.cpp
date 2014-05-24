@@ -23,232 +23,79 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/DefaultAsycClient.h"
+#include "ofx/HTTP/DefaultClientTaskQueue.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-DefaultAsycClient::DefaultAsycClient(std::size_t maxConnections,
-                                     Poco::ThreadPool& threadPool):
-    _maxConnections(maxConnections),
-    _threadPool(threadPool)
+DefaultClientTaskQueue::DefaultClientTaskQueue(int maxTasks,
+                                               Poco::ThreadPool& threadPool):
+    TaskQueue_<ClientResponseEventArgs>(maxTasks, threadPool)
 {
-	ofAddListener(ofEvents().update, this, &DefaultAsycClient::update);
 }
 
-
-DefaultAsycClient::~DefaultAsycClient()
-{
-	ofRemoveListener(ofEvents().update, this, &DefaultAsycClient::update);
-}
-
-
-void DefaultAsycClient::update(ofEventArgs& args)
-{
-    Poco::FastMutex::ScopedLock lock(_mutex);
-
-    while (!_queuedRequests.empty() &&
-           _activeRequests.size() < _maxConnections &&
-           _threadPool.available() > 0)
-    {
-        try
-        {
-            _threadPool.start(*_queuedRequests.front());
-            _activeRequests.push_back(_queuedRequests.front());
-            _queuedRequests.pop_front();
-        }
-        catch (const Poco::NoThreadAvailableException& exc)
-        {
-            // No threads left.
-            break;
-        }
-    }
-
-    TaskQueue::iterator iter = _activeRequests.begin();
-
-    while (iter != _activeRequests.end())
-    {
-        if ((*iter)->isThreadFinished())
-        {
-            iter = _activeRequests.erase(iter);
-        }
-        else
-        {
-            ++iter;
-        }
-    }
-}
-
-
-void DefaultAsycClient::exit(ofEventArgs& args)
+DefaultClientTaskQueue::~DefaultClientTaskQueue()
 {
 }
 
 
-
-Poco::UUID DefaultAsycClient::get(const std::string& uri,
-                                  const Poco::Net::NameValueCollection& formFields,
-                                  const std::string& httpVersion,
-                                  const Poco::UUID& requestId,
-                                  ThreadSettings threadSettings)
+Poco::UUID DefaultClientTaskQueue::get(const std::string& uri,
+                                       const Poco::Net::NameValueCollection& formFields,
+                                       const std::string& httpVersion,
+                                       const Poco::UUID& requestId,
+                                       ThreadSettings threadSettings)
 {
 
     GetRequest* req = new GetRequest(uri,
-                   formFields,
-                   httpVersion,
-                   requestId);
+                                     formFields,
+                                     httpVersion,
+                                     requestId);
 
     return request(req,
                    threadSettings);
 }
 
 
-Poco::UUID DefaultAsycClient::post(const std::string& uri,
-                                   const Poco::Net::NameValueCollection formFields,
-                                   const PostRequest::FormParts formParts,
-                                   const std::string& httpVersion,
-                                   const Poco::UUID& requestId,
-                                   ThreadSettings threadSettings)
+Poco::UUID DefaultClientTaskQueue::post(const std::string& uri,
+                                        const Poco::Net::NameValueCollection formFields,
+                                        const PostRequest::FormParts formParts,
+                                        const std::string& httpVersion,
+                                        const Poco::UUID& requestId,
+                                        ThreadSettings threadSettings)
 {
     return request(new PostRequest(uri,
                                    formFields,
                                    formParts,
                                    httpVersion,
                                    requestId),
-                   threadSettings);
+                                   threadSettings);
 }
 
 
-Poco::UUID DefaultAsycClient::request(BaseRequest* pRequest,
-                                      ThreadSettings threadSettings)
+Poco::UUID DefaultClientTaskQueue::request(BaseRequest* pRequest,
+                                           ThreadSettings threadSettings)
 {
 
+    DefaultClientTask* task = new DefaultClientTask(pRequest,
+                                                   createDefaultResponse(),
+                                                   createDefaultContext());
 
-    DefaultAsycClientTask::SharedPtr task = DefaultAsycClientTask::makeShared(pRequest,
-                                                                              createDefaultResponse(),
-                                                                              createDefaultContext());
-
-    task->registerClientEvents(this);
-    task->registerClientFilterEvents(this);
-    task->registerClientProgressEvents(this);
-
-    
-    // add, signal
-    enqueTask(task);
-
-    return pRequest->getRequestId();
+    return start(task);
 }
 
 
-std::size_t DefaultAsycClient::getNumQueuedRequests() const
-{
-    Poco::FastMutex::ScopedLock lock(_mutex);
-    return _queuedRequests.size();
-}
-
-
-std::size_t DefaultAsycClient::getNumActiveRequests() const
-{
-    Poco::FastMutex::ScopedLock lock(_mutex);
-    return _activeRequests.size();
-}
-
-
-bool DefaultAsycClient::cancel(const Poco::UUID& uuid)
-{
-    Poco::FastMutex::ScopedLock lock(_mutex);
-
-    TaskQueue::iterator iter = _queuedRequests.begin();
-
-    while (iter != _queuedRequests.end())
-    {
-        if (uuid == (*iter)->getRequestId())
-        {
-            _queuedRequests.erase(iter);
-            return true;
-        }
-
-        ++iter;
-    }
-
-    return false;
-}
-
-
-Context* DefaultAsycClient::createDefaultContext()
+Context* DefaultClientTaskQueue::createDefaultContext()
 {
     // TODO, attach context info here.
     return new Context();
 }
 
 
-BaseResponse* DefaultAsycClient::createDefaultResponse()
+BaseResponse* DefaultClientTaskQueue::createDefaultResponse()
 {
     return new BaseResponse();
-}
-
-
-void DefaultAsycClient::processTaskQueue()
-{
-    // NOOP
-}
-
-
-void DefaultAsycClient::enqueTask(DefaultAsycClientTask::SharedPtr task)
-{
-    Poco::FastMutex::ScopedLock lock(_mutex);
-    _queuedRequests.push_back(task);
-}
-
-
-bool DefaultAsycClient::onHTTPClientResponseEvent(ClientResponseEventArgs& args)
-{
-//    std::cout << "ofApp::onHTTPClientResponseEvent" << std::endl;
-//    Poco::StreamCopier::copyStream(args.getResponseStream(), std::cout);
-//    std::cout << std::endl;
-
-    return true;
-}
-
-
-bool DefaultAsycClient::onHTTPClientErrorEvent(ClientErrorEventArgs& args)
-{
-    
-
-//    std::cout << "ofApp::onHTTPClientErrorEvent:" << std::endl;
-//    std::cout << args.getRequest().getRequestId().toString() << endl;
-//    std::cout << args.getException().displayText() << std::endl;
-    return true;
-}
-
-
-bool DefaultAsycClient::onHTTPClientRequestProgress(ClientRequestProgressArgs& args)
-{
-//    std::cout << "DefaultAsycClient::onHTTPClientRequestProgress:" << std::endl;
-    return true;
-}
-
-
-bool DefaultAsycClient::onHTTPClientResponseProgress(ClientResponseProgressArgs& args)
-{
-//    std::cout << "DefaultAsycClient::onHTTPClientResponseProgress:" << std::endl;
-    return true;
-}
-
-
-bool DefaultAsycClient::onHTTPClientRequestFilterEvent(MutableClientRequestArgs& args)
-{
-//    std::cout << "DefaultAsycClient::onHTTPClientRequestFilterEvent:" << std::endl;
-    return true;
-}
-
-
-bool DefaultAsycClient::onHTTPClientResponseFilterEvent(MutableClientResponseArgs& args)
-{
-//    std::cout << "DefaultAsycClient::onHTTPClientResponseFilterEvent:" << std::endl;
-    return true;
 }
 
 

@@ -26,8 +26,8 @@
 #pragma once
 
 
-#include "Poco/AtomicCounter.h"
-#include "Poco/Runnable.h"
+#include "Poco/Task.h"
+#include "Poco/TaskNotification.h"
 #include "ofx/HTTP/ClientEvents.h"
 #include "ofx/HTTP/DefaultClient.h"
 #include "ofx/HTTP/ThreadSettings.h"
@@ -37,36 +37,27 @@ namespace ofx {
 namespace HTTP {
 
 
-class DefaultAsycClientTask:
-    public DefaultClient,
-    public Poco::Runnable
+class DefaultClientTask: public DefaultClient, public Poco::Task
 {
 public:
-    typedef std::shared_ptr<DefaultAsycClientTask> SharedPtr;
+    DefaultClientTask(BaseRequest* request,
+                      BaseResponse* response,
+                      Context* context);
 
-    DefaultAsycClientTask(BaseRequest* request,
-                          BaseResponse* response,
-                          Context* context);
+    virtual ~DefaultClientTask();
 
-    virtual ~DefaultAsycClientTask();
+    void runTask();
 
-    virtual void run();
+    bool onHTTPClientResponseEvent(ClientResponseEventArgs& args);
+    bool onHTTPClientErrorEvent(ClientErrorEventArgs& args);
 
-    bool isThreadFinished() const;
+    bool onHTTPClientRequestProgress(ClientRequestProgressArgs& args);
+    bool onHTTPClientResponseProgress(ClientResponseProgressArgs& args);
 
-    const Poco::UUID& getRequestId() const;
-
-    static SharedPtr makeShared(BaseRequest* request,
-                                BaseResponse* response,
-                                Context* context)
-    {
-        return SharedPtr(new DefaultAsycClientTask(request, response, context));
-    }
-
+    bool onHTTPClientRequestFilterEvent(MutableClientRequestArgs& args);
+    bool onHTTPClientResponseFilterEvent(MutableClientResponseArgs& args);
 
 private:
-    Poco::AtomicCounter _threadFinished;
-
     BaseRequest* _request;
     BaseResponse* _response;
     Context* _context;

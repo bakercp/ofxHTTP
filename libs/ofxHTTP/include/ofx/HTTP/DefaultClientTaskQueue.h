@@ -31,27 +31,26 @@
 #include "Poco/ThreadPool.h"
 #include "ofx/HTTP/ThreadSettings.h"
 #include "ofx/HTTP/DefaultClient.h"
-#include "ofx/HTTP/DefaultAsycClientTask.h"
+#include "ofx/HTTP/DefaultClientTask.h"
 #include "ofx/HTTP/ClientEvents.h"
 #include "ofx/HTTP/BaseRequest.h"
 #include "ofx/HTTP/GetRequest.h"
 #include "ofx/HTTP/PostRequest.h"
+#include "ofx/TaskQueue.h"
+#include "ofx/TaskQueueEvents.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class DefaultAsycClient
+class DefaultClientTaskQueue: public TaskQueue_<ClientResponseEventArgs>
 {
 public:
-    DefaultAsycClient(std::size_t maxConnections = DEFAULT_MAXIMUM_CONNECTIONS,
-                      Poco::ThreadPool& threadPool = Poco::ThreadPool::defaultPool());
+    DefaultClientTaskQueue(int maxTasks = TaskQueue_<ofBuffer>::UNLIMITED_TASKS,
+                           Poco::ThreadPool& threadPool = Poco::ThreadPool::defaultPool());
 
-    virtual ~DefaultAsycClient();
-
-    void update(ofEventArgs& args);
-    void exit(ofEventArgs& args);
+    virtual ~DefaultClientTaskQueue();
 
     Poco::UUID get(const std::string& uri,
                    const Poco::Net::NameValueCollection& formFields = Poco::Net::NameValueCollection(),
@@ -83,60 +82,13 @@ public:
     Poco::UUID request(BaseRequest* pRequest,
                        ThreadSettings threadSettings = ThreadSettings());
 
-
-    /// \brief Get the number of queued requests.
-    /// \returns the number of queued requests.
-    std::size_t getNumQueuedRequests() const;
-
-    /// \brief Get the number of active requests.
-    /// \returns the number of active requests.
-    std::size_t getNumActiveRequests() const;
-
-    /// \brief Cancel an existing task.
-    /// \param uuid The UUID returned with the initial task.
-    bool cancel(const Poco::UUID& uuid);
-
-    /// \brief Users subscribe to these events.
-    // ClientEvents events;
-
-    enum
-    {
-        DEFAULT_MAXIMUM_CONNECTIONS = 4
-    };
-
-    virtual bool onHTTPClientResponseEvent(ClientResponseEventArgs& args);
-    virtual bool onHTTPClientErrorEvent(ClientErrorEventArgs& args);
-
-    virtual bool onHTTPClientRequestProgress(ClientRequestProgressArgs& args);
-    virtual bool onHTTPClientResponseProgress(ClientResponseProgressArgs& args);
-
-    virtual bool onHTTPClientRequestFilterEvent(MutableClientRequestArgs& args);
-    virtual bool onHTTPClientResponseFilterEvent(MutableClientResponseArgs& args);
-
 private:
-    DefaultAsycClient(const DefaultAsycClient&);
-    DefaultAsycClient& operator = (const DefaultAsycClient&);
+    DefaultClientTaskQueue(const DefaultClientTaskQueue&);
+    DefaultClientTaskQueue& operator = (const DefaultClientTaskQueue&);
 
     Context* createDefaultContext();
     BaseResponse* createDefaultResponse();
 
-    /// \brief Subclasses can implement sorting, pruning etc.
-    ///
-    /// This is called before threads are executed.
-    virtual void processTaskQueue();
-
-    void enqueTask(DefaultAsycClientTask::SharedPtr task);
-
-    typedef std::deque<DefaultAsycClientTask::SharedPtr> TaskQueue;
-
-    TaskQueue _queuedRequests;
-    TaskQueue _activeRequests;
-
-    std::size_t _maxConnections;
-
-    Poco::ThreadPool& _threadPool;
-
-    mutable Poco::FastMutex _mutex;
 };
 
 

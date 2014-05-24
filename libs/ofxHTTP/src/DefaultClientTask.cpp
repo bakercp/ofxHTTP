@@ -23,51 +23,87 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/DefaultAsycClientTask.h"
+#include "ofx/HTTP/DefaultClientTask.h"
+#include "Poco/TaskManager.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-DefaultAsycClientTask::DefaultAsycClientTask(BaseRequest* request,
-                                             BaseResponse* response,
-                                             Context* context):
+DefaultClientTask::DefaultClientTask(BaseRequest* request,
+                                     BaseResponse* response,
+                                     Context* context):
     DefaultClient(),
+    Poco::Task(request->getURI()),
     _request(request),
     _response(response),
-    _context(context),
-    _threadFinished(false)
+    _context(context)
 {
 }
 
 
-DefaultAsycClientTask::~DefaultAsycClientTask()
+DefaultClientTask::~DefaultClientTask()
 {
+    // ?
     delete _request;
     delete _response;
     delete _context;
 }
 
 
-void DefaultAsycClientTask::run()
+void DefaultClientTask::runTask()
 {
+    registerClientEvents(this);
+    registerClientProgressEvents(this);
+    registerClientFilterEvents(this);
+
+    // TODO: add progress callback.
     submit(*_request, *_response, *_context);
 
-    _threadFinished = true;
-}
-
-    
-bool DefaultAsycClientTask::isThreadFinished() const
-{
-    return _threadFinished;
+    unregisterClientFilterEvents(this);
+    unregisterClientProgressEvents(this);
+    unregisterClientEvents(this);
 }
 
 
-const Poco::UUID& DefaultAsycClientTask::getRequestId() const
+bool DefaultClientTask::onHTTPClientResponseEvent(HTTP::ClientResponseEventArgs& args)
 {
-    poco_assert(_request);
-    return _request->getRequestId();
+//    ofBuffer buffer(args.getResponseStream());
+    postNotification(new Poco::TaskCustomNotification<HTTP::ClientResponseEventArgs>(this, args));
+    return true;
+}
+
+
+bool DefaultClientTask::onHTTPClientErrorEvent(HTTP::ClientErrorEventArgs& args)
+{
+    Poco::TaskManager* pOwner = getOwner();
+    throw args.getException();
+    return true;
+}
+
+
+bool DefaultClientTask::onHTTPClientRequestProgress(HTTP::ClientRequestProgressArgs& args)
+{
+    return true;
+}
+
+
+bool DefaultClientTask::onHTTPClientResponseProgress(HTTP::ClientResponseProgressArgs& args)
+{
+    return true;
+}
+
+
+bool DefaultClientTask::onHTTPClientRequestFilterEvent(HTTP::MutableClientRequestArgs& args)
+{
+    return true;
+}
+
+
+bool DefaultClientTask::onHTTPClientResponseFilterEvent(HTTP::MutableClientResponseArgs& args)
+{
+    return true;
 }
 
 

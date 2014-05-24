@@ -54,7 +54,8 @@
 #include "ofx/HTTP/DefaultRequestStreamFilter.h"
 #include "ofx/HTTP/DefaultResponseStreamFilter.h"
 #include "ofx/HTTP/DefaultClient.h"
-#include "ofx/HTTP/DefaultAsycClient.h"
+#include "ofx/HTTP/DefaultClientTaskQueue.h"
+#include "ofx/HTTP/DefaultClientTask.h"
 
 
 namespace ofxHTTP = ofx::HTTP;
