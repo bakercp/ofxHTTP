@@ -300,7 +300,7 @@ public:
     }
 
 
-    std::istream& getResponseStream()
+    std::istream& getResponseStream() const
     {
         return _responseStream;
     }
