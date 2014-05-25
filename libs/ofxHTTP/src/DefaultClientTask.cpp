@@ -25,6 +25,9 @@
 
 #include "ofx/HTTP/DefaultClientTask.h"
 #include "Poco/TaskManager.h"
+#include "Poco/Buffer.h"
+#include "ofx/IO/ByteBuffer.h"
+#include "ofx/IO/ByteBufferUtils.h"
 
 
 namespace ofx {
@@ -69,8 +72,37 @@ void DefaultClientTask::runTask()
 
 bool DefaultClientTask::onHTTPClientResponseEvent(HTTP::ClientResponseEventArgs& args)
 {
-//    ofBuffer buffer(args.getResponseStream());
-    postNotification(new Poco::TaskCustomNotification<HTTP::ClientResponseEventArgs>(this, args));
+    const std::size_t bufferSize = IO::ByteBufferUtils::DEFAULT_BUFFER_SIZE;
+
+    IO::ByteBuffer byteBuffer;
+
+    std::istream& istr = args.getResponseStream();
+
+    Poco::Buffer<char> buffer(bufferSize);
+    std::streamsize len = 0;
+	istr.read(buffer.begin(), bufferSize);
+    std::streamsize n = istr.gcount();
+    while (n > 0)
+	{
+		len += n;
+        byteBuffer.writeBytes(reinterpret_cast<uint8_t*>(buffer.begin()), n);
+        if (istr && !isCancelled())
+		{
+			istr.read(buffer.begin(), bufferSize);
+            n = istr.gcount();
+		}
+        else
+        {
+            n = 0;
+        }
+	}
+
+    ClientResponseBufferEventArgs bufferEvent(byteBuffer,
+                                              args.getRequest(),
+                                              args.getResponse(),
+                                              args.getContextRef());
+
+    postNotification(new Poco::TaskCustomNotification<HTTP::ClientResponseBufferEventArgs>(this, bufferEvent));
     return true;
 }
 
@@ -85,12 +117,14 @@ bool DefaultClientTask::onHTTPClientErrorEvent(HTTP::ClientErrorEventArgs& args)
 
 bool DefaultClientTask::onHTTPClientRequestProgress(HTTP::ClientRequestProgressArgs& args)
 {
+    setProgress(args.getProgress());
     return true;
 }
 
 
 bool DefaultClientTask::onHTTPClientResponseProgress(HTTP::ClientResponseProgressArgs& args)
 {
+    setProgress(args.getProgress());
     return true;
 }
 
