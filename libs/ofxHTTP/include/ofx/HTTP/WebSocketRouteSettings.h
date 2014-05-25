@@ -121,7 +121,7 @@ public:
 
     enum
     {
-        DEFAULT_BUFFER_SIZE = 1024
+        DEFAULT_BUFFER_SIZE = 8192
     };
 
 
