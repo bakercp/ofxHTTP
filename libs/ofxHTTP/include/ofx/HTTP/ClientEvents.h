@@ -31,6 +31,7 @@
 #include "ofx/HTTP/BaseRequest.h"
 #include "ofx/HTTP/BaseResponse.h"
 #include "ofx/HTTP/Context.h"
+#include "ofx/IO/ByteBuffer.h"
 
 
 namespace ofx {
@@ -307,6 +308,35 @@ public:
 
 protected:
     std::istream& _responseStream;
+    
+};
+
+
+class ClientResponseBufferEventArgs: public BaseClientResponseArgs
+{
+public:
+    ClientResponseBufferEventArgs(const IO::ByteBuffer& byteBuffer,
+                                  const BaseRequest& request,
+                                  const BaseResponse& response,
+                                  Context& context):
+        BaseClientResponseArgs(request, response, context),
+            _byteBuffer(byteBuffer)
+    {
+    }
+
+
+    virtual ~ClientResponseBufferEventArgs()
+    {
+    }
+    
+
+    const IO::ByteBuffer& getBuffer() const
+    {
+        return _byteBuffer;
+    }
+    
+protected:
+    IO::ByteBuffer _byteBuffer;
     
 };
 

@@ -44,7 +44,7 @@ namespace ofx {
 namespace HTTP {
 
 
-class DefaultClientTaskQueue: public TaskQueue_<ClientResponseEventArgs>
+class DefaultClientTaskQueue: public TaskQueue_<ClientResponseBufferEventArgs>
 {
 public:
     DefaultClientTaskQueue(int maxTasks = TaskQueue_<ofBuffer>::UNLIMITED_TASKS,

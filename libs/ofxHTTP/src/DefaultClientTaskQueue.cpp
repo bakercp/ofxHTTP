@@ -32,7 +32,7 @@ namespace HTTP {
 
 DefaultClientTaskQueue::DefaultClientTaskQueue(int maxTasks,
                                                Poco::ThreadPool& threadPool):
-    TaskQueue_<ClientResponseEventArgs>(maxTasks, threadPool)
+    TaskQueue_<ClientResponseBufferEventArgs>(maxTasks, threadPool)
 {
 }
 
