@@ -6,13 +6,14 @@ ofxHTTP is designed to work best using Project Generator.
 
 NOTE: Requires the following addons:
 
+- https://github.com/bakercp/ofxIO
 - https://github.com/bakercp/ofxMediaType
 - https://github.com/bakercp/ofxSSLManager
+- https://github.com/bakercp/ofxTaskQueue
 
 Some examples require:
 
 - https://github.com/bakercp/ofxJSON
-
 
 A suite of HTTP tools in pure POCO, Web Server, Web Client, etc.
 
