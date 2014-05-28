@@ -29,66 +29,73 @@
 void ofApp::setup()
 {
     ofSetLogLevel(OF_LOG_NOTICE);
+    
     ofSetFrameRate(30);
 
-    BasicPostServerSettings settings;
+    ofx::HTTP::BasicPostServerSettings settings;
 
-    server = BasicPostServer::makeShared(settings);
+    // Many other settings are available.
+    settings.setPort(7890);
 
-    server->getPostRoute()->registerPostEvents(this);
+    // Apply the settings.
+    server.setup(settings);
 
-    server->start();
+    // The client can listen for POST form and multi-part upload events.
+    // User be aware, these methods are called from other threads.
+    // The user is responsible for protecting shared resources (e.g. ofMutex).
+    server.getPostRoute()->registerPostEvents(this);
+
+    // Start the server.
+    server.start();
 
     // Launch a browser with the address of the server.
-    ofLaunchBrowser(server->getURL());
+    ofLaunchBrowser(server.getURL());
 }
 
 
 void ofApp::draw()
 {
     ofBackground(255);
-    ofDrawBitmapStringHighlight("See " + server->getURL(), 10, 16);
-    ofDrawBitmapStringHighlight("See the Console", 10, 45);
-    int y = 70;
-
+    ofDrawBitmapStringHighlight("See " + server.getURL(), 10, 16);
+    ofDrawBitmapStringHighlight("See the Console", 10, 42);
 }
 
 
-void ofApp::onHTTPPostEvent(PostEventArgs& args)
+void ofApp::onHTTPPostEvent(ofx::HTTP::PostEventArgs& args)
 {
     ofLogNotice("ofApp::onHTTPPostEvent") << "Data: " << args.getBuffer().getText();
 }
 
 
-void ofApp::onHTTPFormEvent(PostFormEventArgs& args)
+void ofApp::onHTTPFormEvent(ofx::HTTP::PostFormEventArgs& args)
 {
     ofLogNotice("ofApp::onHTTPFormEvent") << "";
-    Utils::dumpNameValueCollection(args.getForm(), ofGetLogLevel());
+    ofx::HTTP::Utils::dumpNameValueCollection(args.getForm(), ofGetLogLevel());
 }
 
 
-void ofApp::onHTTPUploadEvent(PostUploadEventArgs& args)
+void ofApp::onHTTPUploadEvent(ofx::HTTP::PostUploadEventArgs& args)
 {
     std::string stateString = "";
 
     switch (args.getState())
     {
-        case PostUploadEventArgs::UPLOAD_STARTING:
+        case ofx::HTTP::PostUploadEventArgs::UPLOAD_STARTING:
             stateString = "STARTING";
             break;
-        case PostUploadEventArgs::UPLOAD_PROGRESS:
+        case ofx::HTTP::PostUploadEventArgs::UPLOAD_PROGRESS:
             stateString = "PROGRESS";
             break;
-        case PostUploadEventArgs::UPLOAD_FINISHED:
+        case ofx::HTTP::PostUploadEventArgs::UPLOAD_FINISHED:
             stateString = "FINISHED";
             break;
     }
 
     ofLogNotice("ofApp::onHTTPUploadEvent") << "";
-    cout << "         state: " << stateString << endl;
-    cout << " formFieldName: " << args.getFormFieldName() << endl;
-    cout << "orig. filename: " << args.getOriginalFilename() << endl;
-    cout << "      filename: " << args.getFilename() << endl;
-    cout << "      fileType: " << args.getFileType().toString() << endl;
-    cout << "# bytes xfer'd: " << args.getNumBytesTransferred() << endl;
+    ofLogNotice("ofApp::onHTTPUploadEvent") << "         state: " << stateString;
+    ofLogNotice("ofApp::onHTTPUploadEvent") << " formFieldName: " << args.getFormFieldName();
+    ofLogNotice("ofApp::onHTTPUploadEvent") << "orig. filename: " << args.getOriginalFilename();
+    ofLogNotice("ofApp::onHTTPUploadEvent") <<  "      filename: " << args.getFilename();
+    ofLogNotice("ofApp::onHTTPUploadEvent") <<  "      fileType: " << args.getFileType().toString();
+    ofLogNotice("ofApp::onHTTPUploadEvent") << "# bytes xfer'd: " << args.getNumBytesTransferred();
 }
