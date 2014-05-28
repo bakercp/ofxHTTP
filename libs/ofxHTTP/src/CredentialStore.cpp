@@ -190,7 +190,7 @@ void DefaultCredentialStore::filter(BaseRequest& request,
     if(request.has(Poco::Net::HTTPRequest::AUTHORIZATION))
     {
         ofLogVerbose("CredentialStore::authenticate") << "HTTP Authorization headers already set.  Skipping authentication.";
-        return false;
+        return;
     }
 
     Poco::URI uri(request.getURI());
@@ -212,7 +212,7 @@ void DefaultCredentialStore::filter(BaseRequest& request,
         {
             (*iterDigest).second->updateAuthInfo(request); // successfully updated auth info for matching scope
             ofLogVerbose("CredentialStore::updateAuthentication") << "Found and updated digest credentials.";
-            return true;
+            return;
         }
 
         // if there are no digest credentials, search for basic credentials
@@ -223,16 +223,16 @@ void DefaultCredentialStore::filter(BaseRequest& request,
         {
             (*iterBasic).second->authenticate(request); // successfully updated auth info for matching scope
             ofLogVerbose("CredentialStore::updateAuthentication") << "Found and updated basic credentials.";
-            return true;
+            return;
         }
         
         ofLogVerbose("CredentialStore::updateAuthentication") << "Had no matching cached credentials for preemptive authentication.";
-        return false;
+        return;
     }
     else
     {
         ofLogVerbose("CredentialStore::authenticate") << "Had no matching credentials for preemptive authentication.";
-        return false;
+        return;
     }    
 }
 
@@ -261,7 +261,7 @@ void DefaultCredentialStore::filter(BaseRequest& request,
             else
             {
                 ofLogError("CredentialStore::authenticate") << "Incompatible or unknown WWW-Authenticate header.  Basic and digest supported: " << iter->second;
-                return false;
+                return;
             }
 
             // extract the realm
@@ -275,17 +275,17 @@ void DefaultCredentialStore::filter(BaseRequest& request,
             catch (const Poco::Net::NotAuthenticatedException& exc)
             {
                 ofLogError("CredentialStore::authenticate") << "HTTP response has no authentication header.";
-                return false;
+                return;
             }
             catch (const Poco::InvalidArgumentException& exc)
             {
                 ofLogError("CredentialStore::authenticate") << "Incompatible or unknown WWW-Authenticate header.  Basic and digest supported: " << iter->second;
-                return false;
+                return;
             }
             catch (const Poco::SyntaxException& exc)
             {
                 ofLogError("CredentialStore::authenticate") << "Error parsing WWW-Authenticate header: "  << iter->second;
-                return false;
+                return;
             }
 
             AuthScope targetScope(uri.getScheme(),
@@ -309,34 +309,34 @@ void DefaultCredentialStore::filter(BaseRequest& request,
                     // replace any old ones (probably means they failed and were updated somewhere)
                     basicCredentialCacheMap[matchingScope] = HTTPBasicCredentialsSharedPtr(new Poco::Net::HTTPBasicCredentials(matchingCredentials.getUsername(), matchingCredentials.getPassword()));
                     basicCredentialCacheMap[matchingScope].get()->authenticate(request);
-                    return true;
+                    return;
                 }
                 else if(DIGEST == requestedAuthType)
                 {
                     digestCredentialCacheMap[matchingScope] = HTTPDigestCredentialsSharedPtr(new Poco::Net::HTTPDigestCredentials(matchingCredentials.getUsername(),matchingCredentials.getPassword()));
                     digestCredentialCacheMap[matchingScope].get()->authenticate(request, response);
-                    return true;
+                    return;
                 }
                 else
                 {
                     ofLogError("CredentialStore::authenticate") << "Unknown requestedAuthType: " << requestedAuthType;
-                    return false;
+                    return;
                 }
             }
             else
             {
                 ofLogVerbose("CredentialStore::authenticate") << "Had no matching credentials for authentication.";
-                return false;
+                return;
             }
         }
         
         ofLogVerbose("CredentialStore::authenticate") << "Response was unauthorized, but could not find WWW-Authenticate header.";
-        return false;
+        return;
     }
     else
     {
         ofLogVerbose("CredentialStore::authenticate") << "Response was not unauthorized.  Nothing to be done.";
-        return false;
+        return;
     }
     
 }
