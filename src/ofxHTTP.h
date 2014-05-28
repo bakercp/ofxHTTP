@@ -27,6 +27,8 @@
 
 
 #include "ofSSLManager.h"
+#include "ofxMediaType.h"
+#include "ofxTaskQueue.h"
 #include "ofx/HTTP/Utils.h"
 #include "ofx/HTTP/URIBuilder.h"
 #include "ofx/HTTP/BasicIPVideoServer.h"
