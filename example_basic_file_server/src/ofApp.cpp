@@ -30,11 +30,15 @@ void ofApp::setup()
 {
     ofSetFrameRate(30);
 
-    HTTP::BasicServerSettings settings;
+    ofx::HTTP::BasicServerSettings settings;
+
+    // Many other settings are available.
     settings.setPort(7890);
-    
+
+    // Apply the settings.
     server.setup(settings);
 
+    // Start the server.
     server.start();
 
     // Launch a browser with the address of the server.
