@@ -1,4 +1,0 @@
-ofxHTTP
-ofxJSON
-ofxMediaType
-ofxZeroconf
