@@ -24,31 +24,27 @@
 
 
 #include "ofApp.h"
-#include <iostream>
-#include <iterator>
-#include <algorithm>
-#include <vector>
 
-//------------------------------------------------------------------------------
+
 void ofApp::setup()
 {
     ofSetFrameRate(30);
 
-    BasicServerSettings settings;
-    settings.setPort(8998);
+    HTTP::BasicServerSettings settings;
+    settings.setPort(7890);
+    
+    server.setup(settings);
 
-    server = BasicServer::makeShared(settings);
-
-    server->start();
+    server.start();
 
     // Launch a browser with the address of the server.
-    ofLaunchBrowser(server->getURL());
+    ofLaunchBrowser(server.getURL());
 
 }
 
-//------------------------------------------------------------------------------
+
 void ofApp::draw()
 {
     ofBackground(255);
-    ofDrawBitmapStringHighlight("See " + server->getURL(), 10, 16);
+    ofDrawBitmapStringHighlight("See " + server.getURL(), 10, 16);
 }
