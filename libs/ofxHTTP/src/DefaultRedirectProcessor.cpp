@@ -51,8 +51,6 @@ void DefaultRedirectProcessor::filter(BaseRequest& request,
                                       BaseResponse& response,
                                       Context& context)
 {
-    Poco::Net::HTTPResponse::HTTPStatus status = response.getStatus();
-
     if (canFilterResponse(request, response, context))
     {
         if (context.getRedirects().size() < context.getSessionSettings().getMaxRedirects())
@@ -64,11 +62,7 @@ void DefaultRedirectProcessor::filter(BaseRequest& request,
             if (response.has("Location"))
             {
                 std::string location = response.get("Location");
-//                std::cout << "LOCATION=" << location << std::endl;
                 redirectedURI.resolve(location);
-
-//                std::cout << "RESOLVED=" << redirectedURI.toString() << std::endl;
-
             }
             else
             {
