@@ -96,8 +96,6 @@ public:
     void stop();
     bool isRunning() const;
 
-    void setup(const SettingsType& settings);
-
     const SettingsType& getSettings() const;
 
     std::string getURL() const;
@@ -289,13 +287,6 @@ template <typename SettingsType>
 std::string BaseServer_<SettingsType>::getURL() const
 {
     return _settings.getURI().toString();
-}
-
-
-template <typename SettingsType>
-void BaseServer_<SettingsType>::setup(const SettingsType& settings)
-{
-    _settings = settings;
 }
 
 

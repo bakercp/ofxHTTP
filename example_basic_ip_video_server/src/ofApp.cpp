@@ -44,13 +44,13 @@ void ofApp::setup()
     // settings.setMaxClientConnections(10);
 
     // Apply the settings.
-    server.setup(settings);
+    server = ofx::HTTP::BasicIPVideoServer::makeShared(settings);
 
     // Start the server.
-    server.start();
+    server->start();
 
     // Launch a browser with the address of the server.
-    ofLaunchBrowser(server.getURL());
+    ofLaunchBrowser(server->getURL());
 }
 
 
@@ -63,7 +63,7 @@ void ofApp::update()
     if(player.isFrameNew())
     {
         // This can be any kind of pixels.
-        server.send(player.getPixelsRef());
+        server->send(player.getPixelsRef());
     }
 }
 
@@ -77,7 +77,7 @@ void ofApp::draw()
     std::stringstream ss;
 
     ss << "Num clients connected: ";
-    ss << server.getNumConnections();
+    ss << server->getNumConnections();
 
     ofDrawBitmapStringHighlight(ss.str(), 20, 20);
 }

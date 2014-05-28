@@ -39,6 +39,6 @@ public:
     void onSSLServerVerificationError(Poco::Net::VerificationErrorArgs& args);
     void onSSLPrivateKeyPassphraseRequired(std::string& passphrase);
 
-    ofx::HTTP::BasicServer server;
+    ofx::HTTP::BasicServer::SharedPtr server;
     
 };

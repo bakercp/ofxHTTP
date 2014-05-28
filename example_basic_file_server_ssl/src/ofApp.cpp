@@ -40,12 +40,12 @@ void ofApp::setup()
     // should not be used for production purposes.
     settings.setUseSSL(true);
 
-    server.setup(settings);
+    server = ofx::HTTP::BasicServer::makeShared(settings);
 
-    server.start();
+    server->start();
 
     // Launch a browser with the address of the server.
-    ofLaunchBrowser(server.getURL());
+    ofLaunchBrowser(server->getURL());
 
 }
 
@@ -53,7 +53,7 @@ void ofApp::setup()
 void ofApp::draw()
 {
     ofBackground(255);
-    ofDrawBitmapStringHighlight("See " + server.getURL(), 10, 16);
+    ofDrawBitmapStringHighlight("See " + server->getURL(), 10, 16);
 }
 
 

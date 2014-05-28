@@ -38,25 +38,25 @@ void ofApp::setup()
     settings.setPort(7890);
 
     // Apply the settings.
-    server.setup(settings);
+    server = ofx::HTTP::BasicPostServer::makeShared(settings);
 
     // The client can listen for POST form and multi-part upload events.
     // User be aware, these methods are called from other threads.
     // The user is responsible for protecting shared resources (e.g. ofMutex).
-    server.getPostRoute()->registerPostEvents(this);
+    server->getPostRoute()->registerPostEvents(this);
 
     // Start the server.
-    server.start();
+    server->start();
 
     // Launch a browser with the address of the server.
-    ofLaunchBrowser(server.getURL());
+    ofLaunchBrowser(server->getURL());
 }
 
 
 void ofApp::draw()
 {
     ofBackground(255);
-    ofDrawBitmapStringHighlight("See " + server.getURL(), 10, 16);
+    ofDrawBitmapStringHighlight("See " + server->getURL(), 10, 16);
     ofDrawBitmapStringHighlight("See the Console", 10, 42);
 }
 

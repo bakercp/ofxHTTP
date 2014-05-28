@@ -36,13 +36,13 @@ void ofApp::setup()
     settings.setPort(7890);
 
     // Apply the settings.
-    server.setup(settings);
+    server = ofx::HTTP::BasicServer::makeShared(settings);
 
     // Start the server.
-    server.start();
+    server->start();
 
     // Launch a browser with the address of the server.
-    ofLaunchBrowser(server.getURL());
+    ofLaunchBrowser(server->getURL());
 
 }
 
@@ -50,5 +50,5 @@ void ofApp::setup()
 void ofApp::draw()
 {
     ofBackground(255);
-    ofDrawBitmapStringHighlight("See " + server.getURL(), 10, 16);
+    ofDrawBitmapStringHighlight("See " + server->getURL(), 10, 16);
 }

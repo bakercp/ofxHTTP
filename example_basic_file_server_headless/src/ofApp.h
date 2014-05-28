@@ -37,6 +37,6 @@ public:
 
     // We do not have an draw() method.
 
-    ofx::HTTP::BasicServer server;
+    ofx::HTTP::BasicServer::SharedPtr server;
 
 };
