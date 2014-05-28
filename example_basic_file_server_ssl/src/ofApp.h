@@ -30,9 +30,6 @@
 #include "ofxHTTP.h"
 
 
-using namespace ofx;
-
-
 class ofApp: public ofBaseApp
 {
 public:
@@ -42,6 +39,6 @@ public:
     void onSSLServerVerificationError(Poco::Net::VerificationErrorArgs& args);
     void onSSLPrivateKeyPassphraseRequired(std::string& passphrase);
 
-    HTTP::BasicServer::SharedPtr server;
+    ofx::HTTP::BasicServer server;
     
 };
