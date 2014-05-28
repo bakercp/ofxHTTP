@@ -109,7 +109,6 @@ bool DefaultClientTask::onHTTPClientResponseEvent(HTTP::ClientResponseEventArgs&
 
 bool DefaultClientTask::onHTTPClientErrorEvent(HTTP::ClientErrorEventArgs& args)
 {
-    Poco::TaskManager* pOwner = getOwner();
     throw args.getException();
     return true;
 }
