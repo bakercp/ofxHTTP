@@ -27,7 +27,7 @@
 
 
 #include "ofMain.h"
-#include "BasicServer.h"
+#include "ofxHTTP.h"
 
 
 class ofApp: public ofBaseApp
@@ -35,7 +35,8 @@ class ofApp: public ofBaseApp
 public:
     void setup();
 
-    // we do not have a draw method.
+    // We do not have an draw() method.
 
-    ofx::HTTP::BasicServer::SharedPtr server;
+    ofx::HTTP::BasicServer server;
+
 };

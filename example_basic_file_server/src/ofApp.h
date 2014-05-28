@@ -30,15 +30,12 @@
 #include "ofxHTTP.h"
 
 
-using namespace ofx::HTTP;
-
-
 class ofApp: public ofBaseApp
 {
 public:
     void setup();
     void draw();
 
-    BasicServer::SharedPtr server;
+    ofx::HTTP::BasicServer server;
     
 };

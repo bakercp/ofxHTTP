@@ -1,3 +1,5 @@
 ofxHTTP
-ofxJSON
+ofxIO
 ofxMediaType
+ofxSSLManager
+ofxTaskQueue

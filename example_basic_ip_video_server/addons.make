@@ -1,2 +1,5 @@
 ofxHTTP
+ofxIO
 ofxMediaType
+ofxSSLManager
+ofxTaskQueue

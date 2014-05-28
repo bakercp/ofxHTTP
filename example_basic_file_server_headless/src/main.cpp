@@ -30,6 +30,6 @@
 int main()
 {
     ofAppNoWindow window;
-    ofSetupOpenGL(&window,1,1,OF_WINDOW);
+    ofSetupOpenGL(&window, 1, 1, OF_WINDOW);
     ofRunApp(new ofApp());
 }

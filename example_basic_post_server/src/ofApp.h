@@ -30,22 +30,16 @@
 #include "ofxHTTP.h"
 
 
-using namespace ofx;
-
-
 class ofApp: public ofBaseApp
 {
 public:
     void setup();
     void draw();
 
-    bool onHTTPFormEvent(HTTP::HTTPFormEventArgs& args);
-    bool onHTTPRawFormEvent(HTTP::HTTPRawFormEventArgs& args);
+    void onHTTPPostEvent(ofx::HTTP::PostEventArgs& evt);
+    void onHTTPFormEvent(ofx::HTTP::PostFormEventArgs& evt);
+    void onHTTPUploadEvent(ofx::HTTP::PostUploadEventArgs& evt);
 
-    bool onHTTPUploadStartedEvent(HTTP::HTTPUploadEventArgs& args);
-    bool onHTTPUploadProgressEvent(HTTP::HTTPUploadEventArgs& args);
-    bool onHTTPUploadFinishedEvent(HTTP::HTTPUploadEventArgs& args);
-
-    HTTP::BasicPostServer::SharedPtr server;
+    ofx::HTTP::BasicPostServer server;
 
 };

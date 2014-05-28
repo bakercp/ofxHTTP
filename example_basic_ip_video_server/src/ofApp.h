@@ -30,9 +30,6 @@
 #include "ofxHTTP.h"
 
 
-using namespace ofx::HTTP;
-
-
 class ofApp: public ofBaseApp
 {
 public:
@@ -40,7 +37,7 @@ public:
     void update();
     void draw();
 
-    BasicIPVideoServer::SharedPtr server;
+    ofx::HTTP::BasicIPVideoServer server;
 
     ofVideoPlayer player;
 
