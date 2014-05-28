@@ -26,36 +26,58 @@
 #include "ofApp.h"
 
 
-//------------------------------------------------------------------------------
 void ofApp::setup()
 {
     ofSetFrameRate(30);
 
+    // Set up our video to broadcast.
     player.loadMovie("fingers.mp4");
     player.play();
     player.setLoopState(OF_LOOP_NORMAL);
 
-    BasicIPVideoServerSettings settings;
-    server = BasicIPVideoServer::makeShared();
-    server->start();
+    ofx::HTTP::BasicIPVideoServerSettings settings;
 
-    ofLaunchBrowser(server->getURL());
+    // Many other settings are available.
+    settings.setPort(7890);
+
+    // The default maximum number of client connections is 5.
+    // settings.setMaxClientConnections(10);
+
+    // Apply the settings.
+    server.setup(settings);
+
+    // Start the server.
+    server.start();
+
+    // Launch a browser with the address of the server.
+    ofLaunchBrowser(server.getURL());
 }
 
-//------------------------------------------------------------------------------
+
 void ofApp::update()
 {
+    // Update the video player.
     player.update();
 
+    // If the frame is new, then send it to the server to be broadcast.
     if(player.isFrameNew())
     {
-        server->send(player.getPixelsRef());
+        // This can be any kind of pixels.
+        server.send(player.getPixelsRef());
     }
 }
 
-//------------------------------------------------------------------------------
+
 void ofApp::draw()
 {
+    // Draw the video on the server screen.
     player.draw(0,0);
-    ofDrawBitmapStringHighlight("Num clients connected: " + ofToString(server->getNumConnections()), 20,20);
+
+    // Display the number of connected clients for reference.
+    std::stringstream ss;
+
+    ss << "Num clients connected: ";
+    ss << server.getNumConnections();
+
+    ofDrawBitmapStringHighlight(ss.str(), 20, 20);
 }
