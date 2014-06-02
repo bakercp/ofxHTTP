@@ -28,6 +28,7 @@
 
 #include "Poco/UUID.h"
 #include "Poco/Net/WebSocket.h"
+#include "Poco/Net/HTTPServerRequest.h"
 #include "ofEvents.h"
 #include "ofEventUtils.h"
 
@@ -79,32 +80,23 @@ public:
     /// \param connection A reference to the associated WebSocketConnection.
     /// \param error An error, if any, associated with the event.
     WebSocketEventArgs(const Poco::UUID& sessionId,
-                       const WebSocketConnection& connection,
-                       WebSocketError error = WS_ERR_NONE):
+                       const WebSocketConnection& connection):
         _sessionId(sessionId),
-        _connection(connection),
-        _error(error)
+        _connection(connection)
     {
     }
     
-    /// \returns true iff _error is not equal to WS_ERR_NONE.
-    bool hasError() const
-    {
-        return _error != WS_ERR_NONE;
-    }
-
-    /// \returns the error code.
-    WebSocketError getError() const
-    {
-        return _error;
-    }
-
     /// \brief Get the session id associated with this event.
     ///
     /// The session id is established by the SessionCache.  If no SessionCache
     /// is used, this will always return Poco::UUID::null.
     ///
     /// \returns the session id or Poco::UUID::null if not set.
+    const Poco::UUID& getSessionId() const
+    {
+        return _sessionId;
+    }
+
     const WebSocketConnection& getConnectionRef() const
     {
         return _connection;
@@ -112,15 +104,105 @@ public:
 
 private:
     /// \brief The session id, if available.  Poco::UUID::null if null.
-    Poco::UUID _sessionId;
+    const Poco::UUID& _sessionId;
 
     /// \brief A reference to the WebSocketConnection.
     const WebSocketConnection& _connection;
 
-    /// \brief The WebSocketError associated with the event, if any.
+};
+
+
+class WebSocketErrorEventArgs: public WebSocketEventArgs
+{
+public:
+    WebSocketErrorEventArgs(const Poco::UUID& sessionId,
+                           const WebSocketConnection& connection,
+                           WebSocketError error):
+        WebSocketEventArgs(sessionId, connection),
+        _error(error)
+    {
+    }
+
+    /// \returns the error code if any, otherwise WS_ERROR_NONE.
+    WebSocketError getError() const
+    {
+        return _error;
+    }
+
+protected:
+    /// \brief The WebSocketError associated with the event.
     WebSocketError _error;
 
+
 };
+
+
+
+class WebSocketOpenEventArgs: public WebSocketEventArgs
+{
+public:
+    WebSocketOpenEventArgs(const Poco::UUID& sessionId,
+                           const WebSocketConnection& connection,
+                           const Poco::Net::HTTPServerRequest& request):
+        WebSocketEventArgs(sessionId, connection),
+        _request(request)
+    {
+    }
+
+
+    const Poco::Net::HTTPServerRequest& getRequest() const
+    {
+        return _request;
+    }
+
+protected:
+    const Poco::Net::HTTPServerRequest& _request;
+    
+};
+
+
+class WebSocketCloseEventArgs: public WebSocketEventArgs
+{
+public:
+    WebSocketCloseEventArgs(const Poco::UUID& sessionId,
+                            const WebSocketConnection& connection,
+                            unsigned short code,
+                            const std::string& reason):
+        WebSocketEventArgs(sessionId, connection),
+        _code(code),
+        _reason(reason)
+    {
+    }
+
+    /// \returns A code, 0 if unset.
+    unsigned short getCode() const
+    {
+        return _code;
+    }
+
+    /// \returns A UTF-8 encoded client close reason, empty if unset.
+    const std::string& getReason() const
+    {
+        return _reason;
+    }
+
+protected:
+    /// \brief The WebSocket status code (optional).
+    ///
+    /// This is parsed during frame close events, otherwise 0.
+    ///
+    /// \sa http://tools.ietf.org/html/rfc6455#section-5.5.1
+    unsigned short _code;
+
+    /// \brief The WebSocket UTF-8 encoded reason code (optional)
+    ///
+    /// This is parsed during frame close events, otherwise empty.
+    ///
+    /// \sa http://tools.ietf.org/html/rfc6455#section-5.5.1
+    const std::string& _reason;
+
+};
+
 
 class WebSocketFrameEventArgs: public WebSocketEventArgs
 {
@@ -130,9 +212,8 @@ public:
     /// \param error An error, if any, associated with the event.
     WebSocketFrameEventArgs(const WebSocketFrame& frame,
                             const Poco::UUID& sessionId,
-                            const WebSocketConnection& connection,
-                            WebSocketError error = WS_ERR_NONE):
-        WebSocketEventArgs(sessionId, connection, error),
+                            const WebSocketConnection& connection):
+        WebSocketEventArgs(sessionId, connection),
         _frame(frame)
     {
     }
@@ -152,11 +233,11 @@ private:
 class WebSocketEvents
 {
 public:
-    ofEvent<WebSocketEventArgs>      onOpenEvent;
-    ofEvent<WebSocketEventArgs>      onCloseEvent;
+    ofEvent<WebSocketOpenEventArgs>  onOpenEvent;
+    ofEvent<WebSocketCloseEventArgs> onCloseEvent;
     ofEvent<WebSocketFrameEventArgs> onFrameReceivedEvent;
     ofEvent<WebSocketFrameEventArgs> onFrameSentEvent;
-    ofEvent<WebSocketEventArgs>      onErrorEvent;
+    ofEvent<WebSocketErrorEventArgs> onErrorEvent;
     
 };
 
