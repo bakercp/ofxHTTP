@@ -62,7 +62,7 @@ std::string BaseServerSettings::getHost() const
 }
 
 
-void BaseServerSettings::setPort(const unsigned short port)
+void BaseServerSettings::setPort(unsigned short port)
 {
     _port = port;
 }

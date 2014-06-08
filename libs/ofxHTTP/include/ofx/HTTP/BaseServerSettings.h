@@ -203,7 +203,7 @@ public:
     void setHost(const std::string& host);
     std::string getHost() const;
 
-    void setPort(const unsigned short port);
+    void setPort(unsigned short port);
     unsigned short getPort() const;
 
     void setUseSSL(bool useSSL);
