@@ -75,6 +75,10 @@ bool DefaultClientTask::onHTTPClientResponseEvent(HTTP::ClientResponseEventArgs&
 
     std::istream& istr = args.getResponseStream();
 
+    std::streamsize contentLength = args.getResponse().getContentLength();
+
+    _byteBuffer.reserve(contentLength);
+
     Poco::Buffer<char> buffer(bufferSize);
     std::streamsize len = 0;
 	istr.read(buffer.begin(), bufferSize);
