@@ -62,6 +62,8 @@ private:
     BaseResponse* _response;
     Context* _context;
 
+    IO::ByteBuffer _byteBuffer;
+
 };
 
 

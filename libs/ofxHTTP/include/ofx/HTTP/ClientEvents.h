@@ -122,10 +122,12 @@ public:
         return _request;
     }
 
+
     Context& getContextRef()
     {
         return _context;
     }
+
 
     const Poco::UUID getRequestId() const
     {
@@ -330,13 +332,14 @@ public:
     }
     
 
-    const IO::ByteBuffer& getBuffer() const
+    const IO::ByteBuffer& getByteBuffer() const
     {
         return _byteBuffer;
     }
-    
+
+
 protected:
-    IO::ByteBuffer _byteBuffer;
+    const IO::ByteBuffer& _byteBuffer;
     
 };
 
