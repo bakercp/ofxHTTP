@@ -39,14 +39,12 @@ void ofApp::setup()
     // Lauch three large download tasks.
     for (int i = 0; i < 3; ++i)
     {
-        std::string name = "http://peach.blender.org/wp-content/uploads/big_big_buck_bunny.jpg";
-        Poco::UUID uuid = clientTaskQueue.get(name);
+        std::string url = "http://peach.blender.org/wp-content/uploads/big_big_buck_bunny.jpg";
 
-        // Keep local track of the task's progress.
-        TaskProgress task;
-        task.name = name;
-        task.uuid = uuid;
-        tasks[uuid] = task;
+        // We can use this taskId to cancel the task or keep track of its
+        // progress.  In this example, we register the taskId in the
+        // taskStarted() callback.
+        Poco::UUID uuid = clientTaskQueue.get(url);
     }
 
 }
@@ -59,13 +57,18 @@ void ofApp::exit()
 
 void ofApp::update()
 {
-    std::map<Poco::UUID, TaskProgress>::iterator iter = tasks.begin();
-
-    unsigned long long now = ofGetElapsedTimeMillis();
+    TaskMap::iterator iter = tasks.begin();
 
     while (iter != tasks.end())
     {
-        if (iter->second.progress < 0 && now > iter->second.autoClearTime)
+        TaskProgress& t = iter->second;
+
+        if (t.state != TaskProgress::PENDING)
+        {
+            t.fade--;
+        }
+
+        if (t.fade < 0)
         {
             tasks.erase(iter++);
         }
@@ -81,25 +84,55 @@ void ofApp::draw()
 {
     ofBackground(0);
 
-    std::map<Poco::UUID, TaskProgress>::iterator iter = tasks.begin();
+    TaskMap::const_iterator iter = tasks.begin();
 
     int y = 0;
     int height = 20;
+    int width = ofGetWidth();
 
-    while (iter != tasks.end())
+    while (iter != tasks.end() && y < ofGetHeight())
     {
-        TaskProgress& t = iter->second;
+        const TaskProgress& t = iter->second;
 
-        t.height = height;
-        t.width = ofGetWidth();
-        t.x = 0;
-        t.y = y;
-
-        t.draw();
-
-        y += (height + 5);
-        
         ++iter;
+
+        ofPushMatrix();
+        ofTranslate(0, y);
+        ofFill();
+
+        switch (t.state)
+        {
+            case TaskProgress::PENDING:
+                ofSetColor(0, 255, 0, 50);
+                break;
+            case TaskProgress::SUCCESS:
+                ofSetColor(255, 255, 0, 50);
+                break;
+            case TaskProgress::FAILURE:
+                ofSetColor(255, 0, 0);
+                break;
+        }
+
+        ofRect(0, 0, width, height);
+
+        if (t.progress > 0)
+        {
+            ofFill();
+            ofSetColor(255, 255, 0, 75);
+            ofRect(0, 0, t.progress * width, height);
+        }
+
+        ofSetColor(255);
+
+        std::stringstream ss;
+
+        ss << t.name + " " << (t.progress * 100) << "%: " << t.message;
+
+        ofDrawBitmapString(ss.str(), ofPoint(10, 14, 0));
+        
+        ofPopMatrix();
+
+        y += (height + 1);
     }
 }
 
@@ -133,91 +166,58 @@ void ofApp::onSSLPrivateKeyPassphraseRequired(std::string& args)
 
 void ofApp::onTaskStarted(const ofx::TaskStartedEventArgs& args)
 {
-    if (tasks.find(args.getTaskId()) != tasks.end())
-    {
-        tasks[args.getTaskId()].progress = 0.000001; // Just give it a nudge.
-    }
-    else
-    {
-        ofLogFatalError("ofApp::onTaskCancelled") << "Unknown UUID.";
-    }
+    // Make a record of the task so we can keep track of its progress.
+    TaskProgress task;
+    task.name = args.getTaskName();
+    task.uuid = args.getTaskId();
+    tasks[task.uuid] = task;
 }
 
 
 void ofApp::onTaskCancelled(const ofx::TaskCancelledEventArgs& args)
 {
-    if (tasks.find(args.getTaskId()) != tasks.end())
-    {
-        tasks[args.getTaskId()].progress = -1;
-    }
-    else
-    {
-        ofLogFatalError("ofApp::onTaskCancelled") << "Unknown UUID.";
-    }
+    tasks[args.getTaskId()].state = TaskProgress::FAILURE;
 }
 
 
 void ofApp::onTaskFinished(const ofx::TaskFinishedEventArgs& args)
 {
-    std::map<Poco::UUID, TaskProgress>::iterator iter = tasks.find(args.getTaskId());
-
-    if (tasks.find(args.getTaskId()) != tasks.end())
+    if (tasks[args.getTaskId()].state == TaskProgress::PENDING)
     {
-        if (iter->second.progress < 0)
-        {
-            // There was an error, so let it be here for just a few seconds.
-            tasks[args.getTaskId()].autoClearTime = ofGetElapsedTimeMillis() + 2000;
-        }
-        else
-        {
-            tasks.erase(iter);
-        }
-    }
-    else
-    {
-        ofLogFatalError("ofApp::onTaskFinished") << "Unknown UUID.";
+        tasks[args.getTaskId()].progress = 1;
+        tasks[args.getTaskId()].state = TaskProgress::SUCCESS;
     }
 }
 
 
 void ofApp::onTaskFailed(const ofx::TaskFailedEventArgs& args)
 {
-    if (tasks.find(args.getTaskId()) != tasks.end())
-    {
-        tasks[args.getTaskId()].progress = -1;
-        tasks[args.getTaskId()].message = args.getException().displayText();
-    }
-    else
-    {
-        ofLogFatalError("ofApp::onTaskFailed") << "Unknown UUID.";
-    }
+    tasks[args.getTaskId()].state = TaskProgress::FAILURE;
+    tasks[args.getTaskId()].message = args.getException().displayText();
 }
 
 
 void ofApp::onTaskProgress(const ofx::TaskProgressEventArgs& args)
 {
-    if (tasks.find(args.getTaskId()) != tasks.end())
-    {
-        tasks[args.getTaskId()].progress = args.getProgress();
-    }
-    else
-    {
-        ofLogFatalError("ofApp::onTaskProgress") << "Unknown UUID.";
-    }
+    tasks[args.getTaskId()].progress = args.getProgress();
 }
 
 
 void ofApp::onTaskData(const ofx::TaskDataEventArgs<ofx::HTTP::ClientResponseBufferEventArgs>& args)
 {
-    if (tasks.find(args.getTaskId()) != tasks.end())
-    {
-        ofBuffer buffer(reinterpret_cast<const char*>(args.getData().getBuffer().getDataPtr()),
-                        args.getData().getBuffer().size());
+    // Note: Saving to disk could / should also be done in the task's thread.
 
-        ofBufferToFile("out_" + ofToString(ofRandom(100000)) + ".jpg", buffer);
-    }
-    else
+    // This is useful if you want to load the bytes into a GL texture.
+    const ofx::IO::ByteBuffer& buffer = args.getData().getByteBuffer();
+
+    std::string path = ofToDataPath(args.getTaskId().toString() + ".jpg");
+
+    try
     {
-        ofLogFatalError("ofApp::onTaskData") << "Unknown UUID.";
+        ofx::IO::ByteBufferUtils::saveToFile(buffer, path);
+    }
+    catch (const Poco::Exception& exc)
+    {
+        ofLogError("ofApp::onTaskData") << exc.displayText();
     }
 }

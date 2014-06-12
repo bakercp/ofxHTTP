@@ -28,6 +28,6 @@
 
 int main()
 {
-    ofSetupOpenGL(800, 800, OF_WINDOW);
+    ofSetupOpenGL(800, 300, OF_WINDOW);
     ofRunApp(new ofApp());
 }
