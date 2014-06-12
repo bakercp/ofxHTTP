@@ -48,7 +48,6 @@ DefaultClientTask::DefaultClientTask(BaseRequest* request,
 
 DefaultClientTask::~DefaultClientTask()
 {
-    // ?
     delete _request;
     delete _response;
     delete _context;
@@ -76,14 +75,37 @@ bool DefaultClientTask::onHTTPClientResponseEvent(HTTP::ClientResponseEventArgs&
 
     std::istream& istr = args.getResponseStream();
 
-    IO::ByteBufferUtils::copyStreamToBuffer(istr, _byteBuffer);
+    Poco::Buffer<char> buffer(bufferSize);
+    std::streamsize len = 0;
+	istr.read(buffer.begin(), bufferSize);
+    std::streamsize n = istr.gcount();
+    while (n > 0)
+	{
+		len += n;
+        _byteBuffer.writeBytes(reinterpret_cast<uint8_t*>(buffer.begin()), n);
 
-    ClientResponseBufferEventArgs bufferEvent(_byteBuffer,
-                                              args.getRequest(),
-                                              args.getResponse(),
-                                              args.getContextRef());
+        // Check for task cancellation.
+        if (istr && !isCancelled())
+		{
+			istr.read(buffer.begin(), bufferSize);
+            n = istr.gcount();
+		}
+        else
+        {
+            n = 0;
+        }
+	}
 
-    postNotification(new Poco::TaskCustomNotification<HTTP::ClientResponseBufferEventArgs>(this, bufferEvent));
+    // Don't return cancelled data.
+    if (!isCancelled())
+    {
+        ClientResponseBufferEventArgs bufferEvent(_byteBuffer,
+                                                  args.getRequest(),
+                                                  args.getResponse(),
+                                                  args.getContextRef());
+
+        postNotification(new Poco::TaskCustomNotification<HTTP::ClientResponseBufferEventArgs>(this, bufferEvent));
+    }
 
     return true;
 }
