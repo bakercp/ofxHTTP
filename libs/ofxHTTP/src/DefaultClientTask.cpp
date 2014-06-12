@@ -74,35 +74,17 @@ bool DefaultClientTask::onHTTPClientResponseEvent(HTTP::ClientResponseEventArgs&
 {
     const std::size_t bufferSize = IO::ByteBufferUtils::DEFAULT_BUFFER_SIZE;
 
-    IO::ByteBuffer byteBuffer;
-
     std::istream& istr = args.getResponseStream();
 
-    Poco::Buffer<char> buffer(bufferSize);
-    std::streamsize len = 0;
-	istr.read(buffer.begin(), bufferSize);
-    std::streamsize n = istr.gcount();
-    while (n > 0)
-	{
-		len += n;
-        byteBuffer.writeBytes(reinterpret_cast<uint8_t*>(buffer.begin()), n);
-        if (istr && !isCancelled())
-		{
-			istr.read(buffer.begin(), bufferSize);
-            n = istr.gcount();
-		}
-        else
-        {
-            n = 0;
-        }
-	}
+    IO::ByteBufferUtils::copyStreamToBuffer(istr, _byteBuffer);
 
-    ClientResponseBufferEventArgs bufferEvent(byteBuffer,
+    ClientResponseBufferEventArgs bufferEvent(_byteBuffer,
                                               args.getRequest(),
                                               args.getResponse(),
                                               args.getContextRef());
 
     postNotification(new Poco::TaskCustomNotification<HTTP::ClientResponseBufferEventArgs>(this, bufferEvent));
+
     return true;
 }
 
