@@ -119,6 +119,7 @@ void WebSocketRoute::close()
 {
     ofScopedLock lock(_mutex);
     WebSocketConnectionsIter iter = _connections.begin();
+
     while(iter != _connections.end())
     {
         close(*iter);
@@ -131,6 +132,7 @@ void WebSocketRoute::broadcast(const WebSocketFrame& frame)
 {
     ofScopedLock lock(_mutex);
     WebSocketConnectionsIter iter = _connections.begin();
+
     while(iter != _connections.end())
     {
         sendFrame(*iter,frame);
@@ -142,6 +144,7 @@ void WebSocketRoute::broadcast(const WebSocketFrame& frame)
 void WebSocketRoute::registerWebSocketConnection(WebSocketConnection* connection)
 {
     ofScopedLock lock(_mutex);
+    
     if(!_connections.insert(connection).second)
     {
         ofLogError("BaseWebSocketSessionManager::registerRouteHandler") << "Element was already in set!";
