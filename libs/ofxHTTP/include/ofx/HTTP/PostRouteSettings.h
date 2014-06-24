@@ -90,9 +90,7 @@ public:
     static const HTTPMethodSet DEFAULT_POST_HTTP_METHODS;
 
 private:
-    bool _requireUploadFolderInDataFolder;
     std::string _uploadFolder;
-    bool _autoCreateUploadFolder;
     std::string _uploadRedirect;
     std::size_t _writeBufferSize;
     std::size_t _fieldLimit;
