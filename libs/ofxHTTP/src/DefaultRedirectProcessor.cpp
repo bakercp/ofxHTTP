@@ -43,13 +43,14 @@ DefaultRedirectProcessor::~DefaultRedirectProcessor()
 }
 
 
-void DefaultRedirectProcessor::filter(BaseRequest& request, Context& context)
+void DefaultRedirectProcessor::requestFilter(BaseRequest& request,
+                                             Context& context)
 {
 }
 
-void DefaultRedirectProcessor::filter(BaseRequest& request,
-                                      BaseResponse& response,
-                                      Context& context)
+void DefaultRedirectProcessor::responseFilter(BaseRequest& request,
+                                              BaseResponse& response,
+                                              Context& context)
 {
     if (canFilterResponse(request, response, context))
     {

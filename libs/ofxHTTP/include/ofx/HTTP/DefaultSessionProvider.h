@@ -42,7 +42,7 @@ public:
     DefaultSessionProvider();
     virtual ~DefaultSessionProvider();
 
-    virtual void filter(BaseRequest& request, Context& context);
+    virtual void requestFilter(BaseRequest& request, Context& context);
 
 };
 

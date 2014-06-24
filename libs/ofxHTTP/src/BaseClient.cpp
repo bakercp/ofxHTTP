@@ -52,7 +52,7 @@ std::istream& BaseClient::execute(BaseRequest& request,
 {
     context.setResubmit(false);
 
-    filter(request, context);
+    requestFilter(request, context);
 
     request.prepareRequest();
 
@@ -63,7 +63,7 @@ std::istream& BaseClient::execute(BaseRequest& request,
 
     std::istream& responseStream = receive(request, response, context);
 
-    filter(request, response, context);
+    responseFilter(request, response, context);
 
     if (context.getResubmit())
     {
@@ -210,13 +210,13 @@ void BaseClient::removeResponseStreamFilter()
 }
 
 
-void BaseClient::filter(BaseRequest& request, Context& context)
+void BaseClient::requestFilter(BaseRequest& request, Context& context)
 {
     RequestFilters::iterator requestFilterIter = _requestFilters.begin();
 
     while (requestFilterIter != _requestFilters.end())
     {
-        (*requestFilterIter)->filter(request, context);
+        (*requestFilterIter)->requestFilter(request, context);
         ++requestFilterIter;
     }
 
@@ -225,16 +225,16 @@ void BaseClient::filter(BaseRequest& request, Context& context)
 }
 
 
-void BaseClient::filter(BaseRequest& request,
-                        BaseResponse& response,
-                        Context& context)
+void BaseClient::responseFilter(BaseRequest& request,
+                                BaseResponse& response,
+                                Context& context)
 {
     // Apply attached filters.
     ResponseFilters::iterator responseFilterIter = _responseFilters.begin();
 
     while (responseFilterIter != _responseFilters.end())
     {
-        (*responseFilterIter)->filter(request, response, context);
+        (*responseFilterIter)->responseFilter(request, response, context);
         ++responseFilterIter;
     }
 
@@ -261,9 +261,9 @@ std::ostream& BaseClient::send(BaseRequest& request, Context& context)
                                                                                                   *this));
     if (_pRequestStreamFilter)
     {
-        return _pRequestStreamFilter->filter(*_pClientProgressRequestStream,
-                                             request,
-                                             context);
+        return _pRequestStreamFilter->requestStreamFilter(*_pClientProgressRequestStream,
+                                                          request,
+                                                          context);
     }
     else
     {
@@ -292,10 +292,10 @@ std::istream& BaseClient::receive(BaseRequest& request,
                                                                                                     *this));
     if (_pResponseStreamFilter)
     {
-        return _pResponseStreamFilter->filter(*_pClientProgressResponseStream,
-                                              request,
-                                              response,
-                                              context);
+        return _pResponseStreamFilter->responseStreamFilter(*_pClientProgressResponseStream,
+                                                            request,
+                                                            response,
+                                                            context);
     }
     else
     {

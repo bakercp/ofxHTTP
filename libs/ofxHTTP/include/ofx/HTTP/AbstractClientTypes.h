@@ -50,8 +50,8 @@ public:
     {
     }
 
-    virtual void filter(BaseRequest& request,
-                        Context& context) = 0;
+    virtual void requestFilter(BaseRequest& request,
+                               Context& context) = 0;
 
 };
 
@@ -63,9 +63,9 @@ public:
     {
     }
     
-    virtual void filter(BaseRequest& request,
-                        BaseResponse& response,
-                        Context& context) = 0;
+    virtual void responseFilter(BaseRequest& request,
+                                BaseResponse& response,
+                                Context& context) = 0;
 
 };
 
@@ -89,9 +89,9 @@ public:
     {
     }
 
-    virtual std::ostream& filter(std::ostream& requestStream,
-                                 const BaseRequest& request,
-                                 Context& context) = 0;
+    virtual std::ostream& requestStreamFilter(std::ostream& requestStream,
+                                              const BaseRequest& request,
+                                              Context& context) = 0;
     
 };
 
@@ -103,10 +103,10 @@ public:
     {
     }
 
-    virtual std::istream& filter(std::istream& responseStream,
-                                 const BaseRequest& request,
-                                 const BaseResponse& response,
-                                 Context& context) = 0;
+    virtual std::istream& responseStreamFilter(std::istream& responseStream,
+                                               const BaseRequest& request,
+                                               const BaseResponse& response,
+                                               Context& context) = 0;
 
 };
 

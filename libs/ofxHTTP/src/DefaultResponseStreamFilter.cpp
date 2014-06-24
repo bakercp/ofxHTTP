@@ -48,17 +48,17 @@ DefaultResponseStreamFilter::~DefaultResponseStreamFilter()
 }
 
 
-void DefaultResponseStreamFilter::filter(BaseRequest& request,
-                                                 Context& context)
+void DefaultResponseStreamFilter::requestFilter(BaseRequest& request,
+                                                Context& context)
 {
     // Set the headers indicating the encodings we can decode.
     request.set(ACCEPT_ENCODING_HEADER, "gzip, deflate");
 }
 
 
-void DefaultResponseStreamFilter::filter(BaseRequest& request,
-                                         BaseResponse& response,
-                                         Context& context)
+void DefaultResponseStreamFilter::responseFilter(BaseRequest& request,
+                                                 BaseResponse& response,
+                                                 Context& context)
 {
 }
 
@@ -71,10 +71,10 @@ bool DefaultResponseStreamFilter::canFilterResponse(BaseRequest& request,
 }
 
 
-std::istream& DefaultResponseStreamFilter::filter(std::istream& responseStream,
-                                                  const BaseRequest& request,
-                                                  const BaseResponse& response,
-                                                  Context& context)
+std::istream& DefaultResponseStreamFilter::responseStreamFilter(std::istream& responseStream,
+                                                                const BaseRequest& request,
+                                                                const BaseResponse& response,
+                                                                Context& context)
 {
     _pResponseStream.reset();
 

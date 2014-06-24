@@ -77,12 +77,12 @@ public:
     void clearCredentials(const Poco::URI& uri);
 
 
-    void filter(BaseRequest& request,
-                Context& context);
+    void requestFilter(BaseRequest& request,
+                       Context& context);
 
-    void filter(BaseRequest& request,
-                BaseResponse& response,
-                Context& context);
+    void responseFilter(BaseRequest& request,
+                        BaseResponse& response,
+                        Context& context);
 
     bool canFilterResponse(BaseRequest& request,
                            BaseResponse& response,

@@ -51,12 +51,12 @@ public:
     
     virtual ~DefaultRedirectProcessor();
 
-    virtual void filter(BaseRequest& request,
-                        Context& context);
+    virtual void requestFilter(BaseRequest& request,
+                               Context& context);
 
-    virtual void filter(BaseRequest& request,
-                        BaseResponse& response,
-                        Context& context);
+    virtual void responseFilter(BaseRequest& request,
+                                BaseResponse& response,
+                                Context& context);
 
     virtual bool canFilterResponse(BaseRequest& request,
                                    BaseResponse& response,

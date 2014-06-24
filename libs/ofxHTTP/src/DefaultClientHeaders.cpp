@@ -42,8 +42,8 @@ DefaultClientHeaders::~DefaultClientHeaders()
 }
 
 
-void DefaultClientHeaders::filter(BaseRequest& request,
-                                  Context& context)
+void DefaultClientHeaders::requestFilter(BaseRequest& request,
+                                         Context& context)
 {
     const SessionSettings& settings = context.getSessionSettings();
 

@@ -43,20 +43,20 @@ public:
     DefaultResponseStreamFilter();
     virtual ~DefaultResponseStreamFilter();
     
-    void filter(BaseRequest& request, Context& context);
+    void requestFilter(BaseRequest& request, Context& context);
 
-    void filter(BaseRequest& request,
-                BaseResponse& response,
-                Context& context);
+    void responseFilter(BaseRequest& request,
+                        BaseResponse& response,
+                        Context& context);
 
     bool canFilterResponse(BaseRequest& request,
                            BaseResponse& response,
                            Context& context) const;
 
-    std::istream& filter(std::istream& responseStream,
-                         const BaseRequest& request,
-                         const BaseResponse& response,
-                         Context& context);
+    std::istream& responseStreamFilter(std::istream& responseStream,
+                                       const BaseRequest& request,
+                                       const BaseResponse& response,
+                                       Context& context);
 
     const static std::string ACCEPT_ENCODING_HEADER;
     const static std::string CONTENT_ENCODING_HEADER;

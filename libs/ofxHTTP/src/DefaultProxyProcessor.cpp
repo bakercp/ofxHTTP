@@ -43,8 +43,8 @@ DefaultProxyProcessor::~DefaultProxyProcessor()
 }
 
 
-void DefaultProxyProcessor::filter(BaseRequest& request,
-                                   Context& context)
+void DefaultProxyProcessor::requestFilter(BaseRequest& request,
+                                          Context& context)
 {
     if (!context.getProxyRedirectURI().empty())
     {
@@ -74,7 +74,7 @@ void DefaultProxyProcessor::filter(BaseRequest& request,
 }
 
 
-void DefaultProxyProcessor::filter(BaseRequest& request,
+void DefaultProxyProcessor::responseFilter(BaseRequest& request,
                                            BaseResponse& response,
                                            Context& context)
 {

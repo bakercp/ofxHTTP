@@ -103,11 +103,11 @@ private:
     AbstractRequestStreamFilter* _pRequestStreamFilter;
     AbstractResponseStreamFilter* _pResponseStreamFilter;
 
-    void filter(BaseRequest& request, Context& context);
+    void requestFilter(BaseRequest& request, Context& context);
 
-    void filter(BaseRequest& request,
-                BaseResponse& response,
-                Context& context);
+    void responseFilter(BaseRequest& request,
+                        BaseResponse& response,
+                        Context& context);
 
     std::ostream& send(BaseRequest& request, Context& context);
 

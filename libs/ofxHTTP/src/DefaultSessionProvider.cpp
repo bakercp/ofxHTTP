@@ -43,7 +43,8 @@ DefaultSessionProvider::~DefaultSessionProvider()
 }
 
 
-void DefaultSessionProvider::filter(BaseRequest& request, Context& context)
+void DefaultSessionProvider::requestFilter(BaseRequest& request,
+                                           Context& context)
 {
     Context::Session session = context.getSession();
 

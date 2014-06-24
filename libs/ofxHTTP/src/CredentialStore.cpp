@@ -182,8 +182,8 @@ void DefaultCredentialStore::clearCredentials(const Poco::URI& uri)
 }
 
 
-void DefaultCredentialStore::filter(BaseRequest& request,
-                                    Context& context)
+void DefaultCredentialStore::requestFilter(BaseRequest& request,
+                                           Context& context)
 {
     // first check and see if the request has any authentication headers
     // these could be added via default session headers
@@ -237,9 +237,9 @@ void DefaultCredentialStore::filter(BaseRequest& request,
 }
 
 
-void DefaultCredentialStore::filter(BaseRequest& request,
-                                    BaseResponse& response,
-                                    Context& context)
+void DefaultCredentialStore::responseFilter(BaseRequest& request,
+                                            BaseResponse& response,
+                                            Context& context)
 {
 
     if(response.getStatus() == Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED)
@@ -353,7 +353,7 @@ bool DefaultCredentialStore::canFilterResponse(BaseRequest& request,
 
 
 bool DefaultCredentialStore::authenticateWithCache(const AuthScope& scope,
-                                            Poco::Net::HTTPRequest& request)
+                                                   Poco::Net::HTTPRequest& request)
 {
     // TODO:
     return true;
