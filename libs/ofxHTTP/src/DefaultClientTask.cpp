@@ -60,7 +60,6 @@ void DefaultClientTask::runTask()
     registerClientProgressEvents(this);
     registerClientFilterEvents(this);
 
-    // TODO: add progress callback.
     submit(*_request, *_response, *_context);
 
     unregisterClientFilterEvents(this);
