@@ -73,6 +73,7 @@ public:
     void onSSLClientVerificationError(Poco::Net::VerificationErrorArgs& args);
     void onSSLPrivateKeyPassphraseRequired(std::string& args);
 
+    void onTaskQueued(const ofx::TaskQueuedEventArgs& args);
     void onTaskStarted(const ofx::TaskStartedEventArgs& args);
     void onTaskCancelled(const ofx::TaskCancelledEventArgs& args);
     void onTaskFinished(const ofx::TaskFinishedEventArgs& args);

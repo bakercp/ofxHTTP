@@ -164,13 +164,18 @@ void ofApp::onSSLPrivateKeyPassphraseRequired(std::string& args)
 }
 
 
-void ofApp::onTaskStarted(const ofx::TaskStartedEventArgs& args)
+void ofApp::onTaskQueued(const ofx::TaskQueuedEventArgs& args)
 {
     // Make a record of the task so we can keep track of its progress.
     TaskProgress task;
     task.name = args.getTaskName();
     task.uuid = args.getTaskId();
     tasks[task.uuid] = task;
+}
+
+
+void ofApp::onTaskStarted(const ofx::TaskStartedEventArgs& args)
+{
 }
 
 
