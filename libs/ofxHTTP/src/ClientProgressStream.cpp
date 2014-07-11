@@ -30,20 +30,6 @@ namespace ofx {
 namespace HTTP {
 
 
-ClientProgressStreamBuf::ClientProgressStreamBuf():
-    _pRequest(0),
-    _pResponse(0),
-    _pContext(0),
-    _pRequestStream(0),
-    _pResponseStream(0),
-    _requestStreamBytes(0),
-    _responseStreamBytes(0),
-    _pRequestStreamListener(0),
-    _pResponseStreamListener(0)
-{
-}
-
-
 ClientProgressStreamBuf::ClientProgressStreamBuf(std::ostream& ostr,
                                                  const BaseRequest& request,
                                                  Context& context,
@@ -128,12 +114,6 @@ void ClientProgressStreamBuf::reset()
 }
 
 
-ClientProgressIOS::ClientProgressIOS()
-{
-    poco_ios_init(&_buf);
-}
-
-
 ClientProgressIOS::ClientProgressIOS(std::ostream& ostr,
                                      const BaseRequest& request,
                                      Context& context,
@@ -163,11 +143,6 @@ ClientProgressIOS::~ClientProgressIOS()
 ClientProgressStreamBuf* ClientProgressIOS::rdbuf()
 {
     return &_buf;
-}
-
-
-ClientProgressRequestStream::ClientProgressRequestStream()
-{
 }
 
 

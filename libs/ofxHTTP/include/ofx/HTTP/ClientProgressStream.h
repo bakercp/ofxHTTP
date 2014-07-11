@@ -71,7 +71,7 @@ public:
 class ClientProgressStreamBuf: public Poco::UnbufferedStreamBuf
 {
 public:
-    ClientProgressStreamBuf();
+//    ClientProgressStreamBuf();
 
     ClientProgressStreamBuf(std::ostream& ostr,
                             const BaseRequest& request,
@@ -112,8 +112,6 @@ private:
 class ClientProgressIOS: public virtual std::ios
 {
 public:
-    ClientProgressIOS();
-
     ClientProgressIOS(std::ostream& ostr,
                       const BaseRequest& request,
                       Context& context,
@@ -139,9 +137,6 @@ protected:
 class ClientProgressRequestStream: public ClientProgressIOS, public std::ostream
 {
 public:
-    /// Creates an unconnected CountingOutputStream.
-    ClientProgressRequestStream();
-
     /// Creates the CountingOutputStream and connects it
     /// to the given input stream.
     ClientProgressRequestStream(std::ostream& ostr,
