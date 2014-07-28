@@ -41,8 +41,10 @@ void ofApp::setup()
     // Start the server.
     server->start();
 
+#if !defined(TARGET_LINUX_ARM)
     // Launch a browser with the address of the server.
     ofLaunchBrowser(server->getURL());
+#endif
 
 }
 
