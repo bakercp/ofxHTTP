@@ -28,7 +28,9 @@
 #if defined(TARGET_WIN32)
     // #define clash with std::min
     // http://stackoverflow.com/questions/5004858/stdmin-gives-error
-    #define NOMINMAX
+    #ifndef NOMINMAX
+        #define NOMINMAX
+    #endif
 #endif
 
 
