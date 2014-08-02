@@ -209,18 +209,18 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
 
                         _totalBytesSent += numBytesSent;
 
-                        WebSocketError error = WS_ERR_NONE;
+                        // WebSocketError error = WS_ERR_NONE;
 
                         if(0 == numBytesSent)
                         {
                             ofLogWarning("ServerWebSocketRouteHandler::handleRequest") << "WebSocket numBytesSent == 0";
-                            error = WS_ERROR_ZERO_BYTE_FRAME_SENT;
+                            // error = WS_ERROR_ZERO_BYTE_FRAME_SENT;
                         }
                         // TODO ofBuffer::size() returns long ... sendFrame returns int ... :/
                         else if(numBytesSent < frame.size())
                         {
                             ofLogWarning("ServerWebSocketRouteHandler::handleRequest") << "WebSocket numBytesSent < frame.size()";
-                            error = WS_ERROR_INCOMPLETE_FRAME_SENT;
+                            // error = WS_ERROR_INCOMPLETE_FRAME_SENT;
                         }
                         
                         WebSocketFrameEventArgs eventArgs(frame, sessionId, *this);
