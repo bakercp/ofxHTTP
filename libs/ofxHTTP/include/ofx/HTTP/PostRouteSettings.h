@@ -63,8 +63,8 @@ public:
     void setFieldLimit(std::size_t fieldLimit);
     std::size_t getFieldLimit() const;
 
-    void setMaximumFileUploadSize(std::streamsize maximumFileUploadSize);
-    std::streamsize getMaximumFileUploadSize() const;
+    void setMaximumFileUploadSize(std::size_t maximumFileUploadSize);
+    std::size_t getMaximumFileUploadSize() const;
 
     static const std::string DEFAULT_POST_ROUTE;
     static const std::string DEFAULT_POST_FOLDER;
@@ -94,7 +94,7 @@ private:
     std::string _uploadRedirect;
     std::size_t _writeBufferSize;
     std::size_t _fieldLimit;
-    std::streamsize _maximumFileUploadSize;
+    std::size_t _maximumFileUploadSize;
 
 };
 
