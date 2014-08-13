@@ -155,18 +155,18 @@ void PostRouteFileHandler::handlePart(const Poco::Net::MessageHeader& header,
                         n = 0;
                     }
 
-                    PostUploadEventArgs args(_sessionUUID,
-                                             _request,
-                                             _formUUID,
-                                             formFieldName,
-                                             formFileName,
-                                             newFilename,
-                                             contentType,
-                                             sz,
-                                             PostUploadEventArgs::UPLOAD_PROGRESS);
+                    PostUploadEventArgs uploadArgs(_sessionUUID,
+                                                   _request,
+                                                   _formUUID,
+                                                   formFieldName,
+                                                   formFileName,
+                                                   newFilename,
+                                                   contentType,
+                                                   sz,
+                                                   PostUploadEventArgs::UPLOAD_PROGRESS);
 
                     ofNotifyEvent(_parent.events.onHTTPUploadEvent,
-                                  args,
+                                  uploadArgs,
                                   &_parent);
                 }
 

@@ -181,7 +181,7 @@ public:
         }
         else
         {
-            return _totalBytesTransferred / (double)contentLength;
+            return _totalBytesTransferred / (float)contentLength;
         }
     }
 

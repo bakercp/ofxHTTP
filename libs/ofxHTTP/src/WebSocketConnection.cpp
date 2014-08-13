@@ -122,10 +122,10 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                                 frameFlag |= Poco::Net::WebSocket::FRAME_OP_PING;
                             }
 
-                            WebSocketFrame frame(buffer.begin(), numBytesReceived, frameFlag);
+                            WebSocketFrame pingPongFrame(buffer.begin(), numBytesReceived, frameFlag);
 
                             _mutex.lock();
-                            _frameQueue.push(frame);
+                            _frameQueue.push(pingPongFrame);
                             _mutex.unlock();
                         }
                     }
@@ -173,8 +173,8 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                             }
                         }
 
-                        WebSocketCloseEventArgs eventArgs(sessionId, *this, code, reason);
-                        ofNotifyEvent(events.onCloseEvent, eventArgs, this);
+                        WebSocketCloseEventArgs closeEventArgs(sessionId, *this, code, reason);
+                        ofNotifyEvent(events.onCloseEvent, closeEventArgs, this);
                     }
                     else
                     {
