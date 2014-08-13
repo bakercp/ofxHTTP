@@ -124,7 +124,7 @@ public:
     /// \brief Construct the BaseHTTPServerRequestResponseEventArgs.
     /// \param sessionId the session id associated with this event.
     /// \param request the Poco::Net::HTTPServerRequest.
-    /// \param response the Poco::Net::HTTPServerResponse to be modified.
+    /// \param _response the Poco::Net::HTTPServerResponse to be modified.
     BaseHTTPServerRequestResponseEventArgs(const Poco::UUID& sessionId,
                                            const Poco::Net::HTTPServerRequest& request,
                                            Poco::Net::HTTPServerResponse& _response):

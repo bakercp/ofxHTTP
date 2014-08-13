@@ -73,7 +73,6 @@ public:
     ///
     /// \param key The key.
     /// \param value The boolean value.
-    /// \param numerical if true, will set the value as a "1" or "0",
     ///     otherwise will set the value as a "true" or "false".
     template<typename T>
     void set(const std::string& key, const T& value)
@@ -89,7 +88,6 @@ public:
     ///
     /// \param key The key.
     /// \param value The boolean value.
-    /// \param numerical if true, will set the value as a "1" or "0",
     ///     otherwise will set the value as a "true" or "false".
     template<typename T>
     void add(const std::string& key, const T& value)

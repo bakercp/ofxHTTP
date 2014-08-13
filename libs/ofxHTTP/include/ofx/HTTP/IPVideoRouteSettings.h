@@ -39,7 +39,7 @@ class IPVideoRouteSettings: public BaseRouteSettings
 public:
     /// \brief Create the IPVideoRouteSettings with the given route path.
     /// \param routePathPattern The regex pattern that this route will handle.
-    /// \param requireSecurePorttrue True if this route requires
+    /// \param requireSecurePort True if this route requires
     ///        communication on an SSL encrypted port.
     IPVideoRouteSettings(const std::string& routePathPattern = DEFAULT_VIDEO_ROUTE,
                          bool requireSecurePort = false);

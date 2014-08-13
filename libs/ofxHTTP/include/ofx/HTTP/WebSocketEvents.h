@@ -77,8 +77,8 @@ class WebSocketEventArgs: public ofEventArgs
 {
 public:
     /// \brief Create a WebSocketEventArgs object with the provided params.
+    /// \param sessionId The session id..
     /// \param connection A reference to the associated WebSocketConnection.
-    /// \param error An error, if any, associated with the event.
     WebSocketEventArgs(const Poco::UUID& sessionId,
                        const WebSocketConnection& connection):
         _sessionId(sessionId),

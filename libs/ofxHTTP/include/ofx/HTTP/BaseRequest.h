@@ -61,7 +61,7 @@ public:
     /// \param method the HTTP method (e.g. GET, POST, PUT, etc).
     /// \param uri the endpoint uri
     /// \param formFields a collection of form fields to be processed.
-    /// \param verion Either HTTP/1.0 or HTTP/1.1.
+    /// \param httpVersion Either HTTP/1.0 or HTTP/1.1.
     /// \param requestId A unique UUID for this request.
 	BaseRequest(const std::string& method,
                 const std::string& uri,

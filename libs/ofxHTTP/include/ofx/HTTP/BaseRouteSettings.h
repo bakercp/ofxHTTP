@@ -55,7 +55,7 @@ public:
 
     /// \brief Create the BaseRouteSettings with the given route path.
     /// \param routePathPattern The regex pattern that this route will handle.
-    /// \param requireSecurePorttrue True if this route requires
+    /// \param requireSecurePort True if this route requires
     ///        communication on an SSL encrypted port.
     /// \param validHTTPMethods The valid HTTP Methods that this route
     ///        will handle.
