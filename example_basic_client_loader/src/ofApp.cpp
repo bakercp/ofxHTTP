@@ -33,8 +33,8 @@ void ofApp::setup()
     // Register for all SSL events.
     ofSSLManager::registerAllEvents(this);
 
-    // Register for all client events.
-    clientTaskQueue.registerTaskEvents(this);
+    // Register for all task queue events.
+    clientTaskQueue.registerAllEvents(this);
 
     // Lauch three large download tasks.
     for (int i = 0; i < 3; ++i)
@@ -51,6 +51,7 @@ void ofApp::setup()
 
 void ofApp::exit()
 {
+    clientTaskQueue.unregisterAllEvents(this);
     ofSSLManager::unregisterAllEvents(this);
 }
 
@@ -134,6 +135,24 @@ void ofApp::draw()
 
         y += (height + 1);
     }
+
+    std::stringstream ps;
+
+    ofx::HTTP::DefaultClientTaskQueue::IDTaskProgressMap progress = clientTaskQueue.getTaskProgress();
+
+    ofx::HTTP::DefaultClientTaskQueue::IDTaskProgressMap::const_iterator progressIter = progress.begin();
+
+    while (progressIter != progress.end())
+    {
+        const ofx::TaskProgressEventArgs_<Poco::UUID>& progress = progressIter->second;
+
+        ps << progress.getProgress() << endl;
+
+        ++progressIter;
+    }
+
+    ofDrawBitmapString(ps.str(), 10, ofGetHeight() / 2);
+
 }
 
 
@@ -164,7 +183,7 @@ void ofApp::onSSLPrivateKeyPassphraseRequired(std::string& args)
 }
 
 
-void ofApp::onTaskQueued(const ofx::TaskQueuedEventArgs& args)
+void ofApp::onTaskQueued(const ofx::TaskQueueEventArgs& args)
 {
     // Make a record of the task so we can keep track of its progress.
     TaskProgress task;
@@ -174,18 +193,18 @@ void ofApp::onTaskQueued(const ofx::TaskQueuedEventArgs& args)
 }
 
 
-void ofApp::onTaskStarted(const ofx::TaskStartedEventArgs& args)
+void ofApp::onTaskStarted(const ofx::TaskQueueEventArgs& args)
 {
 }
 
 
-void ofApp::onTaskCancelled(const ofx::TaskCancelledEventArgs& args)
+void ofApp::onTaskCancelled(const ofx::TaskQueueEventArgs& args)
 {
     tasks[args.getTaskId()].state = TaskProgress::FAILURE;
 }
 
 
-void ofApp::onTaskFinished(const ofx::TaskFinishedEventArgs& args)
+void ofApp::onTaskFinished(const ofx::TaskQueueEventArgs& args)
 {
     if (tasks[args.getTaskId()].state == TaskProgress::PENDING)
     {
@@ -208,7 +227,7 @@ void ofApp::onTaskProgress(const ofx::TaskProgressEventArgs& args)
 }
 
 
-void ofApp::onTaskData(const ofx::TaskDataEventArgs<ofx::HTTP::ClientResponseBufferEventArgs>& args)
+void ofApp::onClientBuffer(const ofx::HTTP::ClientBufferEventArgs& args)
 {
     // Note: Saving to disk could / should also be done in the task's thread.
 
