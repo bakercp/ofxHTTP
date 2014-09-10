@@ -44,10 +44,13 @@ namespace ofx {
 namespace HTTP {
 
 
-class DefaultClientTaskQueue: public TaskQueue_<ClientResponseBufferEventArgs>
+typedef TaskDataEventArgs_<Poco::UUID, ClientResponseBufferEventArgs> ClientBufferEventArgs;
+
+
+class DefaultClientTaskQueue: public TaskQueue_<Poco::UUID>
 {
 public:
-    DefaultClientTaskQueue(int maxTasks = TaskQueue_<ofBuffer>::UNLIMITED_TASKS,
+    DefaultClientTaskQueue(int maxTasks = TaskQueue::UNLIMITED_TASKS,
                            Poco::ThreadPool& threadPool = Poco::ThreadPool::defaultPool());
 
     virtual ~DefaultClientTaskQueue();
@@ -82,14 +85,47 @@ public:
     Poco::UUID request(BaseRequest* pRequest,
                        ThreadSettings threadSettings = ThreadSettings());
 
+    /// \brief Register event listeners.
+    /// \tparam ListenerClass The class type with the required callback methods.
+    /// \param listener a pointer to the listening class (usually "this").
+    template<class ListenerClass>
+    void registerAllEvents(ListenerClass* listener);
+
+    /// \brief Unregister event listeners.
+    /// \tparam ListenerClass The class type with the required callback methods.
+    /// \param listener a pointer to the listening class (usually "this").
+    template<class ListenerClass>
+    void unregisterAllEvents(ListenerClass* listener);
+
+    ofEvent<const ClientBufferEventArgs> onClientBuffer;
+
 private:
     DefaultClientTaskQueue(const DefaultClientTaskQueue&);
     DefaultClientTaskQueue& operator = (const DefaultClientTaskQueue&);
+
+    virtual void handleTaskCustomNotification(const Poco::UUID& taskID,
+                                              Poco::AutoPtr<Poco::TaskNotification> pNotification);
 
     Context* createDefaultContext();
     BaseResponse* createDefaultResponse();
 
 };
+
+
+template<typename ListenerClass>
+void DefaultClientTaskQueue::registerAllEvents(ListenerClass* listener)
+{
+    TaskQueue_<Poco::UUID>::registerTaskProgressEvents(listener);
+    ofAddListener(onClientBuffer, listener, &ListenerClass::onClientBuffer);
+}
+
+
+template<typename ListenerClass>
+void DefaultClientTaskQueue::unregisterAllEvents(ListenerClass* listener)
+{
+    TaskQueue_<Poco::UUID>::unregisterTaskProgressEvents(listener);
+    ofRemoveListener(onClientBuffer, listener, &ListenerClass::onClientBuffer);
+}
 
 
 } } // namespace ofx::HTTP

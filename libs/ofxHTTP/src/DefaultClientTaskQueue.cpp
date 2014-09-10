@@ -32,7 +32,7 @@ namespace HTTP {
 
 DefaultClientTaskQueue::DefaultClientTaskQueue(int maxTasks,
                                                Poco::ThreadPool& threadPool):
-    TaskQueue_<ClientResponseBufferEventArgs>(maxTasks, threadPool)
+    TaskQueue_<Poco::UUID>(maxTasks, threadPool)
 {
 }
 
@@ -79,11 +79,44 @@ Poco::UUID DefaultClientTaskQueue::request(BaseRequest* pRequest,
 {
 
     DefaultClientTask* task = new DefaultClientTask(pRequest,
-                                                   createDefaultResponse(),
-                                                   createDefaultContext());
+                                                    createDefaultResponse(),
+                                                    createDefaultContext());
 
-    return start(task);
+
+
+    return start(Poco::UUIDGenerator::defaultGenerator().createOne(), task);
 }
+
+
+void DefaultClientTaskQueue::handleTaskCustomNotification(const Poco::UUID& taskID,
+                                                          Poco::AutoPtr<Poco::TaskNotification> pNotification)
+{
+    Poco::AutoPtr<Poco::TaskCustomNotification<ClientResponseBufferEventArgs> > taskCustomNotification = 0;
+
+    if (!(taskCustomNotification = pNotification.cast<Poco::TaskCustomNotification<ClientResponseBufferEventArgs> >()).isNull())
+    {
+        TaskDataEventArgs_<Poco::UUID, ClientResponseBufferEventArgs> args(taskID,
+                                                                           pNotification->task()->name(),
+                                                                           pNotification->task()->state(),
+                                                                           pNotification->task()->progress(),
+                                                                           taskCustomNotification->custom());
+
+        ofNotifyEvent(onClientBuffer, args, this);
+
+    }
+    else
+    {
+        TaskCustomNotificationEventArgs_<Poco::UUID> args(taskID,
+                                                          pNotification->task()->name(),
+                                                          pNotification->task()->state(),
+                                                          pNotification->task()->progress(),
+                                                          pNotification);
+
+        ofNotifyEvent(TaskQueue_<Poco::UUID>::onTaskCustomNotification, args, this);
+
+    }
+}
+
 
 
 Context* DefaultClientTaskQueue::createDefaultContext()
