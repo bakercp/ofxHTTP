@@ -28,7 +28,7 @@
 
 void ofApp::setup()
 {
-    // Register for class bufer events events.
+    // Register for client buffer events.
     ofAddListener(clientTaskQueue.onClientBuffer, this, &ofApp::onClientBuffer);
 
     // Lauch three large download tasks.
@@ -41,6 +41,8 @@ void ofApp::setup()
         // taskStarted() callback.
 
         Poco::UUID uuid = clientTaskQueue.get(url);
+
+        std::cout << "Getting: " << url << std::endl;
     }
 
 }
