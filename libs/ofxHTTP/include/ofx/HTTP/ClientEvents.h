@@ -163,7 +163,7 @@ public:
         return _totalBytesTransferred;
     }
 
-    /// \brief Get the progress of the request upload.
+    /// \brief Get the progress of the request upload or download.
     ///
     /// If the total content length is unknown (e.g. during chunked-transfer)
     /// progress of Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH will be
@@ -339,7 +339,7 @@ public:
 
 
 protected:
-    const IO::ByteBuffer& _byteBuffer;
+    const IO::ByteBuffer _byteBuffer;
     
 };
 

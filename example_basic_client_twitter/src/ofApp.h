@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2014 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,43 +26,21 @@
 #pragma once
 
 
-#include "Poco/Task.h"
-#include "Poco/TaskNotification.h"
-#include "ofx/HTTP/ClientEvents.h"
-#include "ofx/HTTP/DefaultClient.h"
-#include "ofx/HTTP/ThreadSettings.h"
+#include "ofMain.h"
+#include "ofxHTTP.h"
+#include "ofxJSON.h"
+#include "TwitterRequestFilter.h"
 
 
-namespace ofx {
-namespace HTTP {
-
-
-class DefaultClientTask: public DefaultClient, public Poco::Task
+class ofApp: public ofBaseApp
 {
 public:
-    DefaultClientTask(BaseRequest* request,
-                      BaseResponse* response,
-                      Context* context);
+    void setup();
+    void draw();
 
-    virtual ~DefaultClientTask();
+    ofx::HTTP::Context context;
+    ofx::HTTP::DefaultClient client;
 
-    void runTask();
-
-    bool onHTTPClientResponseEvent(ClientResponseEventArgs& args);
-    bool onHTTPClientErrorEvent(ClientErrorEventArgs& args);
-
-    bool onHTTPClientRequestProgress(ClientRequestProgressArgs& args);
-    bool onHTTPClientResponseProgress(ClientResponseProgressArgs& args);
-
-    bool onHTTPClientRequestFilterEvent(MutableClientRequestArgs& args);
-    bool onHTTPClientResponseFilterEvent(MutableClientResponseArgs& args);
-
-private:
-    BaseRequest* _request;
-    BaseResponse* _response;
-    Context* _context;
+    ofx::TwitterRequestFilter twitterRequestFilter;
 
 };
-
-
-} } // namespace ofx::HTTP

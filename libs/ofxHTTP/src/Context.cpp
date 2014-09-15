@@ -38,9 +38,11 @@ const std::string Context::KEY_RESOLVED_URI       = "HTTP_RESOLVED_URI";
 const std::string Context::KEY_PROXY_REDIRECT_URI = "HTTP_PROXY_REDIRECT_URI";
 const std::string Context::KEY_REDIRECTS          = "HTTP_REDIRECTS";
 const std::string Context::KEY_SESSION            = "HTTP_SESSION";
+const std::string Context::KEY_USE_ABSOLUTE_REQUEST_PATH = "USE_ABSOLUTE_REQUEST_PATH";
 
-    
-Context::Context(): _resubmit(false)
+
+Context::Context():
+    _resubmit(false)
 {
 }
 
@@ -74,15 +76,15 @@ const SessionSettings& Context::getSessionSettings() const
 //}
 
 
-void Context::setSession(Session session)
+void Context::setClientSession(ClientSession clientSession)
 {
-    _session = session;
+    _clientSession = clientSession;
 }
 
 
-Context::Session Context::getSession()
+Context::ClientSession& Context::getClientSession()
 {
-    return _session;
+    return _clientSession;
 }
 
 //void Context::setResolvedURI(const Poco::URI& uri)

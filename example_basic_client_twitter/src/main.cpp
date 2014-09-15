@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2014 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,46 +23,11 @@
 // =============================================================================
 
 
-#pragma once
+#include "ofApp.h"
 
 
-#include "Poco/Task.h"
-#include "Poco/TaskNotification.h"
-#include "ofx/HTTP/ClientEvents.h"
-#include "ofx/HTTP/DefaultClient.h"
-#include "ofx/HTTP/ThreadSettings.h"
-
-
-namespace ofx {
-namespace HTTP {
-
-
-class DefaultClientTask: public DefaultClient, public Poco::Task
+int main()
 {
-public:
-    DefaultClientTask(BaseRequest* request,
-                      BaseResponse* response,
-                      Context* context);
-
-    virtual ~DefaultClientTask();
-
-    void runTask();
-
-    bool onHTTPClientResponseEvent(ClientResponseEventArgs& args);
-    bool onHTTPClientErrorEvent(ClientErrorEventArgs& args);
-
-    bool onHTTPClientRequestProgress(ClientRequestProgressArgs& args);
-    bool onHTTPClientResponseProgress(ClientResponseProgressArgs& args);
-
-    bool onHTTPClientRequestFilterEvent(MutableClientRequestArgs& args);
-    bool onHTTPClientResponseFilterEvent(MutableClientResponseArgs& args);
-
-private:
-    BaseRequest* _request;
-    BaseResponse* _response;
-    Context* _context;
-
-};
-
-
-} } // namespace ofx::HTTP
+    ofSetupOpenGL(250, 50, OF_WINDOW);
+    ofRunApp(new ofApp());
+}

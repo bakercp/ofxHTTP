@@ -94,7 +94,7 @@ void FileSystemRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request
     }
 
     ofFile file(requestPathString); // use it to parse file name parts
-    std::string mediaTypeString = Media::MediaTypeMap::getDefault()->getMediaTypeForPath(file.path()).toString();
+    std::string mediaTypeString = MediaTypeMap::getDefault()->getMediaTypeForPath(file.path()).toString();
 
     try
     {

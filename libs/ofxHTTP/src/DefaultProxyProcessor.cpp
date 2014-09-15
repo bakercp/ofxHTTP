@@ -48,8 +48,8 @@ void DefaultProxyProcessor::requestFilter(BaseRequest& request,
 {
     if (!context.getProxyRedirectURI().empty())
     {
-        context.getSession()->setProxy(context.getProxyRedirectURI().getHost(),
-                                       context.getProxyRedirectURI().getPort());
+        context.getClientSession()->setProxy(context.getProxyRedirectURI().getHost(),
+                                             context.getProxyRedirectURI().getPort());
     }
     else
     {
@@ -57,18 +57,18 @@ void DefaultProxyProcessor::requestFilter(BaseRequest& request,
 
         if (!proxySettings.getHost().empty())
         {
-            context.getSession()->setProxyHost(proxySettings.getHost());
+            context.getClientSession()->setProxyHost(proxySettings.getHost());
         }
 
         if (0 != proxySettings.getPort())
         {
-            context.getSession()->setProxyPort(proxySettings.getPort());
+            context.getClientSession()->setProxyPort(proxySettings.getPort());
         }
 
         if (proxySettings.hasCredentials())
         {
-            context.getSession()->setProxyCredentials(proxySettings.getUsername(),
-                                                      proxySettings.getPassword());
+            context.getClientSession()->setProxyCredentials(proxySettings.getUsername(),
+                                                            proxySettings.getPassword());
         }
     }
 }
@@ -91,7 +91,7 @@ void DefaultProxyProcessor::responseFilter(BaseRequest& request,
             Poco::URI proxyRedirectURI;
             proxyRedirectURI.resolve(response.get("Location"));
             context.setProxyRedirectURI(proxyRedirectURI);
-            context.getSession().reset(); // delete session
+            context.getClientSession().reset(); // delete session
 
             // Set the context to resubmit.
             context.setResubmit(true);

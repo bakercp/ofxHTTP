@@ -62,8 +62,7 @@ void DefaultRedirectProcessor::responseFilter(BaseRequest& request,
 
             if (response.has("Location"))
             {
-                std::string location = response.get("Location");
-                redirectedURI.resolve(location);
+                redirectedURI.resolve(response.get("Location"));
             }
             else
             {
@@ -71,7 +70,7 @@ void DefaultRedirectProcessor::responseFilter(BaseRequest& request,
             }
 
             // Set referrer header.
-            request.add("Referrer", currentURI.toString());
+            request.set("Referrer", currentURI.toString());
 
             // Save the information to the context.
             context.addRedirect(redirectedURI);
@@ -85,7 +84,10 @@ void DefaultRedirectProcessor::responseFilter(BaseRequest& request,
                 // redirect to a different authority.
                 // NOTE: ->reset() and .reset() are not
                 // the same thing.
-                context.getSession().reset();
+                context.getClientSession().reset();
+
+                // Strip out any host header files that were set.
+                request.erase(Poco::Net::HTTPRequest::HOST);
             }
 
             // Set the new URI according to the redirection.
@@ -122,6 +124,7 @@ void DefaultRedirectProcessor::responseFilter(BaseRequest& request,
 
             // Set the context to resubmit.
             context.setResubmit(true);
+
             return;
         }
         else

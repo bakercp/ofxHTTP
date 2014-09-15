@@ -31,61 +31,15 @@
 #include "ofxHTTP.h"
 
 
-/// \brief A small class to help us keep track of our tasks' progress.
-class TaskProgress
-{
-public:
-    enum State
-    {
-        PENDING,
-        SUCCESS,
-        FAILURE
-    };
-
-    TaskProgress():
-        progress(0),
-        state(PENDING), 
-        fade(100)
-    {
-    }
-
-    std::string name;
-    Poco::UUID uuid;
-    float progress;
-    std::string message;
-    State state;
-    int fade;
-
-};
-
-
 class ofApp: public ofBaseApp
 {
 public:
     void setup();
-    void exit();
-    void update();
     void draw();
 
     void keyPressed(int key);
 
-    void onSSLServerVerificationError(Poco::Net::VerificationErrorArgs& args);
-    void onSSLClientVerificationError(Poco::Net::VerificationErrorArgs& args);
-    void onSSLPrivateKeyPassphraseRequired(std::string& args);
-
-    void onTaskQueued(const ofx::TaskQueueEventArgs& args);
-    void onTaskStarted(const ofx::TaskQueueEventArgs& args);
-    void onTaskCancelled(const ofx::TaskQueueEventArgs& args);
-    void onTaskFinished(const ofx::TaskQueueEventArgs& args);
-    void onTaskFailed(const ofx::TaskFailedEventArgs& args);
-    void onTaskProgress(const ofx::TaskProgressEventArgs& args);
-
     void onClientBuffer(const ofx::HTTP::ClientBufferEventArgs& args);
-
-    typedef std::map<Poco::UUID, TaskProgress> TaskMap;
-
-    // A local map of the tasks that we have submitted.
-    TaskMap tasks;
 
     /// \brief An HTTP client task queue.
     ofx::HTTP::DefaultClientTaskQueue clientTaskQueue;

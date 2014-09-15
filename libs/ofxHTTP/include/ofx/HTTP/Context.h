@@ -28,6 +28,8 @@
 
 #include "Poco/Any.h"
 #include "Poco/URI.h"
+#include "Poco/Net/Context.h"
+#include "Poco/Net/Session.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPClientSession.h"
@@ -49,7 +51,7 @@ namespace HTTP {
 class Context
 {
 public:
-    typedef std::shared_ptr<Poco::Net::HTTPClientSession> Session;
+    typedef std::shared_ptr<Poco::Net::HTTPClientSession> ClientSession;
 
     Context();
     virtual ~Context();
@@ -60,8 +62,8 @@ public:
 //    void setCookieStore(CookieStore::SharedPtr cookieStore);
 //    CookieStore::WeakPtr getCookieStore();
 
-    void setSession(Session session);
-    Session getSession();
+    void setClientSession(ClientSession clientSession);
+    ClientSession& getClientSession();
 
     void addRedirect(const Poco::URI& uri);
     const std::vector<Poco::URI>& getRedirects() const;
@@ -80,6 +82,7 @@ public:
     const static std::string KEY_PROXY_REDIRECT_URI;
     const static std::string KEY_REDIRECTS;
     const static std::string KEY_SESSION;
+    const static std::string KEY_USE_ABSOLUTE_REQUEST_PATH;
 
     template<typename TypeName>
     bool getValue(const std::string& key, TypeName& value) const
@@ -126,7 +129,7 @@ private:
 //    Poco::URI _resolvedURI;
     Poco::URI _proxyRedirectURI;
 
-    Session _session;
+    ClientSession _clientSession;
 
     bool _resubmit;
 

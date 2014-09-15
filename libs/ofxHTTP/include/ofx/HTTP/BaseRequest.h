@@ -63,6 +63,7 @@ public:
     /// \param formFields a collection of form fields to be processed.
     /// \param httpVersion Either HTTP/1.0 or HTTP/1.1.
     /// \param requestId A unique UUID for this request.
+    /// \throws Poco::SyntaxException if the uri is not valid.
 	BaseRequest(const std::string& method,
                 const std::string& uri,
                 const Poco::Net::NameValueCollection& formFields = Poco::Net::NameValueCollection(),
@@ -71,6 +72,14 @@ public:
 
     /// \brief Destroy this BaseReuqest.
     virtual ~BaseRequest();
+
+    /// \brief Write the HTTPRequest to an output stream.
+    ///
+    /// This method hides the method with the same signature from the base
+    /// class. While this is not ideal, it allows us to rewrite the request
+    /// in circumstances where the target servers do not support absolute
+    /// URI paths.
+    void write(std::ostream& ostr) const;
 
     /// \brief Add a name value pair to upload with this POST.
     /// \param name The field name.
@@ -86,6 +95,11 @@ public:
 
     Poco::Net::HTMLForm& getFormRef();
 
+    const Poco::URI& getRawURI() const;
+
+    void setRewriteRelativeRequestPath(bool rewriteRelativeRequestPath);
+    bool getRewriteRelativeRequestPath() const;
+
     static Poco::UUID generateUUID();
 
     /// \brief The default MIME type.
@@ -96,11 +110,20 @@ protected:
 
     virtual void writeRequestBody(std::ostream& requestStream);
 
+    /// \brief The original URI passed in during construction.
+    ///
+    /// During an HTTP session, the underlying HTTPRequest may modify or
+    /// otherwise edit the internal URI to meet specifications.  This raw URI
+    /// is stored unmodified for later reference.
+    Poco::URI _rawURI;
+
     /// \brief A unique request id generated for this request.
     Poco::UUID _requestId;
 
     /// \brief A form with all query terms / form parameters.
     Poco::Net::HTMLForm _form;
+
+    bool _rewriteRelativeRequestPath;
 
     friend class BaseClient;
 

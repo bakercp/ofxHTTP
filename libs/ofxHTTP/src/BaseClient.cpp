@@ -56,7 +56,6 @@ std::istream& BaseClient::execute(BaseRequest& request,
 
     request.prepareRequest();
 
-
     std::ostream& requestStream = send(request, context);
 
     request.writeRequestBody(requestStream);
@@ -69,7 +68,7 @@ std::istream& BaseClient::execute(BaseRequest& request,
     {
         // If a response handler did not reset the session, then we must
         // consume the stream in order to reuse the HTTP session.
-        if (context.getSession())
+        if (context.getClientSession())
         {
             Utils::consume(responseStream);
         }
@@ -172,6 +171,7 @@ void BaseClient::removeResponseFilter(AbstractResponseFilter* handler)
     }
 }
 
+
 void BaseClient::setRequestStreamFilter(AbstractRequestStreamFilter* pRequestStreamFilter)
 {
     _pRequestStreamFilter = pRequestStreamFilter;
@@ -246,14 +246,14 @@ void BaseClient::responseFilter(BaseRequest& request,
 
 std::ostream& BaseClient::send(BaseRequest& request, Context& context)
 {
-    Context::Session session = context.getSession();
+    Context::ClientSession clientSession = context.getClientSession();
 
-    if (!session)
+    if (!clientSession)
     {
         throw Poco::Exception("No session available for request.");
     }
 
-    std::ostream& rawRequestStream = session->sendRequest(request);
+    std::ostream& rawRequestStream = clientSession->sendRequest(request);
 
     _pClientProgressRequestStream = std::shared_ptr<std::ostream>(new ClientProgressRequestStream(rawRequestStream,
                                                                                                   request,
@@ -276,14 +276,14 @@ std::istream& BaseClient::receive(BaseRequest& request,
                                   BaseResponse& response,
                                   Context& context)
 {
-    Context::Session session = context.getSession();
+    Context::ClientSession clientSession = context.getClientSession();
 
-    if (!session)
+    if (!clientSession)
     {
         throw Poco::Exception("No session available for request.");
     }
 
-    std::istream& rawResponseStream = session->receiveResponse(response);
+    std::istream& rawResponseStream = clientSession->receiveResponse(response);
 
     _pClientProgressResponseStream = std::shared_ptr<std::istream>(new ClientProgressResponseStream(rawResponseStream,
                                                                                                     request,

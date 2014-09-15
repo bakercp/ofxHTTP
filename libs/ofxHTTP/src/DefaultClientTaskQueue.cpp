@@ -53,8 +53,7 @@ Poco::UUID DefaultClientTaskQueue::get(const std::string& uri,
                                      httpVersion,
                                      requestId);
 
-    return request(req,
-                   threadSettings);
+    return request(req, threadSettings);
 }
 
 
@@ -122,7 +121,15 @@ void DefaultClientTaskQueue::handleTaskCustomNotification(const Poco::UUID& task
 Context* DefaultClientTaskQueue::createDefaultContext()
 {
     // TODO, attach context info here.
-    return new Context();
+
+    Context* c = new Context();
+
+//    ofx::HTTP::SessionSettings sessionSettings;
+//    sessionSettings.setProxy(ofx::HTTP::ProxySettings("127.0.0.1", 8888));
+//
+//    c->setSessionSettings(sessionSettings);
+
+    return c;
 }
 
 

@@ -39,7 +39,9 @@ BaseRequest::BaseRequest(const std::string& method,
                          const std::string& httpVersion,
                          const Poco::UUID& requestId):
     Poco::Net::HTTPRequest(method, uri, httpVersion),
-    _requestId(requestId)
+    _rawURI(uri),
+    _requestId(requestId),
+    _rewriteRelativeRequestPath(true)
 {
     addFormFields(formFields);
 }
@@ -49,6 +51,38 @@ BaseRequest::BaseRequest(const std::string& method,
 BaseRequest::~BaseRequest()
 {
 }
+
+
+void BaseRequest::write(std::ostream& ostr) const
+{
+    if (_rewriteRelativeRequestPath)
+    {
+        try
+        {
+            Poco::URI uri(getURI());
+            std::string pathAndQuery = uri.getPathAndQuery();
+            if (pathAndQuery.empty()) pathAndQuery = "/";
+            ostr << getMethod();
+            // Here we use just path/query.
+            ostr << " " << pathAndQuery;
+            ostr << " " << getVersion();
+            ostr << "\r\n";
+
+            HTTPMessage::write(ostr);
+            ostr << "\r\n";
+        }
+        catch (const Poco::SyntaxException& exc)
+        {
+            ofLogWarning("ofx::HTTP::BaseRequest") << "Unable to parse URI, using: " << getURI();
+            Poco::Net::HTTPRequest::write(ostr);
+        }
+    }
+    else
+    {
+        Poco::Net::HTTPRequest::write(ostr);
+    }
+}
+
 
 
 void BaseRequest::addFormFields(const Poco::Net::NameValueCollection& formFields)
@@ -88,6 +122,24 @@ Poco::Net::HTMLForm& BaseRequest::getFormRef()
 }
 
 
+const Poco::URI& BaseRequest::getRawURI() const
+{
+    return _rawURI;
+}
+
+
+void BaseRequest::setRewriteRelativeRequestPath(bool rewriteRelativeRequestPath)
+{
+    _rewriteRelativeRequestPath = rewriteRelativeRequestPath;
+}
+
+
+bool BaseRequest::getRewriteRelativeRequestPath() const
+{
+    return _rewriteRelativeRequestPath;
+}
+
+
 Poco::UUID BaseRequest::generateUUID()
 {
     return Poco::UUIDGenerator::defaultGenerator().createOne();
@@ -107,6 +159,7 @@ void BaseRequest::prepareRequest()
     {
         setURI(uri.substr(0, uri.size() - 1));
     }
+
 }
 
 

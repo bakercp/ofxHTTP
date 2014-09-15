@@ -46,9 +46,9 @@ DefaultSessionProvider::~DefaultSessionProvider()
 void DefaultSessionProvider::requestFilter(BaseRequest& request,
                                            Context& context)
 {
-    Context::Session session = context.getSession();
+    Context::ClientSession clientSession = context.getClientSession();
 
-    if (!session)
+    if (!clientSession)
     {
         Poco::URI uri(request.getURI());
 
@@ -56,23 +56,19 @@ void DefaultSessionProvider::requestFilter(BaseRequest& request,
         {
             ofSSLManager::initializeClient(); // Initialize SSL context if needed.
 
-            session = Context::Session(new Poco::Net::HTTPSClientSession(uri.getHost(),
-                                                                         uri.getPort()));
-        }
-        else if (0 == uri.getScheme().compare("http"))
-        {
-            session = Context::Session(new Poco::Net::HTTPClientSession(uri.getHost(),
-                                                                        uri.getPort()));
+            clientSession = Context::ClientSession(new Poco::Net::HTTPSClientSession(uri.getHost(),
+                                                                                     uri.getPort()));
         }
         else
         {
-            throw Poco::Exception("Unable to create session for the scheme: " + uri.getScheme());
+            clientSession = Context::ClientSession(new Poco::Net::HTTPClientSession(uri.getHost(),
+                                                                                    uri.getPort()));
         }
 
-        session->setKeepAlive(context.getSessionSettings().getKeepAlive());
-        session->setKeepAliveTimeout(context.getSessionSettings().getKeepAliveTimeout());
+        clientSession->setKeepAlive(context.getSessionSettings().getKeepAlive());
+        clientSession->setKeepAliveTimeout(context.getSessionSettings().getKeepAliveTimeout());
 
-        context.setSession(session);
+        context.setClientSession(clientSession);
     }
 }
 

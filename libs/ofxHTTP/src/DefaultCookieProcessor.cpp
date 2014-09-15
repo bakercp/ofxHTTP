@@ -60,7 +60,6 @@ namespace HTTP {
 //{
 ////    CookieStore::SharedPtr store(context.getCookieStore().lock());
 ////
-////    cout << "in here" << endl;
 ////
 ////    if (store)
 ////    {

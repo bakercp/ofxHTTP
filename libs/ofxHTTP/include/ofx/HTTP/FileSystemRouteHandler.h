@@ -27,7 +27,7 @@
 
 
 #include "ofUtils.h"
-#include "ofx/Media/MediaTypeMap.h"
+#include "ofx/MediaTypeMap.h"
 #include "ofx/HTTP/FileSystemRouteSettings.h"
 
 

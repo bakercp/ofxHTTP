@@ -76,7 +76,12 @@ bool DefaultClientTask::onHTTPClientResponseEvent(HTTP::ClientResponseEventArgs&
 
     std::streamsize contentLength = args.getResponse().getContentLength();
 
-    _byteBuffer.reserve(contentLength);
+    IO::ByteBuffer _byteBuffer;
+
+    if (contentLength > 0)
+    {
+        _byteBuffer.reserve(contentLength);
+    }
 
     Poco::Buffer<char> buffer(bufferSize);
     std::streamsize len = 0;
@@ -123,14 +128,30 @@ bool DefaultClientTask::onHTTPClientErrorEvent(HTTP::ClientErrorEventArgs& args)
 
 bool DefaultClientTask::onHTTPClientRequestProgress(HTTP::ClientRequestProgressArgs& args)
 {
-    setProgress(args.getProgress());
+    if (args.getProgress() == Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH)
+    {
+        setProgress(0);
+    }
+    else
+    {
+        setProgress(args.getProgress());
+    }
+
     return true;
 }
 
 
 bool DefaultClientTask::onHTTPClientResponseProgress(HTTP::ClientResponseProgressArgs& args)
 {
-    setProgress(args.getProgress());
+    if (args.getProgress() == Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH)
+    {
+        setProgress(0);
+    }
+    else
+    {
+        setProgress(args.getProgress());
+    }
+
     return true;
 }
 

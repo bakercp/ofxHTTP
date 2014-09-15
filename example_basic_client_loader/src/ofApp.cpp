@@ -28,13 +28,8 @@
 
 void ofApp::setup()
 {
-    ofSetLogLevel(OF_LOG_NOTICE);
-
-    // Register for all SSL events.
-    ofSSLManager::registerAllEvents(this);
-
-    // Register for all task queue events.
-    clientTaskQueue.registerAllEvents(this);
+    // Register for class bufer events events.
+    ofAddListener(clientTaskQueue.onClientBuffer, this, &ofApp::onClientBuffer);
 
     // Lauch three large download tasks.
     for (int i = 0; i < 3; ++i)
@@ -44,40 +39,10 @@ void ofApp::setup()
         // We can use this taskId to cancel the task or keep track of its
         // progress.  In this example, we register the taskId in the
         // taskStarted() callback.
+
         Poco::UUID uuid = clientTaskQueue.get(url);
     }
 
-}
-
-void ofApp::exit()
-{
-    clientTaskQueue.unregisterAllEvents(this);
-    ofSSLManager::unregisterAllEvents(this);
-}
-
-
-void ofApp::update()
-{
-    TaskMap::iterator iter = tasks.begin();
-
-    while (iter != tasks.end())
-    {
-        TaskProgress& t = iter->second;
-
-        if (t.state != TaskProgress::PENDING)
-        {
-            t.fade--;
-        }
-
-        if (t.fade < 0)
-        {
-            tasks.erase(iter++);
-        }
-        else
-        {
-            ++iter;
-        }
-    }
 }
 
 
@@ -85,69 +50,76 @@ void ofApp::draw()
 {
     ofBackground(0);
 
-    TaskMap::const_iterator iter = tasks.begin();
+    std::stringstream ps;
 
-    int y = 0;
+    ofx::HTTP::DefaultClientTaskQueue::ProgressMap progress = clientTaskQueue.getTaskProgress();
+
+    ofx::HTTP::DefaultClientTaskQueue::ProgressMap::const_iterator progressIter = progress.begin();
+
     int height = 20;
-    int width = ofGetWidth();
+    int y = height * 2;
 
-    while (iter != tasks.end() && y < ofGetHeight())
+    while (progressIter != progress.end() && y < ofGetHeight())
     {
-        const TaskProgress& t = iter->second;
+        const ofx::TaskProgressEventArgs& progressInfo = progressIter->second;
 
-        ++iter;
+        float progress = progressInfo.getProgress();
 
-        ofPushMatrix();
-        ofTranslate(0, y);
-        ofFill();
+        Poco::UUID taskId = progressInfo.getTaskId();
 
-        switch (t.state)
+        std::string name = progressInfo.getTaskName();
+
+        ofColor color;
+
+        std::string statusString;
+
+        switch (progressInfo.getState())
         {
-            case TaskProgress::PENDING:
-                ofSetColor(0, 255, 0, 50);
+            case Poco::Task::TASK_IDLE:
+                color = ofColor(127);
+                statusString = "idle";
                 break;
-            case TaskProgress::SUCCESS:
-                ofSetColor(255, 255, 0, 50);
+            case Poco::Task::TASK_STARTING:
+                color = ofColor(255, 255, 0);
+                statusString = "starting";
                 break;
-            case TaskProgress::FAILURE:
-                ofSetColor(255, 0, 0);
+            case Poco::Task::TASK_RUNNING:
+                color = ofColor(255, 127, 127);
+                statusString = "running";
+                break;
+            case Poco::Task::TASK_CANCELLING:
+                color = ofColor(255, 0, 0);
+                statusString = "cancelling";
+                break;
+            case Poco::Task::TASK_FINISHED:
+                color = ofColor(0, 255, 0);
+                statusString = "finished";
                 break;
         }
-
-        ofRect(0, 0, width, height);
-
-        if (t.progress > 0)
-        {
-            ofFill();
-            ofSetColor(255, 255, 0, 75);
-            ofRect(0, 0, t.progress * width, height);
-        }
-
-        ofSetColor(255);
 
         std::stringstream ss;
 
-        ss << t.name + " " << (t.progress * 100) << "%: " << t.message;
+        ss << taskId.toString() << ": " << statusString << " : " << name << std::endl;
 
-        ofDrawBitmapString(ss.str(), ofPoint(10, 14, 0));
+        ofPushMatrix();
+        ofTranslate(0, y);
+
+        ofFill();
+        ofSetColor(color, 127);
+        ofRect(0, 0, ofGetWidth() * progress, height - 2);
+
+        ofNoFill();
+        ofSetColor(color);
+        ofRect(0, 0, ofGetWidth() * progress, height - 2);
+
+        ofFill();
+        ofSetColor(255);
+        ofDrawBitmapString(ss.str(), 4, 14);
         
         ofPopMatrix();
-
-        y += (height + 1);
-    }
-
-    std::stringstream ps;
-
-    ofx::HTTP::DefaultClientTaskQueue::IDTaskProgressMap progress = clientTaskQueue.getTaskProgress();
-
-    ofx::HTTP::DefaultClientTaskQueue::IDTaskProgressMap::const_iterator progressIter = progress.begin();
-
-    while (progressIter != progress.end())
-    {
-        const ofx::TaskProgressEventArgs_<Poco::UUID>& progress = progressIter->second;
-
-        ps << progress.getProgress() << endl;
-
+        
+        y += height;
+        
         ++progressIter;
     }
 
@@ -165,68 +137,6 @@ void ofApp::keyPressed(int key)
 }
 
 
-void ofApp::onSSLServerVerificationError(Poco::Net::VerificationErrorArgs& args)
-{
-    ofLogVerbose("ofApp::onServerVerificationError") << args.errorMessage();
-}
-
-
-void ofApp::onSSLClientVerificationError(Poco::Net::VerificationErrorArgs& args)
-{
-    ofLogError("ofApp::onClientVerificationError") << args.errorMessage();
-}
-
-
-void ofApp::onSSLPrivateKeyPassphraseRequired(std::string& args)
-{
-    ofLogError("ofApp::onPrivateKeyPassphraseRequired") << args;
-}
-
-
-void ofApp::onTaskQueued(const ofx::TaskQueueEventArgs& args)
-{
-    // Make a record of the task so we can keep track of its progress.
-    TaskProgress task;
-    task.name = args.getTaskName();
-    task.uuid = args.getTaskId();
-    tasks[task.uuid] = task;
-}
-
-
-void ofApp::onTaskStarted(const ofx::TaskQueueEventArgs& args)
-{
-}
-
-
-void ofApp::onTaskCancelled(const ofx::TaskQueueEventArgs& args)
-{
-    tasks[args.getTaskId()].state = TaskProgress::FAILURE;
-}
-
-
-void ofApp::onTaskFinished(const ofx::TaskQueueEventArgs& args)
-{
-    if (tasks[args.getTaskId()].state == TaskProgress::PENDING)
-    {
-        tasks[args.getTaskId()].progress = 1;
-        tasks[args.getTaskId()].state = TaskProgress::SUCCESS;
-    }
-}
-
-
-void ofApp::onTaskFailed(const ofx::TaskFailedEventArgs& args)
-{
-    tasks[args.getTaskId()].state = TaskProgress::FAILURE;
-    tasks[args.getTaskId()].message = args.getException().displayText();
-}
-
-
-void ofApp::onTaskProgress(const ofx::TaskProgressEventArgs& args)
-{
-    tasks[args.getTaskId()].progress = args.getProgress();
-}
-
-
 void ofApp::onClientBuffer(const ofx::HTTP::ClientBufferEventArgs& args)
 {
     // Note: Saving to disk could / should also be done in the task's thread.
@@ -234,7 +144,13 @@ void ofApp::onClientBuffer(const ofx::HTTP::ClientBufferEventArgs& args)
     // This is useful if you want to load the bytes into a GL texture.
     const ofx::IO::ByteBuffer& buffer = args.getData().getByteBuffer();
 
-    std::string path = ofToDataPath(args.getTaskId().toString() + ".jpg");
+    ofx::MediaTypeMap::SharedPtr mtm = ofx::MediaTypeMap::getDefault();
+
+    Poco::Net::MediaType mediaType(args.getData().getResponse().getContentType());
+
+    std::string extension = mtm->getBestFileExtensionsForMediaType(mediaType);
+
+    std::string path = ofToDataPath(args.getTaskId().toString() + "." + extension);
 
     try
     {

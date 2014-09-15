@@ -40,6 +40,7 @@ class DefaultSessionProvider: public AbstractRequestFilter
 {
 public:
     DefaultSessionProvider();
+
     virtual ~DefaultSessionProvider();
 
     virtual void requestFilter(BaseRequest& request, Context& context);
