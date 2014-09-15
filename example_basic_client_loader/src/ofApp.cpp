@@ -28,8 +28,8 @@
 
 void ofApp::setup()
 {
-    // Register for client buffer events.
-    ofAddListener(clientTaskQueue.onClientBuffer, this, &ofApp::onClientBuffer);
+    // Register for client events.
+    clientTaskQueue.registerAllEvents(this);
 
     // Lauch three large download tasks.
     for (int i = 0; i < 3; ++i)
@@ -136,6 +136,38 @@ void ofApp::keyPressed(int key)
     {
         clientTaskQueue.cancelAll();
     }
+}
+
+
+void ofApp::onTaskQueued(const ofx::TaskQueueEventArgs& args)
+{
+}
+
+
+void ofApp::onTaskStarted(const ofx::TaskQueueEventArgs& args)
+{
+}
+
+
+void ofApp::onTaskCancelled(const ofx::TaskQueueEventArgs& args)
+{
+}
+
+
+void ofApp::onTaskFinished(const ofx::TaskQueueEventArgs& args)
+{
+}
+
+
+void ofApp::onTaskFailed(const ofx::TaskFailedEventArgs& args)
+{
+    std::cout << "Task Failed: " << args.getException().displayText() << std::endl;
+    std::cout << "\t" << args.getTaskName() << std::endl;
+}
+
+
+void ofApp::onTaskProgress(const ofx::TaskProgressEventArgs& args)
+{
 }
 
 
