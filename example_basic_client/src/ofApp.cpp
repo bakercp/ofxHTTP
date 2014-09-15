@@ -48,6 +48,10 @@ void ofApp::setup()
 
         // Copy the output to the terminal.
         Poco::StreamCopier::copyStream(responseStream, std::cout);
+
+        // Flush the input stream.
+        std::cout << std::endl;
+
     }
     catch(const Poco::Exception& exc)
     {
