@@ -28,6 +28,9 @@
 
 void ofApp::setup()
 {
+    // Hack to make sure that the net sybsystem is initialized on windows.
+    Poco::Net::initializeNetwork();
+   
     // Register for client events.
     clientTaskQueue.registerAllEvents(this);
 
