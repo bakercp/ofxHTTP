@@ -111,12 +111,18 @@ bool DefaultClientTask::onHTTPClientResponseEvent(HTTP::ClientResponseEventArgs&
                                                   args.getRequest(),
                                                   args.getResponse(),
                                                   args.getContextRef());
-
-        postNotification(new Poco::TaskCustomNotification<HTTP::ClientResponseBufferEventArgs>(this, bufferEvent));
+        handleBufferEvent(bufferEvent);
     }
 
     return true;
 }
+
+
+void DefaultClientTask::handleBufferEvent(const ClientResponseBufferEventArgs& bufferEvent)
+{
+    postNotification(new Poco::TaskCustomNotification<HTTP::ClientResponseBufferEventArgs>(this, bufferEvent));
+}
+
 
 
 bool DefaultClientTask::onHTTPClientErrorEvent(HTTP::ClientErrorEventArgs& args)

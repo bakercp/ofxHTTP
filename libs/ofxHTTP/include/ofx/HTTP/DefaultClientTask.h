@@ -57,6 +57,9 @@ public:
     bool onHTTPClientRequestFilterEvent(MutableClientRequestArgs& args);
     bool onHTTPClientResponseFilterEvent(MutableClientResponseArgs& args);
 
+protected:
+    virtual void handleBufferEvent(const ClientResponseBufferEventArgs& buffer);
+
 private:
     BaseRequest* _request;
     BaseResponse* _response;
