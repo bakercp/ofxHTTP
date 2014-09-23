@@ -24,7 +24,7 @@
 
 
 #include "ofx/HTTP/URIBuilder.h"
-#include "ofx/HTTP/Utils.h"
+#include "ofx/HTTP/HTTPUtils.h"
 
 
 namespace ofx {
@@ -37,7 +37,7 @@ URIBuilder::URIBuilder()
 
 
 URIBuilder::URIBuilder(const Poco::URI& uri):
-    Poco::Net::NameValueCollection(Utils::getQueryMap(uri))
+    Poco::Net::NameValueCollection(HTTPUtils::getQueryMap(uri))
 {
     _uri.setScheme(uri.getScheme());
     _uri.setAuthority(uri.getAuthority());
@@ -54,7 +54,7 @@ URIBuilder::~URIBuilder()
 Poco::URI URIBuilder::toURI() const
 {
     Poco::URI uri(_uri);
-    uri.setRawQuery(Utils::makeQueryString(*this));
+    uri.setRawQuery(HTTPUtils::makeQueryString(*this));
     return uri;
 }
 

@@ -43,7 +43,7 @@ namespace HTTP {
 
 /// \brief A collection of HTTP utilities.
 /// \todo Remove ofLog / ofUtils dependencies.
-class Utils
+class HTTPUtils
 {
 public:
     /// \brief Extract name-value pairs from text/plain encoded posts.

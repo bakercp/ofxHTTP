@@ -70,7 +70,7 @@ std::istream& BaseClient::execute(BaseRequest& request,
         // consume the stream in order to reuse the HTTP session.
         if (context.getClientSession())
         {
-            Utils::consume(responseStream);
+            HTTPUtils::consume(responseStream);
         }
 
         return execute(request, response, context);

@@ -25,7 +25,7 @@
 
 #include "ofx/HTTP/PostRouteFileHandler.h"
 #include "ofx/HTTP/PostRoute.h"
-#include "ofx/HTTP/Utils.h"
+#include "ofx/HTTP/HTTPUtils.h"
 #include "Poco/UUID.h"
 #include "Poco/UUIDGenerator.h"
 

@@ -39,7 +39,7 @@
 #include "ofx/HTTP/WebSocketRouteSettings.h"
 #include "ofx/HTTP/WebSocketEvents.h"
 #include "ofx/HTTP/WebSocketFrame.h"
-#include "ofx/HTTP/Utils.h"
+#include "ofx/HTTP/HTTPUtils.h"
 
 
 namespace ofx {

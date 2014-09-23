@@ -28,7 +28,7 @@
 
 #include <string>
 //#include "Poco/Net/HTTPMessage.h"
-#include "ofx/HTTP/Utils.h"
+#include "ofx/HTTP/HTTPUtils.h"
 #include "ofx/HTTP/BaseRequest.h"
 
 

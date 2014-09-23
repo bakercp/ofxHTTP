@@ -81,7 +81,7 @@ void IPVideoRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
 
     std::string query = uri.getQuery();
 
-    Poco::Net::NameValueCollection queryMap = Utils::getQueryMap(uri);
+    Poco::Net::NameValueCollection queryMap = HTTPUtils::getQueryMap(uri);
 
     if(queryMap.has("vflip"))
     {

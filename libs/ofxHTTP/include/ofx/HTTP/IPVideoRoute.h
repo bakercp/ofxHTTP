@@ -32,7 +32,7 @@
 #include "ofx/HTTP/IPVideoRouteHandler.h"
 #include "ofx/HTTP/IPVideoRouteSettings.h"
 #include "ofx/HTTP/IPVideoFrameQueue.h"
-#include "ofx/HTTP/Utils.h"
+#include "ofx/HTTP/HTTPUtils.h"
 
 
 namespace ofx {

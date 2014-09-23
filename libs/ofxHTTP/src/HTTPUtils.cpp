@@ -23,14 +23,14 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/Utils.h"
+#include "ofx/HTTP/HTTPUtils.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-Poco::Net::NameValueCollection Utils::splitTextPlainPost(const std::string& textPlain)
+Poco::Net::NameValueCollection HTTPUtils::splitTextPlainPost(const std::string& textPlain)
 {
     // Here we handle
     Poco::Net::NameValueCollection nvc;
@@ -56,7 +56,7 @@ Poco::Net::NameValueCollection Utils::splitTextPlainPost(const std::string& text
 
 
 
-Poco::Net::NameValueCollection Utils::splitAndURLDecode(const std::string& encoded)
+Poco::Net::NameValueCollection HTTPUtils::splitAndURLDecode(const std::string& encoded)
 {
     // TODO use code from Poco::Net::HTMLForm
 
@@ -91,7 +91,7 @@ Poco::Net::NameValueCollection Utils::splitAndURLDecode(const std::string& encod
 }
 
 
-Poco::Net::NameValueCollection Utils::getQueryMap(const Poco::URI& uri)
+Poco::Net::NameValueCollection HTTPUtils::getQueryMap(const Poco::URI& uri)
 {
     if(uri.empty())
     {
@@ -110,7 +110,7 @@ Poco::Net::NameValueCollection Utils::getQueryMap(const Poco::URI& uri)
 
 
 
-std::string Utils::makeQueryString(const Poco::Net::NameValueCollection& query)
+std::string HTTPUtils::makeQueryString(const Poco::Net::NameValueCollection& query)
 {
     std::stringstream ostr;
 
@@ -131,31 +131,31 @@ std::string Utils::makeQueryString(const Poco::Net::NameValueCollection& query)
 }
 
 
-void Utils::dumpHeaders(const Poco::Net::HTTPRequest& request,
-                        const Poco::Net::HTTPResponse& response,
-                        ofLogLevel logLevel)
+void HTTPUtils::dumpHeaders(const Poco::Net::HTTPRequest& request,
+                            const Poco::Net::HTTPResponse& response,
+                            ofLogLevel logLevel)
 {
     dumpNameValueCollection(request,logLevel);
     dumpNameValueCollection(response,logLevel);
 }
 
 
-void Utils::dumpHeaders(const Poco::Net::HTTPRequest& request,
-                        ofLogLevel logLevel)
+void HTTPUtils::dumpHeaders(const Poco::Net::HTTPRequest& request,
+                            ofLogLevel logLevel)
 {
     dumpNameValueCollection(request, logLevel);
 }
 
 
-void Utils::dumpHeaders(const Poco::Net::HTTPResponse& response,
-                        ofLogLevel logLevel)
+void HTTPUtils::dumpHeaders(const Poco::Net::HTTPResponse& response,
+                            ofLogLevel logLevel)
 {
     dumpNameValueCollection(response, logLevel);
 }
 
 
-void Utils::dumpNameValueCollection(const Poco::Net::NameValueCollection& nvc,
-                                    ofLogLevel logLevel)
+void HTTPUtils::dumpNameValueCollection(const Poco::Net::NameValueCollection& nvc,
+                                        ofLogLevel logLevel)
 {
     if(logLevel >= ofGetLogLevel())
     {
@@ -171,7 +171,7 @@ void Utils::dumpNameValueCollection(const Poco::Net::NameValueCollection& nvc,
 }
 
 
-std::streamsize Utils::consume(std::istream& stream)
+std::streamsize HTTPUtils::consume(std::istream& stream)
 {
     Poco::NullOutputStream nos;
     return Poco::StreamCopier::copyStream(stream, nos);

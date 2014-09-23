@@ -41,7 +41,7 @@
 #include "ofLog.h"
 #include "ofx/HTTP/AuthScope.h"
 #include "ofx/HTTP/Credentials.h"
-#include "ofx/HTTP/Utils.h"
+#include "ofx/HTTP/HTTPUtils.h"
 #include "ofx/HTTP/AbstractClientTypes.h"
 
 

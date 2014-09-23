@@ -31,7 +31,7 @@
 #include "Poco/Net/NameValueCollection.h"
 #include "ofTypes.h"
 #include "ofx/HTTP/ProxySettings.h"
-#include "ofx/HTTP/Utils.h"
+#include "ofx/HTTP/HTTPUtils.h"
 
 
 namespace ofx {

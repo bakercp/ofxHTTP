@@ -35,7 +35,7 @@
 #include "ofTypes.h"
 #include "ofx/HTTP/Session.h"
 #include "ofx/HTTP/AbstractServerTypes.h"
-#include "ofx/HTTP/Utils.h"
+#include "ofx/HTTP/HTTPUtils.h"
 
 
 namespace ofx {
