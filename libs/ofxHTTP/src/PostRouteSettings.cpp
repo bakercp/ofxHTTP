@@ -104,13 +104,13 @@ std::size_t PostRouteSettings::getFieldLimit() const
 }
 
 
-void PostRouteSettings::setMaximumFileUploadSize(std::streamsize maximumFileUploadSize)
+void PostRouteSettings::setMaximumFileUploadSize(unsigned long long maximumFileUploadSize)
 {
     _maximumFileUploadSize = maximumFileUploadSize;
 }
 
 
-std::streamsize PostRouteSettings::getMaximumFileUploadSize() const
+unsigned long long PostRouteSettings::getMaximumFileUploadSize() const
 {
     return _maximumFileUploadSize;
 }
