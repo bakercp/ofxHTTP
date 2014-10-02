@@ -35,6 +35,13 @@ void ofApp::setup()
     // Many other settings are available.
     settings.setPort(7890);
 
+    // Create a whitelist.
+    ofx::Net::IPAddressRange::List whitelist;
+    whitelist.push_back(ofx::Net::IPAddressRange("127.0.0.1/32"));
+
+    // Set the whitelist.
+    settings.setWhitelist(whitelist);
+
     // Apply the settings.
     server = ofx::HTTP::BasicServer::makeShared(settings);
 

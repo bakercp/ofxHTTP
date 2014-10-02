@@ -325,9 +325,4 @@ Poco::UUID BaseRoute_<SettingsType>::getSessionId(Poco::Net::HTTPServerRequest& 
 }
 
 
-    Poco::UUID getSessionId(Poco::Net::HTTPServerRequest& request,
-                            Poco::Net::HTTPServerResponse& response);
-
-
-
 } } // namespace ofx::HTTP

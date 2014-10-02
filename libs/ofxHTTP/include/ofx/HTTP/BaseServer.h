@@ -135,6 +135,8 @@ private:
 
     Poco::Net::HTTPServerParams::Ptr getPocoHTTPServerParams(const HTTPServerParams& params);
 
+    bool acceptConnection(const Poco::Net::HTTPServerRequest& request);
+
     Poco::ThreadPool& _threadPoolRef;
 
     ThreadErrorHandler eh;
@@ -213,21 +215,20 @@ void BaseServer_<SettingsType>::start()
 
     try
     {
-    _server = HTTPServerPtr(new Poco::Net::HTTPServer(new BaseServerHandle(*this),
-                                                      getThreadPoolRef(),
-                                                      socket,
-                                                      getPocoHTTPServerParams(_settings)));
+        _server = HTTPServerPtr(new Poco::Net::HTTPServer(new BaseServerHandle(*this),
+                                                          getThreadPoolRef(),
+                                                          socket,
+                                                          getPocoHTTPServerParams(_settings)));
 
-    _isSecurePort = socket.secure();
+        _isSecurePort = socket.secure();
 
-#if defined(TARGET_OSX)
-    // essential on a mac!  fixed in 1.4.6p2+ / 1.5.2+
-    socket.setOption(SOL_SOCKET, SO_NOSIGPIPE, 1); // ignore SIGPIPE
-#endif
+    #if defined(TARGET_OSX)
+        // essential on a mac!  fixed in 1.4.6p2+ / 1.5.2+
+        socket.setOption(SOL_SOCKET, SO_NOSIGPIPE, 1); // ignore SIGPIPE
+    #endif
 
-    // start the http server
-    _server->start();
-
+        // start the http server
+        _server->start();
     }
     catch (const Poco::Net::InvalidSocketException& exc)
     {
@@ -326,21 +327,77 @@ Poco::ThreadPool& BaseServer_<SettingsType>::getThreadPoolRef()
 
 
 template <typename SettingsType>
-Poco::Net::HTTPRequestHandler* BaseServer_<SettingsType>::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+bool BaseServer_<SettingsType>::acceptConnection(const Poco::Net::HTTPServerRequest& request)
 {
-    // We start with the last factory that was added.
-    // Thus, factories with overlapping routes should be
-    // carefully ordered.
-    Routes::const_reverse_iterator iter = _routes.rbegin();
+    const Poco::Net::IPAddress& host = request.clientAddress().host();
 
-    while (iter != _routes.rend())
+    // If a whitelist is defined then you _must_ be on the whitelist.
+    const Net::IPAddressRange::List& whitelist = _settings.getWhitelist();
+
+    if (!whitelist.empty())
     {
-        if ((*iter)->canHandleRequest(request, _isSecurePort))
+        bool isWhitelisted = false;
+
+        Net::IPAddressRange::List::const_iterator iter = whitelist.begin();
+
+        while (iter != whitelist.end())
         {
-            return (*iter)->createRequestHandler(request);
+            if (iter->contains(host))
+            {
+                return true;
+            }
+
+            ++iter;
         }
 
-        ++iter;
+        if (!isWhitelisted)
+        {
+            return false;
+        }
+    }
+
+    // If a blacklist is defined then you _must not_ be on the blacklist.
+    const Net::IPAddressRange::List& blacklist = _settings.getBlacklist();
+
+    if (!blacklist.empty())
+    {
+        Net::IPAddressRange::List::const_iterator iter = blacklist.begin();
+
+        while (iter != blacklist.end())
+        {
+            if (iter->contains(request.clientAddress().host()))
+            {
+                return false;
+            }
+            
+            ++iter;
+        }
+    }
+
+    return true;
+}
+
+
+
+template <typename SettingsType>
+Poco::Net::HTTPRequestHandler* BaseServer_<SettingsType>::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+{
+    if (acceptConnection(request))
+    {
+        // We start with the last factory that was added.
+        // Thus, factories with overlapping routes should be
+        // carefully ordered.
+        Routes::const_reverse_iterator iter = _routes.rbegin();
+
+        while (iter != _routes.rend())
+        {
+            if ((*iter)->canHandleRequest(request, _isSecurePort))
+            {
+                return (*iter)->createRequestHandler(request);
+            }
+
+            ++iter;
+        }
     }
 
     return _baseRoute.createRequestHandler(request);
