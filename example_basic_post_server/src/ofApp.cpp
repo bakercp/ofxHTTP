@@ -73,7 +73,7 @@ void ofApp::onHTTPPostEvent(ofx::HTTP::PostEventArgs& args)
 void ofApp::onHTTPFormEvent(ofx::HTTP::PostFormEventArgs& args)
 {
     ofLogNotice("ofApp::onHTTPFormEvent") << "";
-    ofx::HTTP::Utils::dumpNameValueCollection(args.getForm(), ofGetLogLevel());
+    ofx::HTTP::HTTPUtils::dumpNameValueCollection(args.getForm(), ofGetLogLevel());
 }
 
 
