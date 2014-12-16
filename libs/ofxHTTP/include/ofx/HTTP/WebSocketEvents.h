@@ -97,7 +97,7 @@ public:
         return _sessionId;
     }
 
-    const WebSocketConnection& getConnectionRef() const
+    const WebSocketConnection& getConnection() const
     {
         return _connection;
     }
