@@ -244,7 +244,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
     }
     catch (const Poco::Net::WebSocketException& exc)
     {
-        ofLogError("ServerWebSocketRouteHandler::handleRequest") << "WebSocketException: " << exc.code() << " Desc: " << exc.what();
+        ofLogError("ServerWebSocketRouteHandler::handleRequest") << "WebSocketException: " << exc.code() << " : " << exc.displayText();
 
         switch (exc.code())
         {
@@ -267,7 +267,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                 break;
         }
 
-        _parent.handleRequest(request,response);
+        _parent.handleRequest(request, response);
         WebSocketErrorEventArgs eventArgs(sessionId, *this, (WebSocketError)exc.code());
         ofNotifyEvent(_parent.events.onErrorEvent, eventArgs, this);
     }
