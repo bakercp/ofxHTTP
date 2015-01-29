@@ -40,7 +40,7 @@ PostRequest::PostRequest(const std::string& uri,
                          const FormParts formParts,
                          const std::string& httpVersion,
                          const Poco::UUID& requestId):
-    BaseRequest(Poco::Net::HTTPRequest::HTTP_PUT,
+    BaseRequest(Poco::Net::HTTPRequest::HTTP_POST,
                 uri,
                 formFields,
                 httpVersion,
