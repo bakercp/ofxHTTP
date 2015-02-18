@@ -84,9 +84,9 @@ void PutRequest::setContentType(const std::string& contentType)
 }
 
 
-void PutRequest::prepareSubmit()
+void PutRequest::prepareRequest()
 {
-
+    set("Content-Length", ofToString(_buffer.size()));
 }
 
 void PutRequest::writeRequestBody(std::ostream& requestStream)
