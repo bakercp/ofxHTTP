@@ -5,6 +5,9 @@ Project.xcconfig
 docs/html
 docs/tagfile.xml
 RAW/
+*.xcodeproj
+*openFrameworks-Info.plist
+Project.xcconfig
 
 *.mode1v3
 
