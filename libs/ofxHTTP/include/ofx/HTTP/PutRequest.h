@@ -46,22 +46,42 @@ public:
                const Poco::UUID& requestId = generateUUID());
 
     virtual ~PutRequest();
-    
+
+    /// \brief Set the file to include in the body of the PUT request.
+    /// \param filename The file to include in the body of the PUT request.
     void setPutFile(const std::string& filename);
 
+    /// \brief Set the buffer to include in the body of the PUT request.
+    /// \param filename The buffer to include in the body of the PUT request.
     void setPutBuffer(const ofBuffer& buffer);
 
+    /// \brief Set the start byte to include in the header of the PUT request.
+    /// \param startByte The byte number representing the offset of the
+    ///        data included in the body.  End byte is assumed to be the end
+    ///        of the resource.
     void setContentRange(std::size_t startByte);
 
+    /// \brief Set the start byte to include in the header of the PUT request.
+    /// \param startByte The byte number representing the offset of the data
+    ///        included in the body.
+    /// \param endByte The byte number representing the end offset of the data
+    ///        included in the body.
+    /// \throws InvalidArgumentException if startByte is not less than or equal
+    ///         to endByte.
     void setContentRange(std::size_t startByte,
                          std::size_t endByte);
 
+    /// \brief Set the content type for the put request.
+    ///
+    /// The default content type is `application/octet-stream`.
+    ///
+    /// \contentType The content type of the PUT request.
     void setContentType(const std::string& contentType);
 
     /// \brief The default MIME type used for file parts.
     static const std::string DEFAULT_MEDIA_TYPE;
 
-    virtual void prepareSubmit();
+    virtual void prepareRequest();
     
     virtual void writeRequestBody(std::ostream& requestStream);
 

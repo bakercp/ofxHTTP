@@ -33,7 +33,6 @@ namespace HTTP {
 const std::string PutRequest::DEFAULT_MEDIA_TYPE = "application/octet-stream";
 
 
-
 PutRequest::PutRequest(const std::string& uri,
                        const Poco::Net::NameValueCollection formFields,
                        const std::string& httpVersion,
@@ -43,8 +42,8 @@ PutRequest::PutRequest(const std::string& uri,
                 formFields,
                 httpVersion,
                 requestId),
-    _startByte(0),
-    _endByte(0),
+    _startByte(std::numeric_limits<size_t>::max()),
+    _endByte(std::numeric_limits<size_t>::max()),
     _contentType(DEFAULT_MEDIA_TYPE)
 {
 }
@@ -69,13 +68,21 @@ void PutRequest::setPutBuffer(const ofBuffer& buffer)
 
 void PutRequest::setContentRange(std::size_t startByte)
 {
-
+    _startByte = startByte;
 }
 
 void PutRequest::setContentRange(std::size_t startByte,
                                  std::size_t endByte)
 {
-
+    if (startByte < endByte)
+    {
+        _startByte = startByte;
+        _startByte = endByte;
+    }
+    else
+    {
+        throw Poco::InvalidArgumentException("Start byte must be less than end byte.");
+    }
 }
 
 void PutRequest::setContentType(const std::string& contentType)
@@ -84,9 +91,9 @@ void PutRequest::setContentType(const std::string& contentType)
 }
 
 
-void PutRequest::prepareSubmit()
+void PutRequest::prepareRequest()
 {
-
+    set("Content-Length", ofToString(_buffer.size()));
 }
 
 void PutRequest::writeRequestBody(std::ostream& requestStream)

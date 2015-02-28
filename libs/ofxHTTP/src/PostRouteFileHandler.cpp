@@ -99,7 +99,7 @@ void PostRouteFileHandler::handlePart(const Poco::Net::MessageHeader& header,
 
                 std::string newFilename = ofToDataPath(ss.str(), true);
 
-                ofFile file(newFilename, ofFile::WriteOnly);
+                ofFile file(newFilename, ofFile::WriteOnly,true);  
 
                 Poco::Net::MediaType contentType(header["Content-Type"]);
 
