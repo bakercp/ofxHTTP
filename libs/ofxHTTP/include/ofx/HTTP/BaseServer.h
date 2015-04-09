@@ -331,6 +331,8 @@ bool BaseServer_<SettingsType>::acceptConnection(const Poco::Net::HTTPServerRequ
 {
     const Poco::Net::IPAddress& host = request.clientAddress().host();
 
+    /*
+     
     // If a whitelist is defined then you _must_ be on the whitelist.
     const Net::IPAddressRange::List& whitelist = _settings.getWhitelist();
 
@@ -373,6 +375,7 @@ bool BaseServer_<SettingsType>::acceptConnection(const Poco::Net::HTTPServerRequ
             ++iter;
         }
     }
+     */
 
     return true;
 }

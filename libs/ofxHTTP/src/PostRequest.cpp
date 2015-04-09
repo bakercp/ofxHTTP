@@ -36,29 +36,10 @@ namespace HTTP {
 
     
 PostRequest::PostRequest(const std::string& uri,
-                         const Poco::Net::NameValueCollection formFields,
-                         const FormParts formParts,
-                         const std::string& httpVersion,
-                         const Poco::UUID& requestId):
-    BaseRequest(Poco::Net::HTTPRequest::HTTP_POST,
-                uri,
-                formFields,
-                httpVersion,
-                requestId)
+                         const std::string& httpVersion):
+    BaseRequest(Poco::Net::HTTPRequest::HTTP_POST, uri, httpVersion)
 {
-    if (!formParts.empty())
-    {
-        _form.setEncoding(Poco::Net::HTMLForm::ENCODING_MULTIPART);
-
-        FormParts::const_iterator iter = formParts.begin();
-
-        while (iter != formParts.end())
-        {
-            _form.addPart(iter->name, iter->pSource);
-        }
-    }
 }
-
 
 
 PostRequest::~PostRequest()
@@ -91,7 +72,28 @@ PostRequest::FormEncoding PostRequest::getFormEncoding() const
     }
 }
 
-    
+
+void PostRequest::addFormPart(const FormPart& part)
+{
+    _form.addPart(part.name, part.pSource);
+    _form.setEncoding(Poco::Net::HTMLForm::ENCODING_MULTIPART);
+}
+
+
+void PostRequest::addFormParts(const FormParts& parts)
+{
+    FormParts::const_iterator iter = parts.begin();
+
+    while (iter != parts.end())
+    {
+        _form.addPart((*iter).name, (*iter).pSource);
+        ++iter;
+    }
+
+    _form.setEncoding(Poco::Net::HTMLForm::ENCODING_MULTIPART);
+}
+
+
 void PostRequest::addFormFile(const std::string& name,
                               const std::string& path,
                               const std::string& mediaType)

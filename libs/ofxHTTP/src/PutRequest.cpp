@@ -34,14 +34,10 @@ const std::string PutRequest::DEFAULT_MEDIA_TYPE = "application/octet-stream";
 
 
 PutRequest::PutRequest(const std::string& uri,
-                       const Poco::Net::NameValueCollection formFields,
-                       const std::string& httpVersion,
-                       const Poco::UUID& requestId):
+                       const std::string& httpVersion):
     BaseRequest(Poco::Net::HTTPRequest::HTTP_PUT,
                 uri,
-                formFields,
-                httpVersion,
-                requestId),
+                httpVersion),
     _startByte(std::numeric_limits<size_t>::max()),
     _endByte(std::numeric_limits<size_t>::max()),
     _contentType(DEFAULT_MEDIA_TYPE)

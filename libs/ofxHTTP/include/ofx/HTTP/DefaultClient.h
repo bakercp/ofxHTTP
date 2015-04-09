@@ -46,12 +46,12 @@ public:
     virtual ~DefaultClient();
 
 private:
-    DefaultSessionProvider defaultSessionProvider;
-    DefaultClientHeaders defaultClientHeaders;
-    DefaultProxyProcessor defaultProxyProcessor;
-    DefaultCredentialStore defaultAuthenticationProcessor;
-    DefaultRedirectProcessor defaultRedirectProcessor;
-    DefaultResponseStreamFilter responseStreamFilter;
+    DefaultSessionProvider _defaultSessionProvider;
+    DefaultClientHeaders _defaultClientHeaders;
+    DefaultProxyProcessor _defaultProxyProcessor;
+    DefaultCredentialStore _defaultAuthenticationProcessor;
+    DefaultRedirectProcessor _defaultRedirectProcessor;
+    DefaultResponseStreamFilter _responseStreamFilter;
 
 };
 

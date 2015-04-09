@@ -29,7 +29,7 @@
 void ofApp::setup()
 {
     // Testing redirects and https.
-    std::string url = "http://httpbin.org/";
+    std::string url = "http://httpbin.org/put";
 
     ofx::HTTP::DefaultClient client;
     ofx::HTTP::Context context;
@@ -38,7 +38,10 @@ void ofApp::setup()
 
     ofx::HTTP::PutRequest putRequest(url);
 
-    ofBuffer bodyBuffer = "Test body data.";
+    putRequest.set("My-special-request-header", "My-special-request-header-value");
+
+    ofBuffer bodyBuffer;
+    bodyBuffer.set("Test body data.");
 
     putRequest.setPutBuffer(bodyBuffer);
 

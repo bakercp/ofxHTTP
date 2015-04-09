@@ -98,6 +98,7 @@ Poco::URI BaseServerSettings::getURI() const
 }    
 
 
+/*
 const Net::IPAddressRange::List& BaseServerSettings::getWhitelist() const
 {
     return _whitelist;
@@ -120,6 +121,6 @@ void BaseServerSettings::setBlacklist(const Net::IPAddressRange::List& blacklist
 {
     _blacklist = blacklist;
 }
-
+*/
 
 } } // namespace ofx::HTTP

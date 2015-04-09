@@ -40,9 +40,7 @@ class GetRequest: public BaseRequest
 {
 public:
     GetRequest(const std::string& uri,
-               const Poco::Net::NameValueCollection& formFields = Poco::Net::NameValueCollection(),
-               const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1,
-               const Poco::UUID& requestId = BaseRequest::generateUUID());
+               const std::string& httpVersion);
 
     virtual ~GetRequest();
 

@@ -55,18 +55,16 @@ public:
 
     /// \brief Construct a PostRequest with a given uri and http version.
     /// \param uri the Post endpoint uri.
-    /// \param formFields A collection of form fields.
-    /// \param formParts A collection of form parts.
     /// \param httpVersion Either HTTP/1.0 or HTTP/1.1.
-    /// \param requestId A unique UUID for this request.
-    PostRequest(const std::string& uri,
-                const Poco::Net::NameValueCollection formFields = Poco::Net::NameValueCollection(),
-                const FormParts formParts = FormParts(),
-                const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1,
-                const Poco::UUID& requestId = generateUUID());
+    PostRequest(const std::string& uri, const std::string& httpVersion);
 
     /// \brief Destroy the PostRequest.
     virtual ~PostRequest();
+
+
+    void addFormPart(const FormPart& part);
+
+    void addFormParts(const FormParts& parts);
 
     /// \brief Add a file for upload with this POST.
     /// \warning This method will sets the encoding to FORM_ENCODING_MULTIPART.

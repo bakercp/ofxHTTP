@@ -35,17 +35,11 @@ const std::string BaseRequest::DEFAULT_MEDIA_TYPE = "application/octet-stream";
 
 BaseRequest::BaseRequest(const std::string& method,
                          const std::string& uri,
-                         const Poco::Net::NameValueCollection& formFields,
-                         const std::string& httpVersion,
-                         const Poco::UUID& requestId):
+                         const std::string& httpVersion):
     Poco::Net::HTTPRequest(method, uri, httpVersion),
-    _rawURI(uri),
-    _requestId(requestId),
-    _rewriteRelativeRequestPath(true)
+    _requestId(generateUUID())
 {
-    addFormFields(formFields);
 }
-
 
 
 BaseRequest::~BaseRequest()
@@ -55,34 +49,33 @@ BaseRequest::~BaseRequest()
 
 void BaseRequest::write(std::ostream& ostr) const
 {
-    if (_rewriteRelativeRequestPath)
+    try
     {
-        try
-        {
-            Poco::URI uri(getURI());
-            std::string pathAndQuery = uri.getPathAndQuery();
-            if (pathAndQuery.empty()) pathAndQuery = "/";
-            ostr << getMethod();
-            // Here we use just path/query.
-            ostr << " " << pathAndQuery;
-            ostr << " " << getVersion();
-            ostr << "\r\n";
+        Poco::URI uri(getURI());
 
-            HTTPMessage::write(ostr);
-            ostr << "\r\n";
-        }
-        catch (const Poco::SyntaxException& exc)
+        cout << uri.toString() << endl;
+        std::string pathAndQuery = uri.getPathAndQuery();
+
+        if (pathAndQuery.empty())
         {
-            ofLogWarning("ofx::HTTP::BaseRequest") << "Unable to parse URI, using: " << getURI();
-            Poco::Net::HTTPRequest::write(ostr);
+            pathAndQuery = "/";
         }
+
+        ostr << getMethod();
+        // Here we use just path/query.
+        ostr << " " << pathAndQuery;
+        ostr << " " << getVersion();
+        ostr << "\r\n";
+
+        HTTPMessage::write(ostr);
+        ostr << "\r\n";
     }
-    else
+    catch (const Poco::SyntaxException& exc)
     {
+        ofLogWarning("ofx::HTTP::BaseRequest") << "Unable to parse URI, using: " << getURI();
         Poco::Net::HTTPRequest::write(ostr);
     }
 }
-
 
 
 void BaseRequest::addFormFields(const Poco::Net::NameValueCollection& formFields)
@@ -104,6 +97,19 @@ void BaseRequest::addFormField(const std::string& name,
 }
 
 
+void BaseRequest::setFormField(const std::string& name,
+                               const std::string& value)
+{
+    _form.set(name, value);
+}
+
+
+void BaseRequest::setRequestId(const Poco::UUID& requestId)
+{
+    _requestId = requestId;
+}
+
+
 const Poco::UUID& BaseRequest::getRequestId() const
 {
     return _requestId;
@@ -119,24 +125,6 @@ const Poco::Net::HTMLForm& BaseRequest::getForm() const
 Poco::Net::HTMLForm& BaseRequest::getFormRef()
 {
     return _form;
-}
-
-
-const Poco::URI& BaseRequest::getRawURI() const
-{
-    return _rawURI;
-}
-
-
-void BaseRequest::setRewriteRelativeRequestPath(bool rewriteRelativeRequestPath)
-{
-    _rewriteRelativeRequestPath = rewriteRelativeRequestPath;
-}
-
-
-bool BaseRequest::getRewriteRelativeRequestPath() const
-{
-    return _rewriteRelativeRequestPath;
 }
 
 
@@ -159,7 +147,6 @@ void BaseRequest::prepareRequest()
     {
         setURI(uri.substr(0, uri.size() - 1));
     }
-
 }
 
 

@@ -48,10 +48,10 @@ Poco::UUID DefaultClientTaskQueue::get(const std::string& uri,
                                        ThreadSettings threadSettings)
 {
 
-    GetRequest* req = new GetRequest(uri,
-                                     formFields,
-                                     httpVersion,
-                                     requestId);
+    GetRequest* req = new GetRequest(uri, httpVersion);
+
+    req->addFormFields(formFields);
+    req->setRequestId(requestId);
 
     return request(req, threadSettings);
 }
@@ -64,12 +64,13 @@ Poco::UUID DefaultClientTaskQueue::post(const std::string& uri,
                                         const Poco::UUID& requestId,
                                         ThreadSettings threadSettings)
 {
-    return request(new PostRequest(uri,
-                                   formFields,
-                                   formParts,
-                                   httpVersion,
-                                   requestId),
-                                   threadSettings);
+    PostRequest* req = new PostRequest(uri, httpVersion);
+
+    req->addFormFields(formFields);
+    req->addFormParts(formParts);
+    req->setRequestId(requestId);
+
+    return request(req, threadSettings);
 }
 
 
