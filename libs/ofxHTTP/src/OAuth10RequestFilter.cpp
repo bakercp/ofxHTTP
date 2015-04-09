@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2014 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,25 +23,46 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/GetRequest.h"
-
+#include "ofx/HTTP/OAuth10RequestFilter.h"
+#include "ofx/HTTP/BaseRequest.h"
+#include "ofx/HTTP/HTTPUtils.h"
 
 namespace ofx {
 namespace HTTP {
 
 
-GetRequest::GetRequest(const std::string& uri,
-                       const std::string& httpVersion):
-    BaseRequest(Poco::Net::HTTPRequest::HTTP_GET,
-                uri,
-                httpVersion)
+OAuth10RequestFilter::OAuth10RequestFilter()
 {
 }
 
 
-GetRequest::~GetRequest()
+OAuth10RequestFilter::OAuth10RequestFilter(const std::string& consumerKey,
+                                           const std::string& consumerSecret,
+                                           const std::string& token,
+                                           const std::string& tokenSecret):
+    _credentials(consumerKey, consumerSecret, token, tokenSecret)
+{
+}
+
+    
+OAuth10RequestFilter::~OAuth10RequestFilter()
 {
 }
 
 
-} } // namespace ofx::HTTP
+OAuth10Credentials& OAuth10RequestFilter::getCredentialsRef()
+{
+    return _credentials;
+}
+
+
+void OAuth10RequestFilter::requestFilter(BaseRequest& request, Context& context)
+{
+    _credentials.authenticate(request,
+                              Poco::URI(request.getURI()),
+                              request.getForm(),
+                              OAuth10Credentials::SIGN_HMAC_SHA1);
+}
+
+
+} } // namespace ofx::OAuth

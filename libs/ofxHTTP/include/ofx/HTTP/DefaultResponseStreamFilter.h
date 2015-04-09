@@ -36,8 +36,7 @@ namespace ofx {
 namespace HTTP {
 
 
-class DefaultResponseStreamFilter:
-    public AbstractResponseStreamFilter
+class DefaultResponseStreamFilter: public AbstractResponseStreamFilter
 {
 public:
     DefaultResponseStreamFilter();

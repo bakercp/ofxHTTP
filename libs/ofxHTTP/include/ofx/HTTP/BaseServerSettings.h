@@ -30,6 +30,7 @@
 #include "Poco/Thread.h"
 #include "Poco/Timespan.h"
 #include "Poco/URI.h"
+// #include "ofx/Net/IPAddressRange.h"
 
 
 namespace ofx {
@@ -198,6 +199,7 @@ public:
     BaseServerSettings(const std::string& host = DEFAULT_HOST,
                        unsigned short port = DEFAULT_PORT,
                        bool useSSL = DEFAULT_USE_SSL);
+
     virtual ~BaseServerSettings();
 
     void setHost(const std::string& host);
@@ -211,6 +213,12 @@ public:
 
     Poco::URI getURI() const;
 
+    //const Net::IPAddressRange::List& getWhitelist() const;
+    //void setWhitelist(const Net::IPAddressRange::List& whitelist);
+
+    //const Net::IPAddressRange::List& getBlacklist() const;
+    //void setBlacklist(const Net::IPAddressRange::List& blacklist);
+
     const static std::string DEFAULT_HOST;
     const static unsigned short DEFAULT_PORT;
     const static bool DEFAULT_USE_SSL;
@@ -219,6 +227,9 @@ private:
     std::string _host;
     unsigned short _port;
     bool _useSSL;
+
+    //Net::IPAddressRange::List _whitelist;
+    //Net::IPAddressRange::List _blacklist;
 
 };
 

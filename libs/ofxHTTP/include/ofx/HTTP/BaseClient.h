@@ -46,6 +46,8 @@ public:
     typedef std::vector<AbstractRequestFilter*> RequestFilters;
     typedef std::vector<AbstractResponseFilter*> ResponseFilters;
 
+    BaseClient();
+
     BaseClient(RequestFilters requestFilters,
                ResponseFilters responseFilters);
 
@@ -57,8 +59,8 @@ public:
                           Context& context);
 
     void submit(BaseRequest& request,
-                 BaseResponse& response,
-                 Context& context);
+                BaseResponse& response,
+                Context& context);
 
     void addRequestFilter(AbstractRequestFilter* filter);
     void addResponseFilter(AbstractResponseFilter* filter);

@@ -33,18 +33,18 @@ namespace HTTP {
 DefaultClient::DefaultClient():
     BaseClient(RequestFilters(), ResponseFilters())
 {
-    addRequestFilter(&defaultSessionProvider);
-    addRequestFilter(&defaultProxyProcessor);
-    addRequestFilter(&defaultAuthenticationProcessor);
-    addRequestFilter(&defaultRedirectProcessor);
-    addRequestFilter(&defaultClientHeaders);
+    addRequestFilter(&_defaultSessionProvider);
+    addRequestFilter(&_defaultProxyProcessor);
+    addRequestFilter(&_defaultAuthenticationProcessor);
+    addRequestFilter(&_defaultRedirectProcessor);
+    addRequestFilter(&_defaultClientHeaders);
 
     // response processors
-    addResponseFilter(&defaultProxyProcessor);
-    addResponseFilter(&defaultAuthenticationProcessor);
-    addResponseFilter(&defaultRedirectProcessor);
+    addResponseFilter(&_defaultProxyProcessor);
+    addResponseFilter(&_defaultAuthenticationProcessor);
+    addResponseFilter(&_defaultRedirectProcessor);
 
-    setResponseStreamFilter(&responseStreamFilter);
+    setResponseStreamFilter(&_responseStreamFilter);
 }
 
 

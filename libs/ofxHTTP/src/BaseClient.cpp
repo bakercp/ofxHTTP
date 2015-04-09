@@ -30,6 +30,13 @@ namespace ofx {
 namespace HTTP {
 
 
+BaseClient::BaseClient():
+    _pRequestStreamFilter(0),
+    _pResponseStreamFilter(0)
+{
+}
+
+
 BaseClient::BaseClient(RequestFilters requestFilters,
                        ResponseFilters responseFilters):
     _requestFilters(requestFilters),
@@ -42,7 +49,7 @@ BaseClient::BaseClient(RequestFilters requestFilters,
 
 BaseClient::~BaseClient()
 {
-    // we do not own the filter pointers.
+    // We do not own the filter pointers.
 }
 
 
@@ -99,33 +106,33 @@ void BaseClient::submit(BaseRequest& request,
 
         ofNotifyEvent(events.onHTTPClientResponseEvent, evt);
     }
-    catch(const Poco::SyntaxException& exc)
+    catch (const Poco::SyntaxException& exc)
     {
         ClientErrorEventArgs evt(request, response, context, exc);
         ofNotifyEvent(events.onHTTPClientErrorEvent, evt);
     }
-    catch(const Poco::Net::HostNotFoundException& exc)
+    catch (const Poco::Net::HostNotFoundException& exc)
     {
         ClientErrorEventArgs evt(request, response, context, exc);
         ofNotifyEvent(events.onHTTPClientErrorEvent, evt);
     }
-    catch(const Poco::Net::HTTPException& exc)
+    catch (const Poco::Net::HTTPException& exc)
     {
         ClientErrorEventArgs evt(request, response, context, exc);
         ofNotifyEvent(events.onHTTPClientErrorEvent, evt);
     }
-    catch(const Poco::Exception& exc)
+    catch (const Poco::Exception& exc)
     {
         ClientErrorEventArgs evt(request, response, context, exc);
         ofNotifyEvent(events.onHTTPClientErrorEvent, evt);
     }
-    catch(std::exception& exception)
+    catch (std::exception& exception)
     {
         Poco::Exception exc(exception.what());
         ClientErrorEventArgs evt(request, response, context, exc);
         ofNotifyEvent(events.onHTTPClientErrorEvent, evt);
     }
-    catch(...)
+    catch (...)
     {
         Poco::Exception exc("Completely Unknown Exception");
         ClientErrorEventArgs evt(request, response, context, exc);
@@ -162,8 +169,8 @@ void BaseClient::removeRequestFilter(AbstractRequestFilter* filter)
 void BaseClient::removeResponseFilter(AbstractResponseFilter* handler)
 {
     ResponseFilters::iterator iter = std::find(_responseFilters.begin(),
-                                                _responseFilters.end(),
-                                                handler);
+                                               _responseFilters.end(),
+                                               handler);
     
     if (iter != _responseFilters.end())
     {
@@ -305,7 +312,6 @@ std::istream& BaseClient::receive(BaseRequest& request,
 }
 
 
-
 void BaseClient::progress(const BaseRequest& request,
                           Context& context,
                           std::streamsize totalBytesTransferred)
@@ -314,6 +320,7 @@ void BaseClient::progress(const BaseRequest& request,
 
     ofNotifyEvent(events.onHTTPClientRequestProgress, evt);
 }
+
 
 void BaseClient::progress(const BaseRequest& request,
                           const BaseResponse& response,

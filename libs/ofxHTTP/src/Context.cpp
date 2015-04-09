@@ -41,8 +41,7 @@ const std::string Context::KEY_SESSION            = "HTTP_SESSION";
 const std::string Context::KEY_USE_ABSOLUTE_REQUEST_PATH = "USE_ABSOLUTE_REQUEST_PATH";
 
 
-Context::Context():
-    _resubmit(false)
+Context::Context(): _resubmit(false)
 {
 }
 

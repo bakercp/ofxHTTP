@@ -98,4 +98,29 @@ Poco::URI BaseServerSettings::getURI() const
 }    
 
 
+/*
+const Net::IPAddressRange::List& BaseServerSettings::getWhitelist() const
+{
+    return _whitelist;
+}
+
+
+void BaseServerSettings::setWhitelist(const Net::IPAddressRange::List& whitelist)
+{
+    _whitelist = whitelist;
+}
+
+
+const Net::IPAddressRange::List& BaseServerSettings::getBlacklist() const
+{
+    return _blacklist;
+}
+
+
+void BaseServerSettings::setBlacklist(const Net::IPAddressRange::List& blacklist)
+{
+    _blacklist = blacklist;
+}
+*/
+
 } } // namespace ofx::HTTP

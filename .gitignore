@@ -1,3 +1,7 @@
+openFrameworks-info.plist
+Project.xcconfig
+*.xcodeproj
+
 docs/html
 docs/tagfile.xml
 RAW/

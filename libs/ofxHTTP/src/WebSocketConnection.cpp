@@ -197,9 +197,9 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                 _frameQueue.pop();
                 _mutex.unlock();
 
-                if(frame.size() > 0)
+                if (frame.size() > 0)
                 {
-                    if(ws.poll(settings.getPollTimeout(), Poco::Net::Socket::SELECT_WRITE))
+                    if (ws.poll(settings.getPollTimeout(), Poco::Net::Socket::SELECT_WRITE))
                     {
                         int numBytesSent = 0;
 
@@ -211,7 +211,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
 
                         // WebSocketError error = WS_ERR_NONE;
 
-                        if(0 == numBytesSent)
+                        if (0 == numBytesSent)
                         {
                             ofLogWarning("ServerWebSocketRouteHandler::handleRequest") << "WebSocket numBytesSent == 0";
                             // error = WS_ERROR_ZERO_BYTE_FRAME_SENT;
@@ -244,7 +244,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
     }
     catch (const Poco::Net::WebSocketException& exc)
     {
-        ofLogError("ServerWebSocketRouteHandler::handleRequest") << "WebSocketException: " << exc.code() << " Desc: " << exc.what();
+        ofLogError("ServerWebSocketRouteHandler::handleRequest") << "WebSocketException: " << exc.code() << " : " << exc.displayText();
 
         switch (exc.code())
         {
@@ -267,7 +267,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                 break;
         }
 
-        _parent.handleRequest(request,response);
+        _parent.handleRequest(request, response);
         WebSocketErrorEventArgs eventArgs(sessionId, *this, (WebSocketError)exc.code());
         ofNotifyEvent(_parent.events.onErrorEvent, eventArgs, this);
     }
@@ -312,7 +312,7 @@ bool WebSocketConnection::sendFrame(const WebSocketFrame& frame) const
 {
     ofScopedLock lock(_mutex);
 
-    if(_isConnected)
+    if (_isConnected)
     {
         _frameQueue.push(frame);
         return true;

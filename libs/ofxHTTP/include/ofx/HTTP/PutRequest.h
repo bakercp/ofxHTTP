@@ -39,11 +39,8 @@ public:
     /// \brief Construct a PutRequest with a given uri and http version.
     /// \param uri the Put endpoint uri.
     /// \param httpVersion Either HTTP/1.0 or HTTP/1.1.
-    /// \param requestId A unique UUID for this request.
     PutRequest(const std::string& uri,
-               const Poco::Net::NameValueCollection formFields = Poco::Net::NameValueCollection(),
-               const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1,
-               const Poco::UUID& requestId = generateUUID());
+               const std::string& httpVersion);
 
     virtual ~PutRequest();
 

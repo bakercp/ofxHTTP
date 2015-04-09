@@ -109,8 +109,12 @@ public:
 
     Poco::Timespan getPollTimeout() const;
 
+    /// \brief Set the WebSocket buffers size.
+    /// \param bufferSize The buffer size in bytes.
     void setBufferSize(std::size_t bufferSize);
 
+    /// \brief Get the WebSocket buffer size.
+    /// \returns the WebSocket buffers size in bytes.
     std::size_t getBufferSize() const;
 
     /// \brief The default WebSocketRoute path pattern.
@@ -121,6 +125,7 @@ public:
 
     enum
     {
+        /// \brief Default buffer size in bytes.
         DEFAULT_BUFFER_SIZE = 8192
     };
 
@@ -137,6 +142,7 @@ private:
     Poco::Timespan _sendTimeout;
     Poco::Timespan _pollTimeout;
 
+    /// \brief WebSocket buffer size in bytes.
     std::size_t _bufferSize;
 
 };
