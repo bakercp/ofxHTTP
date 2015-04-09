@@ -52,7 +52,7 @@ void DefaultSessionProvider::requestFilter(BaseRequest& request,
     {
         Poco::URI uri(request.getURI());
 
-        if(0 == uri.getScheme().compare("https"))
+        if (0 == uri.getScheme().compare("https"))
         {
             ofSSLManager::initializeClient(); // Initialize SSL context if needed.
 

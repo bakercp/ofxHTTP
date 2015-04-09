@@ -220,7 +220,7 @@ void IPVideoRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
             Poco::Thread::sleep(30);  // TODO: smarter ways of doing for rate / fps limiting
         }
     }
-    catch(Poco::Exception& e)
+    catch (const Poco::Exception& e)
     {
 //        ofLogVerbose("IPVideoRouteHandler::handleRequest") << "Exception: " << e.displayText();
     }
