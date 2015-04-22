@@ -44,4 +44,10 @@ BasicServer::~BasicServer()
 }
 
 
+FileSystemRoute::SharedPtr BasicServer::getFileSystemRoute()
+{
+    return _fileSystemRoute;
+}
+
+
 } } // namespace ofx::HTTP

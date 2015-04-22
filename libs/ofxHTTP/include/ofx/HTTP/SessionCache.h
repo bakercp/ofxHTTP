@@ -55,9 +55,9 @@ public:
     Session::SharedPtr getSession(Poco::Net::HTTPServerRequest& request,
                                   Poco::Net::HTTPServerResponse& response);
 
-    static SharedPtr makeShared()
+    static SharedPtr makeShared(const std::string sessionKey = DEFAULT_SESSION_KEY_NAME)
     {
-        return SharedPtr(new SessionCache());
+        return SharedPtr(new SessionCache(sessionKey));
     }
 
     static const std::string DEFAULT_SESSION_KEY_NAME;

@@ -219,9 +219,9 @@ public:
     //const Net::IPAddressRange::List& getBlacklist() const;
     //void setBlacklist(const Net::IPAddressRange::List& blacklist);
 
-    const static std::string DEFAULT_HOST;
-    const static unsigned short DEFAULT_PORT;
-    const static bool DEFAULT_USE_SSL;
+    static const std::string DEFAULT_HOST;
+    static const unsigned short DEFAULT_PORT;
+    static const bool DEFAULT_USE_SSL;
 
 private:
     std::string _host;

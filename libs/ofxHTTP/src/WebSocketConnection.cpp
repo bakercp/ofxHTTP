@@ -178,7 +178,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                     }
                     else
                     {
-                        WebSocketFrameEventArgs frameArgs(frame, sessionId, *this);
+                        WebSocketFrameEventArgs frameArgs(sessionId, *this, frame);
                         ofNotifyEvent(events.onFrameReceivedEvent, frameArgs, this);
                     }
                 }
@@ -223,7 +223,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                             // error = WS_ERROR_INCOMPLETE_FRAME_SENT;
                         }
                         
-                        WebSocketFrameEventArgs eventArgs(frame, sessionId, *this);
+                        WebSocketFrameEventArgs eventArgs(sessionId, *this, frame);
                         ofNotifyEvent(events.onFrameSentEvent, eventArgs, this);
                     }
                 }

@@ -24,3 +24,10 @@
 
 
 #pragma once
+
+
+namespace ofx {
+namespace HTTP {
+
+
+} } // namespace ofx::HTTP

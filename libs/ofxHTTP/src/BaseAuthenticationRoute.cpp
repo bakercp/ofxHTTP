@@ -24,3 +24,10 @@
 
 
 #include "ofx/HTTP/BaseAuthenticationRoute.h"
+
+
+namespace ofx {
+namespace HTTP {
+
+        
+} } // namespace ofx::HTTP

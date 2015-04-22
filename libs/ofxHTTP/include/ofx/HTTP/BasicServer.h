@@ -60,6 +60,8 @@ public:
     /// \brief Destroy the BasicServer.
     virtual ~BasicServer();
 
+    FileSystemRoute::SharedPtr getFileSystemRoute();
+
     /// \brief Construct a shared pointer to this server.
     /// \param settings The Settings used to configure the server.
     /// \note This will be replaced with C++11 (std::make_shared<...>).
@@ -68,7 +70,7 @@ public:
         return SharedPtr(new BasicServer(settings));
     }
 
-private:
+protected:
     /// \brief The FileSystemRoute attached to this server.
     FileSystemRoute::SharedPtr _fileSystemRoute;
 
