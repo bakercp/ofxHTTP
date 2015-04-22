@@ -85,7 +85,6 @@ public:
     Poco::UUID getSessionId(Poco::Net::HTTPServerRequest& request,
                             Poco::Net::HTTPServerResponse& response);
 
-
 protected:
     /// \brief The settings.
     const SettingsType _settings;
@@ -138,8 +137,7 @@ bool BaseRoute_<SettingsType>::canHandleRequest(const Poco::Net::HTTPServerReque
     const BaseRouteSettings::HTTPMethodSet& validHTTPMethods = _settings.getValidHTTPMethods();
 
     // If validHTTPMethods are defined, then the request must match.
-    if (!validHTTPMethods.empty() &&
-       validHTTPMethods.find(request.getMethod()) == validHTTPMethods.end())
+    if (!validHTTPMethods.empty() && validHTTPMethods.find(request.getMethod()) == validHTTPMethods.end())
     {
         return false;
     }
@@ -181,11 +179,11 @@ bool BaseRoute_<SettingsType>::canHandleRequest(const Poco::Net::HTTPServerReque
     }
     catch (const Poco::SyntaxException& exc)
     {
-        ofLogError("BaseRoute::canHandleRequest") << exc.what();
+        ofLogError("BaseRoute::canHandleRequest") << exc.displayText();
         return false;
     }
 
-    if(path.empty())
+    if (path.empty())
     {
         path = "/";
     }
@@ -197,7 +195,7 @@ bool BaseRoute_<SettingsType>::canHandleRequest(const Poco::Net::HTTPServerReque
     }
     catch (const Poco::RegularExpressionException& exc)
     {
-        ofLogError("BaseRoute::canHandleRequest") << exc.what();
+        ofLogError("BaseRoute::canHandleRequest") << exc.displayText();
         return false;
     }
 
@@ -224,7 +222,8 @@ void BaseRoute_<SettingsType>::handleRequest(Poco::Net::HTTPServerRequest& reque
     // Now we must conclude that there is a server error.
     try
     {
-        // if we got this far and our status is still marked as 200, that constitutes a server error.
+        // If we got this far and our status is still marked as 200, that
+        // constitutes a server error.
         if(response.getStatus() == Poco::Net::HTTPResponse::HTTP_OK)
         {
             response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR,

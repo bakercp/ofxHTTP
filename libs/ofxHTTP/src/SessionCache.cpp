@@ -53,16 +53,16 @@ SessionCache::~SessionCache()
 Session::SharedPtr SessionCache::getSession(Poco::Net::HTTPServerRequest& request,
                                             Poco::Net::HTTPServerResponse& response)
 {
-    // lock everything
+    // Lock everything.
     Poco::FastMutex::ScopedLock lock(_mutex);
 
-    // get the cookies from the client.
+    // Get the cookies from the client.
     Poco::Net::NameValueCollection cookies;
 
-    // get the cookies
+    // Get the cookies
     request.getCookies(cookies);
 
-    // try to find a cookie with our session key name.
+    // Try to find a cookie with our session key name.
     Poco::Net::NameValueCollection::ConstIterator cookieIter = cookies.find(_sessionKeyName);
 
     Poco::UUID uuid;
@@ -89,10 +89,10 @@ Session::SharedPtr SessionCache::getSession(Poco::Net::HTTPServerRequest& reques
     }
     else
     {
-        // Initialize new session data
+        // Initialize new session data.
         Session::SharedPtr session = Session::makeShared();
 
-        // Add session to our hash
+        // Add session to our hash.
         _sessionHash[uuid] = session;
 
         // Create a cookie.
@@ -101,7 +101,7 @@ Session::SharedPtr SessionCache::getSession(Poco::Net::HTTPServerRequest& reques
         // Send our cookie with the response.
         response.addCookie(cookie);
 
-        // Return the session
+        // Return the session.
         return session;
     }
 }

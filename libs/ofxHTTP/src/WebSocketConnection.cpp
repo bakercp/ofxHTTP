@@ -184,7 +184,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                 }
                 else
                 {
-                    // clean shutdown if we read and no bytes were available.
+                    // Clean shutdown if we read and no bytes were available.
                     close();
                 }
             }
@@ -278,7 +278,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
         _parent.handleRequest(request, response);
         WebSocketErrorEventArgs eventArgs(sessionId, *this, WS_ERR_TIMEOUT);
         ofNotifyEvent(events.onErrorEvent, eventArgs, this);
-        // response socket has already been closed (!?)
+        // Response socket has already been closed (!?)
     }
     catch (const Poco::Net::NetException& exc)
     {
@@ -287,7 +287,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
         _parent.handleRequest(request, response);
         WebSocketErrorEventArgs eventArgs(sessionId, *this, WS_ERR_NET_EXCEPTION);
         ofNotifyEvent(events.onErrorEvent, eventArgs, this);
-        // response socket has already been closed (!?)
+        // Response socket has already been closed (!?)
     }
     catch (const std::exception& exc)
     {
@@ -335,7 +335,7 @@ std::size_t WebSocketConnection::getSendQueueSize() const
 void WebSocketConnection::clearSendQueue()
 {
     ofScopedLock lock(_mutex);
-    std::queue<WebSocketFrame> empty; // a way to clear queues.
+    std::queue<WebSocketFrame> empty; // A way to clear queues.
     std::swap(_frameQueue, empty);
 }
 

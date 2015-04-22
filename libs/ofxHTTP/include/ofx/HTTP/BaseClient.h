@@ -58,6 +58,7 @@ public:
                           BaseResponse& response,
                           Context& context);
 
+    // Submit requests / responses and interact via registering for ClientEvents.
     void submit(BaseRequest& request,
                 BaseResponse& response,
                 Context& context);

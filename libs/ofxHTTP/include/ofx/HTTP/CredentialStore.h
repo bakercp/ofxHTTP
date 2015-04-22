@@ -70,12 +70,16 @@ public:
     void setCredentials(const AuthScope& scope, const Credentials& credentials);
     
     void setCredentialsFromURI(const Poco::URI& uri);
+
     void setCredentials(const Poco::URI& uri, const Credentials& credentials);
-    void setCredentials(const Poco::URI& uri, const string& username, const string& password);
+
+    void setCredentials(const Poco::URI& uri,
+                        const string& username,
+                        const string& password);
     
     void clearCredentials(const AuthScope& scope);
-    void clearCredentials(const Poco::URI& uri);
 
+    void clearCredentials(const Poco::URI& uri);
 
     void requestFilter(BaseRequest& request,
                        Context& context);

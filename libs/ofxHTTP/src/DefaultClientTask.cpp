@@ -87,6 +87,7 @@ bool DefaultClientTask::onHTTPClientResponseEvent(HTTP::ClientResponseEventArgs&
     std::streamsize len = 0;
 	istr.read(buffer.begin(), bufferSize);
     std::streamsize n = istr.gcount();
+    
     while (n > 0)
 	{
 		len += n;

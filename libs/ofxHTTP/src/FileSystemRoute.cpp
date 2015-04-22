@@ -76,7 +76,7 @@ void FileSystemRoute::handleRequest(Poco::Net::HTTPServerRequest& request,
         }
     }
 
-    // if nothing is returned, then base route will get it
+    // If nothing is returned, then base route will get it.
     BaseRoute_<FileSystemRouteSettings>::handleRequest(request, response);
 }
 

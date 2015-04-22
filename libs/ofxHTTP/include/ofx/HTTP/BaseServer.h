@@ -101,6 +101,7 @@ public:
     std::string getURL() const;
 
     void addRoute(AbstractRoute::SharedPtr route);
+    
     void removeRoute(AbstractRoute::SharedPtr route);
 
     virtual Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
@@ -140,6 +141,7 @@ private:
     Poco::ThreadPool& _threadPoolRef;
 
     ThreadErrorHandler eh;
+
     Poco::ErrorHandler* pOldEH;
     
 };
@@ -168,7 +170,6 @@ BaseServer_<SettingsType>::~BaseServer_()
 {
     stop();
     Poco::Net::uninitializeSSL();
-
     Poco::ErrorHandler::set(pOldEH);
 }
 
@@ -186,7 +187,7 @@ void BaseServer_<SettingsType>::start()
 {
     if (isRunning())
     {
-        ofLogWarning("BaseServer_::start") << "Server is already running.  Call stop() to stop.";
+        ofLogWarning("BaseServer_::start") << "Server is already running. Call stop() to stop.";
         return;
     }
 

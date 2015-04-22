@@ -74,15 +74,15 @@ public:
     void setProxyRedirectURI(const Poco::URI& uri);
     const Poco::URI& getProxyRedirectURI() const;
 
-    const static std::string KEY_PREFIX_RESERVED;
-    const static std::string KEY_SESSION_SETTINGS;
-    const static std::string KEY_COOKIE_STORE;
-    const static std::string KEY_CREDENTIAL_STORE;
-    const static std::string KEY_RESOLVED_URI;
-    const static std::string KEY_PROXY_REDIRECT_URI;
-    const static std::string KEY_REDIRECTS;
-    const static std::string KEY_SESSION;
-    const static std::string KEY_USE_ABSOLUTE_REQUEST_PATH;
+    static const std::string KEY_PREFIX_RESERVED;
+    static const std::string KEY_SESSION_SETTINGS;
+    static const std::string KEY_COOKIE_STORE;
+    static const std::string KEY_CREDENTIAL_STORE;
+    static const std::string KEY_RESOLVED_URI;
+    static const std::string KEY_PROXY_REDIRECT_URI;
+    static const std::string KEY_REDIRECTS;
+    static const std::string KEY_SESSION;
+    static const std::string KEY_USE_ABSOLUTE_REQUEST_PATH;
 
     template<typename TypeName>
     bool getValue(const std::string& key, TypeName& value) const

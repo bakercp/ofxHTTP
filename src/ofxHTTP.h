@@ -30,7 +30,7 @@
 #include "ofxIO.h"
 #include "ofxMediaType.h"
 #include "ofxTaskQueue.h"
-#include "ofxNetworkUtils.h"
+//#include "ofxNetworkUtils.h"
 #include "ofx/HTTP/HTTPUtils.h"
 #include "ofx/HTTP/URIBuilder.h"
 #include "ofx/HTTP/BasicIPVideoServer.h"

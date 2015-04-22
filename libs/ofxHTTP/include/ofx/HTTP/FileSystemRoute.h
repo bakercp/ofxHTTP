@@ -44,6 +44,7 @@ public:
     typedef FileSystemRouteSettings Settings;
 
     FileSystemRoute(const Settings& settings);
+    
     virtual ~FileSystemRoute();
 
     virtual void handleRequest(Poco::Net::HTTPServerRequest& request,

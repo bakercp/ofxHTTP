@@ -77,7 +77,7 @@ class WebSocketEventArgs: public ofEventArgs
 {
 public:
     /// \brief Create a WebSocketEventArgs object with the provided params.
-    /// \param sessionId The session id..
+    /// \param sessionId The session id.
     /// \param connection A reference to the associated WebSocketConnection.
     WebSocketEventArgs(const Poco::UUID& sessionId,
                        const WebSocketConnection& connection):
@@ -116,8 +116,8 @@ class WebSocketErrorEventArgs: public WebSocketEventArgs
 {
 public:
     WebSocketErrorEventArgs(const Poco::UUID& sessionId,
-                           const WebSocketConnection& connection,
-                           WebSocketError error):
+                            const WebSocketConnection& connection,
+                            WebSocketError error):
         WebSocketEventArgs(sessionId, connection),
         _error(error)
     {
@@ -210,9 +210,9 @@ public:
     /// \brief Create a WebSocketFrameEventArgs object.
     /// \param connection A reference to the associated WebSocketConnection.
     /// \param error An error, if any, associated with the event.
-    WebSocketFrameEventArgs(const WebSocketFrame& frame,
-                            const Poco::UUID& sessionId,
-                            const WebSocketConnection& connection):
+    WebSocketFrameEventArgs(const Poco::UUID& sessionId,
+                            const WebSocketConnection& connection,
+                            const WebSocketFrame& frame):
         WebSocketEventArgs(sessionId, connection),
         _frame(frame)
     {

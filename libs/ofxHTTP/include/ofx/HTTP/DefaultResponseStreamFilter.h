@@ -57,8 +57,8 @@ public:
                                        const BaseResponse& response,
                                        Context& context);
 
-    const static std::string ACCEPT_ENCODING_HEADER;
-    const static std::string CONTENT_ENCODING_HEADER;
+    static const std::string ACCEPT_ENCODING_HEADER;
+    static const std::string CONTENT_ENCODING_HEADER;
 
 private:
     std::shared_ptr<std::istream> _pResponseStream;
