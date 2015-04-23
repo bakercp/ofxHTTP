@@ -106,7 +106,7 @@ void WebSocketRoute::close(WebSocketConnection* connection)
 {
     if(connection)
     {
-        connection->close();
+        connection->stop();
     }
     else
     {

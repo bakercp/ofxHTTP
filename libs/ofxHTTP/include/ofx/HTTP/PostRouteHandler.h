@@ -71,6 +71,8 @@ public:
     void handleRequest(Poco::Net::HTTPServerRequest& request,
                        Poco::Net::HTTPServerResponse& response);
 
+    void stop();
+
     /// \brief A constant defining "text/plain".
     static const Poco::Net::MediaType POST_CONTENT_TYPE_TEXT_PLAIN;
 

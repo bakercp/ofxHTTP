@@ -47,6 +47,7 @@
 #include "ofx/HTTP/AbstractServerTypes.h"
 #include "ofx/HTTP/BaseRoute.h"
 #include "ofx/HTTP/BaseServerSettings.h"
+#include "ofx/HTTP/SessionCache.h"
 #include "ofx/HTTP/ThreadErrorHandler.h"
 
 
@@ -84,9 +85,6 @@ template <typename SettingsType>
 class BaseServer_: public AbstractServer
 {
 public:
-    typedef std::shared_ptr<BaseServer_<SettingsType> > SharedPtr;
-    typedef std::weak_ptr<BaseServer_<SettingsType> > WeakPtr;
-
     BaseServer_(const SettingsType& settings = SettingsType(),
                 Poco::ThreadPool& threadPoolRef = Poco::ThreadPool::defaultPool());
 
@@ -127,11 +125,10 @@ protected:
     };
 
 private:
-    //typedef std::shared_ptr<Poco::Net::HTTPServer> HTTPServerPtr;
-    typedef std::vector<AbstractRoute*> Routes;
-
     BaseServer_(const BaseServer_&);
 	BaseServer_& operator = (const BaseServer_&);
+
+    typedef std::vector<AbstractRoute*> Routes;
 
     // TODO: replace w/ std::unique_ptr?
     // For some reason, shared pointers prevent hangups on close,
@@ -146,7 +143,7 @@ private:
 
     Routes _routes;
 
-    BaseRoute _baseRoute;
+    DefaultRoute _defaultRoute;
 
     bool acceptConnection(const Poco::Net::HTTPServerRequest& request);
 
@@ -269,7 +266,8 @@ void BaseServer_<SettingsType>::stop()
         ++iter;
     }
 
-    _baseRoute.stop();
+    // Stop our default route.
+    _defaultRoute.stop();
 
 #if POCO_VERSION > 0x01040600
     _server->stopAll(true);
@@ -439,7 +437,7 @@ Poco::Net::HTTPRequestHandler* BaseServer_<SettingsType>::createRequestHandler(c
         }
     }
 
-    return _baseRoute.createRequestHandler(request);
+    return _defaultRoute.createRequestHandler(request);
 }
 
 

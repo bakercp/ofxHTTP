@@ -35,8 +35,6 @@
 #include "ofx/HTTP/AbstractServerTypes.h"
 #include "ofx/HTTP/BaseRouteHandler.h"
 #include "ofx/HTTP/BaseRouteSettings.h"
-#include "ofx/HTTP/SessionCache.h"
-#include "ofx/HTTP/SessionData.h"
 
 
 namespace ofx {
@@ -88,8 +86,7 @@ private:
 };
 
 
-/// \brief A standard base route implementation.
-typedef BaseRoute_<BaseRouteSettings> BaseRoute;
+typedef BaseRoute_<BaseRouteSettings> DefaultRoute;
 
 
 template<typename SettingsType>

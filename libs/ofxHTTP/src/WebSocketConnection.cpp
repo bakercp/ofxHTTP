@@ -186,7 +186,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                 else
                 {
                     // clean shutdown if we read and no bytes were available.
-                    close();
+                    stop();
                 }
             }
 
@@ -343,7 +343,7 @@ void WebSocketConnection::clearSendQueue()
 }
 
 
-void WebSocketConnection::close()
+void WebSocketConnection::stop()
 {
     ofScopedLock lock(_mutex);
     _isConnected = false;
@@ -382,42 +382,6 @@ std::size_t WebSocketConnection::getTotalBytesReceived() const
     ofScopedLock lock(_mutex);
     return _totalBytesReceived;
 }
-
-
-//void WebSocketConnection::handleErrorResponse(Poco::Net::HTTPServerResponse& response)
-//{
-//    // TODO: come up with a better solution for shared / default error handling
-//    // Respond immediately?
-//
-//    // We gave the handlers every opportunity to send a response.
-//    // Now we must conclude that there is a server error.
-//    try
-//    {
-//        response.setChunkedTransferEncoding(true);
-//        response.setContentType("text/html");
-//
-//        std::ostream& ostr = response.send(); // get output stream
-//        ostr << "<html>";
-//        ostr << "<head><title>" << response.getStatus() << " - " << response.getReason() << "</title></head>";
-//        ostr << "<body>";
-//        ostr << "<h1>" << response.getStatus() << " - " << response.getReason() << "</h1>";
-//        ostr << "</body>";
-//        ostr << "<html>";
-//    }
-//    catch (const Poco::Exception& exc)
-//    {
-//        ofLogError("WebSocketConnection::handleErrorResponse") << "Exception: " << exc.code() << " " << exc.displayText();
-//    }
-//    catch (const std::exception& exc)
-//    {
-//        ofLogError("WebSocketConnection::handleErrorResponse") << "exception: " << exc.what();
-//    }
-//    catch ( ... )
-//    {
-//        ofLogError("WebSocketConnection::handleErrorResponse") << "... Unknown exception.";
-//    }
-//
-//}
 
 
 void WebSocketConnection::handleOrigin(Poco::Net::HTTPServerRequest& request,

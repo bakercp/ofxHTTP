@@ -47,12 +47,12 @@ class WebSocketFrame;
 class AbstractServer: public Poco::Net::HTTPRequestHandlerFactory
 {
 public:
-    /// \brief Destroy the AbstractHTTPRequestHandler.
+    /// \brief Destroy the AbstractServer.
     virtual ~AbstractServer()
     {
     }
 
-    /// \brief Return the session cache.
+    /// \brief Return a reference to the session cache.
     virtual SessionCache& getSessionCache() = 0;
 
 };
@@ -74,6 +74,8 @@ public:
     /// \note Redeclared here for documentation puposes.
     virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
                                Poco::Net::HTTPServerResponse& response) = 0;
+
+
 
 };
 
@@ -103,22 +105,24 @@ public:
 };
 
 
+class AbstractRoute;
+
+
 /// \brief Defines an abstract HTTP route handler.
 /// Route handlers are invoked in route handling threads
 /// created by classes that inherit from AbstractRoute.
 class AbstractRouteHandler: public AbstractHTTPRequestHandler
 {
 public:
-    /// \brief A typedef for a shared pointer.
-    typedef std::shared_ptr<AbstractRouteHandler> SharedPtr;
-
-    /// \brief A typedef for a weak pointer.
-    typedef std::weak_ptr<AbstractRouteHandler> WeakPtr;
-
     /// \brief Destroy the AbstractRouteHandler instance.
     virtual ~AbstractRouteHandler()
     {
     }
+
+    /// \brief Interrupt the handleRequest method if possible.
+    virtual void stop() = 0;
+
+//    virtual AbstractRoute* getRoute() = 0;
 
 };
 
@@ -137,9 +141,6 @@ public:
     /// \returns true iff the sending operation was successful.
     virtual bool sendFrame(const WebSocketFrame& frame) const = 0;
 
-    /// \brief Close the connection.
-    virtual void close() = 0;
-
 };
 
 
@@ -149,12 +150,6 @@ class AbstractRoute:
     public AbstractHTTPRequestHandlerFactory
 {
 public:
-    /// \brief A typedef for a shared pointer.
-    typedef std::shared_ptr<AbstractRoute> SharedPtr;
-
-    /// \brief A typedef for a weak pointer.
-    typedef std::weak_ptr<AbstractRoute> WeakPtr;
-
     /// \brief Destroy the AbstractRoute instance.
     virtual ~AbstractRoute()
     {

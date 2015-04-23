@@ -74,7 +74,7 @@ public:
     /// \returns false iff frame not queued
     bool sendFrame(const WebSocketFrame& frame) const;
 
-    void close();
+    void stop();
 
 //    /// \brief Called when a WebSocketFrame is received.
 //    /// \details Subclasses can implement this method.

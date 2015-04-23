@@ -124,4 +124,9 @@ void FileSystemRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request
 }
 
 
+void FileSystemRouteHandler::stop()
+{
+}
+
+
 } } // namespace ofx::HTTP

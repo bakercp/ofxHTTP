@@ -73,7 +73,7 @@ void PostRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
 
             if(!_uploadFolder.exists())
             {
-                ofLogError("ServerUploadRouteHandler::handleRequest") << "Upload folder does not exist and cannot be created.";
+                ofLogError("PostRouteHandler::handleRequest") << "Upload folder does not exist and cannot be created.";
                 response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
                 _parent.handleRequest(request,response);
                 return;
@@ -133,5 +133,10 @@ void PostRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
 
 }
 
-    
+
+void PostRouteHandler::stop()
+{
+}
+
+
 } } // namespace ofx::HTTP

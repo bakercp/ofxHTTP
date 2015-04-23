@@ -49,6 +49,7 @@ public:
     virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
                                Poco::Net::HTTPServerResponse& response);
 
+
     virtual void stop();
 
 protected:
