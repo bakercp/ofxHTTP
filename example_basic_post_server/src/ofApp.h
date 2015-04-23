@@ -40,6 +40,6 @@ public:
     void onHTTPFormEvent(ofx::HTTP::PostFormEventArgs& evt);
     void onHTTPUploadEvent(ofx::HTTP::PostUploadEventArgs& evt);
 
-    ofx::HTTP::BasicPostServer::SharedPtr server;
+    ofx::HTTP::SimplePostServer server;
 
 };

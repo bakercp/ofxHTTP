@@ -32,25 +32,25 @@ void ofApp::setup()
     
     ofSetFrameRate(30);
 
-    ofx::HTTP::BasicPostServerSettings settings;
+    ofx::HTTP::SimplePostServerSettings settings;
 
     // Many other settings are available.
     settings.setPort(7890);
 
     // Apply the settings.
-    server = ofx::HTTP::BasicPostServer::makeShared(settings);
+    server.setup(settings);
 
     // The client can listen for POST form and multi-part upload events.
     // User be aware, these methods are called from other threads.
     // The user is responsible for protecting shared resources (e.g. ofMutex).
-    server->getPostRoute()->registerPostEvents(this);
+    server.getPostRoute().registerPostEvents(this);
 
     // Start the server.
-    server->start();
+    server.start();
 
 #if !defined(TARGET_LINUX_ARM)
     // Launch a browser with the address of the server.
-    ofLaunchBrowser(server->getURL());
+    ofLaunchBrowser(server.getURL());
 #endif
 
 }
@@ -59,7 +59,7 @@ void ofApp::setup()
 void ofApp::draw()
 {
     ofBackground(255);
-    ofDrawBitmapStringHighlight("See " + server->getURL(), 10, 16);
+    ofDrawBitmapStringHighlight("See " + server.getURL(), 10, 16);
     ofDrawBitmapStringHighlight("See the Console", 10, 42);
 }
 
@@ -98,7 +98,7 @@ void ofApp::onHTTPUploadEvent(ofx::HTTP::PostUploadEventArgs& args)
     ofLogNotice("ofApp::onHTTPUploadEvent") << "         state: " << stateString;
     ofLogNotice("ofApp::onHTTPUploadEvent") << " formFieldName: " << args.getFormFieldName();
     ofLogNotice("ofApp::onHTTPUploadEvent") << "orig. filename: " << args.getOriginalFilename();
-    ofLogNotice("ofApp::onHTTPUploadEvent") <<  "      filename: " << args.getFilename();
-    ofLogNotice("ofApp::onHTTPUploadEvent") <<  "      fileType: " << args.getFileType().toString();
+    ofLogNotice("ofApp::onHTTPUploadEvent") <<  "     filename: " << args.getFilename();
+    ofLogNotice("ofApp::onHTTPUploadEvent") <<  "     fileType: " << args.getFileType().toString();
     ofLogNotice("ofApp::onHTTPUploadEvent") << "# bytes xfer'd: " << args.getNumBytesTransferred();
 }
