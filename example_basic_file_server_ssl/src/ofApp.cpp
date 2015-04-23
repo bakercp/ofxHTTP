@@ -33,20 +33,20 @@ void ofApp::setup()
 
     ofSetFrameRate(30);
 
-    ofx::HTTP::BasicServerSettings settings;
+    ofx::HTTP::SimpleFileServerSettings settings;
     settings.setPort(4433);
 
     // NOTE: the included private key / certificate
     // should not be used for production purposes.
     settings.setUseSSL(true);
 
-    server = ofx::HTTP::BasicServer::makeShared(settings);
+    server.setup(settings);
 
-    server->start();
+    server.start();
 
 #if !defined(TARGET_LINUX_ARM)
     // Launch a browser with the address of the server.
-    ofLaunchBrowser(server->getURL());
+    ofLaunchBrowser(server.getURL());
 #endif
 
 }
@@ -55,7 +55,7 @@ void ofApp::setup()
 void ofApp::draw()
 {
     ofBackground(255);
-    ofDrawBitmapStringHighlight("See " + server->getURL(), 10, 16);
+    ofDrawBitmapStringHighlight("See " + server.getURL(), 10, 16);
 }
 
 
