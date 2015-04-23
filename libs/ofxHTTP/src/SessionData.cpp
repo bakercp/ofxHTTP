@@ -23,65 +23,71 @@
 // =============================================================================
 
 
-#pragma once
-
-
-#include <string>
-#include <map>
-#include "Poco/Mutex.h"
-#include "Poco/Timestamp.h"
-#include "Poco/UUID.h"
-#include "Poco/UUIDGenerator.h"
-#include "Poco/Net/HTTPCookie.h"
-#include "Poco/Any.h"
-#include "ofTypes.h"
-#include "ofUtils.h"
+#include "ofx/HTTP/SessionData.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class Session
+SessionData::SessionData(const Poco::UUID& uuid,
+                         const Poco::Timestamp& lastModified):
+    _uuid(uuid),
+    _lastModified(lastModified)
 {
-public:
-    typedef std::shared_ptr<Session> SharedPtr;
+}
 
-    Session(const Poco::UUID& uuid = Poco::UUIDGenerator::defaultGenerator().createRandom(),
-            const Poco::Timestamp& lastModified = Poco::Timestamp());
 
-    virtual ~Session();
+SessionData::~SessionData()
+{
+}
 
-    const Poco::UUID& getId() const;
 
-    const Poco::Timestamp getLastModified() const;
+const Poco::UUID& SessionData::getId() const
+{
+    Poco::FastMutex::ScopedLock lock(_mutex);
+    _lastModified.update();
+    return _uuid;
+}
 
-    bool has(const std::string& hashKey) const;
-    void put(const std::string& hashKey, const Poco::Any& hashValue);
 
-    Poco::Any get(const std::string& hashKey) const;
+const Poco::Timestamp SessionData::getLastModified() const
+{
+    Poco::FastMutex::ScopedLock lock(_mutex);
+    return _lastModified;
+}
 
-    static SharedPtr makeShared(const Poco::UUID& uuid = Poco::UUIDGenerator::defaultGenerator().createRandom(),
-                                const Poco::Timestamp& lastModified = Poco::Timestamp())
+
+bool SessionData::has(const std::string& hashKey) const
+{
+    Poco::FastMutex::ScopedLock lock(_mutex);
+    return _sessionDict.find(hashKey) != _sessionDict.end();
+}
+
+
+void SessionData::put(const std::string& hashKey, const Poco::Any& hashValue)
+{
+    Poco::FastMutex::ScopedLock lock(_mutex);
+    _lastModified.update();
+    _sessionDict[hashKey] = hashValue;
+}
+
+
+Poco::Any SessionData::get(const std::string& hashKey,
+                           const Poco::Any& defaultValue) const
+{
+    Poco::FastMutex::ScopedLock lock(_mutex);
+    SessionDict::const_iterator iter = _sessionDict.find(hashKey);
+
+    if (iter != _sessionDict.end())
     {
-        return SharedPtr(new Session(uuid, lastModified));
+        return iter->second;
     }
-
-private:
-    Session(const Session&);
-	Session& operator = (const Session&);
-
-    typedef std::map<std::string, Poco::Any> SessionData;
-
-    SessionData _sessionData;
-
-    Poco::UUID _uuid;
-
-    mutable Poco::Timestamp _lastModified;
-
-    mutable Poco::FastMutex _mutex;
-    
-};
+    else
+    {
+        return defaultValue;
+    }
+}
 
 
 } } // namespace ofx::HTTP

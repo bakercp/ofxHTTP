@@ -110,6 +110,14 @@ public:
 
     void exit(ofEventArgs& args);
 
+    /// \brief Access the SessionCache.
+    ///
+    /// The session cache is optional and may be `nullptr`.
+    /// Any non-null SessionCache may be treated as thread-safe.
+    ///
+    /// \returns a shared pointer to the SessionCache.
+    virtual SessionCache& getSessionCache();
+
 protected:
     virtual Poco::ThreadPool& getThreadPool();
 
@@ -126,7 +134,11 @@ private:
 	BaseServer_& operator = (const BaseServer_&);
 
     // TODO: replace w/ std::unique_ptr?
+    // For some reason, shared pointers prevent hangups on close,
+    // vs. using a raw pointer and delete in the (seemingly) correct location.
     std::shared_ptr<Poco::Net::HTTPServer> _server;
+
+    SessionCache _sessionCache;
 
     bool _isSecurePort;
 
@@ -429,6 +441,13 @@ Poco::Net::HTTPRequestHandler* BaseServer_<SettingsType>::createRequestHandler(c
     }
 
     return _baseRoute.createRequestHandler(request);
+}
+
+
+template<typename SettingsType>
+SessionCache& BaseServer_<SettingsType>::getSessionCache()
+{
+    return _sessionCache;
 }
 
 

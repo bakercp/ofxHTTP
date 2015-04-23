@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2012-2014 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2012 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,8 @@
 
 
 #include <string>
+#include "Poco/UUID.h"
+#include "Poco/Any.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/HTTPRequestHandler.h"
@@ -38,6 +40,7 @@ namespace ofx {
 namespace HTTP {
 
 
+class SessionCache;
 class WebSocketFrame;
 
 
@@ -48,6 +51,9 @@ public:
     virtual ~AbstractServer()
     {
     }
+
+    /// \brief Return the session cache.
+    virtual SessionCache& getSessionCache() = 0;
 
 };
 
@@ -174,6 +180,26 @@ public:
     /// \brief Stop any pending activity and close this route.
     /// \details This method may block until the route is fully stopped.
     virtual void stop() = 0;
+
+};
+
+
+class AbstractSessionData
+{
+public:
+    virtual ~AbstractSessionData()
+    {
+    }
+
+    virtual const Poco::UUID& getId() const = 0;
+
+    virtual const Poco::Timestamp getLastModified() const = 0;
+
+    virtual bool has(const std::string& hashKey) const = 0;
+
+    virtual void put(const std::string& hashKey, const Poco::Any& hashValue) = 0;
+
+    virtual Poco::Any get(const std::string& hashKey, const Poco::Any& defaultValue) const = 0;
 
 };
 

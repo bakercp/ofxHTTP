@@ -50,8 +50,14 @@ SessionCache::~SessionCache()
 }
 
 
-Session::SharedPtr SessionCache::getSession(Poco::Net::HTTPServerRequest& request,
-                                            Poco::Net::HTTPServerResponse& response)
+void SessionCache::clear()
+{
+    _sessions.clear();
+}
+
+
+AbstractSessionData& SessionCache::getSessionData(Poco::Net::HTTPServerRequest& request,
+                                                  Poco::Net::HTTPServerResponse& response)
 {
     // lock everything
     Poco::FastMutex::ScopedLock lock(_mutex);
@@ -67,33 +73,33 @@ Session::SharedPtr SessionCache::getSession(Poco::Net::HTTPServerRequest& reques
 
     Poco::UUID uuid;
 
-    SessionHash::iterator sessionHashIter = _sessionHash.find(uuid);
+    Sessions::iterator sessionsIter = _sessions.find(uuid);
 
     // Did the client present a valid session cookie and can we parse it?
     if (cookieIter != cookies.end() && uuid.tryParse(cookieIter->second))
     {
-        if (sessionHashIter != _sessionHash.end())
+        if (sessionsIter != _sessions.end())
         {
-            return sessionHashIter->second;
+            return *(sessionsIter->second);
         }
         else
         {
             // Initialize new session data
-            Session::SharedPtr session = Session::makeShared(uuid);
+            SessionData::SharedPtr session = SessionData::makeShared(uuid);
 
             // Add session to our hash
-            _sessionHash[uuid] = session;
+            _sessions[uuid] = session;
 
-            return session;
+            return *session;
         }
     }
     else
     {
         // Initialize new session data
-        Session::SharedPtr session = Session::makeShared();
+        SessionData::SharedPtr session = SessionData::makeShared();
 
         // Add session to our hash
-        _sessionHash[uuid] = session;
+        _sessions[uuid] = session;
 
         // Create a cookie.
         Poco::Net::HTTPCookie cookie(_sessionKeyName, session->getId().toString());
@@ -102,7 +108,7 @@ Session::SharedPtr SessionCache::getSession(Poco::Net::HTTPServerRequest& reques
         response.addCookie(cookie);
 
         // Return the session
-        return session;
+        return *session;
     }
 }
 

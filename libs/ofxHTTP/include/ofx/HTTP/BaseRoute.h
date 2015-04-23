@@ -36,7 +36,7 @@
 #include "ofx/HTTP/BaseRouteHandler.h"
 #include "ofx/HTTP/BaseRouteSettings.h"
 #include "ofx/HTTP/SessionCache.h"
-#include "ofx/HTTP/Session.h"
+#include "ofx/HTTP/SessionData.h"
 
 
 namespace ofx {
@@ -71,31 +71,11 @@ public:
     /// \returns the route's Settings.
     const SettingsType& getSettings() const;
 
-    /// \brief Access the SessionCache.
-    ///
-    /// The session cache is optional and may be `nullptr`.
-    /// Any non-null SessionCache may be treated as thread-safe.
-    ///
-    /// \returns a shared pointer to the SessionCache.
-//    SessionCache::SharedPtr getSessionCache();
-
-//    void setSessionCache(SessionCache::SharedPtr sessionCache);
-
-//    Session::SharedPtr getSession(Poco::Net::HTTPServerRequest& request,
-//                                  Poco::Net::HTTPServerResponse& response);
-//
-//    Poco::UUID getSessionId(Poco::Net::HTTPServerRequest& request,
-//                            Poco::Net::HTTPServerResponse& response);
-
-
 protected:
     /// \brief The settings.
     SettingsType _settings;
 
     AbstractServer* _server;
-
-    /// \brief a pointer to the session cache;
-//    SessionCache::SharedPtr _sessionCache;
 
 private:
     BaseRoute_(const BaseRoute_&);
@@ -282,59 +262,5 @@ const SettingsType& BaseRoute_<SettingsType>::getSettings() const
     return _settings;
 }
 
-
-//template<typename SettingsType>
-//SessionCache::SharedPtr BaseRoute_<SettingsType>::getSessionCache()
-//{
-//    return _sessionCache;
-//}
-//
-//
-//template<typename SettingsType>
-//void BaseRoute_<SettingsType>::setSessionCache(SessionCache::SharedPtr sessionCache)
-//{
-//    _sessionCache = sessionCache;
-//}
-//
-//
-//template<typename SettingsType>
-//Session::SharedPtr BaseRoute_<SettingsType>::getSession(Poco::Net::HTTPServerRequest& request,
-//                                                        Poco::Net::HTTPServerResponse& response)
-//{
-//    if (_sessionCache)
-//    {
-//        return _sessionCache->getSession(request, response);
-//    }
-//    else
-//    {
-//        Session::SharedPtr ptr;
-//        return ptr;
-//    }
-//}
-//
-//
-//template<typename SettingsType>
-//Poco::UUID BaseRoute_<SettingsType>::getSessionId(Poco::Net::HTTPServerRequest& request,
-//                                                  Poco::Net::HTTPServerResponse& response)
-//{
-//    if (_sessionCache)
-//    {
-//        Session::SharedPtr session = _sessionCache->getSession(request, response);
-//
-//        if (session)
-//        {
-//            return session->getId();
-//        }
-//        else
-//        {
-//            return Poco::UUID::null();
-//        }
-//    }
-//    else
-//    {
-//        return Poco::UUID::null();
-//    }
-//}
-
-
+    
 } } // namespace ofx::HTTP

@@ -33,9 +33,9 @@
 #include "Poco/Any.h"
 #include "ofUtils.h"
 #include "ofTypes.h"
-#include "ofx/HTTP/Session.h"
 #include "ofx/HTTP/AbstractServerTypes.h"
 #include "ofx/HTTP/HTTPUtils.h"
+#include "ofx/HTTP/SessionData.h"
 
 
 namespace ofx {
@@ -45,20 +45,15 @@ namespace HTTP {
 class SessionCache
 {
 public:
-    typedef std::shared_ptr<SessionCache> SharedPtr;
-
     SessionCache();
     SessionCache(const std::string& sessionKeyName);
 
     virtual ~SessionCache();
 
-    Session::SharedPtr getSession(Poco::Net::HTTPServerRequest& request,
-                                  Poco::Net::HTTPServerResponse& response);
+    AbstractSessionData& getSessionData(Poco::Net::HTTPServerRequest& request,
+                                        Poco::Net::HTTPServerResponse& response);
 
-    static SharedPtr makeShared()
-    {
-        return SharedPtr(new SessionCache());
-    }
+    void clear();
 
     static const std::string DEFAULT_SESSION_KEY_NAME;
 
@@ -66,9 +61,9 @@ private:
     SessionCache(const SessionCache&);
 	SessionCache& operator = (const SessionCache&);
 
-    typedef std::map<Poco::UUID, Session::SharedPtr> SessionHash;
+    typedef std::map<Poco::UUID, SessionData::SharedPtr> Sessions;
 
-    SessionHash _sessionHash;
+    Sessions _sessions;
 
     const std::string _sessionKeyName;
 
