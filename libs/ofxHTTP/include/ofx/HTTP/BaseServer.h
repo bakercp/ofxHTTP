@@ -230,13 +230,14 @@ void BaseServer_<SettingsType>::start()
         socket.setOption(SOL_SOCKET, SO_NOSIGPIPE, 1); // ignore SIGPIPE
     #endif
 
-        cout << "Starting on : " << _settings.getPort() << endl;
+        ofLogNotice("BaseServer_::start()") << "Starting server on port: " << _settings.getPort();
+
         // start the http server
         _server->start();
     }
     catch (const Poco::Net::InvalidSocketException& exc)
     {
-        ofLogError("BaseServer_<SettingsType>::start()") << exc.displayText();
+        ofLogError("BaseServer_::start()") << exc.displayText();
     }
 
 }
@@ -247,7 +248,7 @@ void BaseServer_<SettingsType>::stop()
 {
     if (!isRunning())
     {
-        ofLogWarning("BaseServer_::stop") << "Server is not running.  Call start() to start.";
+        ofLogVerbose("BaseServer_::stop") << "Server is not running.  Call start() to start.";
         return;
     }
 
@@ -267,19 +268,18 @@ void BaseServer_<SettingsType>::stop()
     _server->stop();
 #endif
 
-    ofLogVerbose("BaseServer_<SettingsType>::stop") << "getThreadPool().capacity() = " << getThreadPool().capacity();
-    ofLogVerbose("BaseServer_<SettingsType>::stop") << "getThreadPool().getStackSize() =  " << getThreadPool().getStackSize();
-    ofLogVerbose("BaseServer_<SettingsType>::stop") << "getThreadPool().used() = " << getThreadPool().used();
-    ofLogVerbose("BaseServer_<SettingsType>::stop") << "getThreadPool().allocated() = " << getThreadPool().allocated();
-    ofLogVerbose("BaseServer_<SettingsType>::stop") << "getThreadPool().available() = " << getThreadPool().available();
+    ofLogVerbose("BaseServer_::stop") << "getThreadPool().capacity() = " << getThreadPool().capacity();
+    ofLogVerbose("BaseServer_::stop") << "getThreadPool().getStackSize() =  " << getThreadPool().getStackSize();
+    ofLogVerbose("BaseServer_::stop") << "getThreadPool().used() = " << getThreadPool().used();
+    ofLogVerbose("BaseServer_::stop") << "getThreadPool().allocated() = " << getThreadPool().allocated();
+    ofLogVerbose("BaseServer_::stop") << "getThreadPool().available() = " << getThreadPool().available();
 
-    // wait for all threads in the thread pool
-    // we gotta wait for all of them ... ugh.
+    // Wait for all threads in the thread pool.
     // Particularly troubling if we are sharing
     // this pool with other non-server-based-processes.
     // getThreadPoolRef().joinAll();
 
-    getThreadPool().stopAll(); // at least there's a chance of shutting down
+    getThreadPool().stopAll();
 
     _server.reset();
 
@@ -310,7 +310,7 @@ void BaseServer_<SettingsType>::setup(const SettingsType& settings)
 
     if (isRunning())
     {
-        ofLogWarning("BaseServer_<SettingsType>::stop") << "Server running, restart to load settings.";
+        ofLogWarning("BaseServer_::stop") << "Server running, restart to load new settings.";
     }
 }
 
@@ -353,10 +353,11 @@ Poco::ThreadPool& BaseServer_<SettingsType>::getThreadPool()
 template <typename SettingsType>
 bool BaseServer_<SettingsType>::acceptConnection(const Poco::Net::HTTPServerRequest& request)
 {
+    /*
+
     const Poco::Net::IPAddress& host = request.clientAddress().host();
 
-    /*
-     
+
     // If a whitelist is defined then you _must_ be on the whitelist.
     const Net::IPAddressRange::List& whitelist = _settings.getWhitelist();
 
@@ -443,7 +444,7 @@ Poco::Net::HTTPServerParams::Ptr BaseServer_<SettingsType>::_toPoco(const HTTPSe
     // TODO: currently a bug (?) in void TCPServerParams::setMaxThreads(int count).
     // Poco::Net::HTTPServerParams::setMaxThreads() should be able to handle
     // a value of 0 (according to the documentation), but it is currently asserting
-    // that the value must be > 0.
+    // that the value must be > 0.  This is fixed in Poco 1.6+.
     if (params.getMaxThreads() <= 0)
     {
         serverParams->setMaxThreads(getThreadPool().capacity());
