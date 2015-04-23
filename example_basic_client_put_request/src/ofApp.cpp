@@ -36,7 +36,7 @@ void ofApp::setup()
 
     ofx::HTTP::BaseResponse response;
 
-    ofx::HTTP::PutRequest putRequest(url);
+    ofx::HTTP::PutRequest putRequest(url, Poco::Net::HTTPMessage::HTTP_1_1);
 
     putRequest.set("My-special-request-header", "My-special-request-header-value");
 
