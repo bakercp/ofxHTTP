@@ -126,7 +126,7 @@ private:
 	BaseServer_& operator = (const BaseServer_&);
 
     // TODO: replace w/ std::unique_ptr?
-    Poco::Net::HTTPServer* _server;
+    std::shared_ptr<Poco::Net::HTTPServer> _server;
 
     bool _isSecurePort;
 
@@ -218,10 +218,10 @@ void BaseServer_<SettingsType>::start()
 
     try
     {
-        _server = new Poco::Net::HTTPServer(new BaseServerHandle(*this),
-                                            getThreadPool(),
-                                            socket,
-                                            _toPoco(_settings));
+        _server = std::shared_ptr<Poco::Net::HTTPServer>(new Poco::Net::HTTPServer(new BaseServerHandle(*this),
+                                                                                   getThreadPool(),
+                                                                                   socket,
+                                                                                   _toPoco(_settings)));
 
         _isSecurePort = socket.secure();
 
@@ -281,7 +281,7 @@ void BaseServer_<SettingsType>::stop()
 
     getThreadPool().stopAll(); // at least there's a chance of shutting down
 
-    delete _server;
+    _server.reset();
 
     _isSecurePort = false;
 

@@ -50,7 +50,7 @@ public:
     /// \brief A typedef for the SimpleFileServerSettings.
     typedef SimpleFileServerSettings Settings;
 
-    /// \brief Create a BasicServer with the provided Settings.
+    /// \brief Create a SimpleFileServer with the provided Settings.
     /// \param settings The Settings used to configure the server.
     SimpleFileServer(const Settings& settings = Settings());
 

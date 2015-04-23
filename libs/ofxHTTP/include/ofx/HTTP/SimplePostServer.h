@@ -36,7 +36,7 @@ namespace ofx {
 namespace HTTP {
 
 
-/// \brief Settings for a BasicServer.
+/// \brief Settings for a SimplePostServerSettings.
 class SimplePostServerSettings: public BaseServerSettings
 {
 public:
