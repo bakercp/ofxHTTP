@@ -53,7 +53,7 @@ public:
 
     virtual ~BaseClient();
 
-    // can throw a lot of different exceptions
+    // Can throw a lot of different exceptions.
     std::istream& execute(BaseRequest& request,
                           BaseResponse& response,
                           Context& context);

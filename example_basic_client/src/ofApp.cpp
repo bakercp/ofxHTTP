@@ -35,7 +35,7 @@ void ofApp::setup()
     ofx::HTTP::Context context;
 
     ofx::HTTP::BaseResponse response;
-    ofx::HTTP::GetRequest request(url);
+    ofx::HTTP::GetRequest request(url, Poco::Net::HTTPMessage::HTTP_1_1);
 
     try
     {
