@@ -160,9 +160,6 @@ private:
 };
 
 
-typedef BaseServer_<BaseServerSettings> BaseServer;
-
-
 template <typename SettingsType>
 BaseServer_<SettingsType>::BaseServer_(const SettingsType& settings,
                                        Poco::ThreadPool& rThreadPool):
@@ -337,6 +334,7 @@ const SettingsType& BaseServer_<SettingsType>::getSettings() const
 template <typename SettingsType>
 void BaseServer_<SettingsType>::addRoute(AbstractRoute* pRoute)
 {
+    pRoute->setServer(this);
     _routes.push_back(pRoute);
 }
 
@@ -345,6 +343,7 @@ template <typename SettingsType>
 void BaseServer_<SettingsType>::removeRoute(AbstractRoute* pRoute)
 {
     _routes.erase(std::remove(_routes.begin(), _routes.end(), pRoute), _routes.end());
+    pRoute->setServer(0);
 }
 
 

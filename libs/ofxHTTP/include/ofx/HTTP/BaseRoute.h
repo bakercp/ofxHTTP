@@ -71,6 +71,10 @@ public:
     /// \returns the route's Settings.
     const SettingsType& getSettings() const;
 
+    AbstractServer* getServer();
+
+    void setServer(AbstractServer* server);
+
 protected:
     /// \brief The settings.
     SettingsType _settings;
@@ -260,6 +264,20 @@ template<typename SettingsType>
 const SettingsType& BaseRoute_<SettingsType>::getSettings() const
 {
     return _settings;
+}
+
+
+template<typename SettingsType>
+AbstractServer* BaseRoute_<SettingsType>::getServer()
+{
+    return _server;
+}
+
+
+template<typename SettingsType>
+void BaseRoute_<SettingsType>::setServer(AbstractServer* server)
+{
+    _server = server;
 }
 
     

@@ -181,6 +181,10 @@ public:
     /// \details This method may block until the route is fully stopped.
     virtual void stop() = 0;
 
+    virtual AbstractServer* getServer() = 0;
+
+    virtual void setServer(AbstractServer* server) = 0;
+
 };
 
 
