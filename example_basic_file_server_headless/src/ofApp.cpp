@@ -27,15 +27,15 @@
 
 void ofApp::setup()
 {
-    ofx::HTTP::BasicServerSettings settings;
+    ofx::HTTP::SimpleFileServerSettings settings;
 
     // Many other settings are available.
     settings.setPort(7890);
 
     // Apply the settings.
-    server = ofx::HTTP::BasicServer::makeShared(settings);
+    server.setup(settings);
 
     // Start the server.
-    server->start();
+    server.start();
 
 }
