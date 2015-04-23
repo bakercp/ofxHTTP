@@ -30,17 +30,172 @@ namespace ofx {
 namespace HTTP {
 
 
+TCPServerParams::TCPServerParams():
+    _threadIdleTime(10000000),
+    _maxThreads(0),
+    _maxQueued(64),
+    _threadPriority(Poco::Thread::PRIO_NORMAL)
+{
+}
+
+
+TCPServerParams::~TCPServerParams()
+{
+}
+
+
+void TCPServerParams::setThreadIdleTime(const Poco::Timespan& idleTime)
+{
+    _threadIdleTime = idleTime;
+}
+
+
+const Poco::Timespan& TCPServerParams::getThreadIdleTime() const
+{
+    return _threadIdleTime;
+}
+
+
+void TCPServerParams::setMaxQueued(int count)
+{
+    _maxQueued = count;
+}
+
+
+int TCPServerParams::getMaxQueued() const
+{
+    return _maxQueued;
+}
+
+
+void TCPServerParams::setMaxThreads(int count)
+{
+    // TODO: currently a bug (?) in void TCPServerParams::setMaxThreads(int count).
+    // Poco::Net::HTTPServerParams::setMaxThreads() should be able to handle
+    // a value of 0 (according to the documentation), but it is currently asserting
+    // that the value must be > 0.
+    _maxThreads = count;
+}
+
+
+int TCPServerParams::getMaxThreads() const
+{
+    return _maxThreads;
+}
+
+
+void TCPServerParams::setThreadPriority(Poco::Thread::Priority prio)
+{
+    _threadPriority = prio;
+}
+
+
+Poco::Thread::Priority TCPServerParams::getThreadPriority() const
+{
+    return _threadPriority;
+}
+
+
+HTTPServerParams::HTTPServerParams():
+    _timeout(60000000),
+    _keepAlive(true),
+    _maxKeepAliveRequests(0),
+    _keepAliveTimeout(15000000)
+{
+}
+
+
+HTTPServerParams::~HTTPServerParams()
+{
+}
+
+
+void HTTPServerParams::setServerName(const std::string& serverName)
+{
+    _serverName = serverName;
+}
+
+
+const std::string& HTTPServerParams::getServerName() const
+{
+    return _serverName;
+}
+
+
+void HTTPServerParams::setSoftwareVersion(const std::string& softwareVersion)
+{
+    _softwareVersion = softwareVersion;
+}
+
+
+const std::string& HTTPServerParams::getSoftwareVersion() const
+{
+    return _softwareVersion;
+}
+
+
+void HTTPServerParams::setTimeout(const Poco::Timespan& timeout)
+{
+    _timeout = timeout;
+}
+
+
+const Poco::Timespan& HTTPServerParams::getTimeout() const
+{
+    return _timeout;
+}
+
+
+void HTTPServerParams::setKeepAlive(bool keepAlive)
+{
+    _keepAlive = keepAlive;
+}
+
+
+bool HTTPServerParams::getKeepAlive() const
+{
+    return _keepAlive;
+}
+
+
+void HTTPServerParams::setKeepAliveTimeout(const Poco::Timespan& timeout)
+{
+    _keepAliveTimeout = timeout;
+}
+
+
+const Poco::Timespan& HTTPServerParams::getKeepAliveTimeout() const
+{
+    return _keepAliveTimeout;
+}
+
+
+void HTTPServerParams::setMaxKeepAliveRequests(int maxKeepAliveRequests)
+{
+    _maxKeepAliveRequests = maxKeepAliveRequests;
+}
+
+
+int HTTPServerParams::getMaxKeepAliveRequests() const
+{
+    return _maxKeepAliveRequests;
+}
+
+
 const std::string BaseServerSettings::DEFAULT_HOST    = "127.0.0.1";
 const unsigned short BaseServerSettings::DEFAULT_PORT = 8998;
 const bool BaseServerSettings::DEFAULT_USE_SSL        = false;
+const bool BaseServerSettings::DEFAULT_USE_SESSION_CACHE = true;
 
 
 BaseServerSettings::BaseServerSettings(const std::string& host,
                                        unsigned short port,
-                                       bool useSSL):
+                                       bool useSSL,
+                                       bool useSessionCache):
     _host(host),
     _port(port),
-    _useSSL(useSSL)
+    _useSSL(useSSL),
+    _useSessionCache(useSessionCache)
 {
 }
 
@@ -83,6 +238,18 @@ void BaseServerSettings::setUseSSL(bool useSSL)
 bool BaseServerSettings::getUseSSL() const
 {
     return _useSSL;
+}
+
+
+void BaseServerSettings::setUseSessionCache(bool useSessionCache)
+{
+    _useSessionCache = useSessionCache;
+}
+
+
+bool BaseServerSettings::getUseSessionCache() const
+{
+    return _useSessionCache;
 }
 
 

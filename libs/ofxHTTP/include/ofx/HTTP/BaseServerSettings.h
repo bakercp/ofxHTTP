@@ -36,68 +36,23 @@
 namespace ofx {
 namespace HTTP {
 
-//    Poco::Net::TCPServerParams
-
 
 /// \brief This class mirrors Poco::Net::TCPServerParams, without ref counting.
 class TCPServerParams
 {
 public:
-    TCPServerParams():
-        _threadIdleTime(10000000),
-        _maxThreads(0),
-        _maxQueued(64),
-        _threadPriority(Poco::Thread::PRIO_NORMAL)
-    {
-    }
+    TCPServerParams();
 
-    virtual ~TCPServerParams()
-    {
-    }
+    virtual ~TCPServerParams();
 
-    void setThreadIdleTime(const Poco::Timespan& idleTime)
-    {
-        _threadIdleTime = idleTime;
-    }
-    
-    const Poco::Timespan& getThreadIdleTime() const
-    {
-        return _threadIdleTime;
-    }
-
-    void setMaxQueued(int count)
-    {
-        _maxQueued = count;
-    }
-
-    int getMaxQueued() const
-    {
-        return _maxQueued;
-    }
-
-    void setMaxThreads(int count)
-    {
-        // TODO: currently a bug (?) in void TCPServerParams::setMaxThreads(int count).
-        // Poco::Net::HTTPServerParams::setMaxThreads() should be able to handle
-        // a value of 0 (according to the documentation), but it is currently asserting
-        // that the value must be > 0.
-        _maxThreads = count;
-    }
-
-    int getMaxThreads() const
-    {
-        return _maxThreads;
-    }
-
-    void setThreadPriority(Poco::Thread::Priority prio)
-    {
-        _threadPriority = prio;
-    }
-
-    Poco::Thread::Priority getThreadPriority() const
-    {
-        return _threadPriority;
-    }
+    void setThreadIdleTime(const Poco::Timespan& idleTime);
+    const Poco::Timespan& getThreadIdleTime() const;
+    void setMaxQueued(int count);
+    int getMaxQueued() const;
+    void setMaxThreads(int count);
+    int getMaxThreads() const;
+    void setThreadPriority(Poco::Thread::Priority prio);
+    Poco::Thread::Priority getThreadPriority() const;
 
 private:
     Poco::Timespan _threadIdleTime;
@@ -114,77 +69,21 @@ private:
 class HTTPServerParams: public TCPServerParams
 {
 public:
-    HTTPServerParams():
-        _timeout(60000000),
-        _keepAlive(true),
-        _maxKeepAliveRequests(0),
-        _keepAliveTimeout(15000000)
-    {
-    }
+    HTTPServerParams();
+    virtual ~HTTPServerParams();
 
-    virtual ~HTTPServerParams()
-    {
-    }
-
-    void setServerName(const std::string& serverName)
-    {
-        _serverName = serverName;
-    }
-
-    const std::string& getServerName() const
-    {
-        return _serverName;
-    }
-
-    void setSoftwareVersion(const std::string& softwareVersion)
-    {
-        _softwareVersion = softwareVersion;
-    }
-
-    const std::string& getSoftwareVersion() const
-    {
-        return _softwareVersion;
-    }
-
-    void setTimeout(const Poco::Timespan& timeout)
-    {
-        _timeout = timeout;
-    }
-
-    const Poco::Timespan& getTimeout() const
-    {
-        return _timeout;
-    }
-
-    void setKeepAlive(bool keepAlive)
-    {
-        _keepAlive = keepAlive;
-    }
-
-    bool getKeepAlive() const
-    {
-        return _keepAlive;
-    }
-
-    void setKeepAliveTimeout(const Poco::Timespan& timeout)
-    {
-        _keepAliveTimeout = timeout;
-    }
-
-    const Poco::Timespan& getKeepAliveTimeout() const
-    {
-        return _keepAliveTimeout;
-    }
-
-    void setMaxKeepAliveRequests(int maxKeepAliveRequests)
-    {
-        _maxKeepAliveRequests = maxKeepAliveRequests;
-    }
-
-    int getMaxKeepAliveRequests() const
-    {
-        return _maxKeepAliveRequests;
-    }
+    void setServerName(const std::string& serverName);
+    const std::string& getServerName() const;
+    void setSoftwareVersion(const std::string& softwareVersion);
+    const std::string& getSoftwareVersion() const;
+    void setTimeout(const Poco::Timespan& timeout);
+    const Poco::Timespan& getTimeout() const;
+    void setKeepAlive(bool keepAlive);
+    bool getKeepAlive() const;
+    void setKeepAliveTimeout(const Poco::Timespan& timeout);
+    const Poco::Timespan& getKeepAliveTimeout() const;
+    void setMaxKeepAliveRequests(int maxKeepAliveRequests);
+    int getMaxKeepAliveRequests() const;
 
 private:
     std::string _serverName;
@@ -202,7 +101,8 @@ class BaseServerSettings: public HTTPServerParams
 public:
     BaseServerSettings(const std::string& host = DEFAULT_HOST,
                        unsigned short port = DEFAULT_PORT,
-                       bool useSSL = DEFAULT_USE_SSL);
+                       bool useSSL = DEFAULT_USE_SSL,
+                       bool useSessionCache = DEFAULT_USE_SESSION_CACHE);
 
     virtual ~BaseServerSettings();
 
@@ -215,26 +115,34 @@ public:
     void setUseSSL(bool useSSL);
     bool getUseSSL() const;
 
+    void setUseSessionCache(bool useSessionCache);
+    bool getUseSessionCache() const;
+
     Poco::URI getURI() const;
 
-    //const Net::IPAddressRange::List& getWhitelist() const;
-    //void setWhitelist(const Net::IPAddressRange::List& whitelist);
+    /*
+    const Net::IPAddressRange::List& getWhitelist() const;
+    void setWhitelist(const Net::IPAddressRange::List& whitelist);
 
-    //const Net::IPAddressRange::List& getBlacklist() const;
-    //void setBlacklist(const Net::IPAddressRange::List& blacklist);
+    const Net::IPAddressRange::List& getBlacklist() const;
+    void setBlacklist(const Net::IPAddressRange::List& blacklist);
+    */
 
     const static std::string DEFAULT_HOST;
     const static unsigned short DEFAULT_PORT;
     const static bool DEFAULT_USE_SSL;
+    const static bool DEFAULT_USE_SESSION_CACHE;
 
 private:
     std::string _host;
     unsigned short _port;
     bool _useSSL;
+    bool _useSessionCache;
 
-    //Net::IPAddressRange::List _whitelist;
-    //Net::IPAddressRange::List _blacklist;
-
+    /*
+    Net::IPAddressRange::List _whitelist;
+    Net::IPAddressRange::List _blacklist;
+    */
 };
 
 
