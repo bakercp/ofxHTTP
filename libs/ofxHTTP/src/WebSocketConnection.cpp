@@ -137,7 +137,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                         // TODO: it is possible, per the spec send
                         std::size_t n = frame.size();
 
-                        const char* p = frame.getBinaryBuffer();
+                        const char* p = frame.getData();
 
                         if (n >= 2)
                         {
@@ -205,7 +205,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                     {
                         int numBytesSent = 0;
 
-                        numBytesSent = ws.sendFrame(frame.getBinaryBuffer(),
+                        numBytesSent = ws.sendFrame(frame.getData(),
                                                     frame.size(),
                                                     frame.getFlags());
 
