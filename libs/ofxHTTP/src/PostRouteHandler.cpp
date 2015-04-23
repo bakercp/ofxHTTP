@@ -54,7 +54,7 @@ PostRouteHandler::~PostRouteHandler()
 void PostRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
                                      Poco::Net::HTTPServerResponse& response)
 {
-    Poco::UUID sessionId = _parent.getSessionId(request, response);
+    Poco::UUID sessionId = Poco::UUID::null();// _parent.getSessionId(request, response);
 
 
     // this uuid helps us track form progress updates

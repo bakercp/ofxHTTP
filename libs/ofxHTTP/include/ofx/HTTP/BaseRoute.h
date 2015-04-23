@@ -54,6 +54,8 @@ public:
     /// \brief Destroy a BaseRoute.
     virtual ~BaseRoute_();
 
+    virtual void setup(const SettingsType& settings);
+
     virtual std::string getRoutePathPattern() const;
 
     virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
@@ -75,23 +77,25 @@ public:
     /// Any non-null SessionCache may be treated as thread-safe.
     ///
     /// \returns a shared pointer to the SessionCache.
-    SessionCache::SharedPtr getSessionCache();
+//    SessionCache::SharedPtr getSessionCache();
 
-    void setSessionCache(SessionCache::SharedPtr sessionCache);
+//    void setSessionCache(SessionCache::SharedPtr sessionCache);
 
-    Session::SharedPtr getSession(Poco::Net::HTTPServerRequest& request,
-                                  Poco::Net::HTTPServerResponse& response);
-
-    Poco::UUID getSessionId(Poco::Net::HTTPServerRequest& request,
-                            Poco::Net::HTTPServerResponse& response);
+//    Session::SharedPtr getSession(Poco::Net::HTTPServerRequest& request,
+//                                  Poco::Net::HTTPServerResponse& response);
+//
+//    Poco::UUID getSessionId(Poco::Net::HTTPServerRequest& request,
+//                            Poco::Net::HTTPServerResponse& response);
 
 
 protected:
     /// \brief The settings.
-    const SettingsType _settings;
+    SettingsType _settings;
+
+    AbstractServer* _server;
 
     /// \brief a pointer to the session cache;
-    SessionCache::SharedPtr _sessionCache;
+//    SessionCache::SharedPtr _sessionCache;
 
 private:
     BaseRoute_(const BaseRoute_&);
@@ -106,7 +110,8 @@ typedef BaseRoute_<BaseRouteSettings> BaseRoute;
 
 template<typename SettingsType>
 BaseRoute_<SettingsType>::BaseRoute_(const SettingsType& settings):
-    _settings(settings)
+    _settings(settings),
+    _server(0)
 {
 }
 
@@ -114,6 +119,13 @@ BaseRoute_<SettingsType>::BaseRoute_(const SettingsType& settings):
 template<typename SettingsType>
 BaseRoute_<SettingsType>::~BaseRoute_()
 {
+}
+
+
+template<typename SettingsType>
+void BaseRoute_<SettingsType>::setup(const SettingsType& settings)
+{
+    _settings = settings;
 }
 
 
@@ -271,58 +283,58 @@ const SettingsType& BaseRoute_<SettingsType>::getSettings() const
 }
 
 
-template<typename SettingsType>
-SessionCache::SharedPtr BaseRoute_<SettingsType>::getSessionCache()
-{
-    return _sessionCache;
-}
-
-
-template<typename SettingsType>
-void BaseRoute_<SettingsType>::setSessionCache(SessionCache::SharedPtr sessionCache)
-{
-    _sessionCache = sessionCache;
-}
-
-
-template<typename SettingsType>
-Session::SharedPtr BaseRoute_<SettingsType>::getSession(Poco::Net::HTTPServerRequest& request,
-                                                        Poco::Net::HTTPServerResponse& response)
-{
-    if (_sessionCache)
-    {
-        return _sessionCache->getSession(request, response);
-    }
-    else
-    {
-        Session::SharedPtr ptr;
-        return ptr;
-    }
-}
-
-
-template<typename SettingsType>
-Poco::UUID BaseRoute_<SettingsType>::getSessionId(Poco::Net::HTTPServerRequest& request,
-                                                  Poco::Net::HTTPServerResponse& response)
-{
-    if (_sessionCache)
-    {
-        Session::SharedPtr session = _sessionCache->getSession(request, response);
-
-        if (session)
-        {
-            return session->getId();
-        }
-        else
-        {
-            return Poco::UUID::null();
-        }
-    }
-    else
-    {
-        return Poco::UUID::null();
-    }
-}
+//template<typename SettingsType>
+//SessionCache::SharedPtr BaseRoute_<SettingsType>::getSessionCache()
+//{
+//    return _sessionCache;
+//}
+//
+//
+//template<typename SettingsType>
+//void BaseRoute_<SettingsType>::setSessionCache(SessionCache::SharedPtr sessionCache)
+//{
+//    _sessionCache = sessionCache;
+//}
+//
+//
+//template<typename SettingsType>
+//Session::SharedPtr BaseRoute_<SettingsType>::getSession(Poco::Net::HTTPServerRequest& request,
+//                                                        Poco::Net::HTTPServerResponse& response)
+//{
+//    if (_sessionCache)
+//    {
+//        return _sessionCache->getSession(request, response);
+//    }
+//    else
+//    {
+//        Session::SharedPtr ptr;
+//        return ptr;
+//    }
+//}
+//
+//
+//template<typename SettingsType>
+//Poco::UUID BaseRoute_<SettingsType>::getSessionId(Poco::Net::HTTPServerRequest& request,
+//                                                  Poco::Net::HTTPServerResponse& response)
+//{
+//    if (_sessionCache)
+//    {
+//        Session::SharedPtr session = _sessionCache->getSession(request, response);
+//
+//        if (session)
+//        {
+//            return session->getId();
+//        }
+//        else
+//        {
+//            return Poco::UUID::null();
+//        }
+//    }
+//    else
+//    {
+//        return Poco::UUID::null();
+//    }
+//}
 
 
 } } // namespace ofx::HTTP

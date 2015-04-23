@@ -46,7 +46,7 @@ Poco::Net::HTTPRequestHandler* IPVideoRoute::createRequestHandler(const Poco::Ne
 }
 
 
-void IPVideoRoute::send(ofPixels& pix)
+void IPVideoRoute::send(ofPixels& pix) const
 {
     if(pix.isAllocated())
     {
@@ -60,7 +60,7 @@ void IPVideoRoute::send(ofPixels& pix)
 
         ofScopedLock lock(_mutex);
 
-        ConnectionsIter iter = _connections.begin();
+        Connections::const_iterator iter = _connections.begin();
 
         IPVideoFrameSettings settings;
 //

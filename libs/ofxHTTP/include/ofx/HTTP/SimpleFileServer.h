@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2012-2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,49 +22,48 @@
 //
 // =============================================================================
 
+
 #pragma once
 
 
-#include "ofx/HTTP/BasicServer.h"
-#include "ofx/HTTP/IPVideoRoute.h"
-#include "ofx/HTTP/IPVideoRouteSettings.h"
+#include "ofx/HTTP/BaseServer.h"
+#include "ofx/HTTP/FileSystemRoute.h"
+#include "ofx/HTTP/FileSystemRouteSettings.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class BasicIPVideoServerSettings:
-    public IPVideoRouteSettings,
-    public BasicServerSettings
+/// \brief Settings for a SimpleFileServer.
+class SimpleFileServerSettings: public BaseServerSettings
 {
+public:
+    FileSystemRouteSettings fileSystemRouteSettings;
 };
 
 
-class BasicIPVideoServer: public BasicServer
+/// \brief A simple file server implementation.
+class SimpleFileServer: public BaseServer_<SimpleFileServerSettings>
 {
 public:
-    typedef std::shared_ptr<BasicIPVideoServer> SharedPtr;
-    typedef std::weak_ptr<BasicIPVideoServer> WeakPtr;
-    typedef BasicIPVideoServerSettings Settings;
+    /// \brief A typedef for the SimpleFileServerSettings.
+    typedef SimpleFileServerSettings Settings;
 
-    BasicIPVideoServer(const Settings& settings = Settings());
-    virtual ~BasicIPVideoServer();
+    /// \brief Create a BasicServer with the provided Settings.
+    /// \param settings The Settings used to configure the server.
+    SimpleFileServer(const Settings& settings = Settings());
 
-    void send(ofPixels& pix);
+    /// \brief Destroy the BasicServer.
+    virtual ~SimpleFileServer();
 
-    std::size_t getNumConnections() const
-    {
-        return _ipVideoRoute->getNumConnections();
-    }
+    virtual void setup(const Settings& settings);
 
-    static SharedPtr makeShared(const Settings& settings = Settings())
-    {
-        return SharedPtr(new BasicIPVideoServer(settings));
-    }
+    FileSystemRoute& getFileSystemRoute();
 
 protected:
-    IPVideoRoute::SharedPtr _ipVideoRoute;
+    /// \brief The FileSystemRoute attached to this server.
+    FileSystemRoute _fileSystemRoute;
 
 };
 

@@ -26,46 +26,54 @@
 #pragma once
 
 
-#include "ofx/HTTP/BasicServer.h"
-#include "ofx/HTTP/PostRoute.h"
-#include "ofx/HTTP/PostRouteSettings.h"
-#include "ofx/HTTP/PostRouteEvents.h"
+#include "ofx/HTTP/BaseServer.h"
+#include "ofx/HTTP/FileSystemRoute.h"
+#include "ofx/HTTP/WebSocketRoute.h"
+#include "ofx/HTTP/WebSocketRouteSettings.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class BasicPostServerSettings:
-    public PostRouteSettings,
-    public BasicServerSettings
-{
-};
-
-
-class BasicPostServer: public BasicServer
+/// \brief Aggregate settings for a SimpleWebSocketServer.
+class SimpleWebSocketServerSettings: public BaseServerSettings
 {
 public:
-    typedef std::shared_ptr<BasicPostServer> SharedPtr;
-    typedef std::weak_ptr<BasicPostServer> WeakPtr;
-    typedef BasicPostServerSettings Settings;
-
-    BasicPostServer(const Settings& settings = Settings());
-    virtual ~BasicPostServer();
-
-    PostRoute::SharedPtr getPostRoute();
-
-    /// \brief this method is a hack replacement for
-    /// std::make_shared<BasicServer>(...);
-    static SharedPtr makeShared(const Settings& settings = Settings())
-    {
-        return SharedPtr(new BasicPostServer(settings));
-    }
-
-protected:
-    PostRoute::SharedPtr _postRoute;
-    
+    FileSystemRouteSettings fileSystemRouteSettings;
+    WebSocketRouteSettings webSocketServerSettings;
 };
 
 
+/// \brief A basic implementation of an HTTP Server supporting WebSockets.
+class SimpleWebSocketServer: public BaseServer_<SimpleWebSocketServerSettings>
+{
+public:
+    /// \brief A typedef for the SimpleWebSocketServerSettings.
+    typedef SimpleWebSocketServerSettings Settings;
+
+    /// \brief Create a SimpleWebSocketServer with the provided Settings.
+    /// \param settings The Settings used to configure the server.
+    SimpleWebSocketServer(const Settings& settings = Settings());
+
+    /// \brief Destroy the SimpleWebSocketServer.
+    virtual ~SimpleWebSocketServer();
+
+    virtual void setup(const Settings& settings);
+
+    FileSystemRoute& getFileSystemRoute();
+
+    /// \returns the WebSocketRoute attached to this server.
+    WebSocketRoute& getWebSocketRoute();
+
+private:
+    /// \brief The FileSystemRoute attached to this server.
+    FileSystemRoute _fileSystemRoute;
+
+    /// \brief The WebSocketRoute attached to this server.
+    WebSocketRoute _webSocketRoute;
+
+};
+
+    
 } } // namespace ofx::HTTP

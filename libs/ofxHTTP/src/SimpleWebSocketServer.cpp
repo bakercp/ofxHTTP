@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2012-2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,30 +23,47 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/BasicIPVideoServer.h"
+#include "ofx/HTTP/SimpleWebSocketServer.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-BasicIPVideoServer::BasicIPVideoServer(const Settings& settings):
-    BasicServer(settings),
-    _ipVideoRoute(IPVideoRoute::makeShared(settings))
+SimpleWebSocketServer::SimpleWebSocketServer(const Settings& settings):
+    BaseServer_<SimpleWebSocketServerSettings>(settings),
+    _fileSystemRoute(settings.fileSystemRouteSettings),
+    _webSocketRoute(settings.webSocketServerSettings)
 {
-    addRoute(_ipVideoRoute);
+    addRoute(&_fileSystemRoute);
+    addRoute(&_webSocketRoute);
 }
 
 
-BasicIPVideoServer::~BasicIPVideoServer()
+SimpleWebSocketServer::~SimpleWebSocketServer()
 {
-    removeRoute(_ipVideoRoute);
+    removeRoute(&_webSocketRoute);
+    removeRoute(&_fileSystemRoute);
 }
 
 
-void BasicIPVideoServer::send(ofPixels& pix)
+void SimpleWebSocketServer::setup(const Settings& settings)
 {
-    _ipVideoRoute->send(pix);
+    BaseServer_<SimpleWebSocketServerSettings>::setup(settings);
+    _fileSystemRoute.setup(settings.fileSystemRouteSettings);
+    _webSocketRoute.setup(settings.webSocketServerSettings);
+}
+
+
+FileSystemRoute& SimpleWebSocketServer::getFileSystemRoute()
+{
+    return _fileSystemRoute;
+}
+
+
+WebSocketRoute& SimpleWebSocketServer::getWebSocketRoute()
+{
+    return _webSocketRoute;
 }
 
 

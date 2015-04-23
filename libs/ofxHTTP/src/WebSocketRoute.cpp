@@ -117,7 +117,7 @@ void WebSocketRoute::close(WebSocketConnection* connection)
 
 void WebSocketRoute::close()
 {
-    ofScopedLock lock(_mutex);
+    // ofScopedLock lock(_mutex);
     WebSocketConnectionsIter iter = _connections.begin();
 
     while(iter != _connections.end())

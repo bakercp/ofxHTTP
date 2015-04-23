@@ -23,30 +23,37 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/BasicWebSocketServer.h"
+#include "ofx/HTTP/SimpleFileServer.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-BasicWebSocketServer::BasicWebSocketServer(const Settings& settings):
-    BasicServer(settings),
-    _webSocketRoute(WebSocketRoute::makeShared(settings))
+SimpleFileServer::SimpleFileServer(const Settings& settings):
+    BaseServer_<SimpleFileServerSettings>(settings),
+    _fileSystemRoute(settings.fileSystemRouteSettings)
 {
-    addRoute(_webSocketRoute);
+    addRoute(&_fileSystemRoute);
 }
 
 
-BasicWebSocketServer::~BasicWebSocketServer()
+SimpleFileServer::~SimpleFileServer()
 {
-    removeRoute(_webSocketRoute);
+    removeRoute(&_fileSystemRoute);
 }
 
 
-WebSocketRoute::SharedPtr BasicWebSocketServer::getWebSocketRoute()
+void SimpleFileServer::setup(const Settings& settings)
 {
-    return _webSocketRoute;
+    BaseServer_<SimpleFileServerSettings>::setup(settings);
+    _fileSystemRoute.setup(settings.fileSystemRouteSettings);
+}
+
+
+FileSystemRoute& SimpleFileServer::getFileSystemRoute()
+{
+    return _fileSystemRoute;
 }
 
 

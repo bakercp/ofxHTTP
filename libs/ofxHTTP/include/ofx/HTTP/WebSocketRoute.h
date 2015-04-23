@@ -41,12 +41,6 @@ namespace HTTP {
 class WebSocketRoute: public BaseRoute_<WebSocketRouteSettings>
 {
 public:
-    /// \brief A typedef for a shared pointer.
-    typedef std::shared_ptr<WebSocketRoute> SharedPtr;
-
-    /// \brief A typedef for a weak pointer.
-    typedef std::weak_ptr<WebSocketRoute> WeakPtr;
-
     /// \brief A typedef for the WebSocketRouteSettings.
     typedef WebSocketRouteSettings Settings;
 
@@ -90,11 +84,6 @@ public:
     /// \brief WebSocketEvents for WebSocket callbacks.
     WebSocketEvents events;
 
-    static SharedPtr makeShared(const Settings& settings)
-    {
-        return SharedPtr(new WebSocketRoute(settings));
-    }
-
 protected:
     void registerWebSocketConnection(WebSocketConnection* connection);
     void unregisterWebSocketConnection(WebSocketConnection* connection);
@@ -102,8 +91,8 @@ protected:
     friend class WebSocketConnection;
     
 private:
-    typedef std::set<WebSocketConnection*>          WebSocketConnections;
-    typedef WebSocketConnections::iterator          WebSocketConnectionsIter;
+    typedef std::set<WebSocketConnection*> WebSocketConnections;
+    typedef WebSocketConnections::iterator WebSocketConnectionsIter;
 
     WebSocketConnections _connections;
 

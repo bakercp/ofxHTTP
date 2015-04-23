@@ -23,28 +23,39 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/BasicPostServer.h"
+#include "ofx/HTTP/SimplePostServer.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-BasicPostServer::BasicPostServer(const Settings& settings):
-    BasicServer(settings),
-    _postRoute(PostRoute::makeShared(settings))
+SimplePostServer::SimplePostServer(const Settings& settings):
+    BaseServer_<SimplePostServerSettings>(settings),
+    _fileSystemRoute(settings.fileSystemRouteSettings),
+    _postRoute(settings.postRouteSettings)
 {
-    addRoute(_postRoute);
+    addRoute(&_fileSystemRoute);
+    addRoute(&_postRoute);
 }
 
 
-BasicPostServer::~BasicPostServer()
+SimplePostServer::~SimplePostServer()
 {
-    removeRoute(_postRoute);
+    removeRoute(&_postRoute);
+    removeRoute(&_fileSystemRoute);
 }
 
 
-PostRoute::SharedPtr BasicPostServer::getPostRoute()
+void SimplePostServer::setup(const Settings& settings)
+{
+    BaseServer_<SimplePostServerSettings>::setup(settings);
+    _fileSystemRoute.setup(settings.fileSystemRouteSettings);
+    _postRoute.setup(settings.postRouteSettings);
+}
+
+
+PostRoute& SimplePostServer::getPostRoute()
 {
     return _postRoute;
 }

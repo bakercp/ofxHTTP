@@ -41,6 +41,17 @@ namespace HTTP {
 class WebSocketFrame;
 
 
+class AbstractServer: public Poco::Net::HTTPRequestHandlerFactory
+{
+public:
+    /// \brief Destroy the AbstractHTTPRequestHandler.
+    virtual ~AbstractServer()
+    {
+    }
+
+};
+
+
 /// \brief An AbstractHTTPRequestHandler.
 /// \note This layer of abstraction is to make documentation simpler.
 class AbstractHTTPRequestHandler: public Poco::Net::HTTPRequestHandler

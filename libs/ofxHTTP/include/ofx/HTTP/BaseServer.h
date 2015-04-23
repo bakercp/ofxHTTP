@@ -81,7 +81,7 @@ private:
 ///
 /// The BaseServer template must be initialized with a settings type.
 template <typename SettingsType>
-class BaseServer_: public Poco::Net::HTTPRequestHandlerFactory
+class BaseServer_: public AbstractServer
 {
 public:
     typedef std::shared_ptr<BaseServer_<SettingsType> > SharedPtr;
@@ -94,21 +94,24 @@ public:
         
     void start();
     void stop();
+    void restart();
     bool isRunning() const;
+
+    virtual void setup(const SettingsType& settings);
 
     const SettingsType& getSettings() const;
 
     std::string getURL() const;
 
-    void addRoute(AbstractRoute::SharedPtr route);
-    void removeRoute(AbstractRoute::SharedPtr route);
+    void addRoute(AbstractRoute* pRoute);
+    void removeRoute(AbstractRoute* pRoute);
 
     virtual Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
 
     void exit(ofEventArgs& args);
 
 protected:
-    virtual Poco::ThreadPool& getThreadPoolRef();
+    virtual Poco::ThreadPool& getThreadPool();
 
     enum
     {
@@ -116,14 +119,14 @@ protected:
     };
 
 private:
-    typedef std::shared_ptr<Poco::Net::HTTPServer> HTTPServerPtr;
-    typedef std::vector<AbstractRoute::SharedPtr> Routes;
+    //typedef std::shared_ptr<Poco::Net::HTTPServer> HTTPServerPtr;
+    typedef std::vector<AbstractRoute*> Routes;
 
     BaseServer_(const BaseServer_&);
 	BaseServer_& operator = (const BaseServer_&);
 
     // TODO: replace w/ std::unique_ptr?
-    HTTPServerPtr _server;
+    Poco::Net::HTTPServer* _server;
 
     bool _isSecurePort;
 
@@ -133,15 +136,15 @@ private:
 
     BaseRoute _baseRoute;
 
-    Poco::Net::HTTPServerParams::Ptr getPocoHTTPServerParams(const HTTPServerParams& params);
-
     bool acceptConnection(const Poco::Net::HTTPServerRequest& request);
 
-    Poco::ThreadPool& _threadPoolRef;
+    Poco::ThreadPool& _rThreadPool;
 
     ThreadErrorHandler eh;
     Poco::ErrorHandler* pOldEH;
-    
+
+    Poco::Net::HTTPServerParams::Ptr _toPoco(const HTTPServerParams& params);
+
 };
 
 
@@ -150,10 +153,10 @@ typedef BaseServer_<BaseServerSettings> BaseServer;
 
 template <typename SettingsType>
 BaseServer_<SettingsType>::BaseServer_(const SettingsType& settings,
-                                       Poco::ThreadPool& threadPoolRef):
+                                       Poco::ThreadPool& rThreadPool):
     _isSecurePort(false),
     _settings(settings),
-    _threadPoolRef(threadPoolRef)
+    _rThreadPool(rThreadPool)
 {
     ofAddListener(ofEvents().exit, this, &BaseServer_<SettingsType>::exit);
     Poco::Net::initializeSSL();
@@ -215,10 +218,10 @@ void BaseServer_<SettingsType>::start()
 
     try
     {
-        _server = HTTPServerPtr(new Poco::Net::HTTPServer(new BaseServerHandle(*this),
-                                                          getThreadPoolRef(),
-                                                          socket,
-                                                          getPocoHTTPServerParams(_settings)));
+        _server = new Poco::Net::HTTPServer(new BaseServerHandle(*this),
+                                            getThreadPool(),
+                                            socket,
+                                            _toPoco(_settings));
 
         _isSecurePort = socket.secure();
 
@@ -227,6 +230,7 @@ void BaseServer_<SettingsType>::start()
         socket.setOption(SOL_SOCKET, SO_NOSIGPIPE, 1); // ignore SIGPIPE
     #endif
 
+        cout << "Starting on : " << _settings.getPort() << endl;
         // start the http server
         _server->start();
     }
@@ -263,11 +267,11 @@ void BaseServer_<SettingsType>::stop()
     _server->stop();
 #endif
 
-    ofLogVerbose("BaseServer_<SettingsType>::stop") << "getThreadPoolRef().capacity() = " << getThreadPoolRef().capacity();
-    ofLogVerbose("BaseServer_<SettingsType>::stop") << "getThreadPoolRef().getStackSize() =  " << getThreadPoolRef().getStackSize();
-    ofLogVerbose("BaseServer_<SettingsType>::stop") << "getThreadPoolRef().used() = " << getThreadPoolRef().used();
-    ofLogVerbose("BaseServer_<SettingsType>::stop") << "getThreadPoolRef().allocated() = " << getThreadPoolRef().allocated();
-    ofLogVerbose("BaseServer_<SettingsType>::stop") << "getThreadPoolRef().available() = " << getThreadPoolRef().available();
+    ofLogVerbose("BaseServer_<SettingsType>::stop") << "getThreadPool().capacity() = " << getThreadPool().capacity();
+    ofLogVerbose("BaseServer_<SettingsType>::stop") << "getThreadPool().getStackSize() =  " << getThreadPool().getStackSize();
+    ofLogVerbose("BaseServer_<SettingsType>::stop") << "getThreadPool().used() = " << getThreadPool().used();
+    ofLogVerbose("BaseServer_<SettingsType>::stop") << "getThreadPool().allocated() = " << getThreadPool().allocated();
+    ofLogVerbose("BaseServer_<SettingsType>::stop") << "getThreadPool().available() = " << getThreadPool().available();
 
     // wait for all threads in the thread pool
     // we gotta wait for all of them ... ugh.
@@ -275,12 +279,20 @@ void BaseServer_<SettingsType>::stop()
     // this pool with other non-server-based-processes.
     // getThreadPoolRef().joinAll();
 
-    getThreadPoolRef().stopAll(); // at least there's a chance of shutting down
+    getThreadPool().stopAll(); // at least there's a chance of shutting down
 
-    _server.reset();
+    delete _server;
 
     _isSecurePort = false;
 
+}
+
+
+template <typename SettingsType>
+void BaseServer_<SettingsType>::restart()
+{
+    stop();
+    start();
 }
 
 
@@ -292,6 +304,18 @@ std::string BaseServer_<SettingsType>::getURL() const
 
 
 template <typename SettingsType>
+void BaseServer_<SettingsType>::setup(const SettingsType& settings)
+{
+    _settings = settings;
+
+    if (isRunning())
+    {
+        ofLogWarning("BaseServer_<SettingsType>::stop") << "Server running, restart to load settings.";
+    }
+}
+
+
+template <typename SettingsType>
 const SettingsType& BaseServer_<SettingsType>::getSettings() const
 {
     return _settings;
@@ -299,16 +323,16 @@ const SettingsType& BaseServer_<SettingsType>::getSettings() const
 
 
 template <typename SettingsType>
-void BaseServer_<SettingsType>::addRoute(AbstractRoute::SharedPtr route)
+void BaseServer_<SettingsType>::addRoute(AbstractRoute* pRoute)
 {
-    _routes.push_back(route);
+    _routes.push_back(pRoute);
 }
 
 
 template <typename SettingsType>
-void BaseServer_<SettingsType>::removeRoute(AbstractRoute::SharedPtr route)
+void BaseServer_<SettingsType>::removeRoute(AbstractRoute* pRoute)
 {
-    _routes.erase(std::remove(_routes.begin(), _routes.end(), route), _routes.end());
+    _routes.erase(std::remove(_routes.begin(), _routes.end(), pRoute), _routes.end());
 }
 
 
@@ -320,9 +344,9 @@ bool BaseServer_<SettingsType>::isRunning() const
 
 
 template <typename SettingsType>
-Poco::ThreadPool& BaseServer_<SettingsType>::getThreadPoolRef()
+Poco::ThreadPool& BaseServer_<SettingsType>::getThreadPool()
 {
-    return _threadPoolRef;
+    return _rThreadPool;
 }
 
 
@@ -408,7 +432,7 @@ Poco::Net::HTTPRequestHandler* BaseServer_<SettingsType>::createRequestHandler(c
 
 
 template <typename SettingsType>
-Poco::Net::HTTPServerParams::Ptr BaseServer_<SettingsType>::getPocoHTTPServerParams(const HTTPServerParams& params)
+Poco::Net::HTTPServerParams::Ptr BaseServer_<SettingsType>::_toPoco(const HTTPServerParams& params)
 {
     // hack!
     // all of these params are an attempt to make the server shut down VERY quickly.
@@ -422,7 +446,7 @@ Poco::Net::HTTPServerParams::Ptr BaseServer_<SettingsType>::getPocoHTTPServerPar
     // that the value must be > 0.
     if (params.getMaxThreads() <= 0)
     {
-        serverParams->setMaxThreads(getThreadPoolRef().capacity());
+        serverParams->setMaxThreads(getThreadPool().capacity());
     }
     else
     {

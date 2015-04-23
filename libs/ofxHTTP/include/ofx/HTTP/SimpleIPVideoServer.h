@@ -22,48 +22,53 @@
 //
 // =============================================================================
 
-
 #pragma once
 
 
-#include <algorithm>
-#include "ofImage.h"
-#include "ofx/HTTP/BaseRoute.h"
-#include "ofx/HTTP/IPVideoRouteHandler.h"
+#include "ofx/HTTP/BaseServer.h"
+#include "ofx/HTTP/FileSystemRoute.h"
+#include "ofx/HTTP/IPVideoRoute.h"
 #include "ofx/HTTP/IPVideoRouteSettings.h"
-#include "ofx/HTTP/IPVideoFrameQueue.h"
-#include "ofx/HTTP/HTTPUtils.h"
+#include "ofx/HTTP/PostRoute.h"
+#include "ofx/HTTP/PostRouteSettings.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class IPVideoRoute: public BaseRoute_<IPVideoRouteSettings>
+class SimpleIPVideoServerSettings: public BaseServerSettings
 {
 public:
-    typedef IPVideoRouteSettings Settings;
+    FileSystemRouteSettings fileSystemRouteSettings;
+    PostRouteSettings postRouteSettings;
+    IPVideoRouteSettings ipVideoRouteSettings;
+};
 
-    IPVideoRoute(const Settings& settings);
-    virtual ~IPVideoRoute();
 
-    Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
+class SimpleIPVideoServer: public BaseServer_<SimpleIPVideoServerSettings>
+{
+public:
+    typedef SimpleIPVideoServerSettings Settings;
 
-    void send(ofPixels& pix) const;
+    SimpleIPVideoServer(const Settings& settings = Settings());
 
-    void addConnection(IPVideoRouteHandler* handler);
-    void removeConnection(IPVideoRouteHandler* handler);
+    virtual ~SimpleIPVideoServer();
+
+    virtual void setup(const Settings& settings);
+
+    void send(ofPixels& pix);
 
     std::size_t getNumConnections() const;
 
-    virtual void stop();
+    FileSystemRoute& getFileSystemRoute();
+    PostRoute& getPostRoute();
+    IPVideoRoute& getIPVideoRoute();
 
 protected:
-    typedef std::vector<IPVideoRouteHandler*> Connections;
-
-    Connections _connections;
-
-    mutable ofMutex _mutex;
+    FileSystemRoute _fileSystemRoute;
+    PostRoute _postRoute;
+    IPVideoRoute _ipVideoRoute;
 
 };
 

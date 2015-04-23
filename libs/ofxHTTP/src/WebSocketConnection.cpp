@@ -51,9 +51,9 @@ WebSocketConnection::~WebSocketConnection()
 void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                                         Poco::Net::HTTPServerResponse& response)
 {
-    Poco::UUID sessionId = _parent.getSessionId(request, response);
+    Poco::UUID sessionId = Poco::UUID::null();// _parent.getSessionId(request, response);
 
-    // get a copy of the settings
+    // Get a copy of the settings.
     WebSocketRouteSettings settings = _parent.getSettings();
     WebSocketEvents& events = _parent.events;
 
@@ -62,16 +62,16 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
         _requestHeaders = request;
         _clientAddress = request.clientAddress();
 
-        /// \todo fix when poco is upgraded
-        applyFirefoxHack(request); //
+        /// \todo Fix when poco is upgraded.
+        applyFirefoxHack(request);
 
-        // check origin headers
+        // Check origin headers.
         handleOrigin(request, response);
 
-        // validate subprotocols
+        // Validate subprotocols.
         handleSubprotocols(request, response);
 
-        // respond to extensions
+        // Respond to extensions.
         handleExtensions(request, response);
 
         Poco::Net::WebSocket ws(request, response);
@@ -152,7 +152,8 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                         if (n > 2)
                         {
                             // Skip the first two bytes of the code.
-                            reason = std::string(frame.getText().begin() + 2, frame.getText().end());
+                            reason = std::string(frame.getText().begin() + 2,
+                                                 frame.getText().end());
                         }
                         else
                         {
@@ -199,7 +200,8 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
 
                 if (frame.size() > 0)
                 {
-                    if (ws.poll(settings.getPollTimeout(), Poco::Net::Socket::SELECT_WRITE))
+                    if (ws.poll(settings.getPollTimeout(),
+                                Poco::Net::Socket::SELECT_WRITE))
                     {
                         int numBytesSent = 0;
 
@@ -230,7 +232,8 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
             }
 
             // Check for read error
-            if (ws.poll(settings.getPollTimeout(), Poco::Net::Socket::SELECT_ERROR))
+            if (ws.poll(settings.getPollTimeout(),
+                        Poco::Net::Socket::SELECT_ERROR))
             {
                 ofScopedLock lock(_mutex);
                 _isConnected = false;
@@ -473,10 +476,11 @@ void WebSocketConnection::applyFirefoxHack(Poco::Net::HTTPServerRequest& request
     // require websocket upgrade headers
     std::string connectionHeader = Poco::toLower(request.get("Connection", ""));
     
-    if(Poco::icompare(connectionHeader, "Upgrade") != 0)
+    if (Poco::icompare(connectionHeader, "Upgrade") != 0)
     {
         std::string userAgent = Poco::toLower(request.get("User-Agent",""));
-        if(!userAgent.empty() &&
+
+        if (!userAgent.empty() &&
            !connectionHeader.empty() &&
            ofIsStringInString(userAgent,"firefox") &&
            ofIsStringInString(connectionHeader,"upgrade"))

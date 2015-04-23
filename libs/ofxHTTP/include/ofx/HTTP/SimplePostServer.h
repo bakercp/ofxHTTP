@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2012-2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,45 +26,44 @@
 #pragma once
 
 
-#include <algorithm>
-#include "ofImage.h"
-#include "ofx/HTTP/BaseRoute.h"
-#include "ofx/HTTP/IPVideoRouteHandler.h"
-#include "ofx/HTTP/IPVideoRouteSettings.h"
-#include "ofx/HTTP/IPVideoFrameQueue.h"
-#include "ofx/HTTP/HTTPUtils.h"
+#include "ofx/HTTP/SimpleFileServer.h"
+#include "ofx/HTTP/PostRoute.h"
+#include "ofx/HTTP/PostRouteSettings.h"
+#include "ofx/HTTP/PostRouteEvents.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class IPVideoRoute: public BaseRoute_<IPVideoRouteSettings>
+/// \brief Settings for a BasicServer.
+class SimplePostServerSettings: public BaseServerSettings
 {
 public:
-    typedef IPVideoRouteSettings Settings;
+    FileSystemRouteSettings fileSystemRouteSettings;
+    PostRouteSettings postRouteSettings;
 
-    IPVideoRoute(const Settings& settings);
-    virtual ~IPVideoRoute();
+};
 
-    Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
 
-    void send(ofPixels& pix) const;
+class SimplePostServer: public BaseServer_<SimplePostServerSettings>
+{
+public:
+    typedef SimplePostServerSettings Settings;
 
-    void addConnection(IPVideoRouteHandler* handler);
-    void removeConnection(IPVideoRouteHandler* handler);
+    SimplePostServer(const Settings& settings = Settings());
 
-    std::size_t getNumConnections() const;
+    virtual ~SimplePostServer();
 
-    virtual void stop();
+    virtual void setup(const Settings& settings);
+
+    FileSystemRoute& getFileSystemRoute();
+    PostRoute& getPostRoute();
 
 protected:
-    typedef std::vector<IPVideoRouteHandler*> Connections;
-
-    Connections _connections;
-
-    mutable ofMutex _mutex;
-
+    FileSystemRoute _fileSystemRoute;
+    PostRoute _postRoute;
+    
 };
 
 

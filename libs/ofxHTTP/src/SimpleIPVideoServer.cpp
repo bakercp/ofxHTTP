@@ -23,49 +23,70 @@
 // =============================================================================
 
 
-#pragma once
-
-
-#include <algorithm>
-#include "ofImage.h"
-#include "ofx/HTTP/BaseRoute.h"
-#include "ofx/HTTP/IPVideoRouteHandler.h"
-#include "ofx/HTTP/IPVideoRouteSettings.h"
-#include "ofx/HTTP/IPVideoFrameQueue.h"
-#include "ofx/HTTP/HTTPUtils.h"
+#include "ofx/HTTP/SimpleIPVideoServer.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class IPVideoRoute: public BaseRoute_<IPVideoRouteSettings>
+SimpleIPVideoServer::SimpleIPVideoServer(const Settings& settings):
+    BaseServer_<SimpleIPVideoServerSettings>(settings),
+    _fileSystemRoute(settings.fileSystemRouteSettings),
+    _postRoute(settings.postRouteSettings),
+    _ipVideoRoute(settings.ipVideoRouteSettings)
 {
-public:
-    typedef IPVideoRouteSettings Settings;
+    addRoute(&_fileSystemRoute);
+    addRoute(&_postRoute);
+    addRoute(&_ipVideoRoute);
+}
 
-    IPVideoRoute(const Settings& settings);
-    virtual ~IPVideoRoute();
 
-    Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
+SimpleIPVideoServer::~SimpleIPVideoServer()
+{
+    removeRoute(&_ipVideoRoute);
+    removeRoute(&_postRoute);
+    removeRoute(&_fileSystemRoute);
+}
 
-    void send(ofPixels& pix) const;
 
-    void addConnection(IPVideoRouteHandler* handler);
-    void removeConnection(IPVideoRouteHandler* handler);
+void SimpleIPVideoServer::setup(const Settings& settings)
+{
+    BaseServer_<SimpleIPVideoServerSettings>::setup(settings);
+    _fileSystemRoute.setup(settings.fileSystemRouteSettings);
+    _postRoute.setup(settings.postRouteSettings);
+    _fileSystemRoute.setup(settings.fileSystemRouteSettings);
+}
 
-    std::size_t getNumConnections() const;
 
-    virtual void stop();
+void SimpleIPVideoServer::send(ofPixels& pix)
+{
+    _ipVideoRoute.send(pix);
+}
 
-protected:
-    typedef std::vector<IPVideoRouteHandler*> Connections;
 
-    Connections _connections;
+std::size_t SimpleIPVideoServer::getNumConnections() const
+{
+    return _ipVideoRoute.getNumConnections();
+}
 
-    mutable ofMutex _mutex;
 
-};
+FileSystemRoute& SimpleIPVideoServer::getFileSystemRoute()
+{
+    return _fileSystemRoute;
+}
+
+
+PostRoute& SimpleIPVideoServer::getPostRoute()
+{
+    return _postRoute;
+}
+
+
+IPVideoRoute& SimpleIPVideoServer::getIPVideoRoute()
+{
+    return _ipVideoRoute;
+}
 
 
 } } // namespace ofx::HTTP
