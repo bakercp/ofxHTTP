@@ -6,4 +6,4 @@ meta:
 	ADDON_URL = http://github.com/bakercp/ofxHTTP
 
 common:
-	ADDON_DEPENDENCIES = ofxSSLManager ofxIO ofxMediaType ofxTaskQueue
+	ADDON_DEPENDENCIES = ofxSSLManager ofxIO ofxMediaType ofxTaskQueue ofxNetworkUtils
