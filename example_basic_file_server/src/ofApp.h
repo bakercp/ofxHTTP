@@ -36,6 +36,6 @@ public:
     void setup();
     void draw();
 
-    ofx::HTTP::BasicServer::SharedPtr server;
-    
+    ofx::HTTP::SimpleFileServer server;
+
 };
