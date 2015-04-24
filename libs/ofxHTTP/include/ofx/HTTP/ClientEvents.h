@@ -41,30 +41,11 @@ namespace HTTP {
 class MutableClientRequestArgs: public ofEventArgs
 {
 public:
-    MutableClientRequestArgs(BaseRequest& request,
-                             Context& context):
-        _request(request),
-        _context(context)
-    {
-    }
+    MutableClientRequestArgs(BaseRequest& request, Context& context);
+    virtual ~MutableClientRequestArgs();
+    BaseRequest& getRequest() const;
+    Context& getContext();
 
-
-    virtual ~MutableClientRequestArgs()
-    {
-    }
-
-
-    BaseRequest& getRequestRef() const
-    {
-        return _request;
-    }
-
-
-    Context& getContextRef()
-    {
-        return _context;
-    }
-    
 protected:
     BaseRequest& _request;
     Context& _context;
@@ -77,23 +58,10 @@ class MutableClientResponseArgs: public MutableClientRequestArgs
 public:
     MutableClientResponseArgs(BaseRequest& request,
                               BaseResponse& response,
-                              Context& context):
-        MutableClientRequestArgs(request, context),
-        _response(response)
-    {
-    }
+                              Context& context);
+    virtual ~MutableClientResponseArgs();
+    BaseResponse& getResponse();
 
-
-    virtual ~MutableClientResponseArgs()
-    {
-    }
-
-
-    BaseResponse& getResponseRef()
-    {
-        return _response;
-    }
-    
 protected:
     BaseResponse& _response;
     
@@ -104,35 +72,11 @@ protected:
 class BaseClientRequestArgs: public ofEventArgs
 {
 public:
-    BaseClientRequestArgs(const BaseRequest& request,
-                          Context& context):
-        _request(request),
-        _context(context)
-    {
-    }
-
-
-    virtual ~BaseClientRequestArgs()
-    {
-    }
-
-
-    const BaseRequest& getRequest() const
-    {
-        return _request;
-    }
-
-
-    Context& getContextRef()
-    {
-        return _context;
-    }
-
-
-    const Poco::UUID getRequestId() const
-    {
-        return _request.getRequestId();
-    }
+    BaseClientRequestArgs(const BaseRequest& request, Context& context);
+    virtual ~BaseClientRequestArgs();
+    const BaseRequest& getRequest() const;
+    Context& getContext();
+    const Poco::UUID getRequestId() const;
 
 protected:
     const BaseRequest& _request;
@@ -144,24 +88,13 @@ protected:
 class BaseProgressArgs
 {
 public:
-    BaseProgressArgs(std::streamsize totalBytesTransferred):
-        _totalBytesTransferred(totalBytesTransferred)
-    {
-    }
-
-    virtual ~BaseProgressArgs()
-    {
-    }
-
+    BaseProgressArgs(std::streamsize totalBytesTransferred);
+    virtual ~BaseProgressArgs();
     virtual std::streamsize getContentLength() const = 0;
-
 
     /// \brief Get the total number of bytes transferred during this request.
     /// \returns the total number of bytes transferred.
-    std::streamsize getTotalBytesTransferred() const
-    {
-        return _totalBytesTransferred;
-    }
+    std::streamsize getTotalBytesTransferred() const;
 
     /// \brief Get the progress of the request upload or download.
     ///
@@ -171,19 +104,7 @@ public:
     ///
     /// \returns a value 0.0 - 1.0 iff the content length is known.  Otherwise
     /// returns Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH.
-    float getProgress() const
-    {
-        std::streamsize contentLength = getContentLength();
-
-        if (Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH == contentLength)
-        {
-            return Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH;
-        }
-        else
-        {
-            return _totalBytesTransferred / (float)contentLength;
-        }
-    }
+    float getProgress() const;
 
 protected:
     std::streamsize _totalBytesTransferred;
@@ -198,15 +119,9 @@ class ClientRequestProgressArgs:
 public:
     ClientRequestProgressArgs(const BaseRequest& request,
                               Context& context,
-                              std::streamsize totalBytesTransferred):
-        BaseClientRequestArgs(request, context),
-        BaseProgressArgs(totalBytesTransferred)
-    {
-    }
+                              std::streamsize totalBytesTransferred);
 
-    virtual ~ClientRequestProgressArgs()
-    {
-    }
+    virtual ~ClientRequestProgressArgs();
 
     /// \brief Get the total content length associated with this request.
     ///
@@ -216,10 +131,8 @@ public:
     /// \returns the total length of the content in bytes iff the content length
     /// is known.  Otherwise returns
     /// Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH.
-    std::streamsize getContentLength() const
-    {
-        return _request.getContentLength();
-    }
+    std::streamsize getContentLength() const;
+
 };
 
 
@@ -228,22 +141,12 @@ class BaseClientResponseArgs: public BaseClientRequestArgs
 public:
     BaseClientResponseArgs(const BaseRequest& request,
                            const BaseResponse& response,
-                           Context& context):
-        BaseClientRequestArgs(request, context),
-        _response(response)
-    {
-    }
+                           Context& context);
 
-    
-    virtual ~BaseClientResponseArgs()
-    {
-    }
+    virtual ~BaseClientResponseArgs();
 
 
-    const BaseResponse& getResponse() const
-    {
-        return _response;
-    }
+    const BaseResponse& getResponse() const;
 
 protected:
     const BaseResponse& _response;
@@ -259,15 +162,9 @@ public:
     ClientResponseProgressArgs(const BaseRequest& request,
                                const BaseResponse& response,
                                Context& context,
-                               std::streamsize bytesTransferred):
-        BaseClientResponseArgs(request, response, context),
-        BaseProgressArgs(bytesTransferred)
-    {
-    }
+                               std::streamsize bytesTransferred);
 
-    virtual ~ClientResponseProgressArgs()
-    {
-    }
+    virtual ~ClientResponseProgressArgs();
 
     /// \brief Get the total content length associated with this request.
     ///
@@ -277,10 +174,8 @@ public:
     /// \returns the total length of the content in bytes iff the content length
     /// is known.  Otherwise returns
     /// Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH.
-    std::streamsize getContentLength() const
-    {
-        return _response.getContentLength();
-    }
+    std::streamsize getContentLength() const;
+
 };
 
 

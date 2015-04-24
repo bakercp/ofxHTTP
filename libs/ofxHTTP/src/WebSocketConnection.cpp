@@ -25,6 +25,7 @@
 
 #include "ofx/HTTP/WebSocketConnection.h"
 #include "ofx/HTTP/WebSocketRoute.h"
+#include "ofx/HTTP/SessionCache.h"
 #include "Poco/ByteOrder.h"
 
 
@@ -51,7 +52,12 @@ WebSocketConnection::~WebSocketConnection()
 void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                                         Poco::Net::HTTPServerResponse& response)
 {
-    Poco::UUID sessionId = Poco::UUID::null();// _parent.getSessionId(request, response);
+    Poco::UUID sessionId = Poco::UUID::null();
+
+    if (_parent.getServer())
+    {
+        sessionId = _parent.getServer()->getSessionCache().getSessionData(request, response).getId();
+    }
 
     // Get a copy of the settings.
     WebSocketRouteSettings settings = _parent.getSettings();

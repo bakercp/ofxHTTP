@@ -47,7 +47,7 @@ Poco::Net::HTTPRequestHandler* PostRoute::createRequestHandler(const Poco::Net::
 }
 
 
-PostRouteEvents& PostRoute::getEventsRef()
+PostRouteEvents& PostRoute::getEvents()
 {
     return events;
 }

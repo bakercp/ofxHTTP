@@ -40,12 +40,6 @@ namespace HTTP {
 class PostRoute: public BaseRoute_<PostRouteSettings>
 {
 public:
-    /// \brief A typedef for a shared pointer.
-    typedef std::shared_ptr<PostRoute> SharedPtr;
-
-    /// \brief A typedef for a weak pointer.
-    typedef std::weak_ptr<PostRoute> WeakPtr;
-
     /// \brief A typedef for the WebSocketRouteSettings.
     typedef PostRouteSettings Settings;
 
@@ -55,7 +49,7 @@ public:
 
     Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
 
-    virtual PostRouteEvents& getEventsRef();
+    PostRouteEvents& getEvents();
 
     PostRouteEvents events;
 
@@ -64,11 +58,6 @@ public:
 
     template<class ListenerClass>
     void unregisterPostEvents(ListenerClass* listener);
-
-    static SharedPtr makeShared(const Settings& settings = Settings())
-    {
-        return SharedPtr(new PostRoute(settings));
-    }
 
 };
 

@@ -26,36 +26,37 @@
 #pragma once
 
 
-#include "ofUtils.h"
-#include "ofx/MediaTypeMap.h"
-#include "ofx/HTTP/FileSystemRouteSettings.h"
+#include "Poco/Net/HTTPServerRequest.h"
+#include "Poco/Net/HTTPServerResponse.h"
+#include "ofLog.h"
+#include "ofx/HTTP/AbstractServerTypes.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class FileSystemRoute;
-
-
-class FileSystemRouteHandler: public AbstractRouteHandler
+// A wrapper class to allow a route to handle a request internally without
+// instantiating an explicit route handler class.
+class RouteHandlerAdapter: public AbstractRouteHandler
 {
 public:
-    typedef FileSystemRouteSettings Settings;
+    /// \brief Create a RouteHandlerAdapter with the given handler reference.
+    /// \param defaultRouteHandler The default HTTPRequestHandler to use.
+    RouteHandlerAdapter(AbstractRoute& route);
 
-    FileSystemRouteHandler(FileSystemRoute& parent);
-
-    virtual ~FileSystemRouteHandler();
+    /// \brief Destroy the RouteHandlerAdapter.
+    virtual ~RouteHandlerAdapter();
 
     virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
                                Poco::Net::HTTPServerResponse& response);
 
     virtual void stop();
 
-private:
-    FileSystemRoute& _parent;
+protected:
+    AbstractRoute& _route;
 
 };
-    
+
 
 } } // namespace ofx::HTTP

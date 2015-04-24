@@ -110,7 +110,7 @@ bool DefaultClientTask::onHTTPClientResponseEvent(HTTP::ClientResponseEventArgs&
         ClientResponseBufferEventArgs bufferEvent(_byteBuffer,
                                                   args.getRequest(),
                                                   args.getResponse(),
-                                                  args.getContextRef());
+                                                  args.getContext());
         handleBufferEvent(bufferEvent);
     }
 
@@ -127,6 +127,7 @@ void DefaultClientTask::handleBufferEvent(const ClientResponseBufferEventArgs& b
 
 bool DefaultClientTask::onHTTPClientErrorEvent(HTTP::ClientErrorEventArgs& args)
 {
+    // We throw an exception to be caught by the task manager.
     throw args.getException();
     return true;
 }

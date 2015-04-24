@@ -33,7 +33,7 @@
 #include "Poco/URI.h"
 #include "ofLog.h"
 #include "ofx/HTTP/AbstractServerTypes.h"
-#include "ofx/HTTP/BaseRouteHandler.h"
+#include "ofx/HTTP/RouteHandlerAdapter.h"
 #include "ofx/HTTP/BaseRouteSettings.h"
 
 
@@ -200,7 +200,10 @@ bool BaseRoute_<SettingsType>::canHandleRequest(const Poco::Net::HTTPServerReque
 template<typename SettingsType>
 Poco::Net::HTTPRequestHandler* BaseRoute_<SettingsType>::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
 {
-    return new BaseRouteHandler(*this);
+    // A route handler adapter adapts the factory class (e.g. the BaseRoute_)
+    // to act as a reusable instance.  The instance passed to the RouteHandler
+    // adapter should not modify the internal state of the route itself.
+    return new RouteHandlerAdapter(*this);
 }
 
 
@@ -227,13 +230,15 @@ void BaseRoute_<SettingsType>::handleRequest(Poco::Net::HTTPServerRequest& reque
         response.setChunkedTransferEncoding(true);
         response.setContentType("text/html");
 
+        std::stringstream ss;
+        ss << response.getStatus() << " - " << response.getReason();
+
         std::ostream& ostr = response.send(); // get output stream
-        ostr << "<html>";
-        ostr << "<head><title>" << response.getStatus() << " - " << response.getReason() << "</title></head>";
-        ostr << "<body>";
-        ostr << "<h1>" << response.getStatus() << " - " << response.getReason() << "</h1>";
-        ostr << "</body>";
-        ostr << "<html>";
+        ostr << "<!DOCTYPE html><html><head><meta charset=\"utf-8\"/><title>";
+        ostr << ss.str();
+        ostr << "</title></head><body><h1>";
+        ostr << ss.str();
+        ostr << "</h1></body></html>";
     }
     catch (const Poco::Exception& exc)
     {

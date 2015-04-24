@@ -23,39 +23,35 @@
 // =============================================================================
 
 
-#pragma once
-
-
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
-#include "ofLog.h"
-#include "ofx/HTTP/AbstractServerTypes.h"
+#include "ofx/HTTP/RouteHandlerAdapter.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class BaseRouteHandler: public AbstractRouteHandler
+RouteHandlerAdapter::RouteHandlerAdapter(AbstractRoute& route):
+    _route(route)
 {
-public:
-    /// \brief Create a BaseRouteHandler with the given handler reference.
-    /// \param defaultRouteHandler The default HTTPRequestHandler to use.
-    BaseRouteHandler(Poco::Net::HTTPRequestHandler& defaultRouteHandler);
-
-    /// \brief Destroy the BaseRouteHandler.
-    virtual ~BaseRouteHandler();
-
-    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
-                               Poco::Net::HTTPServerResponse& response);
+}
 
 
-    virtual void stop();
+RouteHandlerAdapter::~RouteHandlerAdapter()
+{
+}
 
-protected:
-    Poco::Net::HTTPRequestHandler& _defaultRouteHandler;
 
-};
+void RouteHandlerAdapter::handleRequest(Poco::Net::HTTPServerRequest& request,
+                                        Poco::Net::HTTPServerResponse& response)
+{
+    _route.handleRequest(request,response);
+}
+
+
+void RouteHandlerAdapter::stop()
+{
+    // empty
+}
 
 
 } } // namespace ofx::HTTP
