@@ -38,11 +38,12 @@ class IPVideoFrameQueue
 {
 public:
     IPVideoFrameQueue(std::size_t maxSize);
+
     virtual ~IPVideoFrameQueue();
 
-    IPVideoFrame::SharedPtr pop();
+    std::shared_ptr<IPVideoFrame> pop();
     
-    void push(IPVideoFrame::SharedPtr frame);
+    void push(std::shared_ptr<IPVideoFrame> frame);
 
     std::size_t getMaxSize() const;
 
@@ -52,13 +53,14 @@ public:
 
     bool empty() const;
 
-private:
-    typedef std::deque<IPVideoFrame::SharedPtr> ClientFrameQueue;
+    void clear();
 
-    ClientFrameQueue _frames;
+private:
+    std::deque<std::shared_ptr<IPVideoFrame> > _frames;
+
     std::size_t _maxSize;
 
-    mutable ofMutex _mutex;
+    mutable Poco::FastMutex _mutex;
     
 };
 

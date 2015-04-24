@@ -40,6 +40,7 @@ IPVideoRoute::~IPVideoRoute()
 {
 }
 
+
 Poco::Net::HTTPRequestHandler* IPVideoRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
 {
     return new IPVideoRouteHandler(*this);
@@ -48,17 +49,16 @@ Poco::Net::HTTPRequestHandler* IPVideoRoute::createRequestHandler(const Poco::Ne
 
 void IPVideoRoute::send(ofPixels& pix) const
 {
-    if(pix.isAllocated())
+    if (pix.isAllocated())
     {
         unsigned long long timestamp = ofGetElapsedTimeMillis();
 
-        ofPixels pixels(pix); // copy the pixels (const!)
         ofBuffer compressedPixels;
 
         // TODO: turbo jpeg an option here?
-        ofSaveImage(pixels, compressedPixels, OF_IMAGE_FORMAT_JPEG, OF_IMAGE_QUALITY_MEDIUM);
+        ofSaveImage(pix, compressedPixels, OF_IMAGE_FORMAT_JPEG, OF_IMAGE_QUALITY_MEDIUM);
 
-        ofScopedLock lock(_mutex);
+        Poco::FastMutex::ScopedLock lock(_mutex);
 
         Connections::const_iterator iter = _connections.begin();
 
@@ -66,9 +66,9 @@ void IPVideoRoute::send(ofPixels& pix) const
 //
 //        settings.quality = settings.quality;
 
-        IPVideoFrame::SharedPtr frame = IPVideoFrame::makeShared(settings, timestamp, compressedPixels);
+        std::shared_ptr<IPVideoFrame> frame = std::shared_ptr<IPVideoFrame>(new IPVideoFrame(settings, timestamp, compressedPixels));
 
-        while(iter != _connections.end())
+        while (iter != _connections.end())
         {
             if(*iter)
             {
@@ -81,43 +81,49 @@ void IPVideoRoute::send(ofPixels& pix) const
             ++iter;
         }
             
-    } else {
-        ofLogError("ofxIpVideoServerRoute::pushFrame") << "Pushing unallocated pixels.";
+    }
+    else
+    {
+        ofLogError("IPVideoRoute::pushFrame") << "Pushing unallocated pixels.";
     }
 }
 
 
 void IPVideoRoute::addConnection(IPVideoRouteHandler* handler)
 {
-    ofScopedLock lock(_mutex);
+    Poco::FastMutex::ScopedLock lock(_mutex);
     _connections.push_back(handler);
 }
 
 
 void IPVideoRoute::removeConnection(IPVideoRouteHandler* handler)
 {
-    ofScopedLock lock(_mutex);
+    Poco::FastMutex::ScopedLock lock(_mutex);
     _connections.erase(std::remove(_connections.begin(), _connections.end(), handler), _connections.end());
 }
 
 
 std::size_t IPVideoRoute::getNumConnections() const
 {
-    ofScopedLock lock(_mutex);
+    Poco::FastMutex::ScopedLock lock(_mutex);
     return _connections.size();
 }
 
 
 void IPVideoRoute::stop()
 {
-    if(!_connections.empty())
+    if (!_connections.empty())
     {
-        for(std::size_t i = _connections.size() - 1; i > 0; --i)
+        Connections::reverse_iterator iter = _connections.rbegin();
+
+        while (iter != _connections.rend())
         {
-            if(_connections[i])
+            if (*iter)
             {
-                _connections[i]->stop();
+                (*iter)->stop();
             }
+
+            ++iter;
         }
     }
 }

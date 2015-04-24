@@ -41,13 +41,13 @@ IPVideoFrameQueue::~IPVideoFrameQueue()
 }
 
 
-IPVideoFrame::SharedPtr IPVideoFrameQueue::pop()
+std::shared_ptr<IPVideoFrame> IPVideoFrameQueue::pop()
 {
-    IPVideoFrame::SharedPtr frame;
+    std::shared_ptr<IPVideoFrame> frame;
 
     ofScopedLock lock(_mutex);
 
-    if(!_frames.empty())
+    if (!_frames.empty())
     {
         frame = _frames.front();
         _frames.pop_front();
@@ -60,7 +60,7 @@ IPVideoFrame::SharedPtr IPVideoFrameQueue::pop()
 }
 
 
-void IPVideoFrameQueue::push(IPVideoFrame::SharedPtr frame)
+void IPVideoFrameQueue::push(std::shared_ptr<IPVideoFrame> frame)
 {
     ofScopedLock lock(_mutex);
 
@@ -84,7 +84,7 @@ void IPVideoFrameQueue::setMaxSize(std::size_t maxSize)
 {
     ofScopedLock lock(_mutex);
     _maxSize = maxSize;
-    while(_frames.size() > _maxSize)
+    while (_frames.size() > _maxSize)
     {
         _frames.pop_front();
     }
@@ -102,6 +102,13 @@ bool IPVideoFrameQueue::empty() const
 {
     ofScopedLock lock(_mutex);
     return _frames.empty();
+}
+
+
+void IPVideoFrameQueue::clear()
+{
+    ofScopedLock lock(_mutex);
+    _frames.clear();
 }
 
     

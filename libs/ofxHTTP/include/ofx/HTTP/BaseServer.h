@@ -86,7 +86,7 @@ class BaseServer_: public AbstractServer
 {
 public:
     BaseServer_(const SettingsType& settings = SettingsType(),
-                Poco::ThreadPool& threadPoolRef = Poco::ThreadPool::defaultPool());
+                Poco::ThreadPool& rThreadPool = Poco::ThreadPool::defaultPool());
 
     virtual ~BaseServer_();
         
@@ -284,7 +284,7 @@ void BaseServer_<SettingsType>::stop()
     // Wait for all threads in the thread pool.
     // Particularly troubling if we are sharing
     // this pool with other non-server-based-processes.
-    // getThreadPoolRef().joinAll();
+    // getThreadPool().joinAll();
 
     getThreadPool().stopAll();
 

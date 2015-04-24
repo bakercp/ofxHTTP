@@ -122,7 +122,7 @@ const Poco::Net::HTMLForm& BaseRequest::getForm() const
 }
 
 
-Poco::Net::HTMLForm& BaseRequest::getFormRef()
+Poco::Net::HTMLForm& BaseRequest::getForm()
 {
     return _form;
 }

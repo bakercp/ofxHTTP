@@ -57,7 +57,7 @@ unsigned long long IPVideoFrame::getTimestamp() const
 }
 
 
-ofBuffer& IPVideoFrame::getBufferRef()
+ofBuffer& IPVideoFrame::getBuffer()
 {
     return _buffer;
 }

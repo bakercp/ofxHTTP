@@ -219,7 +219,7 @@ public:
     }
 
     /// \returns A reference to the WebSocketFrame associated with the event.
-    const WebSocketFrame& getFrameRef() const
+    const WebSocketFrame& getFrame() const
     {
         return _frame;
     }

@@ -45,6 +45,7 @@ public:
     typedef IPVideoRouteSettings Settings;
 
     IPVideoRoute(const Settings& settings);
+    
     virtual ~IPVideoRoute();
 
     Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
@@ -52,6 +53,7 @@ public:
     void send(ofPixels& pix) const;
 
     void addConnection(IPVideoRouteHandler* handler);
+
     void removeConnection(IPVideoRouteHandler* handler);
 
     std::size_t getNumConnections() const;
@@ -63,7 +65,7 @@ protected:
 
     Connections _connections;
 
-    mutable ofMutex _mutex;
+    mutable Poco::FastMutex _mutex;
 
 };
 

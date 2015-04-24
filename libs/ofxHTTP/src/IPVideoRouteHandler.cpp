@@ -83,7 +83,7 @@ void IPVideoRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
 
     Poco::Net::NameValueCollection queryMap = HTTPUtils::getQueryMap(uri);
 
-    if(queryMap.has("vflip"))
+    if (queryMap.has("vflip"))
     {
         std::string vflip = queryMap.get("vflip");
         _frameSettings.setFlipVertical(Poco::icompare(vflip,"1")    == 0 ||
@@ -93,7 +93,7 @@ void IPVideoRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
                                        Poco::icompare(vflip,"yes")  == 0);
     }
 
-    if(queryMap.has("hflip"))
+    if (queryMap.has("hflip"))
     {
         std::string hflip = queryMap.get("hflip");
         _frameSettings.setFlipHorizontal(Poco::icompare(hflip,"1")    == 0 ||
@@ -103,13 +103,13 @@ void IPVideoRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
                                          Poco::icompare(hflip,"yes")  == 0);
     }
 
-    if(queryMap.has("size"))
+    if (queryMap.has("size"))
     {
         std::string size = queryMap.get("size");
         Poco::toLowerInPlace(size);
         std::vector<std::string> tokens = ofSplitString(size,"x");
 
-        if(tokens.size() == 2)
+        if (tokens.size() == 2)
         {
             std::size_t width = 0;
             std::istringstream token0(tokens[0]);
@@ -119,7 +119,7 @@ void IPVideoRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
             std::istringstream token1(tokens[1]);
             token1 >> height;
 
-            if(width > 0 && height > 0)
+            if (width > 0 && height > 0)
             {
                 width = std::min(width,_parent.getSettings().getMaxStreamWidth());
                 height = std::min(height,_parent.getSettings().getMaxStreamHeight());
@@ -129,26 +129,26 @@ void IPVideoRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
         }
     }
 
-    if(queryMap.has("quality"))
+    if (queryMap.has("quality"))
     {
         std::string quality = queryMap.get("quality");
-        if(Poco::icompare(quality,"best"))
+        if (Poco::icompare(quality,"best"))
         {
             _frameSettings.setQuality(OF_IMAGE_QUALITY_BEST);
         }
-        else if(Poco::icompare(quality,"high"))
+        else if (Poco::icompare(quality,"high"))
         {
             _frameSettings.setQuality(OF_IMAGE_QUALITY_HIGH);
         }
-        else if(Poco::icompare(quality,"medium"))
+        else if (Poco::icompare(quality,"medium"))
         {
             _frameSettings.setQuality(OF_IMAGE_QUALITY_MEDIUM);
         }
-        else if(Poco::icompare(quality,"low"))
+        else if (Poco::icompare(quality,"low"))
         {
             _frameSettings.setQuality(OF_IMAGE_QUALITY_LOW);
         }
-        else if(Poco::icompare(quality,"worst"))
+        else if (Poco::icompare(quality,"worst"))
         {
             _frameSettings.setQuality(OF_IMAGE_QUALITY_WORST);
         }
@@ -175,17 +175,17 @@ void IPVideoRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
 
         Poco::CountingOutputStream ostr(outputStream);
 
-        while(_isRunning)
+        while (_isRunning)
         {
-            if(outputStream.good() && !outputStream.fail() && !outputStream.bad())
+            if (outputStream.good() && !outputStream.fail() && !outputStream.bad())
             {
-                if(!empty())
+                if (!empty())
                 {
-                    IPVideoFrame::SharedPtr frame = pop();
+                    std::shared_ptr<IPVideoFrame> frame = pop();
 
-                    if(0 != frame)
+                    if (0 != frame)
                     {
-                        const ofBuffer& buffer = frame->getBufferRef();
+                        const ofBuffer& buffer = frame->getBuffer();
 
                         ostr << _parent.getSettings().getBoundaryMarker();
                         ostr << "\r\n";

@@ -98,7 +98,7 @@ public:
 
     const Poco::Net::HTMLForm& getForm() const;
 
-    Poco::Net::HTMLForm& getFormRef();
+    Poco::Net::HTMLForm& getForm();
 
     static Poco::UUID generateUUID();
 
