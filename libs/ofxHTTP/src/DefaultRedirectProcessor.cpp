@@ -54,7 +54,7 @@ void DefaultRedirectProcessor::responseFilter(BaseRequest& request,
 {
     if (canFilterResponse(request, response, context))
     {
-        if (context.getRedirects().size() < context.getSessionSettings().getMaxRedirects())
+        if (context.getRedirects().size() < context.getClientSessionSettings().getMaxRedirects())
         {
             Poco::URI currentURI(request.getURI());
 

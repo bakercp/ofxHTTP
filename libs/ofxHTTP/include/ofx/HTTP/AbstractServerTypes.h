@@ -40,8 +40,40 @@ namespace ofx {
 namespace HTTP {
 
 
-class SessionCache;
 class WebSocketFrame;
+
+
+class AbstractHasSessionId
+{
+public:
+    virtual ~AbstractHasSessionId()
+    {
+    }
+
+    virtual Poco::UUID getSessionId() const = 0;
+
+};
+
+
+class AbstractSession: public AbstractHasSessionId
+{
+public:
+    virtual ~AbstractSession()
+    {
+    }
+
+    virtual const Poco::Timestamp getLastModified() const = 0;
+
+    virtual bool has(const std::string& key) const = 0;
+
+    virtual void put(const std::string& key, const Poco::Any& value) = 0;
+
+    virtual Poco::Any get(const std::string& key, const Poco::Any& value) const = 0;
+
+};
+
+
+class AbstractSessionManager;
 
 
 class AbstractServer: public Poco::Net::HTTPRequestHandlerFactory
@@ -53,7 +85,7 @@ public:
     }
 
     /// \brief Return a reference to the session cache.
-    virtual SessionCache& getSessionCache() = 0;
+    virtual AbstractSessionManager& getSessionManager() = 0;
 
 };
 
@@ -77,6 +109,20 @@ public:
 
 
 
+};
+
+
+class AbstractSessionManager: public AbstractHTTPRequestHandler
+{
+public:
+    virtual ~AbstractSessionManager()
+    {
+    }
+
+    virtual Poco::UUID getSessionId(const Poco::Net::HTTPServerRequest& request) const = 0;
+
+    virtual std::shared_ptr<AbstractSession> getSession(const Poco::UUID& sessionId) = 0;
+    
 };
 
 
@@ -182,25 +228,6 @@ public:
 
 };
 
-
-class AbstractSessionData
-{
-public:
-    virtual ~AbstractSessionData()
-    {
-    }
-
-    virtual const Poco::UUID& getId() const = 0;
-
-    virtual const Poco::Timestamp getLastModified() const = 0;
-
-    virtual bool has(const std::string& hashKey) const = 0;
-
-    virtual void put(const std::string& hashKey, const Poco::Any& hashValue) = 0;
-
-    virtual Poco::Any get(const std::string& hashKey, const Poco::Any& defaultValue) const = 0;
-
-};
 
 
 } } // namespace ofx::HTTP

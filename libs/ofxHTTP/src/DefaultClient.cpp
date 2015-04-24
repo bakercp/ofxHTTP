@@ -33,7 +33,7 @@ namespace HTTP {
 DefaultClient::DefaultClient():
     BaseClient(RequestFilters(), ResponseFilters())
 {
-    addRequestFilter(&_defaultSessionProvider);
+    addRequestFilter(&_defaultClientSessionProvider);
     addRequestFilter(&_defaultProxyProcessor);
     addRequestFilter(&_defaultAuthenticationProcessor);
     addRequestFilter(&_defaultRedirectProcessor);

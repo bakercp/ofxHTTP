@@ -51,15 +51,15 @@ Context::~Context()
 }
 
 
-void Context::setSessionSettings(const SessionSettings& settings)
+void Context::setClientSessionSettings(const ClientSessionSettings& clientSessionSettings)
 {
-    _settings = settings;
+    _clientSessionSettings = clientSessionSettings;
 }
 
 
-const SessionSettings& Context::getSessionSettings() const
+const ClientSessionSettings& Context::getClientSessionSettings() const
 {
-    return _settings;
+    return _clientSessionSettings;
 }
 
 

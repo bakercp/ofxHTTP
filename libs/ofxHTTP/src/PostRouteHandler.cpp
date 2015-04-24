@@ -26,7 +26,7 @@
 #include "ofx/HTTP/PostRouteHandler.h"
 #include "ofx/HTTP/PostRoute.h"
 #include "ofx/HTTP/HTTPUtils.h"
-#include "ofx/HTTP/SessionCache.h"
+//#include "ofx/HTTP/DefaultSessionManager.h"
 #include "Poco/UUID.h"
 #include "Poco/UUIDGenerator.h"
 
@@ -59,7 +59,8 @@ void PostRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
 
     if (_parent.getServer())
     {
-        sessionId = _parent.getServer()->getSessionCache().getSessionData(request, response).getId();
+        _parent.getServer()->getSessionManager().handleRequest(request, response);
+        sessionId = _parent.getServer()->getSessionManager().getSessionId(request);
     }
 
     // this uuid helps us track form progress updates

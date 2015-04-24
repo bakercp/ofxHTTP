@@ -24,7 +24,7 @@
 
 
 #include "ofx/HTTP/FileSystemRoute.h"
-#include "ofx/HTTP/SessionCache.h"
+//#include "ofx/HTTP/DefaultSessionCache.h"
 #include "ofUtils.h"
 #include "ofx/MediaTypeMap.h"
 
@@ -51,7 +51,8 @@ void FileSystemRoute::handleRequest(Poco::Net::HTTPServerRequest& request,
 
     if (getServer())
     {
-        sessionId = getServer()->getSessionCache().getSessionData(request, response).getId();
+        getServer()->getSessionManager().handleRequest(request, response);
+        sessionId = getServer()->getSessionManager().getSessionId(request);
     }
 
     Poco::Path dataFolder(ofToDataPath("", true));

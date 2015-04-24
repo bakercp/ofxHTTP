@@ -23,7 +23,7 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/DefaultSessionProvider.h"
+#include "ofx/HTTP/DefaultClientSessionProvider.h"
 #include "ofx/HTTP/BaseRequest.h"
 #include "ofx/HTTP/BaseResponse.h"
 #include "ofx/HTTP/Context.h"
@@ -33,23 +33,25 @@ namespace ofx {
 namespace HTTP {
 
 
-DefaultSessionProvider::DefaultSessionProvider()
+DefaultClientSessionProvider::DefaultClientSessionProvider()
 {
 }
 
 
-DefaultSessionProvider::~DefaultSessionProvider()
+DefaultClientSessionProvider::~DefaultClientSessionProvider()
 {
 }
 
 
-void DefaultSessionProvider::requestFilter(BaseRequest& request,
-                                           Context& context)
+void DefaultClientSessionProvider::requestFilter(BaseRequest& request,
+                                                 Context& context)
 {
     Context::ClientSession clientSession = context.getClientSession();
 
     if (!clientSession)
     {
+        const ClientSessionSettings& settings = context.getClientSessionSettings();
+
         Poco::URI uri(request.getURI());
 
         if (0 == uri.getScheme().compare("https"))
@@ -65,8 +67,8 @@ void DefaultSessionProvider::requestFilter(BaseRequest& request,
                                                                                     uri.getPort()));
         }
 
-        clientSession->setKeepAlive(context.getSessionSettings().getKeepAlive());
-        clientSession->setKeepAliveTimeout(context.getSessionSettings().getKeepAliveTimeout());
+        clientSession->setKeepAlive(settings.getKeepAlive());
+        clientSession->setKeepAliveTimeout(settings.getKeepAliveTimeout());
 
         context.setClientSession(clientSession);
     }

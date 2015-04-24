@@ -35,7 +35,7 @@
 #include "Poco/Net/HTTPClientSession.h"
 #include "ofx/HTTP/CookieStore.h"
 #include "ofx/HTTP/CredentialStore.h"
-#include "ofx/HTTP/SessionSettings.h"
+#include "ofx/HTTP/ClientSessionSettings.h"
 
 // a thread-safe shared context
 // -- in theory all members are thread safe
@@ -56,8 +56,8 @@ public:
     Context();
     virtual ~Context();
    
-    void setSessionSettings(const SessionSettings& settings);
-    const SessionSettings& getSessionSettings() const;
+    void setClientSessionSettings(const ClientSessionSettings& settings);
+    const ClientSessionSettings& getClientSessionSettings() const;
 
 //    void setCookieStore(CookieStore::SharedPtr cookieStore);
 //    CookieStore::WeakPtr getCookieStore();
@@ -121,7 +121,7 @@ public:
 private:
     std::map<std::string, Poco::Any> _map;
 
-    SessionSettings _settings;
+    ClientSessionSettings _clientSessionSettings;
 //    CookieStore::WeakPtr _cookieStore;
 
     std::vector<Poco::URI> _redirects;

@@ -38,11 +38,11 @@ namespace ofx {
 namespace HTTP {
 
     
-class SessionSettings
+class ClientSessionSettings
 {
 public:
-    SessionSettings();
-    virtual ~SessionSettings();
+    ClientSessionSettings();
+    virtual ~ClientSessionSettings();
 
     void setVirtualHost(const std::string& virtualHost);
     std::string getVirtualHost() const;

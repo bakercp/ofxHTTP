@@ -73,7 +73,7 @@ enum WebSocketError
 
 
 /// \brief The base WebSocket event arguments.
-class WebSocketEventArgs: public ofEventArgs
+class WebSocketEventArgs: public AbstractHasSessionId, public ofEventArgs
 {
 public:
     /// \brief Create a WebSocketEventArgs object with the provided params.
@@ -92,7 +92,7 @@ public:
     /// is used, this will always return Poco::UUID::null.
     ///
     /// \returns the session id or Poco::UUID::null if not set.
-    const Poco::UUID& getSessionId() const
+    Poco::UUID getSessionId() const
     {
         return _sessionId;
     }

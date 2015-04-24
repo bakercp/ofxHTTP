@@ -53,7 +53,7 @@ void DefaultProxyProcessor::requestFilter(BaseRequest& request,
     }
     else
     {
-        const ProxySettings& proxySettings = context.getSessionSettings().getProxySettings();
+        const ProxySettings& proxySettings = context.getClientSessionSettings().getProxySettings();
 
         if (!proxySettings.getHost().empty())
         {

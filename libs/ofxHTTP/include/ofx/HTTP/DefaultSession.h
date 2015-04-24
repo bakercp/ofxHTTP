@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2014 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,47 +28,57 @@
 
 #include <string>
 #include <map>
+#include "Poco/Mutex.h"
 #include "Poco/Timestamp.h"
 #include "Poco/UUID.h"
+#include "Poco/UUIDGenerator.h"
+#include "Poco/Net/HTTPCookie.h"
 #include "Poco/Any.h"
-#include "ofUtils.h"
 #include "ofTypes.h"
+#include "ofUtils.h"
 #include "ofx/HTTP/AbstractServerTypes.h"
-#include "ofx/HTTP/HTTPUtils.h"
-#include "ofx/HTTP/SessionData.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class SessionCache
+/// \brief A client cookie-based session store for servers.
+///
+/// Client sessions are tracked via cookie. Server routes can access the session
+/// store and associate any information with the client's session.
+class DefaultSession: public AbstractSession
 {
 public:
-    SessionCache();
-    SessionCache(const std::string& sessionKeyName);
+    DefaultSession(const Poco::UUID& uuid = Poco::UUIDGenerator::defaultGenerator().createRandom(),
+                   const Poco::Timestamp& lastModified = Poco::Timestamp());
 
-    virtual ~SessionCache();
+    virtual ~DefaultSession();
 
-    AbstractSessionData& getSessionData(Poco::Net::HTTPServerRequest& request,
-                                        Poco::Net::HTTPServerResponse& response);
+    Poco::UUID getSessionId() const;
 
-    void clear();
+    const Poco::Timestamp getLastModified() const;
 
-    static const std::string DEFAULT_SESSION_KEY_NAME;
+    bool has(const std::string& hashKey) const;
+
+    void put(const std::string& hashKey, const Poco::Any& hashValue);
+
+    Poco::Any get(const std::string& hashKey, const Poco::Any& defaultValue) const;
 
 private:
-    SessionCache(const SessionCache&);
-	SessionCache& operator = (const SessionCache&);
+    DefaultSession(const DefaultSession&);
+	DefaultSession& operator = (const DefaultSession&);
 
-    typedef std::map<Poco::UUID, SessionData::SharedPtr> Sessions;
+    typedef std::map<std::string, Poco::Any> SessionDict;
 
-    Sessions _sessions;
+    SessionDict _sessionDict;
 
-    const std::string _sessionKeyName;
+    Poco::UUID _uuid;
+
+    mutable Poco::Timestamp _lastModified;
 
     mutable Poco::FastMutex _mutex;
-
+    
 };
 
 

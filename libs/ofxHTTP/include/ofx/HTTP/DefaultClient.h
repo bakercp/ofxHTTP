@@ -27,7 +27,7 @@
 
 
 #include "ofx/HTTP/BaseClient.h"
-#include "ofx/HTTP/DefaultSessionProvider.h"
+#include "ofx/HTTP/DefaultClientSessionProvider.h"
 #include "ofx/HTTP/DefaultRedirectProcessor.h"
 #include "ofx/HTTP/DefaultProxyProcessor.h"
 #include "ofx/HTTP/DefaultClientHeaders.h"
@@ -46,7 +46,7 @@ public:
     virtual ~DefaultClient();
 
 private:
-    DefaultSessionProvider _defaultSessionProvider;
+    DefaultClientSessionProvider _defaultClientSessionProvider;
     DefaultClientHeaders _defaultClientHeaders;
     DefaultProxyProcessor _defaultProxyProcessor;
     DefaultCredentialStore _defaultAuthenticationProcessor;

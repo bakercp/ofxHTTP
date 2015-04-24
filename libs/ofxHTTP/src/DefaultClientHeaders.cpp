@@ -45,11 +45,11 @@ DefaultClientHeaders::~DefaultClientHeaders()
 void DefaultClientHeaders::requestFilter(BaseRequest& request,
                                          Context& context)
 {
-    const SessionSettings& settings = context.getSessionSettings();
+    const ClientSessionSettings& settings = context.getClientSessionSettings();
 
     if (!settings.getUserAgent().empty())
     {
-        request.set("User-Agent", context.getSessionSettings().getUserAgent());
+        request.set("User-Agent", settings.getUserAgent());
     }
 
 //    request.set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");

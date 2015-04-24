@@ -32,6 +32,7 @@
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "ofEvents.h"
+#include "ofx/HTTP/AbstractServerTypes.h"
 
 
 namespace ofx {
@@ -39,7 +40,7 @@ namespace HTTP {
 
 
 /// \brief A base class describing 
-class BaseHTTPSessionEvent: public ofEventArgs
+class BaseHTTPSessionEvent: public AbstractHasSessionId, public ofEventArgs
 {
 public:
     /// \brief Create a BaseHTTPSessionEvent with a sessionId.
@@ -62,7 +63,7 @@ public:
     /// is used, this will always return Poco::UUID::null.
     ///
     /// \returns the session id or Poco::UUID::null if not set.
-    const Poco::UUID& getSessionId() const
+    Poco::UUID getSessionId() const
     {
         return _sessionId;
     }

@@ -23,71 +23,29 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/SessionData.h"
+#pragma once
+
+
+#include "ofSSLManager.h"
+#include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/HTTPSClientSession.h"
+#include "ofx/HTTP/AbstractClientTypes.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-SessionData::SessionData(const Poco::UUID& uuid,
-                         const Poco::Timestamp& lastModified):
-    _uuid(uuid),
-    _lastModified(lastModified)
+class DefaultClientSessionProvider: public AbstractRequestFilter
 {
-}
+public:
+    DefaultClientSessionProvider();
 
+    virtual ~DefaultClientSessionProvider();
 
-SessionData::~SessionData()
-{
-}
+    virtual void requestFilter(BaseRequest& request, Context& context);
 
-
-const Poco::UUID& SessionData::getId() const
-{
-    Poco::FastMutex::ScopedLock lock(_mutex);
-    _lastModified.update();
-    return _uuid;
-}
-
-
-const Poco::Timestamp SessionData::getLastModified() const
-{
-    Poco::FastMutex::ScopedLock lock(_mutex);
-    return _lastModified;
-}
-
-
-bool SessionData::has(const std::string& hashKey) const
-{
-    Poco::FastMutex::ScopedLock lock(_mutex);
-    return _sessionDict.find(hashKey) != _sessionDict.end();
-}
-
-
-void SessionData::put(const std::string& hashKey, const Poco::Any& hashValue)
-{
-    Poco::FastMutex::ScopedLock lock(_mutex);
-    _lastModified.update();
-    _sessionDict[hashKey] = hashValue;
-}
-
-
-Poco::Any SessionData::get(const std::string& hashKey,
-                           const Poco::Any& defaultValue) const
-{
-    Poco::FastMutex::ScopedLock lock(_mutex);
-    SessionDict::const_iterator iter = _sessionDict.find(hashKey);
-
-    if (iter != _sessionDict.end())
-    {
-        return iter->second;
-    }
-    else
-    {
-        return defaultValue;
-    }
-}
+};
 
 
 } } // namespace ofx::HTTP

@@ -47,7 +47,7 @@
 #include "ofx/HTTP/AbstractServerTypes.h"
 #include "ofx/HTTP/BaseRoute.h"
 #include "ofx/HTTP/BaseServerSettings.h"
-#include "ofx/HTTP/SessionCache.h"
+#include "ofx/HTTP/BaseSessionManager.h"
 #include "ofx/HTTP/ThreadErrorHandler.h"
 
 
@@ -108,13 +108,7 @@ public:
 
     void exit(ofEventArgs& args);
 
-    /// \brief Access the SessionCache.
-    ///
-    /// The session cache is optional and may be `nullptr`.
-    /// Any non-null SessionCache may be treated as thread-safe.
-    ///
-    /// \returns a shared pointer to the SessionCache.
-    virtual SessionCache& getSessionCache();
+    virtual AbstractSessionManager& getSessionManager();
 
 protected:
     virtual Poco::ThreadPool& getThreadPool();
@@ -135,7 +129,7 @@ private:
     // vs. using a raw pointer and delete in the (seemingly) correct location.
     std::shared_ptr<Poco::Net::HTTPServer> _server;
 
-    SessionCache _sessionCache;
+    DefaultSessionManager _sessionManager;
 
     bool _isSecurePort;
 
@@ -442,9 +436,9 @@ Poco::Net::HTTPRequestHandler* BaseServer_<SettingsType>::createRequestHandler(c
 
 
 template<typename SettingsType>
-SessionCache& BaseServer_<SettingsType>::getSessionCache()
+AbstractSessionManager& BaseServer_<SettingsType>::getSessionManager()
 {
-    return _sessionCache;
+    return _sessionManager;
 }
 
 
