@@ -102,6 +102,7 @@ public:
     std::string getURL() const;
 
     void addRoute(AbstractRoute* pRoute);
+
     void removeRoute(AbstractRoute* pRoute);
 
     virtual Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);

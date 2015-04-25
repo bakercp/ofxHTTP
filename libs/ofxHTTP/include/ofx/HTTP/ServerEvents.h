@@ -40,7 +40,7 @@ namespace HTTP {
 
 
 /// \brief A base class describing 
-class BaseHTTPSessionEvent: public AbstractHasSessionId, public ofEventArgs
+class BaseHTTPSessionEvent: public AbstractSessionId, public ofEventArgs
 {
 public:
     /// \brief Create a BaseHTTPSessionEvent with a sessionId.

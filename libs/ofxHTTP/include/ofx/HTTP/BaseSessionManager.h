@@ -61,6 +61,8 @@ public:
 
     virtual std::shared_ptr<AbstractSession> getSession(const Poco::UUID& sessionId);
 
+    virtual std::shared_ptr<AbstractSession> getSession(const void* p);
+
     static const std::string DEFAULT_SESSION_KEY_NAME;
 
 private:
@@ -119,7 +121,7 @@ Poco::UUID BaseSessionManager_<SessionType>::getSessionId(const Poco::Net::HTTPS
     // Get the cookies from the client.
     Poco::Net::NameValueCollection cookies;
 
-    // Get the cookies
+    // Get the cookies.
     request.getCookies(cookies);
 
     // Try to find a cookie with our session key name.
@@ -131,6 +133,7 @@ Poco::UUID BaseSessionManager_<SessionType>::getSessionId(const Poco::Net::HTTPS
     }
     else
     {
+        // Return a null session id if none is found.
         return Poco::UUID::null();
     }
 }
@@ -144,6 +147,24 @@ std::shared_ptr<AbstractSession> BaseSessionManager_<SessionType>::getSession(co
     if (sessionsIter != _sessionMap.end())
     {
         return sessionsIter->second;
+    }
+    else
+    {
+        // Return an null ptr if it the session id doesn't exist.
+        std::shared_ptr<AbstractSession> ptr;
+        return ptr;
+    }
+}
+
+
+template<typename SessionType>
+std::shared_ptr<AbstractSession> BaseSessionManager_<SessionType>::getSession(const void* p)
+{
+    const AbstractSessionId* pSessionId = static_cast<const AbstractSessionId*>(p);
+
+    if (pSessionId)
+    {
+        return getSession(pSessionId->getSessionId());
     }
     else
     {
@@ -172,17 +193,17 @@ void BaseSessionManager_<SessionType>::handleRequest(Poco::Net::HTTPServerReques
     // Try to find a cookie with our session key name.
     Poco::Net::NameValueCollection::ConstIterator cookieIter = cookies.find(_sessionKeyName);
 
-    if (cookieIter == cookies.end() ||
-        sessionId.tryParse(cookieIter->second) ||
-        _sessionMap.find(sessionId) == _sessionMap.end())
+    if (cookieIter == cookies.end() || // The client sent no cookie.
+        !sessionId.tryParse(cookieIter->second) || // The client sent a cookie, but it couldn't be parsed.
+        _sessionMap.find(sessionId) == _sessionMap.end()) // The session id was not in memory.
     {
-        // We don't have a valid client cookie or session yet, so we make one.
+        // Rebuild a new session id.
         sessionId = Poco::UUIDGenerator::defaultGenerator().createRandom();
 
-        // Add session to our map.
+        // Create a new session id and add session to our map.
         _sessionMap[sessionId] = std::shared_ptr<AbstractSession>(new DefaultSession(sessionId));;
 
-        // Create a cookie.
+        // Create a cookie with the session id.
         Poco::Net::HTTPCookie cookie(_sessionKeyName, sessionId.toString());
         
         // Send our cookie with the response.
