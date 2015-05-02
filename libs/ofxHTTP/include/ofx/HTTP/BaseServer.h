@@ -265,9 +265,9 @@ private:
 template <typename SettingsType>
 BaseServer_<SettingsType>::BaseServer_(const SettingsType& settings,
                                        Poco::ThreadPool& rThreadPool):
+    _sessionStore(0),
     _isSecurePort(false),
     _settings(settings),
-    _sessionStore(0),
     _rThreadPool(rThreadPool)
 {
     ofAddListener(ofEvents().exit, this, &BaseServer_<SettingsType>::exit);
@@ -545,7 +545,7 @@ Poco::Net::HTTPRequestHandler* BaseServer_<SettingsType>::createRequestHandler(c
 template<typename SettingsType>
 void BaseServer_<SettingsType>::setSessionStore(AbstractSessionStore* sessionStore)
 {
-    return _sessionStore;
+    _sessionStore = sessionStore;
 }
 
 
