@@ -443,7 +443,7 @@ Poco::UUID BaseRoute_<SettingsType>::getSessionId(const Poco::Net::HTTPServerReq
 
     if (sessionStore)
     {
-        std::shared_ptr<AbstractSession> session = sessionStore->getSession(request, response);
+        std::shared_ptr<AbstractSession> session = sessionStore->get(request);
 
         if (session)
         {

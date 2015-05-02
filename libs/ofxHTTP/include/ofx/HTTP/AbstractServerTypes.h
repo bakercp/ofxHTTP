@@ -43,10 +43,10 @@ namespace HTTP {
 class WebSocketFrame;
 
 
-class AbstractSessionId
+class AbstractHasSessionId
 {
 public:
-    virtual ~AbstractSessionId()
+    virtual ~AbstractHasSessionId()
     {
     }
 
@@ -55,7 +55,7 @@ public:
 };
 
 
-class AbstractSession: public AbstractSessionId
+class AbstractSession: public AbstractHasSessionId
 {
 public:
     virtual ~AbstractSession()
@@ -116,12 +116,17 @@ public:
     {
     }
 
-    virtual std::shared_ptr<AbstractSession> getSession(const Poco::Net::HTTPServerRequest& request,
-                                                        const Poco::Net::HTTPServerResponse& response) = 0;
+    virtual void clear() = 0;
 
-    virtual std::shared_ptr<AbstractSession> getSession(const Poco::UUID& sessionId) = 0;
+    virtual void remove(const Poco::UUID& sessionId) = 0;
 
-    virtual std::shared_ptr<AbstractSession> getSession(const void* p) = 0;
+    virtual std::shared_ptr<AbstractSession> create() = 0;
+
+    virtual std::shared_ptr<AbstractSession> get(const Poco::Net::HTTPServerRequest& request) = 0;
+
+    virtual std::shared_ptr<AbstractSession> get(const Poco::UUID& sessionId) = 0;
+
+    virtual std::shared_ptr<AbstractSession> get(const void* p) = 0;
 
 };
 

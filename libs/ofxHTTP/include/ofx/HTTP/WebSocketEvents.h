@@ -73,7 +73,7 @@ enum WebSocketError
 
 
 /// \brief The base WebSocket event arguments.
-class WebSocketEventArgs: public AbstractSessionId, public ofEventArgs
+class WebSocketEventArgs: public AbstractHasSessionId, public ofEventArgs
 {
 public:
     /// \brief Create a WebSocketEventArgs object with the provided params.

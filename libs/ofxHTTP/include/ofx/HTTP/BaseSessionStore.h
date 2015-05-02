@@ -42,174 +42,69 @@ namespace ofx {
 namespace HTTP {
 
 
-template<typename SessionType>
-class BaseSessionManager_: public AbstractSessionStore
+class BaseSessionStore: public AbstractSessionStore
 {
 public:
-    BaseSessionManager_();
+    BaseSessionStore();
 
-    BaseSessionManager_(const std::string& sessionKeyName);
+    BaseSessionStore(const std::string& sessionKeyName);
 
-    virtual ~BaseSessionManager_();
+    virtual ~BaseSessionStore();
 
-    void clear();
+    void handleRequest(Poco::Net::HTTPServerRequest& request,
+                       Poco::Net::HTTPServerResponse& response);
 
-    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
-                               Poco::Net::HTTPServerResponse& response);
+    virtual void clear() = 0;
 
-    virtual Poco::UUID getSessionId(const Poco::Net::HTTPServerRequest& request) const;
+    virtual void remove(const Poco::UUID& sessionId) = 0;
 
-    virtual std::shared_ptr<AbstractSession> getSession(const Poco::UUID& sessionId);
+    virtual std::shared_ptr<AbstractSession> create() = 0;
 
-    virtual std::shared_ptr<AbstractSession> getSession(const void* p);
+    virtual std::shared_ptr<AbstractSession> get(const Poco::UUID& sessionId) = 0;
+
+    virtual std::shared_ptr<AbstractSession> get(const Poco::Net::HTTPServerRequest& request);
+
+    virtual std::shared_ptr<AbstractSession> get(const void* p);
 
     static const std::string DEFAULT_SESSION_KEY_NAME;
 
-private:
-    BaseSessionManager_(const BaseSessionManager_&);
-	BaseSessionManager_& operator = (const BaseSessionManager_&);
-
-    typedef std::map<Poco::UUID, std::shared_ptr<AbstractSession> > SessionMap;
-
-    SessionMap _sessionMap;
-
+protected:
     const std::string _sessionKeyName;
 
     mutable Poco::FastMutex _mutex;
 
+private:
+    BaseSessionStore(const BaseSessionStore&);
+    BaseSessionStore& operator = (const BaseSessionStore&);
+
 };
 
 
-typedef BaseSessionManager_<DefaultSession> DefaultSessionManager;
-
-
-template<typename SessionType>
-const std::string BaseSessionManager_<SessionType>::DEFAULT_SESSION_KEY_NAME = "session_key";
-
-
-template<typename SessionType>
-BaseSessionManager_<SessionType>::BaseSessionManager_(): _sessionKeyName(DEFAULT_SESSION_KEY_NAME)
+/// \brief An in-memory session store.
+class DefaultSessionStore: public BaseSessionStore
 {
-}
+public:
+    DefaultSessionStore();
 
+    DefaultSessionStore(const std::string& sessionKeyName);
 
-template<typename SessionType>
-BaseSessionManager_<SessionType>::BaseSessionManager_(const std::string& sessionKeyName):
-    _sessionKeyName(sessionKeyName)
-{
-}
+    virtual ~DefaultSessionStore();
 
+    void clear();
 
-template<typename SessionType>
-BaseSessionManager_<SessionType>::~BaseSessionManager_()
-{
-}
+    std::shared_ptr<AbstractSession> create();
 
+    std::shared_ptr<AbstractSession> get(const Poco::UUID& sessionId);
 
-template<typename SessionType>
-void BaseSessionManager_<SessionType>::clear()
-{
-    _sessionMap.clear();
-}
+    void remove(const Poco::UUID& sessionId);
 
+protected:
+    typedef std::map<Poco::UUID, std::shared_ptr<AbstractSession> > SessionMap;
 
-template<typename SessionType>
-Poco::UUID BaseSessionManager_<SessionType>::getSessionId(const Poco::Net::HTTPServerRequest& request) const
-{
-    Poco::UUID sessionId;
+    SessionMap _sessionMap;
 
-    // Get the cookies from the client.
-    Poco::Net::NameValueCollection cookies;
+};
 
-    // Get the cookies.
-    request.getCookies(cookies);
-
-    // Try to find a cookie with our session key name.
-    Poco::Net::NameValueCollection::ConstIterator cookieIter = cookies.find(_sessionKeyName);
-
-    if (cookieIter != cookies.end() && sessionId.tryParse(cookieIter->second))
-    {
-        return sessionId;
-    }
-    else
-    {
-        // Return a null session id if none is found.
-        return Poco::UUID::null();
-    }
-}
-
-
-template<typename SessionType>
-std::shared_ptr<AbstractSession> BaseSessionManager_<SessionType>::getSession(const Poco::UUID& sessionId)
-{
-    SessionMap::iterator sessionsIter = _sessionMap.find(sessionId);
-
-    if (sessionsIter != _sessionMap.end())
-    {
-        return sessionsIter->second;
-    }
-    else
-    {
-        // Return an null ptr if it the session id doesn't exist.
-        std::shared_ptr<AbstractSession> ptr;
-        return ptr;
-    }
-}
-
-
-template<typename SessionType>
-std::shared_ptr<AbstractSession> BaseSessionManager_<SessionType>::getSession(const void* p)
-{
-    const AbstractSessionId* pSessionId = static_cast<const AbstractSessionId*>(p);
-
-    if (pSessionId)
-    {
-        return getSession(pSessionId->getSessionId());
-    }
-    else
-    {
-        std::shared_ptr<AbstractSession> ptr;
-        return ptr;
-    }
-}
-
-
-template<typename SessionType>
-void BaseSessionManager_<SessionType>::handleRequest(Poco::Net::HTTPServerRequest& request,
-                                                     Poco::Net::HTTPServerResponse& response)
-{
-    // The session id.
-    Poco::UUID sessionId;
-
-    // Lock everything.
-    Poco::FastMutex::ScopedLock lock(_mutex);
-
-    // Get the cookies from the client.
-    Poco::Net::NameValueCollection cookies;
-
-    // Get the cookies
-    request.getCookies(cookies);
-
-    // Try to find a cookie with our session key name.
-    Poco::Net::NameValueCollection::ConstIterator cookieIter = cookies.find(_sessionKeyName);
-
-    if (cookieIter == cookies.end() || // The client sent no cookie.
-        !sessionId.tryParse(cookieIter->second) || // The client sent a cookie, but it couldn't be parsed.
-        _sessionMap.find(sessionId) == _sessionMap.end()) // The session id was not in memory.
-    {
-        // Rebuild a new session id.
-        sessionId = Poco::UUIDGenerator::defaultGenerator().createRandom();
-
-        // Create a new session id and add session to our map.
-        _sessionMap[sessionId] = std::shared_ptr<AbstractSession>(new DefaultSession(sessionId));;
-
-        // Create a cookie with the session id.
-        Poco::Net::HTTPCookie cookie(_sessionKeyName, sessionId.toString());
-        
-        // Send our cookie with the response.
-        response.addCookie(cookie);
-    }
-}
 
 
 } } // namespace ofx::HTTP
