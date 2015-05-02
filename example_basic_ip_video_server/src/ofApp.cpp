@@ -41,7 +41,7 @@ void ofApp::setup()
     settings.setPort(7890);
 
     // The default maximum number of client connections is 5.
-    // settings.setMaxClientConnections(10);
+    settings.ipVideoRouteSettings.setMaxClientConnections(1);
 
     // Apply the settings.
     server.setup(settings);
