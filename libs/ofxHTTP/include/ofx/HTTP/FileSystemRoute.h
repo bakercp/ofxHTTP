@@ -27,11 +27,54 @@
 
 
 #include "ofx/HTTP/BaseRoute.h"
-#include "ofx/HTTP/FileSystemRouteSettings.h"
 
 
 namespace ofx {
 namespace HTTP {
+
+
+class FileSystemRouteSettings: public BaseRouteSettings
+{
+public:
+    FileSystemRouteSettings(const std::string& routePathPattern = BaseRouteSettings::DEFAULT_ROUTE_PATH_PATTERN,
+                            bool requireSecurePort = false);
+
+    virtual ~FileSystemRouteSettings();
+
+    // TODO:
+    // e.g. http://httpd.apache.org/docs/2.2/mod/mod_deflate.html
+    // or the reverse? compression type as key?
+    //    ofxHTTPCompressorEntry html(MediaType("text/html"));
+    //    html.addCompressionType(GZIP);
+    //    html.addCompressionType(DEFLATE);
+    //
+    //    ofxHTTPCompressorEntry plain(MediaType("text/plain"));
+    //    html.addCompressionType(GZIP);
+    //    html.addCompressionType(DEFLATE);
+
+    void setDefaultIndex(const std::string& defaultIndex);
+    const std::string& getDefaultIndex() const;
+
+    void setDocumentRoot(const std::string& documentRoot);
+    const std::string& getDocumentRoot() const;
+
+    void setAutoCreateDocumentRoot(bool autoCreateDocumentRoot);
+    bool getAutoCreateDocumentRoot() const;
+
+    void setRequireDocumentRootInDataFolder(bool requireDocumentRootInDataFolder);
+    bool getRequireDocumentRootInDataFolder() const;
+
+    static const std::string DEFAULT_DOCUMENT_ROOT;
+    static const std::string DEFAULT_INDEX;
+    
+private:
+    std::string _defaultIndex;
+    std::string _documentRoot;
+    
+    bool _autoCreateDocumentRoot;
+    bool _requireDocumentRootInDataFolder;
+    
+};
 
 
 /// \brief A route for serving files from the file system.
@@ -41,6 +84,7 @@ public:
     typedef FileSystemRouteSettings Settings;
 
     FileSystemRoute(const Settings& settings);
+
     virtual ~FileSystemRoute();
 
     virtual void handleRequest(Poco::Net::HTTPServerRequest& request,

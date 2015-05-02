@@ -55,7 +55,7 @@ void SimpleIPVideoServer::setup(const Settings& settings)
     BaseServer_<SimpleIPVideoServerSettings>::setup(settings);
     _fileSystemRoute.setup(settings.fileSystemRouteSettings);
     _postRoute.setup(settings.postRouteSettings);
-    _fileSystemRoute.setup(settings.fileSystemRouteSettings);
+    _ipVideoRoute.setup(settings.ipVideoRouteSettings);
 }
 
 

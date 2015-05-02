@@ -73,7 +73,7 @@ void DefaultSession::put(const std::string& hashKey, const Poco::Any& hashValue)
 
 
 Poco::Any DefaultSession::get(const std::string& hashKey,
-                           const Poco::Any& defaultValue) const
+                              const Poco::Any& defaultValue) const
 {
     Poco::FastMutex::ScopedLock lock(_mutex);
     SessionDict::const_iterator iter = _sessionDict.find(hashKey);

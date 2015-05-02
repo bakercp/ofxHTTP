@@ -29,7 +29,6 @@
 #include "ofx/HTTP/BaseServer.h"
 #include "ofx/HTTP/FileSystemRoute.h"
 #include "ofx/HTTP/WebSocketRoute.h"
-#include "ofx/HTTP/WebSocketRouteSettings.h"
 
 
 namespace ofx {

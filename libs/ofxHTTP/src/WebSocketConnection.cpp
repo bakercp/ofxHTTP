@@ -52,13 +52,9 @@ WebSocketConnection::~WebSocketConnection()
 void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                                         Poco::Net::HTTPServerResponse& response)
 {
-    Poco::UUID sessionId = Poco::UUID::null();
+    _parent.handleRequest(request, response);
 
-    if (_parent.getServer())
-    {
-        _parent.getServer()->getSessionManager().handleRequest(request, response);
-        sessionId = _parent.getServer()->getSessionManager().getSessionId(request);
-    }
+    Poco::UUID sessionId = _parent.getSessionId(request, response);
 
     // Get a copy of the settings.
     WebSocketRouteSettings settings = _parent.getSettings();

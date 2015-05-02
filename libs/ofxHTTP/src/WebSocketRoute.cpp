@@ -31,6 +31,126 @@ namespace ofx {
 namespace HTTP {
 
 
+const std::string WebSocketRouteSettings::DEFAULT_WEBSOCKET_ROUTE_PATH_PATTERN = "/";
+const Poco::Timespan WebSocketRouteSettings::DEFAULT_RECEIVE_TIMEOUT = Poco::Timespan(60 * Poco::Timespan::SECONDS);
+const Poco::Timespan WebSocketRouteSettings::DEFAULT_SEND_TIMEOUT = Poco::Timespan(60 * Poco::Timespan::SECONDS);
+const Poco::Timespan WebSocketRouteSettings::DEFAULT_POLL_TIMEOUT = Poco::Timespan(10 * Poco::Timespan::MILLISECONDS);
+
+
+WebSocketRouteSettings::WebSocketRouteSettings(const std::string& routePathPattern,
+                                               bool requireSecurePort):
+    BaseRouteSettings(routePathPattern, requireSecurePort),
+    _autoPingPongResponse(true),
+    _keepAlive(true),
+    _receiveTimeout(DEFAULT_RECEIVE_TIMEOUT),
+    _sendTimeout(DEFAULT_SEND_TIMEOUT),
+    _pollTimeout(DEFAULT_POLL_TIMEOUT),
+    _bufferSize(DEFAULT_BUFFER_SIZE)
+{
+}
+
+
+WebSocketRouteSettings::~WebSocketRouteSettings()
+{
+}
+
+
+void WebSocketRouteSettings::setValidSubprotcols(const SubprotocolSet& validSubprotocols)
+{
+    _validSubprotocols = validSubprotocols;
+}
+
+
+const WebSocketRouteSettings::SubprotocolSet& WebSocketRouteSettings::getValidSubprotocols() const
+{
+    return _validSubprotocols;
+}
+
+
+void WebSocketRouteSettings::setValidOrigins(const OriginSet& validOrigins)
+{
+    _validOrigins = validOrigins;
+}
+
+
+const WebSocketRouteSettings::OriginSet& WebSocketRouteSettings::getValidOrigins() const
+{
+    return _validOrigins;
+}
+
+
+void WebSocketRouteSettings::setAutoPingPongResponse(bool autoPingPongResponse)
+{
+    _autoPingPongResponse = autoPingPongResponse;
+}
+
+
+bool WebSocketRouteSettings::getAutoPingPongResponse() const
+{
+    return _autoPingPongResponse;
+}
+
+
+void WebSocketRouteSettings::setKeepAlive(bool keepAlive)
+{
+    _keepAlive = keepAlive;
+}
+
+
+bool WebSocketRouteSettings::getKeepAlive() const
+{
+    return _keepAlive;
+}
+
+
+void WebSocketRouteSettings::setReceiveTimeout(const Poco::Timespan& receiveTimeout)
+{
+    _receiveTimeout = receiveTimeout;
+}
+
+
+Poco::Timespan WebSocketRouteSettings::getReceiveTimeout() const
+{
+    return _receiveTimeout;
+}
+
+
+void WebSocketRouteSettings::setSendTimeout(const Poco::Timespan& sendTimeout)
+{
+    _sendTimeout = sendTimeout;
+}
+
+
+Poco::Timespan WebSocketRouteSettings::getSendTimeout() const
+{
+    return _sendTimeout;
+}
+
+
+void WebSocketRouteSettings::setPollTimeout(const Poco::Timespan& pollTimeout)
+{
+    _pollTimeout = pollTimeout;
+}
+
+
+Poco::Timespan WebSocketRouteSettings::getPollTimeout() const
+{
+    return _pollTimeout;
+}
+
+
+void WebSocketRouteSettings::setBufferSize(std::size_t bufferSize)
+{
+    _bufferSize = bufferSize;
+}
+
+
+std::size_t WebSocketRouteSettings::getBufferSize() const
+{
+    return _bufferSize;
+}
+
+
 WebSocketRoute::WebSocketRoute(const Settings& settings):
     BaseRoute_<WebSocketRouteSettings>(settings)
 {
@@ -45,13 +165,13 @@ WebSocketRoute::~WebSocketRoute()
 bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
                                       bool isSecurePort) const
 {
-    if(!BaseRoute_<WebSocketRouteSettings>::canHandleRequest(request, isSecurePort))
+    if (!BaseRoute_<WebSocketRouteSettings>::canHandleRequest(request, isSecurePort))
     {
         return false;
     }
 
     // check to see if this is an websocket upgrade request
-    if(Poco::icompare(request.get("Upgrade", ""), "websocket")  != 0)
+    if (Poco::icompare(request.get("Upgrade", ""), "websocket")  != 0)
     {
         return false;
     }
@@ -61,8 +181,8 @@ bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& reques
     // this is all fixed in Poco 1.4.6 and 1.5.+
     std::string connectionHeader = Poco::toLower(request.get("Connection", ""));
 
-    if(Poco::icompare(connectionHeader, "Upgrade") != 0 &&
-       !ofIsStringInString(connectionHeader, "upgrade"))
+    if (Poco::icompare(connectionHeader, "Upgrade") != 0 &&
+        !ofIsStringInString(connectionHeader, "upgrade"))
     {
         // this request is coming from firefox, which is known to send things that look like:
         // Connection:keep-alive, Upgrade

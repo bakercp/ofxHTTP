@@ -28,6 +28,7 @@
 
 #include <string>
 #include "Poco/ErrorHandler.h"
+#include "Poco/URI.h"
 #include "Poco/Net/Context.h"
 #include "Poco/Net/HTTPServer.h"
 #include "Poco/Net/HTTPServerParams.h"
@@ -46,9 +47,9 @@
 #include "ofSSLManager.h"
 #include "ofx/HTTP/AbstractServerTypes.h"
 #include "ofx/HTTP/BaseRoute.h"
-#include "ofx/HTTP/BaseServerSettings.h"
-#include "ofx/HTTP/BaseSessionManager.h"
+#include "ofx/HTTP/BaseSessionStore.h"
 #include "ofx/HTTP/ThreadErrorHandler.h"
+// #include "ofx/Net/IPAddressRange.h"
 
 
 namespace ofx {
@@ -75,6 +76,113 @@ public:
 private:
     Poco::Net::HTTPRequestHandlerFactory& _factory;
 
+};
+
+
+/// \brief This class mirrors Poco::Net::TCPServerParams, without ref counting.
+class TCPServerParams
+{
+public:
+    TCPServerParams();
+
+    virtual ~TCPServerParams();
+
+    void setThreadIdleTime(const Poco::Timespan& idleTime);
+    const Poco::Timespan& getThreadIdleTime() const;
+    void setMaxQueued(int count);
+    int getMaxQueued() const;
+    void setMaxThreads(int count);
+    int getMaxThreads() const;
+    void setThreadPriority(Poco::Thread::Priority prio);
+    Poco::Thread::Priority getThreadPriority() const;
+
+private:
+    Poco::Timespan _threadIdleTime;
+    int _maxThreads;
+    int _maxQueued;
+    Poco::Thread::Priority _threadPriority;
+
+};
+
+
+/// \brief This class mirrors Poco::Net::HTTPServerParams, without ref counting.
+class HTTPServerParams: public TCPServerParams
+{
+public:
+    HTTPServerParams();
+    virtual ~HTTPServerParams();
+
+    void setServerName(const std::string& serverName);
+    const std::string& getServerName() const;
+    void setSoftwareVersion(const std::string& softwareVersion);
+    const std::string& getSoftwareVersion() const;
+    void setTimeout(const Poco::Timespan& timeout);
+    const Poco::Timespan& getTimeout() const;
+    void setKeepAlive(bool keepAlive);
+    bool getKeepAlive() const;
+    void setKeepAliveTimeout(const Poco::Timespan& timeout);
+    const Poco::Timespan& getKeepAliveTimeout() const;
+    void setMaxKeepAliveRequests(int maxKeepAliveRequests);
+    int getMaxKeepAliveRequests() const;
+
+private:
+    std::string _serverName;
+    std::string _softwareVersion;
+    Poco::Timespan _timeout;
+    bool _keepAlive;
+    int _maxKeepAliveRequests;
+    Poco::Timespan _keepAliveTimeout;
+
+};
+
+
+class BaseServerSettings: public HTTPServerParams
+{
+public:
+    BaseServerSettings(const std::string& host = DEFAULT_HOST,
+                       unsigned short port = DEFAULT_PORT,
+                       bool useSSL = DEFAULT_USE_SSL,
+                       bool useSessionCache = DEFAULT_USE_SESSION_CACHE);
+
+    virtual ~BaseServerSettings();
+
+    void setHost(const std::string& host);
+    std::string getHost() const;
+
+    void setPort(unsigned short port);
+    unsigned short getPort() const;
+
+    void setUseSSL(bool useSSL);
+    bool getUseSSL() const;
+
+    void setUseSessionCache(bool useSessionCache);
+    bool getUseSessionCache() const;
+
+    Poco::URI getURI() const;
+
+    /*
+     const Net::IPAddressRange::List& getWhitelist() const;
+     void setWhitelist(const Net::IPAddressRange::List& whitelist);
+
+     const Net::IPAddressRange::List& getBlacklist() const;
+     void setBlacklist(const Net::IPAddressRange::List& blacklist);
+     */
+    
+    const static std::string DEFAULT_HOST;
+    const static unsigned short DEFAULT_PORT;
+    const static bool DEFAULT_USE_SSL;
+    const static bool DEFAULT_USE_SESSION_CACHE;
+    
+private:
+    std::string _host;
+    unsigned short _port;
+    bool _useSSL;
+    bool _useSessionCache;
+    
+    /*
+     Net::IPAddressRange::List _whitelist;
+     Net::IPAddressRange::List _blacklist;
+     */
 };
 
 
@@ -109,7 +217,9 @@ public:
 
     void exit(ofEventArgs& args);
 
-    virtual AbstractSessionManager& getSessionManager();
+    virtual void setSessionStore(AbstractSessionStore* sessions);
+
+    virtual AbstractSessionStore* getSessionStore();
 
 protected:
     virtual Poco::ThreadPool& getThreadPool();
@@ -130,8 +240,8 @@ private:
     // vs. using a raw pointer and delete in the (seemingly) correct location.
     std::shared_ptr<Poco::Net::HTTPServer> _server;
 
-    DefaultSessionManager _sessionManager;
-
+    AbstractSessionStore* _sessionStore;
+//
     bool _isSecurePort;
 
     SettingsType _settings;
@@ -157,6 +267,7 @@ BaseServer_<SettingsType>::BaseServer_(const SettingsType& settings,
                                        Poco::ThreadPool& rThreadPool):
     _isSecurePort(false),
     _settings(settings),
+    _sessionStore(0),
     _rThreadPool(rThreadPool)
 {
     ofAddListener(ofEvents().exit, this, &BaseServer_<SettingsType>::exit);
@@ -327,7 +438,6 @@ const SettingsType& BaseServer_<SettingsType>::getSettings() const
 template <typename SettingsType>
 void BaseServer_<SettingsType>::addRoute(AbstractRoute* pRoute)
 {
-    pRoute->setServer(this);
     _routes.push_back(pRoute);
 }
 
@@ -336,7 +446,6 @@ template <typename SettingsType>
 void BaseServer_<SettingsType>::removeRoute(AbstractRoute* pRoute)
 {
     _routes.erase(std::remove(_routes.begin(), _routes.end(), pRoute), _routes.end());
-    pRoute->setServer(0);
 }
 
 
@@ -357,54 +466,52 @@ Poco::ThreadPool& BaseServer_<SettingsType>::getThreadPool()
 template <typename SettingsType>
 bool BaseServer_<SettingsType>::acceptConnection(const Poco::Net::HTTPServerRequest& request)
 {
-    /*
-
-    const Poco::Net::IPAddress& host = request.clientAddress().host();
-
-
-    // If a whitelist is defined then you _must_ be on the whitelist.
-    const Net::IPAddressRange::List& whitelist = _settings.getWhitelist();
-
-    if (!whitelist.empty())
-    {
-        bool isWhitelisted = false;
-
-        Net::IPAddressRange::List::const_iterator iter = whitelist.begin();
-
-        while (iter != whitelist.end())
-        {
-            if (iter->contains(host))
-            {
-                return true;
-            }
-
-            ++iter;
-        }
-
-        if (!isWhitelisted)
-        {
-            return false;
-        }
-    }
-
-    // If a blacklist is defined then you _must not_ be on the blacklist.
-    const Net::IPAddressRange::List& blacklist = _settings.getBlacklist();
-
-    if (!blacklist.empty())
-    {
-        Net::IPAddressRange::List::const_iterator iter = blacklist.begin();
-
-        while (iter != blacklist.end())
-        {
-            if (iter->contains(request.clientAddress().host()))
-            {
-                return false;
-            }
-            
-            ++iter;
-        }
-    }
-     */
+//#if POCO_VERSION > 0x01050000
+//    const Poco::Net::IPAddress& host = request.clientAddress().host();
+//
+//    // If a whitelist is defined then you _must_ be on the whitelist.
+//    const Net::IPAddressRange::List& whitelist = _settings.getWhitelist();
+//
+//    if (!whitelist.empty())
+//    {
+//        bool isWhitelisted = false;
+//
+//        Net::IPAddressRange::List::const_iterator iter = whitelist.begin();
+//
+//        while (iter != whitelist.end())
+//        {
+//            if (iter->contains(host))
+//            {
+//                return true;
+//            }
+//
+//            ++iter;
+//        }
+//
+//        if (!isWhitelisted)
+//        {
+//            return false;
+//        }
+//    }
+//
+//    // If a blacklist is defined then you _must not_ be on the blacklist.
+//    const Net::IPAddressRange::List& blacklist = _settings.getBlacklist();
+//
+//    if (!blacklist.empty())
+//    {
+//        Net::IPAddressRange::List::const_iterator iter = blacklist.begin();
+//
+//        while (iter != blacklist.end())
+//        {
+//            if (iter->contains(request.clientAddress().host()))
+//            {
+//                return false;
+//            }
+//
+//            ++iter;
+//        }
+//    }
+//#endif
 
     return true;
 }
@@ -435,11 +542,17 @@ Poco::Net::HTTPRequestHandler* BaseServer_<SettingsType>::createRequestHandler(c
     return _defaultRoute.createRequestHandler(request);
 }
 
+template<typename SettingsType>
+void BaseServer_<SettingsType>::setSessionStore(AbstractSessionStore* sessionStore)
+{
+    return _sessionStore;
+}
+
 
 template<typename SettingsType>
-AbstractSessionManager& BaseServer_<SettingsType>::getSessionManager()
+AbstractSessionStore* BaseServer_<SettingsType>::getSessionStore()
 {
-    return _sessionManager;
+    return _sessionStore;
 }
 
 

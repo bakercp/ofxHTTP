@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2012-2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,47 +22,30 @@
 //
 // =============================================================================
 
-#pragma once
 
-
-#include <queue>
-#include "ofx/HTTP/IPVideoFrame.h"
-#include "ofx/HTTP/IPVideoFrameSettings.h"
+#include "ofx/HTTP/RequestHandlerAdapter.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class IPVideoFrameQueue
+RequestHandlerAdapter::RequestHandlerAdapter(Poco::Net::HTTPRequestHandler& handler):
+    _handler(handler)
 {
-public:
-    IPVideoFrameQueue(std::size_t maxSize);
+}
 
-    virtual ~IPVideoFrameQueue();
 
-    std::shared_ptr<IPVideoFrame> pop();
-    
-    void push(std::shared_ptr<IPVideoFrame> frame);
+RequestHandlerAdapter::~RequestHandlerAdapter()
+{
+}
 
-    std::size_t getMaxSize() const;
 
-    void setMaxSize(std::size_t maxSize);
-
-    std::size_t size() const;
-
-    bool empty() const;
-
-    void clear();
-
-private:
-    std::deque<std::shared_ptr<IPVideoFrame> > _frames;
-
-    std::size_t _maxSize;
-
-    mutable Poco::FastMutex _mutex;
-    
-};
+void RequestHandlerAdapter::handleRequest(Poco::Net::HTTPServerRequest& request,
+                                          Poco::Net::HTTPServerResponse& response)
+{
+    _handler.handleRequest(request, response);
+}
 
 
 } } // namespace ofx::HTTP

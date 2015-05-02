@@ -61,7 +61,6 @@ public:
     /// \brief Destroy the PostRequest.
     virtual ~PostRequest();
 
-
     void addFormPart(const FormPart& part);
 
     void addFormParts(const FormParts& parts);
@@ -97,13 +96,13 @@ protected:
     /// \brief Custom prepareRequest() to set the content length;
     void prepareRequest();
 
-    /// \brief writes from the form buffer.
-    /// \param requestStream the stream to write the request body.
+    /// \brief Writes from the form buffer.
+    /// \param requestStream The stream to write the request body.
     void writeRequestBody(std::ostream& requestStream);
 
 private:
+    /// \brief A utility output buffer.
     std::stringstream _outBuffer;
-
 
 };
 

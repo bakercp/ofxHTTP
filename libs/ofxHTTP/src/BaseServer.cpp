@@ -23,7 +23,7 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/BaseServerSettings.h"
+#include "ofx/HTTP/BaseServer.h"
 
 
 namespace ofx {
@@ -256,38 +256,39 @@ bool BaseServerSettings::getUseSessionCache() const
 Poco::URI BaseServerSettings::getURI() const
 {
     Poco::URI uri;
-
+    
     uri.setScheme(_useSSL ? "https" : "http");
     uri.setHost(_host);
     uri.setPort(_port);
-
+    
     return uri;
 }    
 
 
 /*
-const Net::IPAddressRange::List& BaseServerSettings::getWhitelist() const
-{
-    return _whitelist;
-}
+ const Net::IPAddressRange::List& BaseServerSettings::getWhitelist() const
+ {
+ return _whitelist;
+ }
+ 
+ 
+ void BaseServerSettings::setWhitelist(const Net::IPAddressRange::List& whitelist)
+ {
+ _whitelist = whitelist;
+ }
+ 
+ 
+ const Net::IPAddressRange::List& BaseServerSettings::getBlacklist() const
+ {
+ return _blacklist;
+ }
+ 
+ 
+ void BaseServerSettings::setBlacklist(const Net::IPAddressRange::List& blacklist)
+ {
+ _blacklist = blacklist;
+ }
+ */
 
-
-void BaseServerSettings::setWhitelist(const Net::IPAddressRange::List& whitelist)
-{
-    _whitelist = whitelist;
-}
-
-
-const Net::IPAddressRange::List& BaseServerSettings::getBlacklist() const
-{
-    return _blacklist;
-}
-
-
-void BaseServerSettings::setBlacklist(const Net::IPAddressRange::List& blacklist)
-{
-    _blacklist = blacklist;
-}
-*/
 
 } } // namespace ofx::HTTP

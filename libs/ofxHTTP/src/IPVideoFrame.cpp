@@ -28,7 +28,82 @@
 
 namespace ofx {
 namespace HTTP {
-        
+
+
+IPVideoFrameSettings::IPVideoFrameSettings():
+    _width(DEFAULT_WIDTH),
+    _height(DEFAULT_HEIGHT),
+    _flipHorizontal(false),
+    _flipVertical(false),
+    _quality(OF_IMAGE_QUALITY_MEDIUM)
+{
+}
+
+
+IPVideoFrameSettings::~IPVideoFrameSettings()
+{
+}
+
+
+void IPVideoFrameSettings::setWidth(std::size_t width)
+{
+    _width = width;
+}
+
+
+std::size_t IPVideoFrameSettings::getWidth() const
+{
+    return _width;
+}
+
+
+void IPVideoFrameSettings::setHeight(std::size_t height)
+{
+    _height = height;
+}
+
+
+std::size_t IPVideoFrameSettings::getHeight() const
+{
+    return _height;
+}
+
+
+void IPVideoFrameSettings::setFlipHorizontal(bool flipHorizontal)
+{
+    _flipHorizontal = flipHorizontal;
+}
+
+
+bool IPVideoFrameSettings::getFlipHorizontal() const
+{
+    return _flipHorizontal;
+}
+
+
+void IPVideoFrameSettings::setFlipVertical(bool flipVertical)
+{
+    _flipVertical = flipVertical;
+}
+
+
+bool IPVideoFrameSettings::getFlipVertical() const
+{
+    return _flipVertical;
+}
+
+
+void IPVideoFrameSettings::setQuality(ofImageQualityType quality)
+{
+    _quality = quality;
+}
+
+
+ofImageQualityType IPVideoFrameSettings::getQuality() const
+{
+    return _quality;
+}
+
         
 IPVideoFrame::IPVideoFrame(const Settings& settings,
                            unsigned long long timestamp,

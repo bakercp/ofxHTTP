@@ -73,7 +73,7 @@ public:
 };
 
 
-class AbstractSessionManager;
+class AbstractSessionStore;
 
 
 class AbstractServer: public Poco::Net::HTTPRequestHandlerFactory
@@ -85,7 +85,7 @@ public:
     }
 
     /// \brief Return a reference to the session cache.
-    virtual AbstractSessionManager& getSessionManager() = 0;
+    virtual AbstractSessionStore* getSessionStore() = 0;
 
 };
 
@@ -106,20 +106,18 @@ public:
     /// \note Redeclared here for documentation puposes.
     virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
                                Poco::Net::HTTPServerResponse& response) = 0;
-
-
-
 };
 
 
-class AbstractSessionManager: public AbstractHTTPRequestHandler
+class AbstractSessionStore: public AbstractHTTPRequestHandler
 {
 public:
-    virtual ~AbstractSessionManager()
+    virtual ~AbstractSessionStore()
     {
     }
 
-    virtual Poco::UUID getSessionId(const Poco::Net::HTTPServerRequest& request) const = 0;
+    virtual std::shared_ptr<AbstractSession> getSession(const Poco::Net::HTTPServerRequest& request,
+                                                        const Poco::Net::HTTPServerResponse& response) = 0;
 
     virtual std::shared_ptr<AbstractSession> getSession(const Poco::UUID& sessionId) = 0;
 
@@ -169,8 +167,6 @@ public:
 
     /// \brief Interrupt the handleRequest method if possible.
     virtual void stop() = 0;
-
-//    virtual AbstractRoute* getRoute() = 0;
 
 };
 
@@ -224,8 +220,14 @@ public:
     /// \details This method may block until the route is fully stopped.
     virtual void stop() = 0;
 
+
+    /// \brief Get a pointer to the server.
+    ///
+    /// \returns NULL pointer if no server is specified.
     virtual AbstractServer* getServer() = 0;
 
+    /// \brief Set the parent server.
+    /// \param server A pointer to the parent server.
     virtual void setServer(AbstractServer* server) = 0;
 
 };

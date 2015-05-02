@@ -37,7 +37,6 @@
 #include "ofSSLManager.h"
 #include "ofx/HTTP/BaseRequest.h"
 #include "ofx/HTTP/Context.h"
-#include "ofx/HTTP/StreamUtils.h"
 #include "ofTypes.h"
 
 
@@ -48,7 +47,7 @@ namespace HTTP {
 class BaseResponse: public Poco::Net::HTTPResponse
 {
 public:
-    typedef std::shared_ptr<BaseResponse> SharedPtr;
+//    typedef std::shared_ptr<BaseResponse> SharedPtr;
 
     BaseResponse();
     virtual ~BaseResponse();
@@ -59,10 +58,10 @@ public:
 //    bool hasException() const;
 //    const Poco::Exception* getException() const;
 
-    static SharedPtr makeShared()
-    {
-        return SharedPtr(new BaseResponse());
-    }
+//    static SharedPtr makeShared()
+//    {
+//        return SharedPtr(new BaseResponse());
+//    }
 
 private:
 //    void setResponseStream(std::istream* pResponseStream);

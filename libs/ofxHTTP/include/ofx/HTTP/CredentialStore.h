@@ -93,7 +93,8 @@ public:
 protected:
     bool authenticateWithCache(const AuthScope& scope,
                                Poco::Net::HTTPRequest& pRequest);
-    // get credentials, with mutex already locked
+
+    // Get credentials, with mutex already locked.
     bool getCredentialsWithExistingLock(const AuthScope& targetScope,
                                         AuthScope& matchingScope,
                                         Credentials& matchingCredentials) const;

@@ -96,7 +96,7 @@ std::istream& DefaultResponseStreamFilter::responseStreamFilter(std::istream& re
         }
         else
         {
-            ofLogWarning() << "Returning with unknown content encoding: " << contentEncoding;
+            ofLogWarning("DefaultResponseStreamFilter") << "Returning with unknown content encoding: " << contentEncoding;
             return responseStream;
         }
     }

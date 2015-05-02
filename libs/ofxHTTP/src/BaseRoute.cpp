@@ -23,7 +23,7 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/BaseRouteSettings.h"
+#include "ofx/HTTP/BaseRoute.h"
 
 
 namespace ofx {
@@ -34,12 +34,14 @@ const std::string BaseRouteSettings::DEFAULT_ROUTE_PATH_PATTERN = "/.*";
 const std::string BaseRouteSettings::DEFAULT_HTTP_METHODS_ARRAY[] = { "GET" };
 const BaseRouteSettings::HTTPMethodSet BaseRouteSettings::DEFAULT_HTTP_METHODS(INIT_SET_WITH_ARRAY(DEFAULT_HTTP_METHODS_ARRAY));
 
-    
+
 BaseRouteSettings::BaseRouteSettings(const std::string& routePathPattern,
                                      bool requireSecurePort,
+                                     //bool requireAuthentication,
                                      const HTTPMethodSet& validHTTPMethods):
     _routePathPattern(routePathPattern),
     _requireSecurePort(requireSecurePort),
+    _requireAuthentication(false),
     _validHTTPMethods(validHTTPMethods)
 {
 }
@@ -72,6 +74,18 @@ bool BaseRouteSettings::requireSecurePort() const
 {
     return _requireSecurePort;
 }
+
+
+//void BaseRouteSettings::setRequireAuthentication(bool requireAuthentication)
+//{
+//    _requireAuthentication = requireAuthentication;
+//}
+//
+//
+//bool BaseRouteSettings::requireAuthentication() const
+//{
+//    return _requireAuthentication;
+//}
 
 
 void BaseRouteSettings::setValidHTTPMethods(const BaseRouteSettings::HTTPMethodSet& validHTTPMethods)

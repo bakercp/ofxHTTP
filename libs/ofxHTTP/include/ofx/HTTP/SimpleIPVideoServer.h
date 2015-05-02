@@ -28,9 +28,7 @@
 #include "ofx/HTTP/BaseServer.h"
 #include "ofx/HTTP/FileSystemRoute.h"
 #include "ofx/HTTP/IPVideoRoute.h"
-#include "ofx/HTTP/IPVideoRouteSettings.h"
 #include "ofx/HTTP/PostRoute.h"
-#include "ofx/HTTP/PostRouteSettings.h"
 
 
 namespace ofx {

@@ -45,7 +45,7 @@ DefaultCredentialStore::~DefaultCredentialStore()
 void DefaultCredentialStore::setCredentials(const AuthScope& scope,
                                             const Credentials& credentials)
 {
-    if(!credentials.hasCredentials())
+    if (!credentials.hasCredentials())
     {
         ofLogWarning("CredentialStore::setCredentials") << "Credentials are empty.  Ignoring.";
         return;
@@ -129,7 +129,7 @@ bool DefaultCredentialStore::getCredentialsWithExistingLock(const AuthScope& tar
 
     
 
-    if(iter != credentialMap.end())
+    if (iter != credentialMap.end())
     {
         matchingScope       = (*iter).first;
         matchingCredentials = (*iter).second;
@@ -140,11 +140,11 @@ bool DefaultCredentialStore::getCredentialsWithExistingLock(const AuthScope& tar
         int bestMatchFactor  = -1;
         HTTPCredentialMapIter bestMatch = credentialMap.end();
         iter = credentialMap.begin();
-        while(iter != credentialMap.end())
+        while (iter != credentialMap.end())
         {
             int factor = (*iter).first.match(targetScope);
             
-            if(factor > bestMatchFactor)
+            if (factor > bestMatchFactor)
             {
                 bestMatch = iter;
                 bestMatchFactor = factor;
@@ -152,7 +152,7 @@ bool DefaultCredentialStore::getCredentialsWithExistingLock(const AuthScope& tar
             ++iter;
         }
         
-        if(bestMatch != credentialMap.end())
+        if (bestMatch != credentialMap.end())
         {
             matchingScope       = (*bestMatch).first;
             matchingCredentials = (*bestMatch).second;
@@ -163,7 +163,6 @@ bool DefaultCredentialStore::getCredentialsWithExistingLock(const AuthScope& tar
             return false;
         }
     }
-
 }
 
 
@@ -187,7 +186,7 @@ void DefaultCredentialStore::requestFilter(BaseRequest& request,
 {
     // first check and see if the request has any authentication headers
     // these could be added via default session headers
-    if(request.has(Poco::Net::HTTPRequest::AUTHORIZATION))
+    if (request.has(Poco::Net::HTTPRequest::AUTHORIZATION))
     {
         ofLogVerbose("CredentialStore::authenticate") << "HTTP Authorization headers already set.  Skipping authentication.";
         return;
@@ -203,12 +202,12 @@ void DefaultCredentialStore::requestFilter(BaseRequest& request,
     Poco::FastMutex::ScopedLock lock(mutex);
 
     // mutex locking happens in getCredentials() and authenticateWithCache()
-    if(getCredentialsWithExistingLock(targetScope, matchingScope, matchingCredentials))
+    if (getCredentialsWithExistingLock(targetScope, matchingScope, matchingCredentials))
     {
         // first search our digest credentials to see if we have a matching scope (preferred)
         HTTPDigestCredentialCacheMapIter iterDigest = digestCredentialCacheMap.find(matchingScope);
 
-        if(iterDigest != digestCredentialCacheMap.end())
+        if (iterDigest != digestCredentialCacheMap.end())
         {
             (*iterDigest).second->updateAuthInfo(request); // successfully updated auth info for matching scope
             ofLogVerbose("CredentialStore::updateAuthentication") << "Found and updated digest credentials.";
@@ -219,7 +218,7 @@ void DefaultCredentialStore::requestFilter(BaseRequest& request,
         
         HTTPBasicCredentialCacheMapIter iterBasic = basicCredentialCacheMap.find(matchingScope);
 
-        if(iterBasic != basicCredentialCacheMap.end())
+        if (iterBasic != basicCredentialCacheMap.end())
         {
             (*iterBasic).second->authenticate(request); // successfully updated auth info for matching scope
             ofLogVerbose("CredentialStore::updateAuthentication") << "Found and updated basic credentials.";
@@ -242,19 +241,19 @@ void DefaultCredentialStore::responseFilter(BaseRequest& request,
                                             Context& context)
 {
 
-    if(response.getStatus() == Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED)
+    if (response.getStatus() == Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED)
     {
-        for(Poco::Net::HTTPResponse::ConstIterator iter = response.find("WWW-Authenticate"); iter != response.end(); ++iter)
+        for (Poco::Net::HTTPResponse::ConstIterator iter = response.find("WWW-Authenticate"); iter != response.end(); ++iter)
         {
             Poco::URI uri(request.getURI());
 
             AuthenticationType requestedAuthType;
             
-            if(Poco::Net::HTTPCredentials::isBasicCredentials(iter->second))
+            if (Poco::Net::HTTPCredentials::isBasicCredentials(iter->second))
             {
                 requestedAuthType = BASIC;
             }
-            else if(Poco::Net::HTTPCredentials::isDigestCredentials(iter->second))
+            else if (Poco::Net::HTTPCredentials::isDigestCredentials(iter->second))
             {
                 requestedAuthType = DIGEST;
             }
@@ -304,14 +303,14 @@ void DefaultCredentialStore::responseFilter(BaseRequest& request,
                                               matchingScope,
                                               matchingCredentials))
             {
-                if(BASIC == requestedAuthType)
+                if (BASIC == requestedAuthType)
                 {
                     // replace any old ones (probably means they failed and were updated somewhere)
                     basicCredentialCacheMap[matchingScope] = HTTPBasicCredentialsSharedPtr(new Poco::Net::HTTPBasicCredentials(matchingCredentials.getUsername(), matchingCredentials.getPassword()));
                     basicCredentialCacheMap[matchingScope].get()->authenticate(request);
                     return;
                 }
-                else if(DIGEST == requestedAuthType)
+                else if (DIGEST == requestedAuthType)
                 {
                     digestCredentialCacheMap[matchingScope] = HTTPDigestCredentialsSharedPtr(new Poco::Net::HTTPDigestCredentials(matchingCredentials.getUsername(),matchingCredentials.getPassword()));
                     digestCredentialCacheMap[matchingScope].get()->authenticate(request, response);

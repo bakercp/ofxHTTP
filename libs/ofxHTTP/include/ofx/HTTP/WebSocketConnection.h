@@ -36,7 +36,6 @@
 #include "ofFileUtils.h"
 #include "ofLog.h"
 #include "ofx/HTTP/AbstractServerTypes.h"
-#include "ofx/HTTP/WebSocketRouteSettings.h"
 #include "ofx/HTTP/WebSocketEvents.h"
 #include "ofx/HTTP/WebSocketFrame.h"
 #include "ofx/HTTP/HTTPUtils.h"

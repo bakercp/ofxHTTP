@@ -43,7 +43,7 @@ namespace HTTP {
 
 
 template<typename SessionType>
-class BaseSessionManager_: public AbstractSessionManager
+class BaseSessionManager_: public AbstractSessionStore
 {
 public:
     BaseSessionManager_();

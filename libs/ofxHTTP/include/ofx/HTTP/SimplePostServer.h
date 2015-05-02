@@ -28,7 +28,6 @@
 
 #include "ofx/HTTP/SimpleFileServer.h"
 #include "ofx/HTTP/PostRoute.h"
-#include "ofx/HTTP/PostRouteSettings.h"
 #include "ofx/HTTP/PostRouteEvents.h"
 
 

@@ -24,13 +24,82 @@
 
 
 #include "ofx/HTTP/FileSystemRoute.h"
-//#include "ofx/HTTP/DefaultSessionCache.h"
 #include "ofUtils.h"
 #include "ofx/MediaTypeMap.h"
 
 
 namespace ofx {
 namespace HTTP {
+
+
+const std::string FileSystemRouteSettings::DEFAULT_DOCUMENT_ROOT = "DocumentRoot/";
+const std::string FileSystemRouteSettings::DEFAULT_INDEX         = "index.html";
+
+
+FileSystemRouteSettings::FileSystemRouteSettings(const std::string& routePathPattern,
+                                                 bool requireSecurePort):
+    BaseRouteSettings(routePathPattern,
+                      requireSecurePort,
+                      BaseRouteSettings::DEFAULT_HTTP_METHODS),
+    _defaultIndex(DEFAULT_INDEX),
+    _documentRoot(DEFAULT_DOCUMENT_ROOT),
+    _autoCreateDocumentRoot(false),
+    _requireDocumentRootInDataFolder(true)
+{
+}
+
+
+FileSystemRouteSettings::~FileSystemRouteSettings()
+{
+}
+
+
+void FileSystemRouteSettings::setDefaultIndex(const std::string& defaultIndex)
+{
+    _defaultIndex = defaultIndex;
+}
+
+
+const std::string& FileSystemRouteSettings::getDefaultIndex() const
+{
+    return _defaultIndex;
+}
+
+
+void FileSystemRouteSettings::setDocumentRoot(const std::string& documentRoot)
+{
+    _documentRoot = documentRoot;
+}
+
+
+const std::string& FileSystemRouteSettings::getDocumentRoot() const
+{
+    return _documentRoot;
+}
+
+
+void FileSystemRouteSettings::setAutoCreateDocumentRoot(bool autoCreateDocumentRoot)
+{
+    _autoCreateDocumentRoot = autoCreateDocumentRoot;
+}
+
+
+bool FileSystemRouteSettings::getAutoCreateDocumentRoot() const
+{
+    return _autoCreateDocumentRoot;
+}
+
+
+void FileSystemRouteSettings::setRequireDocumentRootInDataFolder(bool requireDocumentRootInDataFolder)
+{
+    _requireDocumentRootInDataFolder = requireDocumentRootInDataFolder;
+}
+
+
+bool FileSystemRouteSettings::getRequireDocumentRootInDataFolder() const
+{
+    return _requireDocumentRootInDataFolder;
+}
 
 
 FileSystemRoute::FileSystemRoute(const Settings& settings):
@@ -47,13 +116,7 @@ FileSystemRoute::~FileSystemRoute()
 void FileSystemRoute::handleRequest(Poco::Net::HTTPServerRequest& request,
                                     Poco::Net::HTTPServerResponse& response)
 {
-    Poco::UUID sessionId = Poco::UUID::null();
-
-    if (getServer())
-    {
-        getServer()->getSessionManager().handleRequest(request, response);
-        sessionId = getServer()->getSessionManager().getSessionId(request);
-    }
+    BaseRoute_<FileSystemRouteSettings>::handleRequest(request, response);
 
     Poco::Path dataFolder(ofToDataPath("", true));
     Poco::Path documentRoot(ofToDataPath(getSettings().getDocumentRoot(), true));
@@ -61,8 +124,8 @@ void FileSystemRoute::handleRequest(Poco::Net::HTTPServerRequest& request,
     std::string dataFolderString = dataFolder.toString();
     std::string documentRootString = documentRoot.toString();
 
-    // doc root validity check
-    if(getSettings().getRequireDocumentRootInDataFolder() &&
+    // Document root validity check.
+    if (_settings.getRequireDocumentRootInDataFolder() &&
        (documentRootString.length() < dataFolderString.length() ||
         documentRootString.substr(0, dataFolderString.length()) != dataFolderString))
     {
@@ -94,12 +157,12 @@ void FileSystemRoute::handleRequest(Poco::Net::HTTPServerRequest& request,
     std::string requestPathString = requestPath.toString();
 
     // double check path safety (not needed?)
-    if((requestPathString.length() < documentRootString.length() ||
-        requestPathString.substr(0, documentRootString.length()) != documentRootString))
+    if ((requestPathString.length() < documentRootString.length() ||
+         requestPathString.substr(0, documentRootString.length()) != documentRootString))
     {
         ofLogError("FileSystemRoute::handleRequest") << "Requested document not inside DocumentFolder.";
         response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
-        handleErrorRequest(request,response);
+        handleErrorRequest(request, response);
         return;
     }
 
@@ -117,21 +180,21 @@ void FileSystemRoute::handleRequest(Poco::Net::HTTPServerRequest& request,
     {
         ofLogError("FileSystemRoute::handleRequest") << exc.displayText();
         response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
-        handleErrorRequest(request,response);
+        handleErrorRequest(request, response);
         return;
     }
     catch (const Poco::OpenFileException& exc)
     {
         ofLogError("FileSystemRoute::handleRequest") << exc.displayText();
         response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-        handleErrorRequest(request,response);
+        handleErrorRequest(request, response);
         return;
     }
     catch (const std::exception& exc)
     {
         ofLogError("FileSystemRoute::handleRequest") << "Unknown server error: " << exc.what();
         response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-        handleErrorRequest(request,response);
+        handleErrorRequest(request, response);
         return;
     }
 }
@@ -172,14 +235,14 @@ void FileSystemRoute::handleErrorRequest(Poco::Net::HTTPServerRequest& request,
         }
     }
     
-    // if nothing is returned, then base route will get it
-    BaseRoute_<FileSystemRouteSettings>::handleRequest(request, response);
+    // If nothing is returned, then base route will get it
+    BaseRoute_<FileSystemRouteSettings>::handleErrorRequest(request, response);
 }
 
 
 Poco::Net::HTTPRequestHandler* FileSystemRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
 {
-    return new RouteHandlerAdapter(*this);
+    return new RequestHandlerAdapter(*this);
 }
 
 
