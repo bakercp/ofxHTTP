@@ -238,7 +238,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
             if (ws.poll(settings.getPollTimeout(),
                         Poco::Net::Socket::SELECT_ERROR))
             {
-                ofScopedLock lock(_mutex);
+                Poco::FastMutex::ScopedLock lock(_mutex);
                 _isConnected = false;
             }
 
@@ -316,7 +316,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
 
 bool WebSocketConnection::sendFrame(const WebSocketFrame& frame) const
 {
-    ofScopedLock lock(_mutex);
+    Poco::FastMutex::ScopedLock lock(_mutex);
 
     if (_isConnected)
     {
@@ -333,14 +333,14 @@ bool WebSocketConnection::sendFrame(const WebSocketFrame& frame) const
 
 std::size_t WebSocketConnection::getSendQueueSize() const
 {
-    ofScopedLock lock(_mutex);
+    Poco::FastMutex::ScopedLock lock(_mutex);
     return _frameQueue.size();
 }
 
 
 void WebSocketConnection::clearSendQueue()
 {
-    ofScopedLock lock(_mutex);
+    Poco::FastMutex::ScopedLock lock(_mutex);
     std::queue<WebSocketFrame> empty; // a way to clear queues.
     std::swap(_frameQueue, empty);
 }
@@ -348,41 +348,41 @@ void WebSocketConnection::clearSendQueue()
 
 void WebSocketConnection::stop()
 {
-    ofScopedLock lock(_mutex);
+    Poco::FastMutex::ScopedLock lock(_mutex);
     _isConnected = false;
 }
 
 
 Poco::Net::NameValueCollection WebSocketConnection::getRequestHeaders() const
 {
-    ofScopedLock lock(_mutex);
+    Poco::FastMutex::ScopedLock lock(_mutex);
     return _requestHeaders;
 }
 
 
 Poco::Net::SocketAddress WebSocketConnection::getClientAddress() const
 {
-    ofScopedLock lock(_mutex);
+    Poco::FastMutex::ScopedLock lock(_mutex);
     return _clientAddress;
 }
 
 
 bool WebSocketConnection::isConnected() const
 {
-    ofScopedLock lock(_mutex);
+    Poco::FastMutex::ScopedLock lock(_mutex);
     return _isConnected;
 }
 
 std::size_t WebSocketConnection::getTotalBytesSent() const
 {
-    ofScopedLock lock(_mutex);
+    Poco::FastMutex::ScopedLock lock(_mutex);
     return _totalBytesSent;
 }
 
 
 std::size_t WebSocketConnection::getTotalBytesReceived() const
 {
-    ofScopedLock lock(_mutex);
+    Poco::FastMutex::ScopedLock lock(_mutex);
     return _totalBytesReceived;
 }
 
@@ -443,7 +443,7 @@ void WebSocketConnection::applyFirefoxHack(Poco::Net::HTTPServerRequest& request
     // require websocket upgrade headers
     std::string connectionHeader = Poco::toLower(request.get("Connection", ""));
     
-    if (Poco::icompare(connectionHeader, "Upgrade") != 0)
+    if (0 != Poco::icompare(connectionHeader, "Upgrade"))
     {
         std::string userAgent = Poco::toLower(request.get("User-Agent",""));
 
