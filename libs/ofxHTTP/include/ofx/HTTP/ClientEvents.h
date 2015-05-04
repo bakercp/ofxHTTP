@@ -76,7 +76,7 @@ public:
     virtual ~BaseClientRequestArgs();
     const BaseRequest& getRequest() const;
     Context& getContext();
-    const Poco::UUID getRequestId() const;
+    const std::string getRequestId() const;
 
 protected:
     const BaseRequest& _request;

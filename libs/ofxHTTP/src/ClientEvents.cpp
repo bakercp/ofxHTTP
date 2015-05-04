@@ -100,7 +100,7 @@ Context& BaseClientRequestArgs::getContext()
 }
 
 
-const Poco::UUID BaseClientRequestArgs::getRequestId() const
+const std::string BaseClientRequestArgs::getRequestId() const
 {
     return _request.getRequestId();
 }

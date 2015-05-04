@@ -44,10 +44,10 @@ namespace ofx {
 namespace HTTP {
 
 
-typedef TaskDataEventArgs_<Poco::UUID, ClientResponseBufferEventArgs> ClientBufferEventArgs;
+typedef TaskDataEventArgs_<std::string, ClientResponseBufferEventArgs> ClientBufferEventArgs;
 
 
-class DefaultClientTaskQueue: public TaskQueue_<Poco::UUID>
+class DefaultClientTaskQueue: public TaskQueue_<std::string>
 {
 public:
     DefaultClientTaskQueue(int maxTasks = TaskQueue::UNLIMITED_TASKS,
@@ -55,11 +55,11 @@ public:
 
     virtual ~DefaultClientTaskQueue();
 
-    Poco::UUID get(const std::string& uri,
-                   const Poco::Net::NameValueCollection& formFields = Poco::Net::NameValueCollection(),
-                   const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1,
-                   const Poco::UUID& requestId = BaseRequest::generateUUID(),
-                   ThreadSettings threadSettings = ThreadSettings());
+    std::string get(const std::string& uri,
+                    const Poco::Net::NameValueCollection& formFields = Poco::Net::NameValueCollection(),
+                    const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1,
+                    const std::string& requestId = BaseRequest::generateId(),
+                    ThreadSettings threadSettings = ThreadSettings());
 
     /// \brief Construct a PostRequest with a given uri and http version.
     /// \param uri the Post endpoint uri.
@@ -68,12 +68,12 @@ public:
     /// \param httpVersion Either HTTP/1.0 or HTTP/1.1.
     /// \param requestId A unique UUID for this request.
     /// \returns a UUID associated with the BaseRequest.
-    Poco::UUID post(const std::string& uri,
-                    const Poco::Net::NameValueCollection formFields = Poco::Net::NameValueCollection(),
-                    const PostRequest::FormParts formParts = PostRequest::FormParts(),
-                    const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1,
-                    const Poco::UUID& requestId = BaseRequest::generateUUID(),
-                    ThreadSettings threadSettings = ThreadSettings());
+    std::string post(const std::string& uri,
+                     const Poco::Net::NameValueCollection formFields = Poco::Net::NameValueCollection(),
+                     const PostRequest::FormParts formParts = PostRequest::FormParts(),
+                     const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1,
+                     const std::string& requestId = BaseRequest::generateId(),
+                     ThreadSettings threadSettings = ThreadSettings());
 
     /// \brief Submit a request.
     ///
@@ -82,8 +82,8 @@ public:
     /// has been submitted.
     ///
     /// \returns a UUID associated with the BaseRequest.
-    Poco::UUID request(BaseRequest* pRequest,
-                       ThreadSettings threadSettings = ThreadSettings());
+    std::string request(BaseRequest* pRequest,
+                        ThreadSettings threadSettings = ThreadSettings());
 
     /// \brief Register event listeners.
     /// \tparam ListenerClass The class type with the required callback methods.
@@ -103,7 +103,7 @@ private:
     DefaultClientTaskQueue(const DefaultClientTaskQueue&);
     DefaultClientTaskQueue& operator = (const DefaultClientTaskQueue&);
 
-    virtual void handleTaskCustomNotification(const Poco::UUID& taskID,
+    virtual void handleTaskCustomNotification(const std::string& taskID,
                                               Poco::AutoPtr<Poco::TaskNotification> pNotification);
 
     Context* createDefaultContext();
@@ -115,7 +115,7 @@ private:
 template<typename ListenerClass>
 void DefaultClientTaskQueue::registerAllEvents(ListenerClass* listener)
 {
-    TaskQueue_<Poco::UUID>::registerTaskProgressEvents(listener);
+    TaskQueue_<std::string>::registerTaskProgressEvents(listener);
     ofAddListener(onClientBuffer, listener, &ListenerClass::onClientBuffer);
 }
 
@@ -123,7 +123,7 @@ void DefaultClientTaskQueue::registerAllEvents(ListenerClass* listener)
 template<typename ListenerClass>
 void DefaultClientTaskQueue::unregisterAllEvents(ListenerClass* listener)
 {
-    TaskQueue_<Poco::UUID>::unregisterTaskProgressEvents(listener);
+    TaskQueue_<std::string>::unregisterTaskProgressEvents(listener);
     ofRemoveListener(onClientBuffer, listener, &ListenerClass::onClientBuffer);
 }
 

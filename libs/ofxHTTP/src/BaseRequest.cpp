@@ -37,7 +37,7 @@ BaseRequest::BaseRequest(const std::string& method,
                          const std::string& uri,
                          const std::string& httpVersion):
     Poco::Net::HTTPRequest(method, uri, httpVersion),
-    _requestId(generateUUID())
+    _requestId(generateId())
 {
 }
 
@@ -104,13 +104,13 @@ void BaseRequest::setFormField(const std::string& name,
 }
 
 
-void BaseRequest::setRequestId(const Poco::UUID& requestId)
+void BaseRequest::setRequestId(const std::string& requestId)
 {
     _requestId = requestId;
 }
 
 
-const Poco::UUID& BaseRequest::getRequestId() const
+const std::string& BaseRequest::getRequestId() const
 {
     return _requestId;
 }
@@ -128,9 +128,9 @@ Poco::Net::HTMLForm& BaseRequest::getForm()
 }
 
 
-Poco::UUID BaseRequest::generateUUID()
+std::string BaseRequest::generateId()
 {
-    return Poco::UUIDGenerator::defaultGenerator().createOne();
+    return Poco::UUIDGenerator::defaultGenerator().createOne().toString();
 }
 
 

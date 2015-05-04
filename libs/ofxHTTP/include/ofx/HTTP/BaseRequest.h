@@ -92,15 +92,15 @@ public:
 
     void addFormFields(const Poco::Net::NameValueCollection& formFields);
 
-    void setRequestId(const Poco::UUID& requestId);
+    void setRequestId(const std::string& requestId);
 
-    const Poco::UUID& getRequestId() const;
+    const std::string& getRequestId() const;
 
     const Poco::Net::HTMLForm& getForm() const;
 
     Poco::Net::HTMLForm& getForm();
 
-    static Poco::UUID generateUUID();
+    static std::string generateId();
 
     /// \brief The default MIME type.
     static const std::string DEFAULT_MEDIA_TYPE;
@@ -118,7 +118,7 @@ protected:
     /// Poco::URI _rawURI;
 
     /// \brief A unique request id generated for this request.
-    Poco::UUID _requestId;
+    std::string _requestId;
 
     /// \brief A form with all query terms / form parameters.
     Poco::Net::HTMLForm _form;
