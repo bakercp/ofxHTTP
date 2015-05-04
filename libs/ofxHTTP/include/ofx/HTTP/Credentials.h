@@ -36,12 +36,6 @@ namespace HTTP {
 class Credentials
 {
 public:
-    enum Type
-    {
-        BASIC,
-        DIGEST
-    };
-
     Credentials();
     Credentials(const std::string& username, const std::string& password);
 
