@@ -45,7 +45,7 @@ class BaseHTTPSessionEvent: public AbstractHasSessionId, public ofEventArgs
 public:
     /// \brief Create a BaseHTTPSessionEvent with a sessionId.
     /// \param sessionId the session id associated with this event.
-    BaseHTTPSessionEvent(const Poco::UUID& sessionId):
+    BaseHTTPSessionEvent(const std::string& sessionId):
         _sessionId(sessionId)
     {
     }
@@ -63,14 +63,14 @@ public:
     /// is used, this will always return Poco::UUID::null.
     ///
     /// \returns the session id or Poco::UUID::null if not set.
-    Poco::UUID getSessionId() const
+    std::string getSessionId() const
     {
         return _sessionId;
     }
 
 protected:
     /// \brief The session id, if available.  Poco::UUID::null if null.
-    Poco::UUID _sessionId;
+    std::string _sessionId;
 
 };
 
@@ -83,7 +83,7 @@ public:
     /// \brief Construct the BaseHTTPServerRequestEventArgs.
     /// \param sessionId the session id associated with this event.
     /// \param request the Poco::Net::HTTPServerRequest.
-    BaseHTTPServerRequestEventArgs(const Poco::UUID& sessionId,
+    BaseHTTPServerRequestEventArgs(const std::string& sessionId,
                                    const Poco::Net::HTTPServerRequest& request):
         BaseHTTPSessionEvent(sessionId),
         _request(request)
@@ -126,7 +126,7 @@ public:
     /// \param sessionId the session id associated with this event.
     /// \param request the Poco::Net::HTTPServerRequest.
     /// \param _response the Poco::Net::HTTPServerResponse to be modified.
-    BaseHTTPServerRequestResponseEventArgs(const Poco::UUID& sessionId,
+    BaseHTTPServerRequestResponseEventArgs(const std::string& sessionId,
                                            const Poco::Net::HTTPServerRequest& request,
                                            Poco::Net::HTTPServerResponse& _response):
         BaseHTTPServerRequestEventArgs(sessionId, request),

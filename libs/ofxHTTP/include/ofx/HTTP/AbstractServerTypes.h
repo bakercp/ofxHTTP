@@ -50,7 +50,7 @@ public:
     {
     }
 
-    virtual Poco::UUID getSessionId() const = 0;
+    virtual std::string getSessionId() const = 0;
 
 };
 
@@ -118,13 +118,13 @@ public:
 
     virtual void clear() = 0;
 
-    virtual void remove(const Poco::UUID& sessionId) = 0;
+    virtual void remove(const std::string& sessionId) = 0;
 
     virtual std::shared_ptr<AbstractSession> create() = 0;
 
     virtual std::shared_ptr<AbstractSession> get(const Poco::Net::HTTPServerRequest& request) = 0;
 
-    virtual std::shared_ptr<AbstractSession> get(const Poco::UUID& sessionId) = 0;
+    virtual std::shared_ptr<AbstractSession> get(const std::string& sessionId) = 0;
 
     virtual std::shared_ptr<AbstractSession> get(const void* p) = 0;
 

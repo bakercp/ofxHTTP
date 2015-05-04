@@ -54,7 +54,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
 {
     _parent.handleRequest(request, response);
 
-    Poco::UUID sessionId = _parent.getSessionId(request, response);
+    std::string sessionId = _parent.getSessionId(request, response);
 
     // Get a copy of the settings.
     WebSocketRouteSettings settings = _parent.getSettings();

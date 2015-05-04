@@ -79,7 +79,7 @@ public:
     /// \brief Create a WebSocketEventArgs object with the provided params.
     /// \param sessionId The session id..
     /// \param connection A reference to the associated WebSocketConnection.
-    WebSocketEventArgs(const Poco::UUID& sessionId,
+    WebSocketEventArgs(const std::string& sessionId,
                        const WebSocketConnection& connection):
         _sessionId(sessionId),
         _connection(connection)
@@ -92,7 +92,7 @@ public:
     /// is used, this will always return Poco::UUID::null.
     ///
     /// \returns the session id or Poco::UUID::null if not set.
-    Poco::UUID getSessionId() const
+    std::string getSessionId() const
     {
         return _sessionId;
     }
@@ -104,7 +104,7 @@ public:
 
 private:
     /// \brief The session id, if available.  Poco::UUID::null if null.
-    const Poco::UUID& _sessionId;
+    const std::string& _sessionId;
 
     /// \brief A reference to the WebSocketConnection.
     const WebSocketConnection& _connection;
@@ -115,9 +115,9 @@ private:
 class WebSocketErrorEventArgs: public WebSocketEventArgs
 {
 public:
-    WebSocketErrorEventArgs(const Poco::UUID& sessionId,
-                           const WebSocketConnection& connection,
-                           WebSocketError error):
+    WebSocketErrorEventArgs(const std::string& sessionId,
+                            const WebSocketConnection& connection,
+                            WebSocketError error):
         WebSocketEventArgs(sessionId, connection),
         _error(error)
     {
@@ -141,7 +141,7 @@ protected:
 class WebSocketOpenEventArgs: public WebSocketEventArgs
 {
 public:
-    WebSocketOpenEventArgs(const Poco::UUID& sessionId,
+    WebSocketOpenEventArgs(const std::string& sessionId,
                            const WebSocketConnection& connection,
                            const Poco::Net::HTTPServerRequest& request):
         WebSocketEventArgs(sessionId, connection),
@@ -164,7 +164,7 @@ protected:
 class WebSocketCloseEventArgs: public WebSocketEventArgs
 {
 public:
-    WebSocketCloseEventArgs(const Poco::UUID& sessionId,
+    WebSocketCloseEventArgs(const std::string& sessionId,
                             const WebSocketConnection& connection,
                             unsigned short code,
                             const std::string& reason):
@@ -211,7 +211,7 @@ public:
     /// \param connection A reference to the associated WebSocketConnection.
     /// \param error An error, if any, associated with the event.
     WebSocketFrameEventArgs(const WebSocketFrame& frame,
-                            const Poco::UUID& sessionId,
+                            const std::string& sessionId,
                             const WebSocketConnection& connection):
         WebSocketEventArgs(sessionId, connection),
         _frame(frame)
@@ -229,6 +229,7 @@ private:
     const WebSocketFrame& _frame;
 
 };
+
 
 class WebSocketEvents
 {

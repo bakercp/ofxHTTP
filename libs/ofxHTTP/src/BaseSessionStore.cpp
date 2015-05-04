@@ -51,9 +51,6 @@ BaseSessionStore::~BaseSessionStore()
 
 std::shared_ptr<AbstractSession> BaseSessionStore::get(const Poco::Net::HTTPServerRequest& request)
 {
-    // The session id.
-    Poco::UUID sessionId;
-
     // Lock everything.
     Poco::FastMutex::ScopedLock lock(_mutex);
 
@@ -68,9 +65,9 @@ std::shared_ptr<AbstractSession> BaseSessionStore::get(const Poco::Net::HTTPServ
 
     std::shared_ptr<AbstractSession> session;
 
-    if (cookieIter != cookies.end() && sessionId.tryParse(cookieIter->second))
+    if (cookieIter != cookies.end() && !cookieIter->second.empty())
     {
-        return get(sessionId);
+        return get(cookieIter->second);
     }
     else
     {
@@ -110,7 +107,7 @@ void BaseSessionStore::handleRequest(Poco::Net::HTTPServerRequest& request,
         std::shared_ptr<AbstractSession> session = create();
 
         // Create a cookie with the session id.
-        Poco::Net::HTTPCookie cookie(_sessionKeyName, session->getSessionId().toString());
+        Poco::Net::HTTPCookie cookie(_sessionKeyName, session->getSessionId());
 
         // Send our cookie with the response.
         response.addCookie(cookie);
@@ -148,10 +145,8 @@ std::shared_ptr<AbstractSession> DefaultSessionStore::create()
 }
 
 
-std::shared_ptr<AbstractSession> DefaultSessionStore::get(const Poco::UUID& sessionId)
+std::shared_ptr<AbstractSession> DefaultSessionStore::get(const std::string& sessionId)
 {
-    cout << "DefaultSessionStore::: " << sessionId.toString() << endl;
-
     SessionMap::iterator sessionsIter = _sessionMap.find(sessionId);
 
     if (sessionsIter != _sessionMap.end())
@@ -167,7 +162,7 @@ std::shared_ptr<AbstractSession> DefaultSessionStore::get(const Poco::UUID& sess
 }
 
 
-void DefaultSessionStore::remove(const Poco::UUID& sessionId)
+void DefaultSessionStore::remove(const std::string& sessionId)
 {
     _sessionMap.erase(sessionId);
 }

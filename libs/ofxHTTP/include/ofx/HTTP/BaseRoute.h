@@ -191,8 +191,8 @@ public:
 
     AbstractSessionStore* getSessionStore();
 
-    Poco::UUID getSessionId(const Poco::Net::HTTPServerRequest& request,
-                            const Poco::Net::HTTPServerResponse& response);
+    std::string getSessionId(const Poco::Net::HTTPServerRequest& request,
+                             const Poco::Net::HTTPServerResponse& response);
 
 protected:
     /// \brief The settings.
@@ -436,8 +436,8 @@ void BaseRoute_<SettingsType>::setServer(AbstractServer* server)
 
 
 template<typename SettingsType>
-Poco::UUID BaseRoute_<SettingsType>::getSessionId(const Poco::Net::HTTPServerRequest& request,
-                                                  const Poco::Net::HTTPServerResponse& response)
+std::string BaseRoute_<SettingsType>::getSessionId(const Poco::Net::HTTPServerRequest& request,
+                                                   const Poco::Net::HTTPServerResponse& response)
 {
     AbstractSessionStore* sessionStore = getSessionStore();
 
@@ -451,12 +451,12 @@ Poco::UUID BaseRoute_<SettingsType>::getSessionId(const Poco::Net::HTTPServerReq
         }
         else
         {
-            return Poco::UUID::null();
+            return Poco::UUID::null().toString();
         }
     }
     else
     {
-        return Poco::UUID::null();
+        return Poco::UUID::null().toString();
     }
 }
 

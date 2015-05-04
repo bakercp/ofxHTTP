@@ -30,9 +30,9 @@ namespace ofx {
 namespace HTTP {
 
 
-DefaultSession::DefaultSession(const Poco::UUID& uuid,
+DefaultSession::DefaultSession(const std::string& sessionId,
                                const Poco::Timestamp& lastModified):
-    _uuid(uuid),
+    _sessionId(sessionId),
     _lastModified(lastModified)
 {
 }
@@ -43,10 +43,10 @@ DefaultSession::~DefaultSession()
 }
 
 
-Poco::UUID DefaultSession::getSessionId() const
+std::string DefaultSession::getSessionId() const
 {
     Poco::FastMutex::ScopedLock lock(_mutex);
-    return _uuid;
+    return _sessionId;
 }
 
 

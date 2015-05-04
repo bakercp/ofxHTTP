@@ -165,10 +165,10 @@ void PostRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
 {
     _parent.handleRequest(request, response);
 
-    Poco::UUID sessionId = _parent.getSessionId(request, response);
+    std::string sessionId = _parent.getSessionId(request, response);
 
     // This uuid helps us track form progress updates.
-    Poco::UUID formUUID = Poco::UUIDGenerator::defaultGenerator().createOne();
+    std::string formId = Poco::UUIDGenerator::defaultGenerator().createOne().toString();
 
     // Get the content type header (already checked in parent route).
     Poco::Net::MediaType contentType(request.get("Content-Type", ""));
@@ -190,7 +190,7 @@ void PostRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
             }
         }
 
-        PostRouteFileHandler postRoutePartHandler(_parent, sessionId, request, formUUID);
+        PostRouteFileHandler postRoutePartHandler(_parent, sessionId, request, formId);
 
         Poco::Net::HTMLForm form(contentType.toString());
         form.setFieldLimit(_parent.getSettings().getFieldLimit());
@@ -199,7 +199,7 @@ void PostRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
         PostFormEventArgs args(sessionId,
                                request,
                                response,
-                               formUUID,
+                               formId,
                                form);
 
         ofNotifyEvent(_parent.events.onHTTPFormEvent, args, &_parent);
@@ -217,7 +217,7 @@ void PostRouteHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
 
         ofBuffer buffer(result);
 
-        PostEventArgs args(sessionId, request, response, formUUID, buffer);
+        PostEventArgs args(sessionId, request, response, formId, buffer);
 
         ofNotifyEvent(_parent.events.onHTTPPostEvent, args, &_parent);
 
@@ -250,13 +250,13 @@ void PostRouteHandler::stop()
 
 
 PostRouteFileHandler::PostRouteFileHandler(PostRoute& parent,
-                                           const Poco::UUID& sessionId,
+                                           const std::string& sessionId,
                                            const Poco::Net::HTTPServerRequest& request,
-                                           const Poco::UUID& formUUID):
+                                           const std::string& formId):
     _parent(parent),
     _sessionId(sessionId),
     _request(request),
-    _formUUID(formUUID)
+    _formId(formId)
 {
 }
 
@@ -321,7 +321,7 @@ void PostRouteFileHandler::handlePart(const Poco::Net::MessageHeader& header,
 
                 PostUploadEventArgs args(_sessionId,
                                          _request,
-                                         _formUUID,
+                                         _formId,
                                          formFieldName,
                                          formFileName,
                                          newFilename,
@@ -373,7 +373,7 @@ void PostRouteFileHandler::handlePart(const Poco::Net::MessageHeader& header,
 
                     PostUploadEventArgs uploadArgs(_sessionId,
                                                    _request,
-                                                   _formUUID,
+                                                   _formId,
                                                    formFieldName,
                                                    formFileName,
                                                    newFilename,
@@ -390,7 +390,7 @@ void PostRouteFileHandler::handlePart(const Poco::Net::MessageHeader& header,
 
                 PostUploadEventArgs finishedArgs(_sessionId,
                                                  _request,
-                                                 _formUUID,
+                                                 _formId,
                                                  formFieldName,
                                                  formFileName,
                                                  newFilename,

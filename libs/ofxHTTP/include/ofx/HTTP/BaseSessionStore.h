@@ -56,11 +56,11 @@ public:
 
     virtual void clear() = 0;
 
-    virtual void remove(const Poco::UUID& sessionId) = 0;
+    virtual void remove(const std::string& sessionId) = 0;
 
     virtual std::shared_ptr<AbstractSession> create() = 0;
 
-    virtual std::shared_ptr<AbstractSession> get(const Poco::UUID& sessionId) = 0;
+    virtual std::shared_ptr<AbstractSession> get(const std::string& sessionId) = 0;
 
     virtual std::shared_ptr<AbstractSession> get(const Poco::Net::HTTPServerRequest& request);
 
@@ -94,12 +94,12 @@ public:
 
     std::shared_ptr<AbstractSession> create();
 
-    std::shared_ptr<AbstractSession> get(const Poco::UUID& sessionId);
+    std::shared_ptr<AbstractSession> get(const std::string& sessionId);
 
-    void remove(const Poco::UUID& sessionId);
+    void remove(const std::string& sessionId);
 
 protected:
-    typedef std::map<Poco::UUID, std::shared_ptr<AbstractSession> > SessionMap;
+    typedef std::map<std::string, std::shared_ptr<AbstractSession> > SessionMap;
 
     SessionMap _sessionMap;
 

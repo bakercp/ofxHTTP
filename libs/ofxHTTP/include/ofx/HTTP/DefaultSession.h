@@ -50,12 +50,12 @@ namespace HTTP {
 class DefaultSession: public AbstractSession
 {
 public:
-    DefaultSession(const Poco::UUID& uuid = Poco::UUIDGenerator::defaultGenerator().createRandom(),
+    DefaultSession(const std::string& sessionId = Poco::UUIDGenerator::defaultGenerator().createRandom().toString(),
                    const Poco::Timestamp& lastModified = Poco::Timestamp());
 
     virtual ~DefaultSession();
 
-    Poco::UUID getSessionId() const;
+    std::string getSessionId() const;
 
     const Poco::Timestamp getLastModified() const;
 
@@ -73,7 +73,7 @@ private:
 
     SessionDict _sessionDict;
 
-    Poco::UUID _uuid;
+    std::string _sessionId;
 
     mutable Poco::Timestamp _lastModified;
 
