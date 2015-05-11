@@ -31,7 +31,7 @@ namespace HTTP {
 
 
 SimpleIPVideoServer::SimpleIPVideoServer(const Settings& settings):
-    BaseServer_<SimpleIPVideoServerSettings>(settings),
+    BaseServer_<SimpleIPVideoServerSettings, SimpleSessionStore>(settings),
     _fileSystemRoute(settings.fileSystemRouteSettings),
     _postRoute(settings.postRouteSettings),
     _ipVideoRoute(settings.ipVideoRouteSettings)
@@ -52,7 +52,7 @@ SimpleIPVideoServer::~SimpleIPVideoServer()
 
 void SimpleIPVideoServer::setup(const Settings& settings)
 {
-    BaseServer_<SimpleIPVideoServerSettings>::setup(settings);
+    BaseServer_<SimpleIPVideoServerSettings, SimpleSessionStore>::setup(settings);
     _fileSystemRoute.setup(settings.fileSystemRouteSettings);
     _postRoute.setup(settings.postRouteSettings);
     _ipVideoRoute.setup(settings.ipVideoRouteSettings);

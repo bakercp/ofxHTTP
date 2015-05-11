@@ -43,9 +43,8 @@
 
 #include "ofx/HTTP/AbstractServerTypes.h"
 #include "ofx/HTTP/RequestHandlerAdapter.h"
+#include "ofx/HTTP/ServerEvents.h"
 
-
-//#include "ofx/HTTP/AbstractServerTypes.h"
 
 namespace ofx {
 namespace HTTP {
@@ -68,12 +67,13 @@ public:
     /// \param routePathPattern The regex pattern that this route will handle.
     /// \param requireSecurePort True if this route requires
     ///        communication on an SSL encrypted port.
+    /// \param requireAuthentication Require authenticated requests.
     /// \param validHTTPMethods The valid HTTP Methods that this route
     ///        will handle.
     BaseRouteSettings(const std::string& routePathPattern = BaseRouteSettings::DEFAULT_ROUTE_PATH_PATTERN,
                       bool requireSecurePort = false,
-                      //                      bool requireAuthentication = false,
-                      const HTTPMethodSet& validHTTPMethods = BaseRouteSettings::DEFAULT_HTTP_METHODS);
+                      bool requireAuthentication = false,
+                      const HTTPMethodSet& validHTTPMethods = HTTPMethodSet());
 
     /// \brief Destroy the BaseRoutSettings.
     virtual ~BaseRouteSettings();
@@ -93,13 +93,13 @@ public:
     /// \returns true iff route requires communication on an SSL encrypted port.
     bool requireSecurePort() const;
 
-    //    /// \brief Set the authentication requirement.
-    //    /// \param requireAuthentication Set to true if this route requires
-    //    ///        authentication.
-    //    void setRequireAuthentication(bool requireAuthentication);
-    //
-    //    /// \returns true iff route requires server authentication.
-    //    bool requireAuthentication() const;
+    /// \brief Set the authentication requirement.
+    /// \param requireAuthentication Set to true if this route requires
+    ///        authentication.
+    void setRequireAuthentication(bool requireAuthentication);
+
+    /// \returns true iff route requires server authentication.
+    bool requireAuthentication() const;
 
     /// \brief Set the list of valid HTTPMethods.
     /// \param validHTTPMethods A set of valid HTTPMethods.
@@ -126,14 +126,6 @@ public:
     /// \brief The default route path regex pattern.
     /// \details By default, this pattern matches all requests.
     static const std::string DEFAULT_ROUTE_PATH_PATTERN;
-
-    /// \brief An unfortunate compromise until C++11.
-    /// \note C++ is not able to initialize static collections until
-    ///        after C++11.  This is a compromise until then.
-    static const std::string DEFAULT_HTTP_METHODS_ARRAY[];
-
-    /// \brief The default HTTP methods for this route.
-    static const HTTPMethodSet DEFAULT_HTTP_METHODS;
 
 private:
     /// \brief the route's regex route pattern.
@@ -174,11 +166,10 @@ public:
 
     virtual Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
 
-    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
-                               Poco::Net::HTTPServerResponse& response);
+    void handleRequest(Poco::Net::HTTPServerRequest& request,
+                       Poco::Net::HTTPServerResponse& response);
 
-    virtual void handleErrorRequest(Poco::Net::HTTPServerRequest& request,
-                                    Poco::Net::HTTPServerResponse& response);
+    virtual void handleRequest(ServerEventArgs& evt);
 
     virtual void stop();
 
@@ -188,11 +179,6 @@ public:
     AbstractServer* getServer();
 
     void setServer(AbstractServer* server);
-
-    AbstractSessionStore* getSessionStore();
-
-    std::string getSessionId(const Poco::Net::HTTPServerRequest& request,
-                             const Poco::Net::HTTPServerResponse& response);
 
 protected:
     /// \brief The settings.
@@ -243,7 +229,7 @@ template<typename SettingsType>
 bool BaseRoute_<SettingsType>::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
                                                 bool isSecurePort) const
 {
-    // If this isn't a secure pot and we require that, reject it.
+    // If this isn't a secure port and we require that, reject it.
     if (_settings.requireSecurePort() && !isSecurePort)
     {
         return false;
@@ -333,20 +319,43 @@ template<typename SettingsType>
 void BaseRoute_<SettingsType>::handleRequest(Poco::Net::HTTPServerRequest& request,
                                              Poco::Net::HTTPServerResponse& response)
 {
-    AbstractSessionStore* sessionStore = getSessionStore();
+    // We assert that the server must be set on a route.
+    poco_assert(_server);
 
-    if (sessionStore)
+    // All requests pass through the server's handleRequest method first.
+    // The server broadcasts the request / response to any listeners.
+    // Generally these listeners should only modify headers, not send a response.
+    AbstractSession& session = _server->getSessionStore().getSession(request, response);
+
+    ServerEventArgs evt(request, response, session);
+
+    _server->onHTTPServerEvent(this, evt);
+
+    // If the response was sent from the server or its delegates, we finish.
+    if (response.sent())
     {
-        sessionStore->handleRequest(request, response);
+        return;
+    }
+    else
+    {
+        // Otherwise, we call the route's sendResponse method.
+        // Eventually we may end up back at this base class' sendResponse
+        // method.
+        handleRequest(evt);
+    }
+
+    // A failsafe.
+    if (!response.sent())
+    {
+        BaseRoute_<SettingsType>::handleRequest(evt);
     }
 }
 
 
 template<typename SettingsType>
-void BaseRoute_<SettingsType>::handleErrorRequest(Poco::Net::HTTPServerRequest& request,
-                                                  Poco::Net::HTTPServerResponse& response)
+void BaseRoute_<SettingsType>::handleRequest(ServerEventArgs& evt)
 {
-    if (response.sent())
+    if (evt.getResponse().sent())
     {
         return;
     }
@@ -357,19 +366,19 @@ void BaseRoute_<SettingsType>::handleErrorRequest(Poco::Net::HTTPServerRequest& 
     {
         // If we got this far and our status is still marked as 200,
         // that constitutes a server error.
-        if (Poco::Net::HTTPResponse::HTTP_OK == response.getStatus())
+        if (Poco::Net::HTTPResponse::HTTP_OK == evt.getResponse().getStatus())
         {
-            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR,
-                                        "No handlers for route.");
+            evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR,
+                                                 "No handlers for route.");
         }
 
-        response.setChunkedTransferEncoding(true);
-        response.setContentType("text/html");
+        evt.getResponse().setChunkedTransferEncoding(true);
+        evt.getResponse().setContentType("text/html");
 
         std::stringstream ss;
-        ss << response.getStatus() << " - " << response.getReason();
+        ss << evt.getResponse().getStatus() << " - " << evt.getResponse().getReason();
 
-        std::ostream& ostr = response.send(); // get output stream
+        std::ostream& ostr = evt.getResponse().send(); // get output stream
         ostr << "<!DOCTYPE html><html><head><meta charset=\"utf-8\"/><title>";
         ostr << ss.str();
         ostr << "</title></head><body><h1>";
@@ -413,51 +422,103 @@ AbstractServer* BaseRoute_<SettingsType>::getServer()
 
 
 template<typename SettingsType>
-AbstractSessionStore* BaseRoute_<SettingsType>::getSessionStore()
-{
-    AbstractServer* server = getServer();
-
-    if (server)
-    {
-        return server->getSessionStore();
-    }
-    else
-    {
-        return 0;
-    }
-}
-
-
-template<typename SettingsType>
 void BaseRoute_<SettingsType>::setServer(AbstractServer* server)
 {
     _server = server;
 }
 
 
-template<typename SettingsType>
-std::string BaseRoute_<SettingsType>::getSessionId(const Poco::Net::HTTPServerRequest& request,
-                                                   const Poco::Net::HTTPServerResponse& response)
+/// \brief The base implmentation of a server route.
+template<typename RouteType>
+class BaseRouteHandler_: public AbstractRouteHandler
 {
-    AbstractSessionStore* sessionStore = getSessionStore();
+public:
+    /// \brief Create a BaseRoute.
+    BaseRouteHandler_(RouteType& route);
 
-    if (sessionStore)
+    /// \brief Destroy a BaseRoute.
+    virtual ~BaseRouteHandler_();
+
+    void handleRequest(Poco::Net::HTTPServerRequest& request,
+                       Poco::Net::HTTPServerResponse& response);
+
+    virtual void handleRequest(ServerEventArgs& evt) = 0;
+
+    virtual void stop();
+
+    /// \brief Get the dispatching route.
+    RouteType& getRoute();
+
+private:
+    BaseRouteHandler_(const BaseRouteHandler_&);
+    BaseRouteHandler_& operator = (const BaseRouteHandler_&);
+
+    /// \brief The route.
+    RouteType& _route;
+
+};
+
+
+template<typename RouteType>
+BaseRouteHandler_<RouteType>::BaseRouteHandler_(RouteType& route):
+    _route(route)
+{
+}
+
+
+template<typename RouteType>
+BaseRouteHandler_<RouteType>::~BaseRouteHandler_()
+{
+}
+
+
+template<typename RouteType>
+void BaseRouteHandler_<RouteType>::handleRequest(Poco::Net::HTTPServerRequest& request,
+                                                 Poco::Net::HTTPServerResponse& response)
+{
+    // We assert that the server must be set on a route.
+    poco_assert(getRoute().getServer());
+
+    // All requests pass through the server's handleRequest method first.
+    // The server broadcasts the request / response to any listeners.
+    // Generally these listeners should only modify headers, not send a response.
+    AbstractSession& session = getRoute().getServer()->getSessionStore().getSession(request, response);
+
+    ServerEventArgs evt(request, response, session);
+
+    getRoute().getServer()->onHTTPServerEvent(this, evt);
+
+    // If the response was sent from the server or its delegates, we finish.
+    if (response.sent())
     {
-        std::shared_ptr<AbstractSession> session = sessionStore->get(request);
-
-        if (session)
-        {
-            return session->getSessionId();
-        }
-        else
-        {
-            return Poco::UUID::null().toString();
-        }
+        return;
     }
     else
     {
-        return Poco::UUID::null().toString();
+        // Otherwise, we call the route's sendResponse method.
+        // Eventually we may end up back at this base class' sendResponse
+        // method.
+        handleRequest(evt);
     }
+
+    // A failsafe.
+    if (!response.sent())
+    {
+        getRoute().handleRequest(evt);
+    }
+}
+
+
+template<typename RouteType>
+void BaseRouteHandler_<RouteType>::stop()
+{
+}
+
+
+template<typename RouteType>
+RouteType& BaseRouteHandler_<RouteType>::getRoute()
+{
+    return _route;
 }
 
 

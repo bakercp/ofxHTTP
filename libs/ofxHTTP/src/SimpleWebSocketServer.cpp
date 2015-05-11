@@ -31,7 +31,7 @@ namespace HTTP {
 
 
 SimpleWebSocketServer::SimpleWebSocketServer(const Settings& settings):
-    BaseServer_<SimpleWebSocketServerSettings>(settings),
+    BaseServer_<SimpleWebSocketServerSettings, SimpleSessionStore>(settings),
     _fileSystemRoute(settings.fileSystemRouteSettings),
     _webSocketRoute(settings.webSocketServerSettings)
 {
@@ -49,7 +49,7 @@ SimpleWebSocketServer::~SimpleWebSocketServer()
 
 void SimpleWebSocketServer::setup(const Settings& settings)
 {
-    BaseServer_<SimpleWebSocketServerSettings>::setup(settings);
+    BaseServer_<SimpleWebSocketServerSettings, SimpleSessionStore>::setup(settings);
     _fileSystemRoute.setup(settings.fileSystemRouteSettings);
     _webSocketRoute.setup(settings.webSocketServerSettings);
 }

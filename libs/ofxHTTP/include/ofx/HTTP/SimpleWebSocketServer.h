@@ -45,7 +45,7 @@ public:
 
 
 /// \brief A basic implementation of an HTTP Server supporting WebSockets.
-class SimpleWebSocketServer: public BaseServer_<SimpleWebSocketServerSettings>
+class SimpleWebSocketServer: public BaseServer_<SimpleWebSocketServerSettings, SimpleSessionStore>
 {
 public:
     /// \brief A typedef for the SimpleWebSocketServerSettings.

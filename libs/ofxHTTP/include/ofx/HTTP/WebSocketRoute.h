@@ -48,8 +48,8 @@ public:
 
     /// \brief Create a WebSocketRouteSettings.
     /// \param routePathPattern The regex pattern that this route will handle.
-    /// \param requireSecurePorttrue True if this route requires communication
-    ///     on an SSL encrypted port.
+    /// \param requireSecurePort True if this route requires communication
+    ///        on an SSL encrypted port.
     WebSocketRouteSettings(const std::string& routePathPattern = DEFAULT_WEBSOCKET_ROUTE_PATH_PATTERN,
                            bool requireSecurePort = false);
 
@@ -88,7 +88,7 @@ public:
     const OriginSet& getValidOrigins() const;
 
     /// \param autoPingPongResponse If set to true, the WebSocket connection
-    ///     will return all PINGs with a PONG.
+    ///        will return all PINGs with a PONG.
     void setAutoPingPongResponse(bool autoPingPongResponse);
 
     bool getAutoPingPongResponse() const;
@@ -194,6 +194,7 @@ public:
 
     /// \brief WebSocketEvents for WebSocket callbacks.
     WebSocketEvents events;
+
 
 protected:
     void registerWebSocketConnection(WebSocketConnection* connection);

@@ -34,13 +34,17 @@ namespace HTTP {
 
 const std::string FileSystemRouteSettings::DEFAULT_DOCUMENT_ROOT = "DocumentRoot/";
 const std::string FileSystemRouteSettings::DEFAULT_INDEX         = "index.html";
+const std::string FileSystemRouteSettings::DEFAULT_GET_HTTP_METHODS_ARRAY[] = { "GET" };
+const FileSystemRouteSettings::HTTPMethodSet FileSystemRouteSettings::DEFAULT_GET_HTTP_METHODS(INIT_SET_WITH_ARRAY(DEFAULT_GET_HTTP_METHODS_ARRAY));
 
 
 FileSystemRouteSettings::FileSystemRouteSettings(const std::string& routePathPattern,
-                                                 bool requireSecurePort):
+                                                 bool requireSecurePort,
+                                                 bool requireAuthentication):
     BaseRouteSettings(routePathPattern,
                       requireSecurePort,
-                      BaseRouteSettings::DEFAULT_HTTP_METHODS),
+                      requireAuthentication,
+                      FileSystemRouteSettings::DEFAULT_GET_HTTP_METHODS),
     _defaultIndex(DEFAULT_INDEX),
     _documentRoot(DEFAULT_DOCUMENT_ROOT),
     _autoCreateDocumentRoot(false),
@@ -113,11 +117,8 @@ FileSystemRoute::~FileSystemRoute()
 }
 
 
-void FileSystemRoute::handleRequest(Poco::Net::HTTPServerRequest& request,
-                                    Poco::Net::HTTPServerResponse& response)
+void FileSystemRoute::handleRequest(ServerEventArgs& evt)
 {
-    BaseRoute_<FileSystemRouteSettings>::handleRequest(request, response);
-
     Poco::Path dataFolder(ofToDataPath("", true));
     Poco::Path documentRoot(ofToDataPath(getSettings().getDocumentRoot(), true));
 
@@ -130,14 +131,14 @@ void FileSystemRoute::handleRequest(Poco::Net::HTTPServerRequest& request,
         documentRootString.substr(0, dataFolderString.length()) != dataFolderString))
     {
         ofLogError("FileSystemRoute::handleRequest") << "Document Root is not a sub directory of the data folder.";
-        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-        handleErrorRequest(request, response);
+        evt.getResponse()   .setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        handleErrorResponse(evt);
         return;
     }
 
     // check path
 
-    Poco::URI uri(request.getURI());
+    Poco::URI uri(evt.getRequest().getURI());
     std::string path = uri.getPath(); // just get the path
 
     // make paths absolute
@@ -161,8 +162,8 @@ void FileSystemRoute::handleRequest(Poco::Net::HTTPServerRequest& request,
          requestPathString.substr(0, documentRootString.length()) != documentRootString))
     {
         ofLogError("FileSystemRoute::handleRequest") << "Requested document not inside DocumentFolder.";
-        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
-        handleErrorRequest(request, response);
+        evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+        handleErrorResponse(evt);
         return;
     }
 
@@ -173,44 +174,45 @@ void FileSystemRoute::handleRequest(Poco::Net::HTTPServerRequest& request,
     {
         // TODO: this is where we would begin to work honoring
         /// Accept-Encoding:gzip, deflate, sdch
-        response.sendFile(file.getAbsolutePath(), mediaTypeString);
+        evt.getResponse().sendFile(file.getAbsolutePath(), mediaTypeString);
         return;
     }
     catch (const Poco::FileNotFoundException& exc)
     {
         ofLogError("FileSystemRoute::handleRequest") << exc.displayText();
-        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
-        handleErrorRequest(request, response);
+        evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+        handleErrorResponse(evt);
         return;
     }
     catch (const Poco::OpenFileException& exc)
     {
         ofLogError("FileSystemRoute::handleRequest") << exc.displayText();
-        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-        handleErrorRequest(request, response);
+        evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        handleErrorResponse(evt);
         return;
     }
     catch (const std::exception& exc)
     {
         ofLogError("FileSystemRoute::handleRequest") << "Unknown server error: " << exc.what();
-        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-        handleErrorRequest(request, response);
+        evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        handleErrorResponse(evt);
         return;
     }
 }
 
 
-void FileSystemRoute::handleErrorRequest(Poco::Net::HTTPServerRequest& request,
-                                         Poco::Net::HTTPServerResponse& response)
+void FileSystemRoute::handleErrorResponse(ServerEventArgs& evt)
 {
+    cout << "sending error response" << endl;
+
     // See if we have an html file with that error code.
-    ofFile errorFile(_settings.getDocumentRoot() + "/" + ofToString(response.getStatus()) + ".html");
+    ofFile errorFile(_settings.getDocumentRoot() + "/" + ofToString(evt.getResponse().getStatus()) + ".html");
 
     if (errorFile.exists())
     {
         try
         {
-            response.sendFile(errorFile.getAbsolutePath(), "text/html");
+            evt.getResponse().sendFile(errorFile.getAbsolutePath(), "text/html");
             return;
         }
         catch (const Poco::FileNotFoundException& exc)
@@ -234,9 +236,8 @@ void FileSystemRoute::handleErrorRequest(Poco::Net::HTTPServerRequest& request,
             ofLogVerbose("FileSystemRoute::sendErrorResponse") << "... Unknown exception.";
         }
     }
-    
-    // If nothing is returned, then base route will get it
-    BaseRoute_<FileSystemRouteSettings>::handleErrorRequest(request, response);
+
+    // Will pass to BaseRoute_<>::sendResponse() if not already sent.
 }
 
 

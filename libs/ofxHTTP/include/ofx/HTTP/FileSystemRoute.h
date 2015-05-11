@@ -36,8 +36,9 @@ namespace HTTP {
 class FileSystemRouteSettings: public BaseRouteSettings
 {
 public:
-    FileSystemRouteSettings(const std::string& routePathPattern = BaseRouteSettings::DEFAULT_ROUTE_PATH_PATTERN,
-                            bool requireSecurePort = false);
+    FileSystemRouteSettings(const std::string& routePathPattern = DEFAULT_ROUTE_PATH_PATTERN,
+                            bool requireSecurePort = false,
+                            bool requireAuthentication = false);
 
     virtual ~FileSystemRouteSettings();
 
@@ -66,7 +67,15 @@ public:
 
     static const std::string DEFAULT_DOCUMENT_ROOT;
     static const std::string DEFAULT_INDEX;
-    
+
+    /// \brief An unfortunate compromise until C++11.
+    /// \note C++ is not able to initialize static collections until
+    ///        after C++11.  This is a compromise until then.
+    static const std::string DEFAULT_GET_HTTP_METHODS_ARRAY[];
+
+    /// \brief The default HTTP methods for this route.
+    static const HTTPMethodSet DEFAULT_GET_HTTP_METHODS;
+
 private:
     std::string _defaultIndex;
     std::string _documentRoot;
@@ -87,11 +96,9 @@ public:
 
     virtual ~FileSystemRoute();
 
-    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
-                               Poco::Net::HTTPServerResponse& response);
+    virtual void handleRequest(ServerEventArgs& evt);
 
-    void handleErrorRequest(Poco::Net::HTTPServerRequest& request,
-                            Poco::Net::HTTPServerResponse& response);
+    virtual void handleErrorResponse(ServerEventArgs& evt);
 
     Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
 

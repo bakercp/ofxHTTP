@@ -67,30 +67,30 @@ private:
     bool _flipHorizontal;
     bool _flipVertical;
     ofImageQualityType _quality;
+
 };
 
 
 class IPVideoFrame
 {
 public:
-    typedef IPVideoFrameSettings Settings;
-
-    IPVideoFrame(const Settings& settings,
+    IPVideoFrame(const IPVideoFrameSettings& settings,
                  unsigned long long timestamp,
                  const ofBuffer& buffer);
     
     virtual ~IPVideoFrame();
 
-    Settings getSettings() const;
+    IPVideoFrameSettings getSettings() const;
 
     unsigned long long getTimestamp() const;
 
     ofBuffer& getBuffer();
 
 private:
-    Settings _settings;
+    IPVideoFrameSettings _settings;
     unsigned long long _timestamp;
     ofBuffer _buffer;
+    
 };
 
 

@@ -27,58 +27,71 @@
 
 
 #include <string>
-#include <map>
-#include "Poco/Mutex.h"
-#include "Poco/Timestamp.h"
-#include "Poco/UUID.h"
-#include "Poco/UUIDGenerator.h"
-#include "Poco/Net/HTTPCookie.h"
-#include "Poco/Any.h"
-#include "ofTypes.h"
-#include "ofUtils.h"
 #include "ofx/HTTP/AbstractServerTypes.h"
+#include "Poco/Mutex.h"
+#include "ofEvents.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
+class BaseSession: public AbstractSession
+{
+public:
+    BaseSession(const std::string sessionId = generateId());
+
+    virtual ~BaseSession();
+
+    std::string getId() const;
+
+    /// \brief A utility function for generating unique session ids.
+    /// \returns A unique session id string.
+    static std::string generateId();
+
+    static const std::string KEY_LAST_MODIFIED;
+
+protected:
+    BaseSession(const BaseSession&);
+    BaseSession& operator = (const BaseSession&);
+
+    std::string _sessionId;
+
+    mutable Poco::FastMutex _mutex;
+
+};
+
+
+
 /// \brief A client cookie-based session store for servers.
 ///
 /// Client sessions are tracked via cookie. Server routes can access the session
 /// store and associate any information with the client's session.
-class DefaultSession: public AbstractSession
+class SimpleSession: public BaseSession
 {
 public:
-    DefaultSession(const std::string& sessionId = Poco::UUIDGenerator::defaultGenerator().createRandom().toString(),
-                   const Poco::Timestamp& lastModified = Poco::Timestamp());
+    SimpleSession(const std::string& sessionId = generateId());
 
-    virtual ~DefaultSession();
+    virtual ~SimpleSession();
 
-    std::string getSessionId() const;
+    bool has(const std::string& key) const;
 
-    const Poco::Timestamp getLastModified() const;
+    void put(const std::string& key, const std::string& value);
 
-    bool has(const std::string& hashKey) const;
+    std::string get(const std::string& key, const std::string& defaultValue) const;
 
-    void put(const std::string& hashKey, const Poco::Any& hashValue);
+    std::string get(const std::string& key) const;
 
-    Poco::Any get(const std::string& hashKey, const Poco::Any& defaultValue) const;
+    void remove(const std::string& key);
 
-private:
-    DefaultSession(const DefaultSession&);
-	DefaultSession& operator = (const DefaultSession&);
+    void clear();
 
-    typedef std::map<std::string, Poco::Any> SessionDict;
+protected:
+    SimpleSession(const SimpleSession&);
+    SimpleSession& operator = (const SimpleSession&);
 
-    SessionDict _sessionDict;
+    std::map<std::string, std::string> _sessionDict;
 
-    std::string _sessionId;
-
-    mutable Poco::Timestamp _lastModified;
-
-    mutable Poco::FastMutex _mutex;
-    
 };
 
 

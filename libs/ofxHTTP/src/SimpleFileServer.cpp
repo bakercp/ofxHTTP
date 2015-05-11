@@ -31,7 +31,7 @@ namespace HTTP {
 
 
 SimpleFileServer::SimpleFileServer(const Settings& settings):
-    BaseServer_<SimpleFileServerSettings>(settings),
+    BaseServer_<SimpleFileServerSettings, SimpleSessionStore>(settings),
     _fileSystemRoute(settings.fileSystemRouteSettings)
 {
     addRoute(&_fileSystemRoute);
@@ -46,7 +46,7 @@ SimpleFileServer::~SimpleFileServer()
 
 void SimpleFileServer::setup(const Settings& settings)
 {
-    BaseServer_<SimpleFileServerSettings>::setup(settings);
+    BaseServer_<SimpleFileServerSettings, SimpleSessionStore>::setup(settings);
     _fileSystemRoute.setup(settings.fileSystemRouteSettings);
 }
 

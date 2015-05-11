@@ -28,14 +28,9 @@
 
 #include <string>
 #include <map>
-#include "Poco/Timestamp.h"
-#include "Poco/UUID.h"
-#include "Poco/Any.h"
-#include "ofUtils.h"
+#include "Poco/Mutex.h"
 #include "ofTypes.h"
 #include "ofx/HTTP/AbstractServerTypes.h"
-#include "ofx/HTTP/HTTPUtils.h"
-#include "ofx/HTTP/DefaultSession.h"
 
 
 namespace ofx {
@@ -51,27 +46,21 @@ public:
 
     virtual ~BaseSessionStore();
 
-    void handleRequest(Poco::Net::HTTPServerRequest& request,
-                       Poco::Net::HTTPServerResponse& response);
+    AbstractSession& getSession(Poco::Net::HTTPServerRequest& request,
+                                Poco::Net::HTTPServerResponse& response);
 
-    virtual void clear() = 0;
-
-    virtual void remove(const std::string& sessionId) = 0;
-
-    virtual std::shared_ptr<AbstractSession> create() = 0;
-
-    virtual std::shared_ptr<AbstractSession> get(const std::string& sessionId) = 0;
-
-    virtual std::shared_ptr<AbstractSession> get(const Poco::Net::HTTPServerRequest& request);
-
-    virtual std::shared_ptr<AbstractSession> get(const void* p);
+    void destroySession(Poco::Net::HTTPServerRequest& request,
+                        Poco::Net::HTTPServerResponse& response);
 
     static const std::string DEFAULT_SESSION_KEY_NAME;
 
 protected:
-    const std::string _sessionKeyName;
+    virtual bool hasSession(const std::string& sessionId) const = 0;
+    virtual AbstractSession& getSession(const std::string& sessionId) = 0;
+    virtual AbstractSession& createSession() = 0;
+    virtual void destroySession(const std::string& sessionId) = 0;
 
-    mutable Poco::FastMutex _mutex;
+    const std::string _sessionKeyName;
 
 private:
     BaseSessionStore(const BaseSessionStore&);
@@ -81,30 +70,31 @@ private:
 
 
 /// \brief An in-memory session store.
-class DefaultSessionStore: public BaseSessionStore
+class SimpleSessionStore: public BaseSessionStore
 {
 public:
-    DefaultSessionStore();
+    SimpleSessionStore();
 
-    DefaultSessionStore(const std::string& sessionKeyName);
+    SimpleSessionStore(const std::string& sessionKeyName);
 
-    virtual ~DefaultSessionStore();
-
-    void clear();
-
-    std::shared_ptr<AbstractSession> create();
-
-    std::shared_ptr<AbstractSession> get(const std::string& sessionId);
-
-    void remove(const std::string& sessionId);
+    virtual ~SimpleSessionStore();
 
 protected:
+    SimpleSessionStore(const SimpleSessionStore&);
+    SimpleSessionStore& operator = (const SimpleSessionStore&);
+
+    bool hasSession(const std::string& sessionId) const;
+    AbstractSession& getSession(const std::string& sessionId);
+    AbstractSession& createSession();
+    void destroySession(const std::string& sessionId);
+
     typedef std::map<std::string, std::shared_ptr<AbstractSession> > SessionMap;
 
     SessionMap _sessionMap;
 
-};
+    mutable Poco::FastMutex _mutex;
 
+};
 
 
 } } // namespace ofx::HTTP

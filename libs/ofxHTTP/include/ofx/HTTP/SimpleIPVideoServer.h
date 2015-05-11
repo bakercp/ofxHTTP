@@ -44,7 +44,7 @@ public:
 };
 
 
-class SimpleIPVideoServer: public BaseServer_<SimpleIPVideoServerSettings>
+class SimpleIPVideoServer: public BaseServer_<SimpleIPVideoServerSettings, SimpleSessionStore>
 {
 public:
     typedef SimpleIPVideoServerSettings Settings;

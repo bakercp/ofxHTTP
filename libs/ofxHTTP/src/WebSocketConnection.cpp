@@ -33,72 +33,63 @@ namespace ofx {
 namespace HTTP {
 
 
-WebSocketConnection::WebSocketConnection(WebSocketRoute& parent):
-    _parent(parent),
+WebSocketConnection::WebSocketConnection(WebSocketRoute& route):
+    BaseRouteHandler_<WebSocketRoute>(route),
     _isConnected(false),
     _totalBytesSent(0),
     _totalBytesReceived(0)
 {
-    _parent.registerWebSocketConnection(this);
+    getRoute().registerWebSocketConnection(this);
 }
 
 
 WebSocketConnection::~WebSocketConnection()
 {
-    _parent.unregisterWebSocketConnection(this);
+    getRoute().unregisterWebSocketConnection(this);
 }
 
 
-void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
-                                        Poco::Net::HTTPServerResponse& response)
+void WebSocketConnection::handleRequest(ServerEventArgs& evt)
 {
-    _parent.handleRequest(request, response);
-
-    std::string sessionId = _parent.getSessionId(request, response);
-
-    // Get a copy of the settings.
-    WebSocketRouteSettings settings = _parent.getSettings();
-    WebSocketEvents& events = _parent.events;
-
     try
     {
-        _requestHeaders = request;
-        _clientAddress = request.clientAddress();
+        _requestHeaders = evt.getRequest();
+        _clientAddress = evt.getRequest().clientAddress();
 
         /// \todo Fix when poco is upgraded.
-        applyFirefoxHack(request);
+        applyFirefoxHack(evt);
 
         // Check origin headers.
-        handleOrigin(request, response);
+        handleOrigin(evt);
 
         // Validate subprotocols.
-        handleSubprotocols(request, response);
+        handleSubprotocols(evt);
 
         // Respond to extensions.
-        handleExtensions(request, response);
+        handleExtensions(evt);
 
-        Poco::Net::WebSocket ws(request, response);
+        Poco::Net::WebSocket ws(evt.getRequest(), evt.getResponse());
 
-        ws.setReceiveTimeout(settings.getReceiveTimeout());
-        ws.setSendTimeout(settings.getSendTimeout());
-        ws.setKeepAlive(settings.getKeepAlive());
+        ws.setReceiveTimeout(getRoute().getSettings().getReceiveTimeout());
+        ws.setSendTimeout(getRoute().getSettings().getSendTimeout());
+        ws.setKeepAlive(getRoute().getSettings().getKeepAlive());
 
         _mutex.lock();
         _isConnected = true;
         _mutex.unlock();
 
-        Poco::Buffer<char> buffer(settings.getBufferSize());
+        Poco::Buffer<char> buffer(getRoute().getSettings().getBufferSize());
 
         int flags = 0;
 
-        WebSocketOpenEventArgs eventArgs(sessionId, *this, request);
-        ofNotifyEvent(events.onOpenEvent, eventArgs, this);
+        WebSocketOpenEventArgs eventArgs(evt, *this);
+        ofNotifyEvent(getRoute().events.onOpenEvent, eventArgs, this);
 
         do
         {
             flags = 0; // clear
 
-            if (ws.poll(settings.getPollTimeout(), Poco::Net::Socket::SELECT_READ))
+            if (ws.poll(getRoute().getSettings().getPollTimeout(), Poco::Net::Socket::SELECT_READ))
             {
                 int numBytesReceived = ws.receiveFrame(buffer.begin(),
                                                        buffer.size(),
@@ -112,7 +103,7 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
 
                     if (frame.isPing() || frame.isPong())
                     {
-                        if (settings.getAutoPingPongResponse())
+                        if (getRoute().getSettings().getAutoPingPongResponse())
                         {
                             int frameFlag = Poco::Net::WebSocket::FRAME_FLAG_FIN;
 
@@ -140,8 +131,11 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                         // TODO: it is possible, per the spec send
                         std::size_t n = frame.size();
 
+#if OF_VERSION_MINOR > 8
+                        const char* p = frame.getData();
+#else
                         const char* p = frame.getBinaryBuffer();
-
+#endif
                         if (n >= 2)
                         {
                             // Get thec close code.
@@ -177,13 +171,20 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                             }
                         }
 
-                        WebSocketCloseEventArgs closeEventArgs(sessionId, *this, code, reason);
-                        ofNotifyEvent(events.onCloseEvent, closeEventArgs, this);
+                        WebSocketCloseEventArgs closeEventArgs(evt,
+                                                               *this,
+                                                               code,
+                                                               reason);
+                        ofNotifyEvent(getRoute().events.onCloseEvent,
+                                      closeEventArgs,
+                                      this);
                     }
                     else
                     {
-                        WebSocketFrameEventArgs frameArgs(frame, sessionId, *this);
-                        ofNotifyEvent(events.onFrameReceivedEvent, frameArgs, this);
+                        WebSocketFrameEventArgs frameArgs(evt, *this, frame);
+                        ofNotifyEvent(getRoute().events.onFrameReceivedEvent,
+                                      frameArgs,
+                                      this);
                     }
                 }
                 else
@@ -203,12 +204,17 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
 
                 if (frame.size() > 0)
                 {
-                    if (ws.poll(settings.getPollTimeout(),
+                    if (ws.poll(getRoute().getSettings().getPollTimeout(),
                                 Poco::Net::Socket::SELECT_WRITE))
                     {
                         int numBytesSent = 0;
 
-                        numBytesSent = ws.sendFrame(frame.getBinaryBuffer(),
+#if OF_VERSION_MINOR > 8
+                        const char* p = frame.getData();
+#else
+                        const char* p = frame.getBinaryBuffer();
+#endif
+                        numBytesSent = ws.sendFrame(p,
                                                     frame.size(),
                                                     frame.getFlags());
 
@@ -228,14 +234,14 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
                             // error = WS_ERROR_INCOMPLETE_FRAME_SENT;
                         }
                         
-                        WebSocketFrameEventArgs eventArgs(frame, sessionId, *this);
-                        ofNotifyEvent(events.onFrameSentEvent, eventArgs, this);
+                        WebSocketFrameEventArgs eventArgs(evt, *this, frame);
+                        ofNotifyEvent(getRoute().events.onFrameSentEvent, eventArgs, this);
                     }
                 }
             }
 
             // Check for read error
-            if (ws.poll(settings.getPollTimeout(),
+            if (ws.poll(getRoute().getSettings().getPollTimeout(),
                         Poco::Net::Socket::SELECT_ERROR))
             {
                 Poco::FastMutex::ScopedLock lock(_mutex);
@@ -255,61 +261,61 @@ void WebSocketConnection::handleRequest(Poco::Net::HTTPServerRequest& request,
         switch (exc.code())
         {
             case Poco::Net::WebSocket::WS_ERR_HANDSHAKE_UNSUPPORTED_VERSION:
-                response.set("Sec-WebSocket-Version", Poco::Net::WebSocket::WEBSOCKET_VERSION);
-                response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
-                response.setReason("WS_ERR_HANDSHAKE_UNSUPPORTED_VERSION");
+                evt.getResponse().set("Sec-WebSocket-Version", Poco::Net::WebSocket::WEBSOCKET_VERSION);
+                evt.getResponse().setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+                evt.getResponse().setReason("WS_ERR_HANDSHAKE_UNSUPPORTED_VERSION");
                 break;
             case Poco::Net::WebSocket::WS_ERR_NO_HANDSHAKE:
-                response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
-                response.setReason("WS_ERR_NO_HANDSHAKE");
+                evt.getResponse().setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+                evt.getResponse().setReason("WS_ERR_NO_HANDSHAKE");
                 break;
             case Poco::Net::WebSocket::WS_ERR_HANDSHAKE_NO_VERSION:
-                response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
-                response.setReason("WS_ERR_HANDSHAKE_NO_VERSION");
+                evt.getResponse().setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+                evt.getResponse().setReason("WS_ERR_HANDSHAKE_NO_VERSION");
                 break;
             case Poco::Net::WebSocket::WS_ERR_HANDSHAKE_NO_KEY:
-                response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
-                response.setReason("WS_ERR_HANDSHAKE_NO_KEY");
+                evt.getResponse().setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+                evt.getResponse().setReason("WS_ERR_HANDSHAKE_NO_KEY");
                 break;
         }
 
-        _parent.handleRequest(request, response);
-        WebSocketErrorEventArgs eventArgs(sessionId, *this, (WebSocketError)exc.code());
-        ofNotifyEvent(_parent.events.onErrorEvent, eventArgs, this);
+        getRoute().handleRequest(evt);
+        WebSocketErrorEventArgs eventArgs(evt, *this, (WebSocketError)exc.code());
+        ofNotifyEvent(getRoute().events.onErrorEvent, eventArgs, this);
     }
     catch (const Poco::TimeoutException& exc)
     {
         ofLogError("WebSocketConnection::handleRequest") << "TimeoutException: " << exc.code() << " Desc: " << exc.what();
-        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-        _parent.handleRequest(request, response);
-        WebSocketErrorEventArgs eventArgs(sessionId, *this, WS_ERR_TIMEOUT);
-        ofNotifyEvent(events.onErrorEvent, eventArgs, this);
+        evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        getRoute().handleRequest(evt);
+        WebSocketErrorEventArgs eventArgs(evt, *this, WS_ERR_TIMEOUT);
+        ofNotifyEvent(getRoute().events.onErrorEvent, eventArgs, this);
         // response socket has already been closed (!?)
     }
     catch (const Poco::Net::NetException& exc)
     {
         ofLogError("WebSocketConnection::handleRequest") << "NetException: " << exc.code() << " Desc: " << exc.what();
-        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-        _parent.handleRequest(request, response);
-        WebSocketErrorEventArgs eventArgs(sessionId, *this, WS_ERR_NET_EXCEPTION);
-        ofNotifyEvent(events.onErrorEvent, eventArgs, this);
+        evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        getRoute().handleRequest(evt);
+        WebSocketErrorEventArgs eventArgs(evt, *this, WS_ERR_NET_EXCEPTION);
+        ofNotifyEvent(getRoute().events.onErrorEvent, eventArgs, this);
         // response socket has already been closed (!?)
     }
     catch (const std::exception& exc)
     {
         ofLogError("WebSocketConnection::handleRequest") << "exception: " << exc.what();
-        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-        _parent.handleRequest(request, response);
-        WebSocketErrorEventArgs eventArgs(sessionId, *this, WS_ERR_OTHER);
-        ofNotifyEvent(_parent.events.onErrorEvent, eventArgs, this);
+        evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        getRoute().handleRequest(evt);
+        WebSocketErrorEventArgs eventArgs(evt, *this, WS_ERR_OTHER);
+        ofNotifyEvent(getRoute().events.onErrorEvent, eventArgs, this);
     }
     catch ( ... )
     {
         ofLogError("WebSocketConnection::handleRequest") << "... Unknown exception.";
-        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-        _parent.handleRequest(request,response);
-        WebSocketErrorEventArgs eventArgs(sessionId, *this, WS_ERR_OTHER);
-        ofNotifyEvent(_parent.events.onErrorEvent, eventArgs, this);
+        evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        getRoute().handleRequest(evt);
+        WebSocketErrorEventArgs eventArgs(evt, *this, WS_ERR_OTHER);
+        ofNotifyEvent(getRoute().events.onErrorEvent, eventArgs, this);
     }
 }
 
@@ -387,8 +393,7 @@ std::size_t WebSocketConnection::getTotalBytesReceived() const
 }
 
 
-void WebSocketConnection::handleOrigin(Poco::Net::HTTPServerRequest& request,
-                                       Poco::Net::HTTPServerResponse& response)
+void WebSocketConnection::handleOrigin(ServerEventArgs& evt)
 {
     // http://en.wikipedia.org/wiki/Same_origin_policy
     //    _settings.getAllowCrossOriginConnections();
@@ -398,8 +403,7 @@ void WebSocketConnection::handleOrigin(Poco::Net::HTTPServerRequest& request,
 }
 
 
-void WebSocketConnection::handleSubprotocols(Poco::Net::HTTPServerRequest& request,
-                                             Poco::Net::HTTPServerResponse& response)
+void WebSocketConnection::handleSubprotocols(ServerEventArgs& evt)
 {
 //    SubprotocolSet& getValidSubprotocols()
 //    std::vector<std::string> proposedProtocols = ofSplitString(request.get("Sec-WebSocket-Protocol",""),
@@ -426,8 +430,7 @@ void WebSocketConnection::handleSubprotocols(Poco::Net::HTTPServerRequest& reque
 }
 
 
-void WebSocketConnection::handleExtensions(Poco::Net::HTTPServerRequest& request,
-                                           Poco::Net::HTTPServerResponse& response)
+void WebSocketConnection::handleExtensions(ServerEventArgs& evt)
 {
 //    if(request.has("Sec-WebSocket-Extensions"))
 //    {
@@ -437,26 +440,26 @@ void WebSocketConnection::handleExtensions(Poco::Net::HTTPServerRequest& request
 //    }
 }
 
-void WebSocketConnection::applyFirefoxHack(Poco::Net::HTTPServerRequest& request)
+void WebSocketConnection::applyFirefoxHack(ServerEventArgs& evt)
 {
     // HACK FOR FIREFOX
     // require websocket upgrade headers
-    std::string connectionHeader = Poco::toLower(request.get("Connection", ""));
+    std::string connectionHeader = Poco::toLower(evt.getRequest().get("Connection", ""));
     
     if (0 != Poco::icompare(connectionHeader, "Upgrade"))
     {
-        std::string userAgent = Poco::toLower(request.get("User-Agent",""));
+        std::string userAgent = Poco::toLower(evt.getRequest().get("User-Agent",""));
 
         if (!userAgent.empty() &&
-           !connectionHeader.empty() &&
-           ofIsStringInString(userAgent,"firefox") &&
-           ofIsStringInString(connectionHeader,"upgrade"))
+            !connectionHeader.empty() &&
+            ofIsStringInString(userAgent,"firefox") &&
+            ofIsStringInString(connectionHeader,"upgrade"))
         {
             // this request is coming from firefox, which is known to send things that look like:
             // Connection:keep-alive, Upgrade
             // thus failing the standard Poco upgrade test.
             // we can't do this here, but will do a similar hack in the handler
-            request.set("Connection","Upgrade");
+            evt.getRequest().set("Connection","Upgrade");
         }
     }
 }

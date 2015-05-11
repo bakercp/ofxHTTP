@@ -31,7 +31,7 @@ namespace HTTP {
 
 
 SimplePostServer::SimplePostServer(const Settings& settings):
-    BaseServer_<SimplePostServerSettings>(settings),
+    BaseServer_<SimplePostServerSettings, SimpleSessionStore>(settings),
     _fileSystemRoute(settings.fileSystemRouteSettings),
     _postRoute(settings.postRouteSettings)
 {
@@ -49,7 +49,7 @@ SimplePostServer::~SimplePostServer()
 
 void SimplePostServer::setup(const Settings& settings)
 {
-    BaseServer_<SimplePostServerSettings>::setup(settings);
+    BaseServer_<SimplePostServerSettings, SimpleSessionStore>::setup(settings);
     _fileSystemRoute.setup(settings.fileSystemRouteSettings);
     _postRoute.setup(settings.postRouteSettings);
 }

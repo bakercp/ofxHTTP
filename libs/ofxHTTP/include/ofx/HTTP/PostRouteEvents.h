@@ -39,55 +39,19 @@ namespace ofx {
 namespace HTTP {
 
 
-class BasePostRequestEventArgs: public BaseHTTPServerRequestEventArgs
+class BasePostEventArgs: public ServerEventArgs
 {
 public:
-    BasePostRequestEventArgs(const std::string& sessionId,
-                             const Poco::Net::HTTPServerRequest& request,
-                             const std::string& formId):
-        BaseHTTPServerRequestEventArgs(sessionId, request),
-        _formId(formId)
-    {
-    }
-
-    virtual ~BasePostRequestEventArgs()
-    {
-    }
-
-    /// \brief The post id.
-    ///
-    /// Each time a POST request, is processed it is assigned a unique id.
-    /// This id allows us to track post progress updates and multi-part posts.
-    ///
-    /// \returns the session id or Poco::UUID::null if not set.
-    const std::string& getPostId() const
-    {
-        return _formId;
-    }
-
-protected:
-    std::string _formId;
-
-};
-
-
-class BasePostRequestResponseEventArgs: public BaseHTTPServerRequestResponseEventArgs
-{
-public:
-    BasePostRequestResponseEventArgs(const std::string& sessionId,
-                                     const Poco::Net::HTTPServerRequest& request,
-                                     Poco::Net::HTTPServerResponse& response,
-                                     const std::string& postId):
-        BaseHTTPServerRequestResponseEventArgs(sessionId, request, response),
+    BasePostEventArgs(ServerEventArgs& evt,
+                      const std::string& postId):
+        ServerEventArgs(evt),
         _postId(postId)
     {
     }
 
-
-    virtual ~BasePostRequestResponseEventArgs()
+    virtual ~BasePostEventArgs()
     {
     }
-
 
     /// \brief The post id.
     ///
@@ -110,18 +74,14 @@ protected:
 /// \note If either the response or headers are non-empty, a response with the
 /// contents of the buffer (even if empty) will be returned along with the
 /// headers.
-class PostEventArgs: public BasePostRequestResponseEventArgs
+class PostEventArgs: public BasePostEventArgs
 {
 public:
-    PostEventArgs(const std::string& sessionId,
-                  const Poco::Net::HTTPServerRequest& request,
-                  Poco::Net::HTTPServerResponse& response,
+    PostEventArgs(ServerEventArgs& evt,
                   const std::string& postId,
                   const ofBuffer& data):
-        BasePostRequestResponseEventArgs(sessionId,
-                                         request,
-                                         response,
-                                         postId),
+        BasePostEventArgs(evt,
+                          postId),
         _data(data)
     {
     }
@@ -129,7 +89,6 @@ public:
     virtual ~PostEventArgs()
     {
     }
-
 
     const ofBuffer& getBuffer() const
     {
@@ -143,18 +102,13 @@ protected:
 };
 
 
-class PostFormEventArgs: public BasePostRequestResponseEventArgs
+class PostFormEventArgs: public BasePostEventArgs
 {
 public:
-    PostFormEventArgs(const std::string& sessionId,
-                      const Poco::Net::HTTPServerRequest& request,
-                      Poco::Net::HTTPServerResponse& response,
+    PostFormEventArgs(ServerEventArgs& evt,
                       const std::string& postId,
                       const Poco::Net::NameValueCollection& form):
-        BasePostRequestResponseEventArgs(sessionId,
-                                         request,
-                                         response,
-                                         postId),
+        BasePostEventArgs(evt, postId),
         _form(form)
     {
     }
@@ -163,12 +117,10 @@ public:
     {
     }
 
-
     const Poco::Net::NameValueCollection& getForm() const
     {
         return _form;
     }
-
 
 protected:
     const Poco::Net::NameValueCollection _form;
@@ -176,7 +128,7 @@ protected:
 };
 
 
-class PostUploadEventArgs: public BasePostRequestEventArgs
+class PostUploadEventArgs: public BasePostEventArgs
 {
 public:
     enum UploadState
@@ -186,16 +138,15 @@ public:
         UPLOAD_FINISHED
     };
 
-    PostUploadEventArgs(const std::string& sessionId,
-                        const Poco::Net::HTTPServerRequest& request,
-                        const std::string& formId,
+    PostUploadEventArgs(ServerEventArgs& evt,
+                        const std::string& postId,
                         const std::string& formFieldName,
                         const std::string& originalFilename,
                         const std::string& filename,
                         const Poco::Net::MediaType& contentType,
                         std::streamsize numBytesTransferred,
                         UploadState state):
-        BasePostRequestEventArgs(sessionId, request, formId),
+        BasePostEventArgs(evt, postId),
         _formFieldName(formFieldName),
         _originalFilename(originalFilename),
         _filename(filename),

@@ -185,17 +185,17 @@ int HTTPServerParams::getMaxKeepAliveRequests() const
 const std::string BaseServerSettings::DEFAULT_HOST    = "127.0.0.1";
 const unsigned short BaseServerSettings::DEFAULT_PORT = 8998;
 const bool BaseServerSettings::DEFAULT_USE_SSL        = false;
-const bool BaseServerSettings::DEFAULT_USE_SESSION_CACHE = true;
+const bool BaseServerSettings::DEFAULT_USE_SESSIONS = true;
 
 
 BaseServerSettings::BaseServerSettings(const std::string& host,
                                        unsigned short port,
                                        bool useSSL,
-                                       bool useSessionCache):
+                                       bool useSessions):
     _host(host),
     _port(port),
     _useSSL(useSSL),
-    _useSessionCache(useSessionCache)
+    _useSessions(useSessions)
 {
 }
 
@@ -235,21 +235,21 @@ void BaseServerSettings::setUseSSL(bool useSSL)
 }
 
 
-bool BaseServerSettings::getUseSSL() const
+bool BaseServerSettings::useSSL() const
 {
     return _useSSL;
 }
 
 
-void BaseServerSettings::setUseSessionCache(bool useSessionCache)
+void BaseServerSettings::setUseSessions(bool useSessions)
 {
-    _useSessionCache = useSessionCache;
+    _useSessions = useSessions;
 }
 
 
-bool BaseServerSettings::getUseSessionCache() const
+bool BaseServerSettings::useSessions() const
 {
-    return _useSessionCache;
+    return _useSessions;
 }
 
 

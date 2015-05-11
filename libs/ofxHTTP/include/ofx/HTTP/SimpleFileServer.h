@@ -43,7 +43,7 @@ public:
 
 
 /// \brief A simple file server implementation.
-class SimpleFileServer: public BaseServer_<SimpleFileServerSettings>
+class SimpleFileServer: public BaseServer_<SimpleFileServerSettings, SimpleSessionStore>
 {
 public:
     /// \brief A typedef for the SimpleFileServerSettings.

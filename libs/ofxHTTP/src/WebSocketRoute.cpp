@@ -293,5 +293,4 @@ std::size_t WebSocketRoute::getNumWebSocketConnections() const
 }
 
 
-
 } } // namespace ofx::HTTP

@@ -38,8 +38,9 @@ namespace HTTP {
 
 /// \brief A wrapper class to allow Poco::Net::HTTPRequestHandler to be reused.
 ///
-/// This is particularly important when a new instance of the handler is not
-/// required to service every request.
+// A route handler adapter adapts the factory class (e.g. the BaseRoute_)
+// to act as a reusable instance. The instance passed to the RouteHandler
+// adapter should not modify the internal state of the route itself.
 class RequestHandlerAdapter: public Poco::Net::HTTPRequestHandler
 {
 public:

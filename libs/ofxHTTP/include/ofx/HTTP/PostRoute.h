@@ -50,7 +50,8 @@ public:
     /// \param requireSecurePort True if this route requires
     ///        communication on an SSL encrypted port.
     PostRouteSettings(const std::string& routePathPattern = DEFAULT_POST_ROUTE,
-                      bool requireSecurePort = false);
+                      bool requireSecurePort = false,
+                      bool requireAuthentication = false);
 
     /// \brief Destroy the PostRouteSetting.
     virtual ~PostRouteSettings();
@@ -157,7 +158,7 @@ void PostRoute::unregisterPostEvents(ListenerClass* listener)
 /// Form data must be encoded with "multipart/form-data" or
 /// "application/x-www-form-urlencoded".  "text/plain" form
 /// encoding is supported, but not parsed.
-class PostRouteHandler: public AbstractRouteHandler
+class PostRouteHandler: public BaseRouteHandler_<PostRoute>
 {
 public:
     /// \brief A typedef for PostRouteSettings
@@ -165,15 +166,12 @@ public:
 
     /// \brief Create a PostRouteHandler.
     /// \param parent The parent PostRoute.
-    PostRouteHandler(PostRoute& parent);
+    PostRouteHandler(PostRoute& route);
 
     /// \brief Destroy the PostRouteHandler.
     virtual ~PostRouteHandler();
 
-    void handleRequest(Poco::Net::HTTPServerRequest& request,
-                       Poco::Net::HTTPServerResponse& response);
-
-    void stop();
+    void handleRequest(ServerEventArgs& evt);
 
     /// \brief A constant defining "text/plain".
     static const Poco::Net::MediaType POST_CONTENT_TYPE_TEXT_PLAIN;
@@ -186,22 +184,16 @@ public:
     
     /// \brief A constant defining "application/json".
     static const Poco::Net::MediaType POST_CONTENT_TYPE_JSON;
-    
-    
-private:
-    /// \brief The parent PostRoute reference.
-    PostRoute& _parent;
-    
+
 };
 
 
 class PostRouteFileHandler: public Poco::Net::PartHandler
 {
 public:
-    PostRouteFileHandler(PostRoute& parent,
-                         const std::string& sessionId,
-                         const Poco::Net::HTTPServerRequest& request,
-                         const std::string& formId);
+    PostRouteFileHandler(PostRoute& route,
+                         ServerEventArgs& evt,
+                         const std::string& postId);
 
     virtual ~PostRouteFileHandler();
 
@@ -212,16 +204,13 @@ public:
 
 private:
     /// \brief A reference to the parent
-    PostRoute& _parent;
+    PostRoute& _route;
 
-    /// \brief A const reference to the sessionid.
-    const std::string& _sessionId;
+    /// \brief A reference to the server event args.
+    ServerEventArgs& _evt;
 
-    /// \brief A const reference to the request.
-    const Poco::Net::HTTPServerRequest& _request;
-    
-    /// \brief THe form id.
-    const std::string& _formId;
+    /// \brief The post id.
+    const std::string& _postId;
     
 };
 

@@ -105,7 +105,7 @@ ofImageQualityType IPVideoFrameSettings::getQuality() const
 }
 
         
-IPVideoFrame::IPVideoFrame(const Settings& settings,
+IPVideoFrame::IPVideoFrame(const IPVideoFrameSettings& settings,
                            unsigned long long timestamp,
                            const ofBuffer& buffer):
     _settings(settings),
@@ -120,7 +120,7 @@ IPVideoFrame::~IPVideoFrame()
 }
 
 
-IPVideoFrame::Settings IPVideoFrame::getSettings() const
+IPVideoFrameSettings IPVideoFrame::getSettings() const
 {
     return _settings;
 }

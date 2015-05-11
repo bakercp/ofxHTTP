@@ -45,7 +45,7 @@ public:
 };
 
 
-class SimplePostServer: public BaseServer_<SimplePostServerSettings>
+class SimplePostServer: public BaseServer_<SimplePostServerSettings, SimpleSessionStore>
 {
 public:
     typedef SimplePostServerSettings Settings;

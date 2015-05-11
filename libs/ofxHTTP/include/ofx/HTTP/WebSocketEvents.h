@@ -31,6 +31,7 @@
 #include "Poco/Net/HTTPServerRequest.h"
 #include "ofEvents.h"
 #include "ofEventUtils.h"
+#include "ofx/HTTP/ServerEvents.h"
 
 
 namespace ofx {
@@ -73,41 +74,27 @@ enum WebSocketError
 
 
 /// \brief The base WebSocket event arguments.
-class WebSocketEventArgs: public AbstractHasSessionId, public ofEventArgs
+class WebSocketEventArgs: public ServerEventArgs
 {
 public:
     /// \brief Create a WebSocketEventArgs object with the provided params.
     /// \param sessionId The session id..
     /// \param connection A reference to the associated WebSocketConnection.
-    WebSocketEventArgs(const std::string& sessionId,
-                       const WebSocketConnection& connection):
-        _sessionId(sessionId),
+    WebSocketEventArgs(ServerEventArgs& evt,
+                       WebSocketConnection& connection):
+        ServerEventArgs(evt),
         _connection(connection)
     {
     }
-    
-    /// \brief Get the session id associated with this event.
-    ///
-    /// The session id is established by the SessionCache.  If no SessionCache
-    /// is used, this will always return Poco::UUID::null.
-    ///
-    /// \returns the session id or Poco::UUID::null if not set.
-    std::string getSessionId() const
-    {
-        return _sessionId;
-    }
 
-    const WebSocketConnection& getConnection() const
+    WebSocketConnection& getConnection()
     {
         return _connection;
     }
 
 private:
-    /// \brief The session id, if available.  Poco::UUID::null if null.
-    const std::string& _sessionId;
-
     /// \brief A reference to the WebSocketConnection.
-    const WebSocketConnection& _connection;
+    WebSocketConnection& _connection;
 
 };
 
@@ -115,10 +102,10 @@ private:
 class WebSocketErrorEventArgs: public WebSocketEventArgs
 {
 public:
-    WebSocketErrorEventArgs(const std::string& sessionId,
-                            const WebSocketConnection& connection,
+    WebSocketErrorEventArgs(ServerEventArgs& evt,
+                            WebSocketConnection& connection,
                             WebSocketError error):
-        WebSocketEventArgs(sessionId, connection),
+        WebSocketEventArgs(evt, connection),
         _error(error)
     {
     }
@@ -137,38 +124,14 @@ protected:
 };
 
 
-
-class WebSocketOpenEventArgs: public WebSocketEventArgs
-{
-public:
-    WebSocketOpenEventArgs(const std::string& sessionId,
-                           const WebSocketConnection& connection,
-                           const Poco::Net::HTTPServerRequest& request):
-        WebSocketEventArgs(sessionId, connection),
-        _request(request)
-    {
-    }
-
-
-    const Poco::Net::HTTPServerRequest& getRequest() const
-    {
-        return _request;
-    }
-
-protected:
-    const Poco::Net::HTTPServerRequest& _request;
-    
-};
-
-
 class WebSocketCloseEventArgs: public WebSocketEventArgs
 {
 public:
-    WebSocketCloseEventArgs(const std::string& sessionId,
-                            const WebSocketConnection& connection,
+    WebSocketCloseEventArgs(ServerEventArgs& evt,
+                            WebSocketConnection& connection,
                             unsigned short code,
                             const std::string& reason):
-        WebSocketEventArgs(sessionId, connection),
+        WebSocketEventArgs(evt, connection),
         _code(code),
         _reason(reason)
     {
@@ -210,10 +173,10 @@ public:
     /// \brief Create a WebSocketFrameEventArgs object.
     /// \param connection A reference to the associated WebSocketConnection.
     /// \param error An error, if any, associated with the event.
-    WebSocketFrameEventArgs(const WebSocketFrame& frame,
-                            const std::string& sessionId,
-                            const WebSocketConnection& connection):
-        WebSocketEventArgs(sessionId, connection),
+    WebSocketFrameEventArgs(ServerEventArgs& evt,
+                            WebSocketConnection& connection,
+                            const WebSocketFrame& frame):
+        WebSocketEventArgs(evt, connection),
         _frame(frame)
     {
     }
@@ -229,6 +192,9 @@ private:
     const WebSocketFrame& _frame;
 
 };
+
+
+typedef WebSocketEventArgs WebSocketOpenEventArgs;
 
 
 class WebSocketEvents

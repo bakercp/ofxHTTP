@@ -40,42 +40,59 @@ namespace ofx {
 namespace HTTP {
 
 
-class WebSocketFrame;
-
-
-class AbstractHasSessionId
+class AbstractSession
 {
 public:
-    virtual ~AbstractHasSessionId()
-    {
-    }
-
-    virtual std::string getSessionId() const = 0;
-
-};
-
-
-class AbstractSession: public AbstractHasSessionId
-{
-public:
+    /// \brief Destroy the AbstractSession.
     virtual ~AbstractSession()
     {
     }
 
-    virtual const Poco::Timestamp getLastModified() const = 0;
+    /// \brief Get the session id.
+    /// \returns the session id.
+    virtual std::string getId() const = 0;
 
+    /// \brief Check to see if the provided key exists in the session data.
+    /// \param key The data key to check.
+    /// \returns true iff the key exists in the session data.
     virtual bool has(const std::string& key) const = 0;
 
-    virtual void put(const std::string& key, const Poco::Any& value) = 0;
+    /// \brief Add (or replace) a key in the sesion data with the given value.
+    /// \param key The data key to add.
+    /// \param value The data value to add for the given key.
+    virtual void put(const std::string& key, const std::string& value) = 0;
 
-    virtual Poco::Any get(const std::string& key, const Poco::Any& value) const = 0;
+    /// \brief Get the session data for a given key, or a default value.
+    /// \param key The data key to get.
+    /// \param defaultValue The data value to return if the key does not exist.
+    /// \returns the data value for the key or the defaultValue if the key does
+    ///          not exist.
+    virtual std::string get(const std::string& key,
+                            const std::string& defaultValue) const = 0;
+
+    /// \brief Get the session data for a given key, or throw an exception.
+    /// \param key The data key to get.
+    /// \throws Poco::InvalidAccessException if key does not exist.
+    /// \returns the data value for the key.
+    virtual std::string get(const std::string& key) const = 0;
+
+    /// \brief Remove a key / value pair.
+    /// \param key The key to remove.
+    virtual void remove(const std::string& key) = 0;
+
+    /// \brief Remove all data from the session.
+    virtual void clear() = 0;
 
 };
 
 
+class ServerEventArgs;
 class AbstractSessionStore;
 
 
+/// \brief Represents an abstract server interface.
+///
+/// Provides a server event callback and access to the session store.
 class AbstractServer: public Poco::Net::HTTPRequestHandlerFactory
 {
 public:
@@ -84,8 +101,10 @@ public:
     {
     }
 
+    virtual void onHTTPServerEvent(const void* pSender, ServerEventArgs& evt) = 0;
+
     /// \brief Return a reference to the session cache.
-    virtual AbstractSessionStore* getSessionStore() = 0;
+    virtual AbstractSessionStore& getSessionStore() = 0;
 
 };
 
@@ -106,29 +125,94 @@ public:
     /// \note Redeclared here for documentation puposes.
     virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
                                Poco::Net::HTTPServerResponse& response) = 0;
+
+    virtual void handleRequest(ServerEventArgs& evt) = 0;
+
 };
 
 
-class AbstractSessionStore: public AbstractHTTPRequestHandler
+/// \brief An abstract class representing a session store.
+///
+/// A session store is responsible for establishing browsing sessions.  This
+/// includes but is not limited to sessions created using HTTP cookies.
+class AbstractSessionStore
 {
 public:
+    /// \brief Destroy the AbstractSessionStore.
     virtual ~AbstractSessionStore()
     {
     }
 
-    virtual void clear() = 0;
+    /// \brief Get a valid session for the given request.
+    ///
+    /// This method is guaranteed to provide a valid session the session created
+    /// will expire when teh browser window is closed. Other method will be able
+    /// to update the cookie in the response headers if more speific cookie
+    /// parameters are desired.
+    ///
+    /// This method will also ensure that only one session id is availble at a
+    /// given time
+    ///
+    /// \param request The HTTP request.
+    /// \param response The HTTP response.
+    /// \returns A reference to an AbstractSession.
+    virtual AbstractSession& getSession(Poco::Net::HTTPServerRequest& request,
+                                        Poco::Net::HTTPServerResponse& response) = 0;
 
-    virtual void remove(const std::string& sessionId) = 0;
+    /// \brief Destroy the session(s) associated with the given exchange.
+    ///
+    /// This method will invalidate any session cookies in the response header.
+    /// If session data does not exist, the method will return quietly.
+    virtual void destroySession(Poco::Net::HTTPServerRequest& request,
+                                Poco::Net::HTTPServerResponse& response) = 0;
 
-    virtual std::shared_ptr<AbstractSession> create() = 0;
+protected:
+    /// \brief Query if the store has the the given session
+    /// \param sessionId The id of the session to query.
+    virtual bool hasSession(const std::string& sessionId) const = 0;
 
-    virtual std::shared_ptr<AbstractSession> get(const Poco::Net::HTTPServerRequest& request) = 0;
+    /// \brief Get a session
+    /// \param sessionId The id of the session to get.
+    /// \throws Poco::InvalidAccessException if no session is found.
+    virtual AbstractSession& getSession(const std::string& sessionId) = 0;
 
-    virtual std::shared_ptr<AbstractSession> get(const std::string& sessionId) = 0;
+    /// \brief Create a completely new session.
+    ///
+    /// Since this returns a reference, the newly created session must be stored
+    /// outside of the local method scope so the reference does not become
+    /// invalid.
+    ///
+    /// \returns A reference to the newly created session.
+    virtual AbstractSession& createSession() = 0;
 
-    virtual std::shared_ptr<AbstractSession> get(const void* p) = 0;
+    /// \brief Destroy the record of a session by its session id.
+    ///
+    /// If session data does not exist, the method will return quietly.
+    ///
+    /// \params sessionId The id of the session to destroy.
+    virtual void destroySession(const std::string& sessionId) = 0;
 
 };
+
+
+//class Credentials;
+//
+//
+//class AbstractSessionAuthenticator
+//{
+//public:
+//    virtual ~AbstractSessionAuthenticator()
+//    {
+//    }
+//
+//    virtual bool authenticate(const std::string& sessionId,
+//                              const Credentials& credentials) = 0;
+//
+//    virtual void deauthenticate(const std::string& sessionId) = 0;
+//
+//    virtual bool isAuthenticated(const std::string& sessionId) = 0;
+//
+//};
 
 
 /// \brief An AbstractHTTPRequestHandlerFactory.
@@ -172,23 +256,6 @@ public:
 
     /// \brief Interrupt the handleRequest method if possible.
     virtual void stop() = 0;
-
-};
-
-
-/// \brief Defines an interface for handling a websocket connection.
-class AbstractWebSocketConnection: public AbstractRouteHandler
-{
-public:
-    /// \brief Destroy the AbstractWebSocketConnection instance.
-    virtual ~AbstractWebSocketConnection()
-    {
-    }
-
-    /// \brief Send a WebSocketFrame using this connection.
-    /// \param frame The WebSocketFrame to send.
-    /// \returns true iff the sending operation was successful.
-    virtual bool sendFrame(const WebSocketFrame& frame) const = 0;
 
 };
 

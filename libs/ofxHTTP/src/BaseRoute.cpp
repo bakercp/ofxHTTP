@@ -31,17 +31,15 @@ namespace HTTP {
 
 
 const std::string BaseRouteSettings::DEFAULT_ROUTE_PATH_PATTERN = "/.*";
-const std::string BaseRouteSettings::DEFAULT_HTTP_METHODS_ARRAY[] = { "GET" };
-const BaseRouteSettings::HTTPMethodSet BaseRouteSettings::DEFAULT_HTTP_METHODS(INIT_SET_WITH_ARRAY(DEFAULT_HTTP_METHODS_ARRAY));
 
 
 BaseRouteSettings::BaseRouteSettings(const std::string& routePathPattern,
                                      bool requireSecurePort,
-                                     //bool requireAuthentication,
+                                     bool requireAuthentication,
                                      const HTTPMethodSet& validHTTPMethods):
     _routePathPattern(routePathPattern),
     _requireSecurePort(requireSecurePort),
-    _requireAuthentication(false),
+    _requireAuthentication(requireAuthentication),
     _validHTTPMethods(validHTTPMethods)
 {
 }
@@ -76,16 +74,16 @@ bool BaseRouteSettings::requireSecurePort() const
 }
 
 
-//void BaseRouteSettings::setRequireAuthentication(bool requireAuthentication)
-//{
-//    _requireAuthentication = requireAuthentication;
-//}
-//
-//
-//bool BaseRouteSettings::requireAuthentication() const
-//{
-//    return _requireAuthentication;
-//}
+void BaseRouteSettings::setRequireAuthentication(bool requireAuthentication)
+{
+    _requireAuthentication = requireAuthentication;
+}
+
+
+bool BaseRouteSettings::requireAuthentication() const
+{
+    return _requireAuthentication;
+}
 
 
 void BaseRouteSettings::setValidHTTPMethods(const BaseRouteSettings::HTTPMethodSet& validHTTPMethods)

@@ -23,60 +23,71 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/DefaultSession.h"
+#include "ofx/HTTP/Session.h"
+#include "Poco/UUIDGenerator.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-DefaultSession::DefaultSession(const std::string& sessionId,
-                               const Poco::Timestamp& lastModified):
-    _sessionId(sessionId),
-    _lastModified(lastModified)
+const std::string BaseSession::KEY_LAST_MODIFIED = "last_modified";
+
+
+BaseSession::BaseSession(const std::string sessionId): _sessionId(sessionId)
 {
 }
 
 
-DefaultSession::~DefaultSession()
+BaseSession::~BaseSession()
 {
 }
 
 
-std::string DefaultSession::getSessionId() const
+std::string BaseSession::getId() const
 {
     Poco::FastMutex::ScopedLock lock(_mutex);
     return _sessionId;
 }
 
 
-const Poco::Timestamp DefaultSession::getLastModified() const
+std::string BaseSession::generateId()
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
-    return _lastModified;
+    return Poco::UUIDGenerator::defaultGenerator().createRandom().toString();
 }
 
 
-bool DefaultSession::has(const std::string& hashKey) const
+SimpleSession::SimpleSession(const std::string& sessionId):
+    BaseSession(sessionId)
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
-    return _sessionDict.find(hashKey) != _sessionDict.end();
 }
 
 
-void DefaultSession::put(const std::string& hashKey, const Poco::Any& hashValue)
+SimpleSession::~SimpleSession()
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
-    _lastModified.update();
-    _sessionDict[hashKey] = hashValue;
 }
 
 
-Poco::Any DefaultSession::get(const std::string& hashKey,
-                              const Poco::Any& defaultValue) const
+bool SimpleSession::has(const std::string& key) const
 {
     Poco::FastMutex::ScopedLock lock(_mutex);
-    SessionDict::const_iterator iter = _sessionDict.find(hashKey);
+    return _sessionDict.find(key) != _sessionDict.end();
+}
+
+
+void SimpleSession::put(const std::string& key, const std::string& value)
+{
+    Poco::FastMutex::ScopedLock lock(_mutex);
+    _sessionDict[key] = value;
+}
+
+
+std::string SimpleSession::get(const std::string& key,
+                               const std::string& defaultValue) const
+{
+    Poco::FastMutex::ScopedLock lock(_mutex);
+
+    std::map<std::string, std::string>::const_iterator iter = _sessionDict.find(key);
 
     if (iter != _sessionDict.end())
     {
@@ -86,6 +97,37 @@ Poco::Any DefaultSession::get(const std::string& hashKey,
     {
         return defaultValue;
     }
+}
+
+
+std::string SimpleSession::get(const std::string& key) const
+{
+    Poco::FastMutex::ScopedLock lock(_mutex);
+
+    std::map<std::string, std::string>::const_iterator iter = _sessionDict.find(key);
+
+    if (iter != _sessionDict.end())
+    {
+        return iter->second;
+    }
+    else
+    {
+        throw Poco::InvalidAccessException("No key: " + key);
+    }
+}
+
+
+void SimpleSession::remove(const std::string& key)
+{
+    Poco::FastMutex::ScopedLock lock(_mutex);
+    _sessionDict.erase(_sessionDict.find(key));
+}
+
+
+void SimpleSession::clear()
+{
+    Poco::FastMutex::ScopedLock lock(_mutex);
+    _sessionDict.clear();
 }
 
 

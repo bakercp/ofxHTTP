@@ -180,15 +180,14 @@ protected:
 
 
 class IPVideoRouteHandler:
-    public AbstractRouteHandler,
+    public BaseRouteHandler_<IPVideoRoute>,
     public IPVideoFrameQueue
 {
 public:
-    IPVideoRouteHandler(IPVideoRoute& parent);
+    IPVideoRouteHandler(IPVideoRoute& route);
     virtual ~IPVideoRouteHandler();
 
-    void handleRequest(Poco::Net::HTTPServerRequest& request,
-                       Poco::Net::HTTPServerResponse& response);
+    void handleRequest(ServerEventArgs& evt);
 
     void stop();
 
@@ -199,7 +198,7 @@ public:
 
 protected:
     IPVideoFrameSettings _frameSettings;
-    IPVideoRoute& _parent;
+
     bool _isRunning;
 
     unsigned long long _startTime;
@@ -213,7 +212,7 @@ protected:
     
     unsigned long long _nextScheduledFrame;
     
-    mutable ofMutex _mutex;
+    mutable Poco::FastMutex _mutex;
     
 };
 

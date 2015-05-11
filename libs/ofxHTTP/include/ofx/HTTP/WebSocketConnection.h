@@ -38,6 +38,7 @@
 #include "ofx/HTTP/AbstractServerTypes.h"
 #include "ofx/HTTP/WebSocketEvents.h"
 #include "ofx/HTTP/WebSocketFrame.h"
+#include "ofx/HTTP/WebSocketRoute.h"
 #include "ofx/HTTP/HTTPUtils.h"
 
 
@@ -45,29 +46,24 @@ namespace ofx {
 namespace HTTP {
 
 
-class WebSocketRoute;
-
-
 /// \brief A class representing a WebSocket connection with a single client.
 ///
 /// Frames can be sent across thread boundaries and are queued for sending
 /// during the WebSocketConnection's service loop.  All accessors are
 /// synchronized and thread-safe.
-class WebSocketConnection: public AbstractWebSocketConnection
+class WebSocketConnection: public BaseRouteHandler_<WebSocketRoute>
 {
 public:
     /// \brief Create a WebSocketConnection.
     /// \param parent A reference to the parent WebSocketRoute.
-    WebSocketConnection(WebSocketRoute& parent);
+    WebSocketConnection(WebSocketRoute& route);
 
     /// \brief Destroy the WebSocketConnection.
     virtual ~WebSocketConnection();
 
-    /// \brief Handle an HTTPServerRequest with an HTTPServerResponse.
-    /// \param request The HTTPServerRequest to handle.
-    /// \param response The HTTPServerResponse to return.
-    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
-                               Poco::Net::HTTPServerResponse& response);
+    /// \brief Handle an ServerEventArgs.
+    /// \param evt The ServerEventArgs to handle.
+    void handleRequest(ServerEventArgs& evt);
 
     /// \brief Queue a frame to be sent.
     /// \returns false iff frame not queued
@@ -116,23 +112,20 @@ public:
 
 protected:
     /// \brief A reference to the parent WebSocketRoute.
-    WebSocketRoute& _parent;
+//    WebSocketRoute& _parent;
 
 private:
-    void handleOrigin(Poco::Net::HTTPServerRequest& request,
-                      Poco::Net::HTTPServerResponse& response);
+    void handleOrigin(ServerEventArgs& evt);
     
-    void handleSubprotocols(Poco::Net::HTTPServerRequest& request,
-                            Poco::Net::HTTPServerResponse& response);
+    void handleSubprotocols(ServerEventArgs& evt);
 
-    void handleExtensions(Poco::Net::HTTPServerRequest& request,
-                          Poco::Net::HTTPServerResponse& response);
+    void handleExtensions(ServerEventArgs& evt);
 
 
     std::size_t sendFrames(Poco::Net::WebSocket& ws);
 
     // this is all fixed in Poco 1.4.6 and 1.5.+
-    void applyFirefoxHack(Poco::Net::HTTPServerRequest& request);
+    void applyFirefoxHack(ServerEventArgs& evt);
 
     /// \brief The original request headers for reference.
     Poco::Net::NameValueCollection _requestHeaders;
