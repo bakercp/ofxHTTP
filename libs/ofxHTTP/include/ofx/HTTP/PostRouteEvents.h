@@ -144,7 +144,7 @@ public:
                         const std::string& originalFilename,
                         const std::string& filename,
                         const Poco::Net::MediaType& contentType,
-                        std::streamsize numBytesTransferred,
+                        unsigned long long numBytesTransferred,
                         UploadState state):
         BasePostEventArgs(evt, postId),
         _formFieldName(formFieldName),
@@ -186,7 +186,7 @@ public:
     }
 
     
-    std::streamsize getNumBytesTransferred() const
+    unsigned long long getNumBytesTransferred() const
     {
         return _numBytesTransferred;
     }
@@ -201,7 +201,7 @@ private:
     const std::string _originalFilename;
     const std::string _filename;
     const Poco::Net::MediaType _contentType;
-    std::streamsize _numBytesTransferred;
+    unsigned long long _numBytesTransferred;
     UploadState _state;
 
 };

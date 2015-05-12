@@ -350,10 +350,9 @@ void PostRouteFileHandler::handlePart(const Poco::Net::MessageHeader& header,
 
                 Poco::Buffer<char> buffer(_route.getSettings().getWriteBufferSize());
 
-                std::streamsize sz = 0;
-
                 stream.read(buffer.begin(), _route.getSettings().getWriteBufferSize());
 
+                unsigned long long sz = 0;
                 unsigned long long n = stream.gcount();
 
                 while (n > 0)
