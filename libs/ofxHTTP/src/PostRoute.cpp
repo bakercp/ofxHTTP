@@ -164,87 +164,102 @@ PostRouteHandler::~PostRouteHandler()
 
 void PostRouteHandler::handleRequest(ServerEventArgs& evt)
 {
-    Poco::Net::HTTPServerResponse& response = evt.getResponse();
-
-    // This uuid helps us track form progress updates.
-    std::string postId = Poco::UUIDGenerator::defaultGenerator().createOne().toString();
-
-    // Get the content type header (already checked in parent route).
-    Poco::Net::MediaType contentType(evt.getRequest().get("Content-Type", ""));
-
-    if (contentType.matches(POST_CONTENT_TYPE_URLENCODED) ||
-        contentType.matches(POST_CONTENT_TYPE_MULTIPART))
+    try
     {
-        // Prepare the upload directory if needed.
-        if (contentType.matches(POST_CONTENT_TYPE_MULTIPART))
-        {
-            ofDirectory _uploadFolder(getRoute().getSettings().getUploadFolder());
+        Poco::Net::HTTPServerResponse& response = evt.getResponse();
 
-            if (!_uploadFolder.exists())
+        // This uuid helps us track form progress updates.
+        std::string postId = Poco::UUIDGenerator::defaultGenerator().createOne().toString();
+
+        // Get the content type header (already checked in parent route).
+        Poco::Net::MediaType contentType(evt.getRequest().get("Content-Type", ""));
+
+        if (contentType.matches(POST_CONTENT_TYPE_URLENCODED) ||
+            contentType.matches(POST_CONTENT_TYPE_MULTIPART))
+        {
+            // Prepare the upload directory if needed.
+            if (contentType.matches(POST_CONTENT_TYPE_MULTIPART))
             {
-                ofLogError("PostRouteHandler::handleRequest") << "Upload folder does not exist and cannot be created.";
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-                getRoute().handleRequest(evt);
+                ofDirectory _uploadFolder(getRoute().getSettings().getUploadFolder());
+
+                if (!_uploadFolder.exists())
+                {
+                    ofLogError("PostRouteHandler::handleRequest") << "Upload folder does not exist and cannot be created.";
+                    response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+                    getRoute().handleRequest(evt);
+                    return;
+                }
+            }
+
+            PostRouteFileHandler postRoutePartHandler(getRoute(),
+                                                      evt,
+                                                      postId);
+
+            Poco::Net::HTMLForm form(contentType.toString());
+            form.setFieldLimit(getRoute().getSettings().getFieldLimit());
+            form.load(evt.getRequest(), evt.getRequest().stream(), postRoutePartHandler);
+
+            PostFormEventArgs args(evt,
+                                   postId,
+                                   form);
+
+            ofNotifyEvent(getRoute().events.onHTTPFormEvent, args, &getRoute());
+
+            if (form.has("destination") && !form.get("destination").empty())
+            {
+                response.redirect(form.get("destination"));
                 return;
             }
         }
-
-        PostRouteFileHandler postRoutePartHandler(getRoute(),
-                                                  evt,
-                                                  postId);
-
-        Poco::Net::HTMLForm form(contentType.toString());
-        form.setFieldLimit(getRoute().getSettings().getFieldLimit());
-        form.load(evt.getRequest(), evt.getRequest().stream(), postRoutePartHandler);
-
-        PostFormEventArgs args(evt,
-                               postId,
-                               form);
-
-        ofNotifyEvent(getRoute().events.onHTTPFormEvent, args, &getRoute());
-
-        if (form.has("destination") && !form.get("destination").empty())
+        else
         {
-            response.redirect(form.get("destination"));
+            // Poco::Net::HTMLForm, like php does not handle text/plain because
+            // it cannot be unambiguously encoded.  Here we simply return
+            // the raw text with the event.
+
+            std::string result;
+
+            Poco::StreamCopier::copyToString(evt.getRequest().stream(),
+                                             result);
+
+            ofBuffer buffer(result);
+
+            PostEventArgs args(evt,
+                               postId,
+                               buffer);
+
+            ofNotifyEvent(getRoute().events.onHTTPPostEvent, args, &getRoute());
+        }
+
+        if (response.sent())
+        {
+            return;
+        }
+        else if (!getRoute().getSettings().getUploadRedirect().empty())
+        {
+            response.redirect(getRoute().getSettings().getUploadRedirect());
+            return;
+        }
+        else
+        {
+            // done
+            response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_OK);
+            response.setContentLength(0);
+            response.send();
             return;
         }
     }
-    else
+    catch (const Poco::Exception& exc)
     {
-        // Poco::Net::HTMLForm, like php does not handle text/plain because
-        // it cannot be unambiguously encoded.  Here we simply return
-        // the raw text with the event.
-
-        std::string result;
-
-        Poco::StreamCopier::copyToString(evt.getRequest().stream(),
-                                         result);
-
-        ofBuffer buffer(result);
-
-        PostEventArgs args(evt,
-                           postId,
-                           buffer);
-
-        ofNotifyEvent(getRoute().events.onHTTPPostEvent, args, &getRoute());
+        evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, exc.displayText());
     }
-
-    if (response.sent())
+    catch (const std::exception& exc)
     {
-        return;
+        evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, exc.what());
     }
-    else if (!getRoute().getSettings().getUploadRedirect().empty())
+    catch (...)
     {
-        response.redirect(getRoute().getSettings().getUploadRedirect());
-        return;
-    }
-    else
-    {
-        // done
-        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_OK);
-        response.setContentLength(0);
-        response.send();
-        return;
+        evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
 }
 
