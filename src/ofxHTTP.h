@@ -33,7 +33,6 @@
 #include "ofxTaskQueue.h"
 #include "ofx/HTTP/AbstractClientTypes.h"
 #include "ofx/HTTP/AbstractServerTypes.h"
-#include "ofx/HTTP/AuthenticationRoute.h"
 #include "ofx/HTTP/BaseClient.h"
 #include "ofx/HTTP/BaseResponse.h"
 #include "ofx/HTTP/BaseRequest.h"
