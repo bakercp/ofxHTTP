@@ -43,7 +43,7 @@ void ofApp::setup()
         // progress.  In this example, we register the taskId in the
         // taskStarted() callback.
 
-        Poco::UUID uuid = clientTaskQueue.get(url);
+        std::string uuid = clientTaskQueue.get(url);
 
         std::cout << "Getting: " << url << std::endl;
     }
@@ -70,7 +70,7 @@ void ofApp::draw()
 
         float progress = progressInfo.getProgress();
 
-        Poco::UUID taskId = progressInfo.getTaskId();
+        std::string taskId = progressInfo.getTaskId();
 
         std::string name = progressInfo.getTaskName();
 
@@ -104,7 +104,7 @@ void ofApp::draw()
 
         std::stringstream ss;
 
-        ss << taskId.toString() << ": " << statusString << " : " << name << std::endl;
+        ss << taskId << ": " << statusString << " : " << name << std::endl;
 
         ofPushMatrix();
         ofTranslate(0, y);
@@ -187,7 +187,7 @@ void ofApp::onClientBuffer(const ofx::HTTP::ClientBufferEventArgs& args)
 
     std::string extension = mtm->getBestFileExtensionsForMediaType(mediaType);
 
-    std::string path = ofToDataPath(args.getTaskId().toString() + "." + extension);
+    std::string path = ofToDataPath(args.getTaskId() + "." + extension);
 
     try
     {
