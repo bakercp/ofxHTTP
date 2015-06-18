@@ -208,7 +208,7 @@ private:
 
     WebSocketConnections _connections;
 
-    mutable ofMutex _mutex; // locks the handlers set
+    mutable Poco::FastMutex _mutex; // locks the handlers set
 
 };
 

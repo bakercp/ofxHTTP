@@ -250,7 +250,7 @@ void WebSocketRoute::close()
 
 void WebSocketRoute::broadcast(const WebSocketFrame& frame)
 {
-    ofScopedLock lock(_mutex);
+    Poco::FastMutex::ScopedLock lock(_mutex);
     WebSocketConnectionsIter iter = _connections.begin();
 
     while(iter != _connections.end())
@@ -263,7 +263,7 @@ void WebSocketRoute::broadcast(const WebSocketFrame& frame)
 
 void WebSocketRoute::registerWebSocketConnection(WebSocketConnection* connection)
 {
-    ofScopedLock lock(_mutex);
+    Poco::FastMutex::ScopedLock lock(_mutex);
     
     if(!_connections.insert(connection).second)
     {
@@ -274,7 +274,7 @@ void WebSocketRoute::registerWebSocketConnection(WebSocketConnection* connection
 
 void WebSocketRoute::unregisterWebSocketConnection(WebSocketConnection* connection)
 {
-    ofScopedLock lock(_mutex);
+    Poco::FastMutex::ScopedLock lock(_mutex);
     // TODO: this will never return more than 1
     std::size_t numErased = _connections.erase(connection);
 
@@ -288,7 +288,7 @@ void WebSocketRoute::unregisterWebSocketConnection(WebSocketConnection* connecti
 
 std::size_t WebSocketRoute::getNumWebSocketConnections() const
 {
-    ofScopedLock lock(_mutex);
+    Poco::FastMutex::ScopedLock lock(_mutex);
     return _connections.size();
 }
 

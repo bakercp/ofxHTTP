@@ -203,8 +203,6 @@ void FileSystemRoute::handleRequest(ServerEventArgs& evt)
 
 void FileSystemRoute::handleErrorResponse(ServerEventArgs& evt)
 {
-    cout << "sending error response" << endl;
-
     // See if we have an html file with that error code.
     ofFile errorFile(_settings.getDocumentRoot() + "/" + ofToString(evt.getResponse().getStatus()) + ".html");
 

@@ -25,9 +25,11 @@
 
 #include "ofx/HTTP/PostRoute.h"
 #include "Poco/Buffer.h"
+#include "Poco/Path.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/UUIDGenerator.h"
 #include "Poco/Net/HTMLForm.h"
+#include "Poco/Net/MediaType.h"
 
 
 namespace ofx {
@@ -437,19 +439,22 @@ bool PostRouteFileHandler::isContentTypeValid(const std::string& contentType) co
 {
     Poco::Net::MediaType mediaType(contentType);
     
-    std::set<Poco::Net::MediaType> validContentTypes = _route.getSettings().getValidContentTypes();
+    const std::set<Poco::Net::MediaType>& validContentTypes = _route.getSettings().getValidContentTypes();
+
     std::set<Poco::Net::MediaType>::const_iterator iter = validContentTypes.begin();
     
     while (iter != validContentTypes.end())
     {
-        if ((*iter).matchesRange(mediaType))
+        Poco::Net::MediaType type(*iter);
+
+        if (type.matchesRange(mediaType))
         {
             return true;
         }
         
         ++iter;
     }
-    
+
     return false;
 }
 

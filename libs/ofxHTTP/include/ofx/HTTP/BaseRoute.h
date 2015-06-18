@@ -61,7 +61,7 @@ public:
     typedef std::set<std::string> HTTPMethodSet;
 
     /// \brief A typedef for a MediaTypeSet.
-    typedef std::set<Poco::Net::MediaType> MediaTypeSet;
+    typedef std::set<std::string> MediaTypeSet;
 
     /// \brief Create the BaseRouteSettings with the given route path.
     /// \param routePathPattern The regex pattern that this route will handle.
@@ -258,7 +258,9 @@ bool BaseRoute_<SettingsType>::canHandleRequest(const Poco::Net::HTTPServerReque
 
         while (iter != validContentTypes.end())
         {
-            if ((*iter).matchesRange(contentType))
+            Poco::Net::MediaType type(*iter);
+
+            if (type.matchesRange(contentType))
             {
                 foundMatch = true;
                 break;
