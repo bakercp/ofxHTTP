@@ -53,11 +53,11 @@ void ofApp::setup()
         std::cout << std::endl;
 
     }
-    catch(const Poco::Exception& exc)
+    catch (const Poco::Exception& exc)
     {
         ofLogError("ofApp::setup") << "Got Exception " << exc.displayText() << " " << exc.code();
     }
-    catch(...)
+    catch (...)
     {
         ofLogError("ofApp::setup") << "Got unknown exception.";
     }
