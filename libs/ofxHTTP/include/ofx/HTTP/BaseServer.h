@@ -50,7 +50,7 @@
 #include "ofx/HTTP/ThreadErrorHandler.h"
 #include "ofx/HTTP/ServerEvents.h"
 #include "ofx/HTTP/SessionStore.h"
-// #include "ofx/Net/IPAddressRange.h"
+#include "ofx/Net/IPAddressRange.h"
 
 
 namespace ofx {
@@ -161,13 +161,12 @@ public:
 
     Poco::URI getURI() const;
 
-    /*
-     const Net::IPAddressRange::List& getWhitelist() const;
-     void setWhitelist(const Net::IPAddressRange::List& whitelist);
 
-     const Net::IPAddressRange::List& getBlacklist() const;
-     void setBlacklist(const Net::IPAddressRange::List& blacklist);
-     */
+    const Net::IPAddressRange::List& getWhitelist() const;
+    void setWhitelist(const Net::IPAddressRange::List& whitelist);
+
+    const Net::IPAddressRange::List& getBlacklist() const;
+    void setBlacklist(const Net::IPAddressRange::List& blacklist);
     
     const static std::string DEFAULT_HOST;
     const static unsigned short DEFAULT_PORT;
@@ -180,10 +179,9 @@ private:
     bool _useSSL;
     bool _useSessions;
     
-    /*
-     Net::IPAddressRange::List _whitelist;
-     Net::IPAddressRange::List _blacklist;
-     */
+    Net::IPAddressRange::List _whitelist;
+    Net::IPAddressRange::List _blacklist;
+
 };
 
 
@@ -435,53 +433,53 @@ private:
 
     bool acceptConnection(const Poco::Net::HTTPServerRequest& request)
     {
-        //#if POCO_VERSION > 0x01050000
-        //    const Poco::Net::IPAddress& host = request.clientAddress().host();
-        //
-        //    // If a whitelist is defined then you _must_ be on the whitelist.
-        //    const Net::IPAddressRange::List& whitelist = _settings.getWhitelist();
-        //
-        //    if (!whitelist.empty())
-        //    {
-        //        bool isWhitelisted = false;
-        //
-        //        Net::IPAddressRange::List::const_iterator iter = whitelist.begin();
-        //
-        //        while (iter != whitelist.end())
-        //        {
-        //            if (iter->contains(host))
-        //            {
-        //                return true;
-        //            }
-        //
-        //            ++iter;
-        //        }
-        //
-        //        if (!isWhitelisted)
-        //        {
-        //            return false;
-        //        }
-        //    }
-        //
-        //    // If a blacklist is defined then you _must not_ be on the blacklist.
-        //    const Net::IPAddressRange::List& blacklist = _settings.getBlacklist();
-        //
-        //    if (!blacklist.empty())
-        //    {
-        //        Net::IPAddressRange::List::const_iterator iter = blacklist.begin();
-        //
-        //        while (iter != blacklist.end())
-        //        {
-        //            if (iter->contains(request.clientAddress().host()))
-        //            {
-        //                return false;
-        //            }
-        //
-        //            ++iter;
-        //        }
-        //    }
-        //#endif
-        
+#if POCO_VERSION > 0x01050000
+        const Poco::Net::IPAddress& host = request.clientAddress().host();
+
+        // If a whitelist is defined then you _must_ be on the whitelist.
+        const Net::IPAddressRange::List& whitelist = _settings.getWhitelist();
+
+        if (!whitelist.empty())
+        {
+            bool isWhitelisted = false;
+
+            Net::IPAddressRange::List::const_iterator iter = whitelist.begin();
+
+            while (iter != whitelist.end())
+            {
+                if (iter->contains(host))
+                {
+                    return true;
+                }
+
+                ++iter;
+            }
+
+            if (!isWhitelisted)
+            {
+                return false;
+            }
+        }
+
+        // If a blacklist is defined then you _must not_ be on the blacklist.
+        const Net::IPAddressRange::List& blacklist = _settings.getBlacklist();
+
+        if (!blacklist.empty())
+        {
+            Net::IPAddressRange::List::const_iterator iter = blacklist.begin();
+
+            while (iter != blacklist.end())
+            {
+                if (iter->contains(request.clientAddress().host()))
+                {
+                    return false;
+                }
+
+                ++iter;
+            }
+        }
+#endif
+
         return true;
     }
 
