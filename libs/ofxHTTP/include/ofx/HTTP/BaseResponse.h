@@ -58,11 +58,6 @@ public:
 //    bool hasException() const;
 //    const Poco::Exception* getException() const;
 
-//    static SharedPtr makeShared()
-//    {
-//        return SharedPtr(new BaseResponse());
-//    }
-
 private:
 //    void setResponseStream(std::istream* pResponseStream);
 //    void setException(Poco::Exception* pException);

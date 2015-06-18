@@ -134,12 +134,6 @@
 //    void add(const Poco::URI& uri, const Poco::Net::HTTPCookie& cookie);
 //    std::vector<Cookie> get(const Poco::URI& uri) const;
 //
-//
-//    static SharedPtr makeShared()
-//    {
-//        return SharedPtr(new CookieStore());
-//    }
-//
 //private:
 //    typedef std::map<std::string, Cookies> CookieIndex;
 //
