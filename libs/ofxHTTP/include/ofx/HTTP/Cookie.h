@@ -28,6 +28,7 @@
 
 #include "Poco/URI.h"
 #include "Poco/String.h"
+#include "Poco/Timestamp.h"
 #include "Poco/UTF8String.h"
 #include "Poco/Net/HTTPCookie.h"
 #include "ofUtils.h"
@@ -65,4 +66,4 @@ protected:
 };
 
 
-} }
+} } // namespace ofx::HTTP
