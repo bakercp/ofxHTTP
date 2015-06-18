@@ -152,14 +152,14 @@ SimpleSessionStore::~SimpleSessionStore()
 
 bool SimpleSessionStore::hasSession(const std::string& sessionId) const
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     return _sessionMap.find(sessionId) != _sessionMap.end();
 }
 
 
 AbstractSession& SimpleSessionStore::getSession(const std::string& sessionId)
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
 
     SessionMap::iterator sessionsIter = _sessionMap.find(sessionId);
 
@@ -181,7 +181,7 @@ AbstractSession& SimpleSessionStore::getSession(const std::string& sessionId)
 
 AbstractSession& SimpleSessionStore::createSession()
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     std::shared_ptr<SimpleSession> session = std::shared_ptr<SimpleSession>(new SimpleSession());
     _sessionMap[session->getId()] = session;
     return *session;
@@ -190,7 +190,7 @@ AbstractSession& SimpleSessionStore::createSession()
 
 void SimpleSessionStore::destroySession(const std::string& sessionId)
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     _sessionMap.erase(_sessionMap.find(sessionId));
 }
 

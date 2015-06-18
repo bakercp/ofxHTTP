@@ -146,7 +146,7 @@ private:
     mutable std::queue<WebSocketFrame> _frameQueue;
 
     /// \brief A mutex for threadsafe access to the frame queue, etc.
-    mutable Poco::FastMutex _mutex;
+    mutable std::mutex _mutex;
 
 };
 

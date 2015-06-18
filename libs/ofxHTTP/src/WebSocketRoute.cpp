@@ -237,7 +237,7 @@ void WebSocketRoute::close(WebSocketConnection* connection)
 
 void WebSocketRoute::close()
 {
-    // ofScopedLock lock(_mutex);
+    // std::unique_lock<std::mutex> lock(_mutex);
     WebSocketConnectionsIter iter = _connections.begin();
 
     while (iter != _connections.end())
@@ -250,7 +250,7 @@ void WebSocketRoute::close()
 
 void WebSocketRoute::broadcast(const WebSocketFrame& frame)
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     WebSocketConnectionsIter iter = _connections.begin();
 
     while (iter != _connections.end())
@@ -263,8 +263,8 @@ void WebSocketRoute::broadcast(const WebSocketFrame& frame)
 
 void WebSocketRoute::registerWebSocketConnection(WebSocketConnection* connection)
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
-    
+    std::unique_lock<std::mutex> lock(_mutex);
+
     if(!_connections.insert(connection).second)
     {
         ofLogError("BaseWebSocketSessionManager::registerRouteHandler") << "Element was already in set!";
@@ -274,7 +274,7 @@ void WebSocketRoute::registerWebSocketConnection(WebSocketConnection* connection
 
 void WebSocketRoute::unregisterWebSocketConnection(WebSocketConnection* connection)
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     // TODO: this will never return more than 1
     std::size_t numErased = _connections.erase(connection);
 
@@ -288,7 +288,7 @@ void WebSocketRoute::unregisterWebSocketConnection(WebSocketConnection* connecti
 
 std::size_t WebSocketRoute::getNumWebSocketConnections() const
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     return _connections.size();
 }
 

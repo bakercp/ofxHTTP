@@ -72,7 +72,7 @@ private:
     
     std::size_t _maxSize;
     
-    mutable Poco::FastMutex _mutex;
+    mutable std::mutex _mutex;
     
 };
 
@@ -174,7 +174,7 @@ protected:
 
     Connections _connections;
 
-    mutable Poco::FastMutex _mutex;
+    mutable std::mutex _mutex;
 
 };
 
@@ -212,8 +212,8 @@ protected:
     
     unsigned long long _nextScheduledFrame;
     
-    mutable Poco::FastMutex _mutex;
-    
+    mutable std::mutex _mutex;
+
 };
 
 

@@ -52,7 +52,7 @@ std::shared_ptr<IPVideoFrame> IPVideoFrameQueue::pop()
 {
     std::shared_ptr<IPVideoFrame> frame;
 
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
 
     if (!_frames.empty())
     {
@@ -69,7 +69,7 @@ std::shared_ptr<IPVideoFrame> IPVideoFrameQueue::pop()
 
 void IPVideoFrameQueue::push(std::shared_ptr<IPVideoFrame> frame)
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
 
     _frames.push_back(frame);
 
@@ -82,14 +82,14 @@ void IPVideoFrameQueue::push(std::shared_ptr<IPVideoFrame> frame)
 
 std::size_t IPVideoFrameQueue::getMaxSize() const
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     return _maxSize;
 }
 
 
 void IPVideoFrameQueue::setMaxSize(std::size_t maxSize)
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     _maxSize = maxSize;
     while (_frames.size() > _maxSize)
     {
@@ -100,21 +100,21 @@ void IPVideoFrameQueue::setMaxSize(std::size_t maxSize)
 
 std::size_t IPVideoFrameQueue::size() const
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     return _frames.size();
 }
 
 
 bool IPVideoFrameQueue::empty() const
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     return _frames.empty();
 }
 
 
 void IPVideoFrameQueue::clear()
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     _frames.clear();
 }
 
@@ -268,7 +268,7 @@ void IPVideoRoute::send(ofPixels& pix) const
         // TODO: turbo jpeg an option here?
         ofSaveImage(pix, compressedPixels, OF_IMAGE_FORMAT_JPEG, OF_IMAGE_QUALITY_MEDIUM);
 
-        Poco::FastMutex::ScopedLock lock(_mutex);
+        std::unique_lock<std::mutex> lock(_mutex);
 
         Connections::const_iterator iter = _connections.begin();
 
@@ -301,21 +301,21 @@ void IPVideoRoute::send(ofPixels& pix) const
 
 void IPVideoRoute::addConnection(IPVideoRouteHandler* handler)
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     _connections.push_back(handler);
 }
 
 
 void IPVideoRoute::removeConnection(IPVideoRouteHandler* handler)
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     _connections.erase(std::remove(_connections.begin(), _connections.end(), handler), _connections.end());
 }
 
 
 std::size_t IPVideoRoute::getNumConnections() const
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     return _connections.size();
 }
 
@@ -534,7 +534,7 @@ void IPVideoRouteHandler::handleRequest(ServerEventArgs& evt)
 
 void IPVideoRouteHandler::stop()
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     _isRunning = false;
 }
 
@@ -547,14 +547,14 @@ IPVideoFrameSettings IPVideoRouteHandler::getFrameSettings() const
 
 float IPVideoRouteHandler::getCurrentBitRate() const
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     return (float)_bytesSent * 8.0f / (ofGetElapsedTimeMillis() - _startTime);
 }
 
 
 float IPVideoRouteHandler::getCurrentFrameRate() const
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     return (float)_framesSent / (ofGetElapsedTimeMillis() - _startTime);
 }
 

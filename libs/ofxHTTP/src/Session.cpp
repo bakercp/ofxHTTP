@@ -46,7 +46,7 @@ BaseSession::~BaseSession()
 
 std::string BaseSession::getId() const
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     return _sessionId;
 }
 
@@ -70,14 +70,14 @@ SimpleSession::~SimpleSession()
 
 bool SimpleSession::has(const std::string& key) const
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     return _sessionDict.find(key) != _sessionDict.end();
 }
 
 
 void SimpleSession::put(const std::string& key, const std::string& value)
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     _sessionDict[key] = value;
 }
 
@@ -85,7 +85,7 @@ void SimpleSession::put(const std::string& key, const std::string& value)
 std::string SimpleSession::get(const std::string& key,
                                const std::string& defaultValue) const
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
 
     std::map<std::string, std::string>::const_iterator iter = _sessionDict.find(key);
 
@@ -102,7 +102,7 @@ std::string SimpleSession::get(const std::string& key,
 
 std::string SimpleSession::get(const std::string& key) const
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
 
     std::map<std::string, std::string>::const_iterator iter = _sessionDict.find(key);
 
@@ -119,14 +119,14 @@ std::string SimpleSession::get(const std::string& key) const
 
 void SimpleSession::remove(const std::string& key)
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     _sessionDict.erase(_sessionDict.find(key));
 }
 
 
 void SimpleSession::clear()
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     _sessionDict.clear();
 }
 

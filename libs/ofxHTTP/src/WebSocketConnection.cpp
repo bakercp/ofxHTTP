@@ -244,7 +244,7 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
             if (ws.poll(getRoute().getSettings().getPollTimeout(),
                         Poco::Net::Socket::SELECT_ERROR))
             {
-                Poco::FastMutex::ScopedLock lock(_mutex);
+                std::unique_lock<std::mutex> lock(_mutex);
                 _isConnected = false;
             }
 
@@ -322,7 +322,7 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
 
 bool WebSocketConnection::sendFrame(const WebSocketFrame& frame) const
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
 
     if (_isConnected)
     {
@@ -339,14 +339,14 @@ bool WebSocketConnection::sendFrame(const WebSocketFrame& frame) const
 
 std::size_t WebSocketConnection::getSendQueueSize() const
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     return _frameQueue.size();
 }
 
 
 void WebSocketConnection::clearSendQueue()
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     std::queue<WebSocketFrame> empty; // a way to clear queues.
     std::swap(_frameQueue, empty);
 }
@@ -354,41 +354,41 @@ void WebSocketConnection::clearSendQueue()
 
 void WebSocketConnection::stop()
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     _isConnected = false;
 }
 
 
 Poco::Net::NameValueCollection WebSocketConnection::getRequestHeaders() const
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     return _requestHeaders;
 }
 
 
 Poco::Net::SocketAddress WebSocketConnection::getClientAddress() const
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     return _clientAddress;
 }
 
 
 bool WebSocketConnection::isConnected() const
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     return _isConnected;
 }
 
 std::size_t WebSocketConnection::getTotalBytesSent() const
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     return _totalBytesSent;
 }
 
 
 std::size_t WebSocketConnection::getTotalBytesReceived() const
 {
-    Poco::FastMutex::ScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     return _totalBytesReceived;
 }
 

@@ -119,7 +119,7 @@ private:
     BasicCredentialCacheMap  basicCredentialCacheMap;
     DigestCredentialCacheMap digestCredentialCacheMap;
 
-    mutable Poco::FastMutex mutex;
+    mutable std::mutex _mutex;
     
 };
 

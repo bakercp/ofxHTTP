@@ -57,7 +57,7 @@ protected:
 
     std::string _sessionId;
 
-    mutable Poco::FastMutex _mutex;
+    mutable std::mutex _mutex;
 
 };
 

@@ -92,7 +92,7 @@ protected:
 
     SessionMap _sessionMap;
 
-    mutable Poco::FastMutex _mutex;
+    mutable std::mutex _mutex;
 
 };
 

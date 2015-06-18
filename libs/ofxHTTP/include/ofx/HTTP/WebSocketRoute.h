@@ -208,7 +208,7 @@ private:
 
     WebSocketConnections _connections;
 
-    mutable Poco::FastMutex _mutex; // locks the handlers set
+    mutable std::mutex _mutex; // locks the handlers set
 
 };
 

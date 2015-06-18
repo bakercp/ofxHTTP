@@ -50,8 +50,8 @@ void DefaultCredentialStore::setCredentials(const AuthScope& scope,
         ofLogWarning("CredentialStore::setCredentials") << "Credentials are empty.  Ignoring.";
         return;
     }
-        
-    Poco::FastMutex::ScopedLock lock(mutex);
+
+    std::unique_lock<std::mutex> lock(_mutex);
     credentialMap[scope] = credentials;
     basicCredentialCacheMap.erase(scope); // invalidate cached credentials with the same scope
     digestCredentialCacheMap.erase(scope);
@@ -111,7 +111,7 @@ bool DefaultCredentialStore::getCredentials(const AuthScope& targetScope,
                                      AuthScope& matchingScope,
                                      Credentials& matchingCredentials) const
 {
-    Poco::FastMutex::ScopedLock lock(mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     return getCredentialsWithExistingLock(targetScope, matchingScope, matchingCredentials);
 }
 
@@ -168,7 +168,7 @@ bool DefaultCredentialStore::getCredentialsWithExistingLock(const AuthScope& tar
 
 void DefaultCredentialStore::clearCredentials(const AuthScope& scope)
 {
-    Poco::FastMutex::ScopedLock lock(mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     credentialMap.erase(scope);
     basicCredentialCacheMap.erase(scope);
     digestCredentialCacheMap.erase(scope);
@@ -199,7 +199,7 @@ void DefaultCredentialStore::requestFilter(BaseRequest& request,
     Credentials  matchingCredentials;
     AuthScope    matchingScope;
     
-    Poco::FastMutex::ScopedLock lock(mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
 
     // mutex locking happens in getCredentials() and authenticateWithCache()
     if (getCredentialsWithExistingLock(targetScope, matchingScope, matchingCredentials))
@@ -297,8 +297,8 @@ void DefaultCredentialStore::responseFilter(BaseRequest& request,
 
             AuthScope matchingScope;
             
-            Poco::FastMutex::ScopedLock lock(mutex);
-            
+            std::unique_lock<std::mutex> lock(_mutex);
+
             if(getCredentialsWithExistingLock(targetScope,
                                               matchingScope,
                                               matchingCredentials))
@@ -361,7 +361,7 @@ bool DefaultCredentialStore::authenticateWithCache(const AuthScope& scope,
 
 void DefaultCredentialStore::clear()
 {
-    Poco::FastMutex::ScopedLock lock(mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     credentialMap.clear();
     basicCredentialCacheMap.clear();
     digestCredentialCacheMap.clear();
