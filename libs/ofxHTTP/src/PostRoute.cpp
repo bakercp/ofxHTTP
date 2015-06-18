@@ -439,9 +439,9 @@ bool PostRouteFileHandler::isContentTypeValid(const std::string& contentType) co
 {
     Poco::Net::MediaType mediaType(contentType);
     
-    const std::set<Poco::Net::MediaType>& validContentTypes = _route.getSettings().getValidContentTypes();
+    const BaseRouteSettings::MediaTypeSet& validContentTypes = _route.getSettings().getValidContentTypes();
 
-    std::set<Poco::Net::MediaType>::const_iterator iter = validContentTypes.begin();
+    BaseRouteSettings::MediaTypeSet::const_iterator iter = validContentTypes.begin();
     
     while (iter != validContentTypes.end())
     {

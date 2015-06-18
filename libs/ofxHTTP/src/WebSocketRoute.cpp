@@ -240,7 +240,7 @@ void WebSocketRoute::close()
     // ofScopedLock lock(_mutex);
     WebSocketConnectionsIter iter = _connections.begin();
 
-    while(iter != _connections.end())
+    while (iter != _connections.end())
     {
         close(*iter);
         ++iter;
@@ -253,7 +253,7 @@ void WebSocketRoute::broadcast(const WebSocketFrame& frame)
     Poco::FastMutex::ScopedLock lock(_mutex);
     WebSocketConnectionsIter iter = _connections.begin();
 
-    while(iter != _connections.end())
+    while (iter != _connections.end())
     {
         sendFrame(*iter,frame);
         ++iter;

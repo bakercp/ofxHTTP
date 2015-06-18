@@ -71,7 +71,7 @@ namespace HTTP {
 ////        response.getCookies(newCookies);
 ////
 ////        std::vector<Poco::Net::HTTPCookie>::iterator iter = newCookies.begin();
-////        while(iter != newCookies.end())
+////        while (iter != newCookies.end())
 ////        {
 ////            cout << "COOKIE: " << (*iter).toString() << endl;
 ////

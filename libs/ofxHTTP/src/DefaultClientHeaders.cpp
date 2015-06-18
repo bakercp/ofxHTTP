@@ -59,7 +59,7 @@ void DefaultClientHeaders::requestFilter(BaseRequest& request,
 
     Poco::Net::NameValueCollection::ConstIterator iter = defaultHeaders.begin();
 
-    while(iter != defaultHeaders.end())
+    while (iter != defaultHeaders.end())
     {
         request.set((*iter).first, (*iter).second);
         ++iter;

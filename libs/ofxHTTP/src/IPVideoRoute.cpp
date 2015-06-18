@@ -73,7 +73,7 @@ void IPVideoFrameQueue::push(std::shared_ptr<IPVideoFrame> frame)
 
     _frames.push_back(frame);
 
-    while(_frames.size() > _maxSize)
+    while (_frames.size() > _maxSize)
     {
         _frames.pop_front();
     }
