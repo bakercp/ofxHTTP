@@ -53,7 +53,6 @@ void BaseRequest::write(std::ostream& ostr) const
     {
         Poco::URI uri(getURI());
 
-        cout << uri.toString() << endl;
         std::string pathAndQuery = uri.getPathAndQuery();
 
         if (pathAndQuery.empty())
