@@ -32,17 +32,20 @@ namespace HTTP {
 
 BaseClient::BaseClient():
     _pRequestStreamFilter(0),
-    _pResponseStreamFilter(0)
+    _pResponseStreamFilter(0),
+    _bytesPerProgressUpdate(DEFAULT_BYTES_PER_PROGRESS_UPDATE)
 {
 }
 
 
 BaseClient::BaseClient(RequestFilters requestFilters,
-                       ResponseFilters responseFilters):
+                       ResponseFilters responseFilters,
+                       streamsize bytesPerProgressUpdate):
     _requestFilters(requestFilters),
     _responseFilters(responseFilters),
     _pRequestStreamFilter(0),
-    _pResponseStreamFilter(0)
+    _pResponseStreamFilter(0),
+    _bytesPerProgressUpdate(bytesPerProgressUpdate)
 {
 }
 
@@ -217,6 +220,18 @@ void BaseClient::removeResponseStreamFilter()
 }
 
 
+void BaseClient::setBytesPerProgressUpdate(std::streamsize bytesPerProgressUpdate)
+{
+    _bytesPerProgressUpdate = bytesPerProgressUpdate;
+}
+
+
+std::streamsize BaseClient::getBytesPerProgressUpdate() const
+{
+    return _bytesPerProgressUpdate;
+}
+
+
 void BaseClient::requestFilter(BaseRequest& request, Context& context)
 {
     RequestFilters::iterator requestFilterIter = _requestFilters.begin();
@@ -265,7 +280,8 @@ std::ostream& BaseClient::send(BaseRequest& request, Context& context)
     _pClientProgressRequestStream = std::shared_ptr<std::ostream>(new ClientProgressRequestStream(rawRequestStream,
                                                                                                   request,
                                                                                                   context,
-                                                                                                  *this));
+                                                                                                  *this,
+                                                                                                  _bytesPerProgressUpdate));
     if (_pRequestStreamFilter)
     {
         return _pRequestStreamFilter->requestStreamFilter(*_pClientProgressRequestStream,
@@ -296,7 +312,8 @@ std::istream& BaseClient::receive(BaseRequest& request,
                                                                                                     request,
                                                                                                     response,
                                                                                                     context,
-                                                                                                    *this));
+                                                                                                    *this,
+                                                                                                    _bytesPerProgressUpdate));
     if (_pResponseStreamFilter)
     {
         return _pResponseStreamFilter->responseStreamFilter(*_pClientProgressResponseStream,

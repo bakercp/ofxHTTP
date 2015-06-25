@@ -33,7 +33,8 @@ namespace HTTP {
 ClientProgressStreamBuf::ClientProgressStreamBuf(std::ostream& ostr,
                                                  const BaseRequest& request,
                                                  Context& context,
-                                                 AbstractRequestStreamListener& listener):
+                                                 AbstractRequestStreamListener& listener,
+                                                 std::streamsize bytesPerProgressUpdate):
     _pRequest(&request),
     _pResponse(0),
     _pContext(&context),
@@ -42,7 +43,8 @@ ClientProgressStreamBuf::ClientProgressStreamBuf(std::ostream& ostr,
     _requestStreamBytes(0),
     _responseStreamBytes(0),
     _pRequestStreamListener(&listener),
-    _pResponseStreamListener(0)
+    _pResponseStreamListener(0),
+    _bytesPerProgressUpdate(bytesPerProgressUpdate)
 {
 }
 
@@ -51,7 +53,8 @@ ClientProgressStreamBuf::ClientProgressStreamBuf(std::istream& istr,
                                                  const BaseRequest& request,
                                                  const BaseResponse& response,
                                                  Context& context,
-                                                 AbstractResponseStreamListener& listener):
+                                                 AbstractResponseStreamListener& listener,
+                                                 std::streamsize bytesPerProgressUpdate):
     _pRequest(0),
     _pResponse(&response),
     _pContext(&context),
@@ -59,8 +62,9 @@ ClientProgressStreamBuf::ClientProgressStreamBuf(std::istream& istr,
     _pResponseStream(&istr),
     _requestStreamBytes(0),
     _responseStreamBytes(0),
-    _pRequestStreamListener(),
-    _pResponseStreamListener(&listener)
+    _pRequestStreamListener(0),
+    _pResponseStreamListener(&listener),
+    _bytesPerProgressUpdate(bytesPerProgressUpdate)
 {
 }
 
@@ -80,10 +84,13 @@ int ClientProgressStreamBuf::readFromDevice()
         {
             ++_responseStreamBytes;
 
-            _pResponseStreamListener->progress(*_pRequest,
-                                               *_pResponse,
-                                               *_pContext,
-                                               _responseStreamBytes);
+            if (0 == (_responseStreamBytes % _bytesPerProgressUpdate))
+            {
+                _pResponseStreamListener->progress(*_pRequest,
+                                                   *_pResponse,
+                                                   *_pContext,
+                                                   _responseStreamBytes);
+            }
         }
 
         return c;
@@ -117,8 +124,9 @@ void ClientProgressStreamBuf::reset()
 ClientProgressIOS::ClientProgressIOS(std::ostream& ostr,
                                      const BaseRequest& request,
                                      Context& context,
-                                     AbstractRequestStreamListener& listener):
-    _buf(ostr, request, context, listener)
+                                     AbstractRequestStreamListener& listener,
+                                     std::streamsize bytesPerProgressUpdate):
+    _buf(ostr, request, context, listener, bytesPerProgressUpdate)
 {
     poco_ios_init(&_buf);
 }
@@ -128,8 +136,9 @@ ClientProgressIOS::ClientProgressIOS(std::istream& istr,
                                      const BaseRequest& request,
                                      const BaseResponse& response,
                                      Context& context,
-                                     AbstractResponseStreamListener& listener):
-    _buf(istr, request, response, context, listener)
+                                     AbstractResponseStreamListener& listener,
+                                     std::streamsize bytesPerProgressUpdate):
+    _buf(istr, request, response, context, listener, bytesPerProgressUpdate)
 {
     poco_ios_init(&_buf);
 }
@@ -149,8 +158,9 @@ ClientProgressStreamBuf* ClientProgressIOS::rdbuf()
 ClientProgressRequestStream::ClientProgressRequestStream(std::ostream& ostr,
                                                          const BaseRequest& request,
                                                          Context& context,
-                                                         AbstractRequestStreamListener& listener):
-    ClientProgressIOS(ostr, request, context, listener),
+                                                         AbstractRequestStreamListener& listener,
+                                                         std::streamsize bytesPerProgressUpdate):
+    ClientProgressIOS(ostr, request, context, listener, bytesPerProgressUpdate),
     std::ostream(&_buf)
 {
 }
@@ -165,8 +175,9 @@ ClientProgressResponseStream::ClientProgressResponseStream(std::istream& istr,
                                                            const BaseRequest& request,
                                                            const BaseResponse& response,
                                                            Context& context,
-                                                           AbstractResponseStreamListener& listener):
-    ClientProgressIOS(istr, request, response, context, listener),
+                                                           AbstractResponseStreamListener& listener,
+                                                           std::streamsize bytesPerProgressUpdate):
+    ClientProgressIOS(istr, request, response, context, listener, bytesPerProgressUpdate),
     std::istream(&_buf)
 {
 }

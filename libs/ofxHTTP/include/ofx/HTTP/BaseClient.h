@@ -49,7 +49,8 @@ public:
     BaseClient();
 
     BaseClient(RequestFilters requestFilters,
-               ResponseFilters responseFilters);
+               ResponseFilters responseFilters,
+               std::streamsize bytesPerProgressUpdate = DEFAULT_BYTES_PER_PROGRESS_UPDATE);
 
     virtual ~BaseClient();
 
@@ -74,6 +75,9 @@ public:
     void removeRequestStreamFilter();
     void removeResponseStreamFilter();
 
+    void setBytesPerProgressUpdate(std::streamsize bytesPerProgressUpdate);
+    std::streamsize getBytesPerProgressUpdate() const;
+
     template<class ListenerClass>
     void registerClientEvents(ListenerClass* listener);
 
@@ -94,9 +98,17 @@ public:
 
     ClientEvents events;
 
+    enum
+    {
+        DEFAULT_BYTES_PER_PROGRESS_UPDATE = 1024
+    };
+    
+
 protected:
     RequestFilters _requestFilters;
     ResponseFilters _responseFilters;
+
+    std::streamsize _bytesPerProgressUpdate;
 
 private:
     std::shared_ptr<std::ostream> _pClientProgressRequestStream;
