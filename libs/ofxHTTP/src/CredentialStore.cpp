@@ -243,7 +243,9 @@ void DefaultCredentialStore::responseFilter(BaseRequest& request,
 
     if (response.getStatus() == Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED)
     {
-        for (Poco::Net::HTTPResponse::ConstIterator iter = response.find("WWW-Authenticate"); iter != response.end(); ++iter)
+        Poco::Net::HTTPResponse::ConstIterator iter = response.find("WWW-Authenticate");
+
+        if (iter != response.end())
         {
             Poco::URI uri(request.getURI());
 
