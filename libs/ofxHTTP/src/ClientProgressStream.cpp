@@ -40,17 +40,17 @@ ClientProgressStreamBuf::ClientProgressStreamBuf(std::ostream& ostr,
     _pContext(&context),
     _pRequestStream(&ostr),
     _pResponseStream(0),
-    _requestStreamBytes(0),
-    _responseStreamBytes(0),
     _pRequestStreamListener(&listener),
     _pResponseStreamListener(0),
+    _requestStreamBytes(0),
+    _responseStreamBytes(0),
     _bytesPerProgressUpdate(bytesPerProgressUpdate)
 {
 }
 
 
 ClientProgressStreamBuf::ClientProgressStreamBuf(std::istream& istr,
-                                                 const BaseRequest& request,
+                                                 const BaseRequest&,
                                                  const BaseResponse& response,
                                                  Context& context,
                                                  AbstractResponseStreamListener& listener,
@@ -60,10 +60,10 @@ ClientProgressStreamBuf::ClientProgressStreamBuf(std::istream& istr,
     _pContext(&context),
     _pRequestStream(0),
     _pResponseStream(&istr),
-    _requestStreamBytes(0),
-    _responseStreamBytes(0),
     _pRequestStreamListener(0),
     _pResponseStreamListener(&listener),
+    _requestStreamBytes(0),
+    _responseStreamBytes(0),
     _bytesPerProgressUpdate(bytesPerProgressUpdate)
 {
 }

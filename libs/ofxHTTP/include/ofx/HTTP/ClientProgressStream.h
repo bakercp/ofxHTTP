@@ -102,13 +102,13 @@ private:
     std::ostream* _pRequestStream;
     std::istream* _pResponseStream;
 
+    AbstractRequestStreamListener*  _pRequestStreamListener;
+    AbstractResponseStreamListener* _pResponseStreamListener;
+
     std::streamsize _requestStreamBytes;
     std::streamsize _responseStreamBytes;
 
     std::streamsize _bytesPerProgressUpdate;
-
-    AbstractRequestStreamListener*  _pRequestStreamListener;
-    AbstractResponseStreamListener* _pResponseStreamListener;
 
 };
 
