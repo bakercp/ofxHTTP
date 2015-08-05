@@ -189,7 +189,7 @@ protected:
     ///
     /// If session data does not exist, the method will return quietly.
     ///
-    /// \params sessionId The id of the session to destroy.
+    /// \param sessionId The id of the session to destroy.
     virtual void destroySession(const std::string& sessionId) = 0;
 
 };

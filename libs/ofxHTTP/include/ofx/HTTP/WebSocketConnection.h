@@ -55,7 +55,7 @@ class WebSocketConnection: public BaseRouteHandler_<WebSocketRoute>
 {
 public:
     /// \brief Create a WebSocketConnection.
-    /// \param parent A reference to the parent WebSocketRoute.
+    /// \param route A reference to the parent WebSocketRoute.
     WebSocketConnection(WebSocketRoute& route);
 
     /// \brief Destroy the WebSocketConnection.

@@ -78,11 +78,11 @@ class WebSocketEventArgs: public ServerEventArgs
 {
 public:
     /// \brief Create a WebSocketEventArgs object with the provided params.
-    /// \param sessionId The session id..
+    /// \param args The server event arguments.
     /// \param connection A reference to the associated WebSocketConnection.
-    WebSocketEventArgs(ServerEventArgs& evt,
+    WebSocketEventArgs(ServerEventArgs& args,
                        WebSocketConnection& connection):
-        ServerEventArgs(evt),
+        ServerEventArgs(args),
         _connection(connection)
     {
     }
@@ -171,12 +171,13 @@ class WebSocketFrameEventArgs: public WebSocketEventArgs
 {
 public:
     /// \brief Create a WebSocketFrameEventArgs object.
+    /// \param args The server event arguments.
     /// \param connection A reference to the associated WebSocketConnection.
-    /// \param error An error, if any, associated with the event.
-    WebSocketFrameEventArgs(ServerEventArgs& evt,
+    /// \param frame The WebSocketFrame the referenced frame.
+    WebSocketFrameEventArgs(ServerEventArgs& args,
                             WebSocketConnection& connection,
                             const WebSocketFrame& frame):
-        WebSocketEventArgs(evt, connection),
+        WebSocketEventArgs(args, connection),
         _frame(frame)
     {
     }

@@ -49,7 +49,7 @@ public:
     void setPutFile(const std::string& filename);
 
     /// \brief Set the buffer to include in the body of the PUT request.
-    /// \param filename The buffer to include in the body of the PUT request.
+    /// \param buffer The buffer to include in the body of the PUT request.
     void setPutBuffer(const ofBuffer& buffer);
 
     /// \brief Set the start byte to include in the header of the PUT request.

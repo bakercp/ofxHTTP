@@ -88,7 +88,8 @@ public:
                             ofLogLevel logLevel = OF_LOG_VERBOSE);
 
     /// \brief Dump a name value collection from a server response.
-    /// \param response the HTTPServerResponse response.
+    /// \param nvc the Name value collection to print.
+    /// \param logLevel The log level at which to print.
     static void dumpNameValueCollection(const Poco::Net::NameValueCollection& nvc,
                                         ofLogLevel logLevel = OF_LOG_VERBOSE);
 

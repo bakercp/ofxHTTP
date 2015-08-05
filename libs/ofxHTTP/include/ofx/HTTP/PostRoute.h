@@ -165,7 +165,7 @@ public:
     typedef PostRouteSettings Settings;
 
     /// \brief Create a PostRouteHandler.
-    /// \param parent The parent PostRoute.
+    /// \param route The parent PostRoute.
     PostRouteHandler(PostRoute& route);
 
     /// \brief Destroy the PostRouteHandler.

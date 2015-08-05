@@ -59,9 +59,7 @@ public:
     ///
     /// \param method The HTTP method (e.g. GET, POST, PUT, etc).
     /// \param uri The endpoint URI.
-    /// \param formFields A collection of form fields to be processed.
     /// \param httpVersion Either HTTP/1.0 or HTTP/1.1.
-    /// \param requestId A unique UUID for this request.
     /// \throws Poco::SyntaxException if the uri is not valid.
     BaseRequest(const std::string& method,
                 const std::string& uri,
