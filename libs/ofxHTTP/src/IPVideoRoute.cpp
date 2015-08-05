@@ -502,7 +502,7 @@ void IPVideoRouteHandler::handleRequest(ServerEventArgs& evt)
                         unsigned long long now = ofGetElapsedTimeMillis();
                         _lastFrameDuration = now - _lastFrameSent;
                         _lastFrameSent = now;
-                        _bytesSent += ostr.chars(); // add the counts
+                        _bytesSent += static_cast<unsigned long long>(ostr.chars()); // add the counts
                         ostr.reset();               // reset the counts
                     }
                     else

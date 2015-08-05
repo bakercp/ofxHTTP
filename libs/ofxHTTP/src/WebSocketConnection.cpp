@@ -125,7 +125,8 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
                     }
                     else if (frame.isClose())
                     {
-                        int code = -1;
+                        unsigned short code = 0;
+                        
                         std::string reason = "";
 
                         // TODO: it is possible, per the spec send
@@ -139,7 +140,7 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
                         if (n >= 2)
                         {
                             // Get thec close code.
-                            code = Poco::ByteOrder::fromNetwork((p[0] << 8) | p[1]);
+                            code = static_cast<unsigned short>(Poco::ByteOrder::fromNetwork((p[0] << 8) | p[1]));
                         }
                         else
                         {
