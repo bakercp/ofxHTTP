@@ -45,10 +45,10 @@ ProgressMonitor::~ProgressMonitor()
 }
 
 
-void ProgressMonitor::update(std::streamsize totalBytesTransferred,
-                             std::streamsize totalBytes,
-                             std::size_t transferBufferSize,
-                             unsigned long long lastUpdate)
+void ProgressMonitor::update(std::streamsize,
+                             std::streamsize,
+                             std::size_t,
+                             unsigned long long)
 {
 //    _totalBytesTransferred  = totalBytesTransferred;
 //    _totalBytes             = totalBytes;

@@ -195,7 +195,7 @@ bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& reques
 }
 
 
-Poco::Net::HTTPRequestHandler* WebSocketRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+Poco::Net::HTTPRequestHandler* WebSocketRoute::createRequestHandler(const Poco::Net::HTTPServerRequest&)
 {
     return new WebSocketConnection(*this);
 }

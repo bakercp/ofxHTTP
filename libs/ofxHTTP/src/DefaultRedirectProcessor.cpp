@@ -43,8 +43,8 @@ DefaultRedirectProcessor::~DefaultRedirectProcessor()
 }
 
 
-void DefaultRedirectProcessor::requestFilter(BaseRequest& request,
-                                             Context& context)
+void DefaultRedirectProcessor::requestFilter(BaseRequest&,
+                                             Context&)
 {
 }
 
@@ -139,9 +139,9 @@ void DefaultRedirectProcessor::responseFilter(BaseRequest& request,
 }
 
 
-bool DefaultRedirectProcessor::canFilterResponse(BaseRequest& request,
+bool DefaultRedirectProcessor::canFilterResponse(BaseRequest&,
                                                  BaseResponse& response,
-                                                 Context& context) const
+                                                 Context&) const
 {
     Poco::Net::HTTPResponse::HTTPStatus status = response.getStatus();
 

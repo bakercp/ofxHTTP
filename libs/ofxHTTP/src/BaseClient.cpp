@@ -31,9 +31,9 @@ namespace HTTP {
 
 
 BaseClient::BaseClient():
-    _pRequestStreamFilter(0),
-    _pResponseStreamFilter(0),
-    _bytesPerProgressUpdate(DEFAULT_BYTES_PER_PROGRESS_UPDATE)
+    _bytesPerProgressUpdate(DEFAULT_BYTES_PER_PROGRESS_UPDATE),
+    _pRequestStreamFilter(nullptr),
+    _pResponseStreamFilter(nullptr)
 {
 }
 
@@ -43,9 +43,9 @@ BaseClient::BaseClient(RequestFilters requestFilters,
                        streamsize bytesPerProgressUpdate):
     _requestFilters(requestFilters),
     _responseFilters(responseFilters),
-    _pRequestStreamFilter(0),
-    _pResponseStreamFilter(0),
-    _bytesPerProgressUpdate(bytesPerProgressUpdate)
+    _bytesPerProgressUpdate(bytesPerProgressUpdate),
+    _pRequestStreamFilter(nullptr),
+    _pResponseStreamFilter(nullptr)
 {
 }
 

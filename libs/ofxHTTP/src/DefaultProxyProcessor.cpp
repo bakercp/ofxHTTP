@@ -43,7 +43,7 @@ DefaultProxyProcessor::~DefaultProxyProcessor()
 }
 
 
-void DefaultProxyProcessor::requestFilter(BaseRequest& request,
+void DefaultProxyProcessor::requestFilter(BaseRequest&,
                                           Context& context)
 {
     if (!context.getProxyRedirectURI().empty())
@@ -106,9 +106,9 @@ void DefaultProxyProcessor::responseFilter(BaseRequest& request,
 }
 
 
-bool DefaultProxyProcessor::canFilterResponse(BaseRequest& request,
+bool DefaultProxyProcessor::canFilterResponse(BaseRequest&,
                                               BaseResponse& response,
-                                              Context& context) const
+                                              Context&) const
 {
     return Poco::Net::HTTPResponse::HTTP_USEPROXY == response.getStatus();
 }

@@ -163,13 +163,13 @@ bool DefaultClientTask::onHTTPClientResponseProgress(HTTP::ClientResponseProgres
 }
 
 
-bool DefaultClientTask::onHTTPClientRequestFilterEvent(HTTP::MutableClientRequestArgs& args)
+bool DefaultClientTask::onHTTPClientRequestFilterEvent(HTTP::MutableClientRequestArgs&)
 {
     return true;
 }
 
 
-bool DefaultClientTask::onHTTPClientResponseFilterEvent(HTTP::MutableClientResponseArgs& args)
+bool DefaultClientTask::onHTTPClientResponseFilterEvent(HTTP::MutableClientResponseArgs&)
 {
     return true;
 }

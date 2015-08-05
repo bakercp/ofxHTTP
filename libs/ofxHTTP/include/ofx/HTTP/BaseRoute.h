@@ -308,7 +308,7 @@ bool BaseRoute_<SettingsType>::canHandleRequest(const Poco::Net::HTTPServerReque
 
 
 template<typename SettingsType>
-Poco::Net::HTTPRequestHandler* BaseRoute_<SettingsType>::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+Poco::Net::HTTPRequestHandler* BaseRoute_<SettingsType>::createRequestHandler(const Poco::Net::HTTPServerRequest&)
 {
     // A route handler adapter adapts the factory class (e.g. the BaseRoute_)
     // to act as a reusable instance. The instance passed to the RouteHandler

@@ -393,7 +393,7 @@ std::size_t WebSocketConnection::getTotalBytesReceived() const
 }
 
 
-void WebSocketConnection::handleOrigin(ServerEventArgs& evt)
+void WebSocketConnection::handleOrigin(ServerEventArgs&)
 {
     // http://en.wikipedia.org/wiki/Same_origin_policy
     //    _settings.getAllowCrossOriginConnections();
@@ -403,7 +403,7 @@ void WebSocketConnection::handleOrigin(ServerEventArgs& evt)
 }
 
 
-void WebSocketConnection::handleSubprotocols(ServerEventArgs& evt)
+void WebSocketConnection::handleSubprotocols(ServerEventArgs&)
 {
 //    SubprotocolSet& getValidSubprotocols()
 //    std::vector<std::string> proposedProtocols = ofSplitString(request.get("Sec-WebSocket-Protocol",""),
@@ -430,7 +430,7 @@ void WebSocketConnection::handleSubprotocols(ServerEventArgs& evt)
 }
 
 
-void WebSocketConnection::handleExtensions(ServerEventArgs& evt)
+void WebSocketConnection::handleExtensions(ServerEventArgs&)
 {
 //    if(request.has("Sec-WebSocket-Extensions"))
 //    {
@@ -439,6 +439,7 @@ void WebSocketConnection::handleExtensions(ServerEventArgs& evt)
 //        // http://tools.ietf.org/html/draft-ietf-hybi-websocket-multiplexing-09
 //    }
 }
+
 
 void WebSocketConnection::applyFirefoxHack(ServerEventArgs& evt)
 {

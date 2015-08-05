@@ -135,7 +135,7 @@ PostRoute::~PostRoute()
 }
 
 
-Poco::Net::HTTPRequestHandler* PostRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+Poco::Net::HTTPRequestHandler* PostRoute::createRequestHandler(const Poco::Net::HTTPServerRequest&)
 {
     return new PostRouteHandler(*this);
 }

@@ -386,7 +386,7 @@ public:
         return _defaultRoute.createRequestHandler(request);
     }
 
-    void exit(ofEventArgs& args)
+    void exit(ofEventArgs&)
     {
         stop();
         ofRemoveListener(ofEvents().exit, this, &BaseServer_::exit);
