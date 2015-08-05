@@ -178,7 +178,7 @@ void ofApp::onClientBuffer(const ofx::HTTP::ClientBufferEventArgs& args)
 {
     // Note: Saving to disk could / should also be done in the task's thread.
 
-    // This is useful if you want to load the bytes into a GL texture.
+    // This is useful if you want to load the bytes into an openGL texture.
     const ofx::IO::ByteBuffer& buffer = args.getData().getByteBuffer();
 
     ofx::MediaTypeMap::SharedPtr mtm = ofx::MediaTypeMap::getDefault();
