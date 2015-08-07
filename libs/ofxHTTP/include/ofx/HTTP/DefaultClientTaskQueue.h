@@ -106,7 +106,10 @@ private:
     virtual void handleTaskCustomNotification(const std::string& taskID,
                                               Poco::AutoPtr<Poco::TaskNotification> pNotification);
 
+    /// \brief Creates a new Context.  Caller must dispose of Context.
     Context* createDefaultContext();
+
+    /// \brief Creates a new BaseResponse.  Caller must dispose of BaseResponse.
     BaseResponse* createDefaultResponse();
 
 };
