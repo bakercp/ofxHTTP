@@ -49,7 +49,9 @@ public:
 
     void requestFilter(BaseRequest& request, Context& context);
 
-    OAuth10Credentials& getCredentialsRef();
+    OAuth10Credentials& credentials();
+
+    const OAuth10Credentials& credentials() const;
 
 private:
     OAuth10Credentials _credentials;

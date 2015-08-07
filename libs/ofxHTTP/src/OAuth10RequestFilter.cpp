@@ -50,7 +50,13 @@ OAuth10RequestFilter::~OAuth10RequestFilter()
 }
 
 
-OAuth10Credentials& OAuth10RequestFilter::getCredentialsRef()
+OAuth10Credentials& OAuth10RequestFilter::credentials()
+{
+    return _credentials;
+}
+
+
+const OAuth10Credentials& OAuth10RequestFilter::credentials() const
 {
     return _credentials;
 }
