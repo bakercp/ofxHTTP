@@ -124,7 +124,6 @@ void DefaultClientTask::handleBufferEvent(const ClientResponseBufferEventArgs& b
 }
 
 
-
 bool DefaultClientTask::onHTTPClientErrorEvent(HTTP::ClientErrorEventArgs& args)
 {
     // We throw an exception to be caught by the task manager.
