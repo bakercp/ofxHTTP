@@ -1,13 +1,17 @@
-openFrameworks-info.plist
-Project.xcconfig
-*.xcodeproj
-
 docs/html
 docs/tagfile.xml
-RAW/
-*.xcodeproj
-*openFrameworks-Info.plist
+docs/*.tag
+
+raw/
+
 Project.xcconfig
+*.xcodeproj
+*.plist
+
+*.sln
+*.vcxproj
+*.vcxproj.filters
+icon.rc
 
 *.mode1v3
 
