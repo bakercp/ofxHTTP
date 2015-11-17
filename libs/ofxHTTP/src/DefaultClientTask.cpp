@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -111,7 +111,7 @@ bool DefaultClientTask::onHTTPClientResponseEvent(HTTP::ClientResponseEventArgs&
         ClientResponseBufferEventArgs bufferEvent(_byteBuffer,
                                                   args.getRequest(),
                                                   args.getResponse(),
-                                                  args.getContextRef());
+                                                  args.getContext());
         handleBufferEvent(bufferEvent);
     }
 
@@ -125,9 +125,9 @@ void DefaultClientTask::handleBufferEvent(const ClientResponseBufferEventArgs& b
 }
 
 
-
 bool DefaultClientTask::onHTTPClientErrorEvent(HTTP::ClientErrorEventArgs& args)
 {
+    // We throw an exception to be caught by the task manager.
     throw args.getException();
     return true;
 }
@@ -163,13 +163,13 @@ bool DefaultClientTask::onHTTPClientResponseProgress(HTTP::ClientResponseProgres
 }
 
 
-bool DefaultClientTask::onHTTPClientRequestFilterEvent(HTTP::MutableClientRequestArgs& args)
+bool DefaultClientTask::onHTTPClientRequestFilterEvent(HTTP::MutableClientRequestArgs&)
 {
     return true;
 }
 
 
-bool DefaultClientTask::onHTTPClientResponseFilterEvent(HTTP::MutableClientResponseArgs& args)
+bool DefaultClientTask::onHTTPClientResponseFilterEvent(HTTP::MutableClientResponseArgs&)
 {
     return true;
 }

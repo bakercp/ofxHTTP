@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2014 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2014-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -50,7 +50,13 @@ OAuth10RequestFilter::~OAuth10RequestFilter()
 }
 
 
-OAuth10Credentials& OAuth10RequestFilter::getCredentialsRef()
+OAuth10Credentials& OAuth10RequestFilter::credentials()
+{
+    return _credentials;
+}
+
+
+const OAuth10Credentials& OAuth10RequestFilter::credentials() const
 {
     return _credentials;
 }

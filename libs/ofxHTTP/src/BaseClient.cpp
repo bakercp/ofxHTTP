@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,18 +31,21 @@ namespace HTTP {
 
 
 BaseClient::BaseClient():
-    _pRequestStreamFilter(0),
-    _pResponseStreamFilter(0)
+    _bytesPerProgressUpdate(DEFAULT_BYTES_PER_PROGRESS_UPDATE),
+    _pRequestStreamFilter(nullptr),
+    _pResponseStreamFilter(nullptr)
 {
 }
 
 
 BaseClient::BaseClient(RequestFilters requestFilters,
-                       ResponseFilters responseFilters):
+                       ResponseFilters responseFilters,
+                       streamsize bytesPerProgressUpdate):
     _requestFilters(requestFilters),
     _responseFilters(responseFilters),
-    _pRequestStreamFilter(0),
-    _pResponseStreamFilter(0)
+    _bytesPerProgressUpdate(bytesPerProgressUpdate),
+    _pRequestStreamFilter(nullptr),
+    _pResponseStreamFilter(nullptr)
 {
 }
 
@@ -217,6 +220,18 @@ void BaseClient::removeResponseStreamFilter()
 }
 
 
+void BaseClient::setBytesPerProgressUpdate(std::streamsize bytesPerProgressUpdate)
+{
+    _bytesPerProgressUpdate = bytesPerProgressUpdate;
+}
+
+
+std::streamsize BaseClient::getBytesPerProgressUpdate() const
+{
+    return _bytesPerProgressUpdate;
+}
+
+
 void BaseClient::requestFilter(BaseRequest& request, Context& context)
 {
     RequestFilters::iterator requestFilterIter = _requestFilters.begin();
@@ -255,17 +270,20 @@ std::ostream& BaseClient::send(BaseRequest& request, Context& context)
 {
     Context::ClientSession clientSession = context.getClientSession();
 
-    if (!clientSession)
+    if (clientSession == nullptr)
     {
         throw Poco::Exception("No session available for request.");
     }
 
     std::ostream& rawRequestStream = clientSession->sendRequest(request);
 
-    _pClientProgressRequestStream = std::shared_ptr<std::ostream>(new ClientProgressRequestStream(rawRequestStream,
-                                                                                                  request,
-                                                                                                  context,
-                                                                                                  *this));
+
+    _pClientProgressRequestStream = std::make_shared<ClientProgressRequestStream>(rawRequestStream,
+                                                                                  request,
+                                                                                  context,
+                                                                                  *this,
+                                                                                  _bytesPerProgressUpdate);
+
     if (_pRequestStreamFilter)
     {
         return _pRequestStreamFilter->requestStreamFilter(*_pClientProgressRequestStream,
@@ -292,11 +310,13 @@ std::istream& BaseClient::receive(BaseRequest& request,
 
     std::istream& rawResponseStream = clientSession->receiveResponse(response);
 
-    _pClientProgressResponseStream = std::shared_ptr<std::istream>(new ClientProgressResponseStream(rawResponseStream,
-                                                                                                    request,
-                                                                                                    response,
-                                                                                                    context,
-                                                                                                    *this));
+    _pClientProgressResponseStream = std::make_shared<ClientProgressResponseStream>(rawResponseStream,
+                                                                                    request,
+                                                                                    response,
+                                                                                    context,
+                                                                                    *this,
+                                                                                    _bytesPerProgressUpdate);
+
     if (_pResponseStreamFilter)
     {
         return _pResponseStreamFilter->responseStreamFilter(*_pClientProgressResponseStream,

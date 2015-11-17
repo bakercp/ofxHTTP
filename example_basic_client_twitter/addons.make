@@ -1,6 +1,0 @@
-ofxHTTP
-ofxIO
-ofxJSON
-ofxMediaType
-ofxTaskQueue
-ofxSSLManager

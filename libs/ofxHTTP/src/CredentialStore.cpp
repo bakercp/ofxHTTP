@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,13 +45,13 @@ DefaultCredentialStore::~DefaultCredentialStore()
 void DefaultCredentialStore::setCredentials(const AuthScope& scope,
                                             const Credentials& credentials)
 {
-    if(!credentials.hasCredentials())
+    if (!credentials.hasCredentials())
     {
         ofLogWarning("CredentialStore::setCredentials") << "Credentials are empty.  Ignoring.";
         return;
     }
-        
-    Poco::FastMutex::ScopedLock lock(mutex);
+
+    std::unique_lock<std::mutex> lock(_mutex);
     credentialMap[scope] = credentials;
     basicCredentialCacheMap.erase(scope); // invalidate cached credentials with the same scope
     digestCredentialCacheMap.erase(scope);
@@ -111,7 +111,7 @@ bool DefaultCredentialStore::getCredentials(const AuthScope& targetScope,
                                      AuthScope& matchingScope,
                                      Credentials& matchingCredentials) const
 {
-    Poco::FastMutex::ScopedLock lock(mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     return getCredentialsWithExistingLock(targetScope, matchingScope, matchingCredentials);
 }
 
@@ -129,7 +129,7 @@ bool DefaultCredentialStore::getCredentialsWithExistingLock(const AuthScope& tar
 
     
 
-    if(iter != credentialMap.end())
+    if (iter != credentialMap.end())
     {
         matchingScope       = (*iter).first;
         matchingCredentials = (*iter).second;
@@ -140,11 +140,11 @@ bool DefaultCredentialStore::getCredentialsWithExistingLock(const AuthScope& tar
         int bestMatchFactor  = -1;
         HTTPCredentialMapIter bestMatch = credentialMap.end();
         iter = credentialMap.begin();
-        while(iter != credentialMap.end())
+        while (iter != credentialMap.end())
         {
             int factor = (*iter).first.match(targetScope);
             
-            if(factor > bestMatchFactor)
+            if (factor > bestMatchFactor)
             {
                 bestMatch = iter;
                 bestMatchFactor = factor;
@@ -152,7 +152,7 @@ bool DefaultCredentialStore::getCredentialsWithExistingLock(const AuthScope& tar
             ++iter;
         }
         
-        if(bestMatch != credentialMap.end())
+        if (bestMatch != credentialMap.end())
         {
             matchingScope       = (*bestMatch).first;
             matchingCredentials = (*bestMatch).second;
@@ -163,13 +163,12 @@ bool DefaultCredentialStore::getCredentialsWithExistingLock(const AuthScope& tar
             return false;
         }
     }
-
 }
 
 
 void DefaultCredentialStore::clearCredentials(const AuthScope& scope)
 {
-    Poco::FastMutex::ScopedLock lock(mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     credentialMap.erase(scope);
     basicCredentialCacheMap.erase(scope);
     digestCredentialCacheMap.erase(scope);
@@ -183,11 +182,11 @@ void DefaultCredentialStore::clearCredentials(const Poco::URI& uri)
 
 
 void DefaultCredentialStore::requestFilter(BaseRequest& request,
-                                           Context& context)
+                                           Context&)
 {
     // first check and see if the request has any authentication headers
     // these could be added via default session headers
-    if(request.has(Poco::Net::HTTPRequest::AUTHORIZATION))
+    if (request.has(Poco::Net::HTTPRequest::AUTHORIZATION))
     {
         ofLogVerbose("CredentialStore::authenticate") << "HTTP Authorization headers already set.  Skipping authentication.";
         return;
@@ -200,15 +199,15 @@ void DefaultCredentialStore::requestFilter(BaseRequest& request,
     Credentials  matchingCredentials;
     AuthScope    matchingScope;
     
-    Poco::FastMutex::ScopedLock lock(mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
 
     // mutex locking happens in getCredentials() and authenticateWithCache()
-    if(getCredentialsWithExistingLock(targetScope, matchingScope, matchingCredentials))
+    if (getCredentialsWithExistingLock(targetScope, matchingScope, matchingCredentials))
     {
         // first search our digest credentials to see if we have a matching scope (preferred)
         HTTPDigestCredentialCacheMapIter iterDigest = digestCredentialCacheMap.find(matchingScope);
 
-        if(iterDigest != digestCredentialCacheMap.end())
+        if (iterDigest != digestCredentialCacheMap.end())
         {
             (*iterDigest).second->updateAuthInfo(request); // successfully updated auth info for matching scope
             ofLogVerbose("CredentialStore::updateAuthentication") << "Found and updated digest credentials.";
@@ -219,7 +218,7 @@ void DefaultCredentialStore::requestFilter(BaseRequest& request,
         
         HTTPBasicCredentialCacheMapIter iterBasic = basicCredentialCacheMap.find(matchingScope);
 
-        if(iterBasic != basicCredentialCacheMap.end())
+        if (iterBasic != basicCredentialCacheMap.end())
         {
             (*iterBasic).second->authenticate(request); // successfully updated auth info for matching scope
             ofLogVerbose("CredentialStore::updateAuthentication") << "Found and updated basic credentials.";
@@ -239,22 +238,24 @@ void DefaultCredentialStore::requestFilter(BaseRequest& request,
 
 void DefaultCredentialStore::responseFilter(BaseRequest& request,
                                             BaseResponse& response,
-                                            Context& context)
+                                            Context&)
 {
 
-    if(response.getStatus() == Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED)
+    if (response.getStatus() == Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED)
     {
-        for(Poco::Net::HTTPResponse::ConstIterator iter = response.find("WWW-Authenticate"); iter != response.end(); ++iter)
+        Poco::Net::HTTPResponse::ConstIterator iter = response.find("WWW-Authenticate");
+
+        if (iter != response.end())
         {
             Poco::URI uri(request.getURI());
 
             AuthenticationType requestedAuthType;
             
-            if(Poco::Net::HTTPCredentials::isBasicCredentials(iter->second))
+            if (Poco::Net::HTTPCredentials::isBasicCredentials(iter->second))
             {
                 requestedAuthType = BASIC;
             }
-            else if(Poco::Net::HTTPCredentials::isDigestCredentials(iter->second))
+            else if (Poco::Net::HTTPCredentials::isDigestCredentials(iter->second))
             {
                 requestedAuthType = DIGEST;
             }
@@ -298,20 +299,20 @@ void DefaultCredentialStore::responseFilter(BaseRequest& request,
 
             AuthScope matchingScope;
             
-            Poco::FastMutex::ScopedLock lock(mutex);
-            
+            std::unique_lock<std::mutex> lock(_mutex);
+
             if(getCredentialsWithExistingLock(targetScope,
                                               matchingScope,
                                               matchingCredentials))
             {
-                if(BASIC == requestedAuthType)
+                if (BASIC == requestedAuthType)
                 {
                     // replace any old ones (probably means they failed and were updated somewhere)
                     basicCredentialCacheMap[matchingScope] = HTTPBasicCredentialsSharedPtr(new Poco::Net::HTTPBasicCredentials(matchingCredentials.getUsername(), matchingCredentials.getPassword()));
                     basicCredentialCacheMap[matchingScope].get()->authenticate(request);
                     return;
                 }
-                else if(DIGEST == requestedAuthType)
+                else if (DIGEST == requestedAuthType)
                 {
                     digestCredentialCacheMap[matchingScope] = HTTPDigestCredentialsSharedPtr(new Poco::Net::HTTPDigestCredentials(matchingCredentials.getUsername(),matchingCredentials.getPassword()));
                     digestCredentialCacheMap[matchingScope].get()->authenticate(request, response);
@@ -342,9 +343,9 @@ void DefaultCredentialStore::responseFilter(BaseRequest& request,
 }
 
 
-bool DefaultCredentialStore::canFilterResponse(BaseRequest& request,
-                                               BaseResponse& response,
-                                               Context& context) const
+bool DefaultCredentialStore::canFilterResponse(BaseRequest&,
+                                               BaseResponse&,
+                                               Context&) const
 {
     // TODO
     return true;
@@ -352,8 +353,8 @@ bool DefaultCredentialStore::canFilterResponse(BaseRequest& request,
 
 
 
-bool DefaultCredentialStore::authenticateWithCache(const AuthScope& scope,
-                                                   Poco::Net::HTTPRequest& request)
+bool DefaultCredentialStore::authenticateWithCache(const AuthScope&,
+                                                   Poco::Net::HTTPRequest&)
 {
     // TODO:
     return true;
@@ -362,7 +363,7 @@ bool DefaultCredentialStore::authenticateWithCache(const AuthScope& scope,
 
 void DefaultCredentialStore::clear()
 {
-    Poco::FastMutex::ScopedLock lock(mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     credentialMap.clear();
     basicCredentialCacheMap.clear();
     digestCredentialCacheMap.clear();

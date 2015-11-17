@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,119 +32,77 @@
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "ofEvents.h"
+#include "ofx/HTTP/AbstractServerTypes.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-/// \brief A base class describing 
-class BaseHTTPSessionEvent: public ofEventArgs
-{
-public:
-    /// \brief Create a BaseHTTPSessionEvent with a sessionId.
-    /// \param sessionId the session id associated with this event.
-    BaseHTTPSessionEvent(const Poco::UUID& sessionId):
-        _sessionId(sessionId)
-    {
-    }
-
-
-    /// \brief Destroy the BaseHTTPSessionEvent.
-    virtual ~BaseHTTPSessionEvent()
-    {
-    }
-
-
-    /// \brief Get the session id associated with this event.
-    ///
-    /// The session id is established by the SessionCache.  If no SessionCache
-    /// is used, this will always return Poco::UUID::null.
-    ///
-    /// \returns the session id or Poco::UUID::null if not set.
-    const Poco::UUID& getSessionId() const
-    {
-        return _sessionId;
-    }
-
-protected:
-    /// \brief The session id, if available.  Poco::UUID::null if null.
-    Poco::UUID _sessionId;
-
-};
-
-
-
 /// \brief An event describing a server request.
-class BaseHTTPServerRequestEventArgs: public BaseHTTPSessionEvent
+class ServerEventArgs: public ofEventArgs
 {
 public:
-    /// \brief Construct the BaseHTTPServerRequestEventArgs.
-    /// \param sessionId the session id associated with this event.
+    /// \brief Construct the ServerEventArgs.
     /// \param request the Poco::Net::HTTPServerRequest.
-    BaseHTTPServerRequestEventArgs(const Poco::UUID& sessionId,
-                                   const Poco::Net::HTTPServerRequest& request):
-        BaseHTTPSessionEvent(sessionId),
-        _request(request)
+    /// \param response the Poco::Net::HTTPServerResponse.
+    /// \param session The AbstractSession associated with this event.
+    ServerEventArgs(Poco::Net::HTTPServerRequest& request,
+                    Poco::Net::HTTPServerResponse& response,
+                    AbstractSession& session):
+        _request(request),
+        _response(response),
+        _session(session)
     {
     }
 
-    /// \brief Destroy the BaseHTTPServerRequestEventArgs.
-    virtual ~BaseHTTPServerRequestEventArgs()
+    /// \brief Destroy the ServerEventArgs.
+    virtual ~ServerEventArgs()
     {
     }
 
-
-    /// \brief Return the Poco::Net::HTTPServerRequest.
+    /// \brief Get the Poco::Net::HTTPServerRequest.
     /// \return the Poco::Net::HTTPServerRequest.
-    const Poco::Net::HTTPServerRequest& getRequest() const
+    Poco::Net::HTTPServerRequest& getRequest()
     {
         return _request;
     }
 
-    /// \brief Get the request's content length.
-    /// \returns the Request's content lenght in bytes.
-    std::streamsize getRequestContentLength() const
+    /// \brief Get the Poco::Net::HTTPServerResponse.
+    /// \return the Poco::Net::HTTPServerResponse.
+    Poco::Net::HTTPServerResponse& getResponse()
     {
-        return _request.getContentLength();
+        return _response;
     }
 
+    /// \brief Get the session associated with this event.
+    /// \returns the session associated with this event.
+    AbstractSession& getSession()
+    {
+        return _session;
+    }
 
 protected:
-    /// \brief A const reference to the server request.
-    const Poco::Net::HTTPServerRequest& _request;
-
-};
-
-
-/// \brief An event describing a server response.
-class BaseHTTPServerRequestResponseEventArgs: public BaseHTTPServerRequestEventArgs
-{
-public:
-    /// \brief Construct the BaseHTTPServerRequestResponseEventArgs.
-    /// \param sessionId the session id associated with this event.
-    /// \param request the Poco::Net::HTTPServerRequest.
-    /// \param _response the Poco::Net::HTTPServerResponse to be modified.
-    BaseHTTPServerRequestResponseEventArgs(const Poco::UUID& sessionId,
-                                           const Poco::Net::HTTPServerRequest& request,
-                                           Poco::Net::HTTPServerResponse& _response):
-        BaseHTTPServerRequestEventArgs(sessionId, request),
-        response(_response)
-    {
-    }
-
-    /// \brief Destroy the BaseHTTPServerRequestResponseEventArgs.
-    virtual ~BaseHTTPServerRequestResponseEventArgs()
-    {
-    }
-
+    /// \brief A reference to the server request.
+    Poco::Net::HTTPServerRequest& _request;
 
     /// \brief Callbacks are permitted to set the response.
     ///
     /// \warning Before working with the response, the callback must check the
     /// HTTPServerResponse::sent() method to ensure that the response stream
     /// is still available available.
-    Poco::Net::HTTPServerResponse& response;
+    Poco::Net::HTTPServerResponse& _response;
+
+    /// \brief The session associated with the event.
+    AbstractSession& _session;
+
+};
+
+
+class ServerEvents
+{
+public:
+    ofEvent<ServerEventArgs> onHTTPServerEvent;
 
 };
 

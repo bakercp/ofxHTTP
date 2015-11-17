@@ -35,23 +35,23 @@ void ofApp::setup()
     player.play();
     player.setLoopState(OF_LOOP_NORMAL);
 
-    ofx::HTTP::BasicIPVideoServerSettings settings;
+    ofx::HTTP::SimpleIPVideoServerSettings settings;
 
     // Many other settings are available.
     settings.setPort(7890);
 
     // The default maximum number of client connections is 5.
-    // settings.setMaxClientConnections(10);
+    settings.ipVideoRouteSettings.setMaxClientConnections(1);
 
     // Apply the settings.
-    server = ofx::HTTP::BasicIPVideoServer::makeShared(settings);
+    server.setup(settings);
 
     // Start the server.
-    server->start();
+    server.start();
 
 #if !defined(TARGET_LINUX_ARM)
     // Launch a browser with the address of the server.
-    ofLaunchBrowser(server->getURL());
+    ofLaunchBrowser(server.getURL());
 #endif
 
 }
@@ -66,7 +66,7 @@ void ofApp::update()
     if(player.isFrameNew())
     {
         // This can be any kind of pixels.
-        server->send(player.getPixelsRef());
+        server.send(player.getPixels());
     }
 }
 
@@ -80,7 +80,7 @@ void ofApp::draw()
     std::stringstream ss;
 
     ss << "Num clients connected: ";
-    ss << server->getNumConnections();
+    ss << server.getNumConnections();
 
     ofDrawBitmapStringHighlight(ss.str(), 20, 20);
 }

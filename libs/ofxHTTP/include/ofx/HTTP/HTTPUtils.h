@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -88,7 +88,8 @@ public:
                             ofLogLevel logLevel = OF_LOG_VERBOSE);
 
     /// \brief Dump a name value collection from a server response.
-    /// \param response the HTTPServerResponse response.
+    /// \param nvc the Name value collection to print.
+    /// \param logLevel The log level at which to print.
     static void dumpNameValueCollection(const Poco::Net::NameValueCollection& nvc,
                                         ofLogLevel logLevel = OF_LOG_VERBOSE);
 

@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2014 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2014-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ void ofApp::setup()
     ofx::HTTP::Context context;
 
     ofx::HTTP::BaseResponse response;
-    ofx::HTTP::GetRequest request(url);
+    ofx::HTTP::GetRequest request(url, Poco::Net::HTTPMessage::HTTP_1_1);
 
     try
     {
@@ -53,11 +53,11 @@ void ofApp::setup()
         std::cout << std::endl;
 
     }
-    catch(const Poco::Exception& exc)
+    catch (const Poco::Exception& exc)
     {
         ofLogError("ofApp::setup") << "Got Exception " << exc.displayText() << " " << exc.code();
     }
-    catch(...)
+    catch (...)
     {
         ofLogError("ofApp::setup") << "Got unknown exception.";
     }

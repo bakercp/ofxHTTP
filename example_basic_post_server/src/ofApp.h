@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -40,6 +40,6 @@ public:
     void onHTTPFormEvent(ofx::HTTP::PostFormEventArgs& evt);
     void onHTTPUploadEvent(ofx::HTTP::PostUploadEventArgs& evt);
 
-    ofx::HTTP::BasicPostServer::SharedPtr server;
+    ofx::HTTP::SimplePostServer server;
 
 };

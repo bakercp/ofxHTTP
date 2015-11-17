@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,7 +49,7 @@ public:
     void setPutFile(const std::string& filename);
 
     /// \brief Set the buffer to include in the body of the PUT request.
-    /// \param filename The buffer to include in the body of the PUT request.
+    /// \param buffer The buffer to include in the body of the PUT request.
     void setPutBuffer(const ofBuffer& buffer);
 
     /// \brief Set the start byte to include in the header of the PUT request.
@@ -78,12 +78,12 @@ public:
     /// \brief The default MIME type used for file parts.
     static const std::string DEFAULT_MEDIA_TYPE;
 
-    virtual void prepareRequest();
-    
-    virtual void writeRequestBody(std::ostream& requestStream);
+    virtual void prepareRequest() override;
+    virtual void writeRequestBody(std::ostream& requestStream) override;
 
 protected:
     std::size_t _startByte;
+    
     std::size_t _endByte;
 
     std::string _contentType;

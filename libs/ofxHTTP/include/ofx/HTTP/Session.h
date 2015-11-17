@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,60 +27,71 @@
 
 
 #include <string>
-#include <map>
+#include "ofx/HTTP/AbstractServerTypes.h"
 #include "Poco/Mutex.h"
-#include "Poco/Timestamp.h"
-#include "Poco/UUID.h"
-#include "Poco/UUIDGenerator.h"
-#include "Poco/Net/HTTPCookie.h"
-#include "Poco/Any.h"
-#include "ofTypes.h"
-#include "ofUtils.h"
+#include "ofEvents.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class Session
+class BaseSession: public AbstractSession
 {
 public:
-    typedef std::shared_ptr<Session> SharedPtr;
+    BaseSession(const std::string sessionId = generateId());
 
-    Session(const Poco::UUID& uuid = Poco::UUIDGenerator::defaultGenerator().createRandom(),
-            const Poco::Timestamp& lastModified = Poco::Timestamp());
+    virtual ~BaseSession();
 
-    virtual ~Session();
+    std::string getId() const;
 
-    const Poco::UUID& getId() const;
+    /// \brief A utility function for generating unique session ids.
+    /// \returns A unique session id string.
+    static std::string generateId();
 
-    const Poco::Timestamp getLastModified() const;
+    static const std::string KEY_LAST_MODIFIED;
 
-    bool has(const std::string& hashKey) const;
-    void put(const std::string& hashKey, const Poco::Any& hashValue);
+protected:
+    BaseSession(const BaseSession&);
+    BaseSession& operator = (const BaseSession&);
 
-    Poco::Any get(const std::string& hashKey) const;
+    std::string _sessionId;
 
-    static SharedPtr makeShared(const Poco::UUID& uuid = Poco::UUIDGenerator::defaultGenerator().createRandom(),
-                                const Poco::Timestamp& lastModified = Poco::Timestamp())
-    {
-        return SharedPtr(new Session(uuid, lastModified));
-    }
+    mutable std::mutex _mutex;
 
-private:
-    Session(const Session&);
-	Session& operator = (const Session&);
+};
 
-    typedef std::map<std::string, Poco::Any> SessionData;
 
-    SessionData _sessionData;
 
-    Poco::UUID _uuid;
+/// \brief A client cookie-based session store for servers.
+///
+/// Client sessions are tracked via cookie. Server routes can access the session
+/// store and associate any information with the client's session.
+class SimpleSession: public BaseSession
+{
+public:
+    SimpleSession(const std::string& sessionId = generateId());
 
-    mutable Poco::Timestamp _lastModified;
+    virtual ~SimpleSession();
 
-    mutable Poco::FastMutex _mutex;
-    
+    bool has(const std::string& key) const;
+
+    void put(const std::string& key, const std::string& value);
+
+    std::string get(const std::string& key, const std::string& defaultValue) const;
+
+    std::string get(const std::string& key) const;
+
+    void remove(const std::string& key);
+
+    void clear();
+
+protected:
+    SimpleSession(const SimpleSession&);
+    SimpleSession& operator = (const SimpleSession&);
+
+    std::map<std::string, std::string> _sessionDict;
+
 };
 
 

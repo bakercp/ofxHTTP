@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -76,13 +76,15 @@ public:
     ClientProgressStreamBuf(std::ostream& ostr,
                             const BaseRequest& request,
                             Context& context,
-                            AbstractRequestStreamListener& listener);
+                            AbstractRequestStreamListener& listener,
+                            std::streamsize bytesPerProgressUpdate);
 
     ClientProgressStreamBuf(std::istream& istr,
                             const BaseRequest& request,
                             const BaseResponse& response,
                             Context& context,
-                            AbstractResponseStreamListener& listener);
+                            AbstractResponseStreamListener& listener,
+                            std::streamsize bytesPerProgressUpdate);
 
     ~ClientProgressStreamBuf();
 
@@ -100,11 +102,13 @@ private:
     std::ostream* _pRequestStream;
     std::istream* _pResponseStream;
 
+    AbstractRequestStreamListener*  _pRequestStreamListener;
+    AbstractResponseStreamListener* _pResponseStreamListener;
+
     std::streamsize _requestStreamBytes;
     std::streamsize _responseStreamBytes;
 
-    AbstractRequestStreamListener*  _pRequestStreamListener;
-    AbstractResponseStreamListener* _pResponseStreamListener;
+    std::streamsize _bytesPerProgressUpdate;
 
 };
 
@@ -115,13 +119,15 @@ public:
     ClientProgressIOS(std::ostream& ostr,
                       const BaseRequest& request,
                       Context& context,
-                      AbstractRequestStreamListener& listener);
+                      AbstractRequestStreamListener& listener,
+                      std::streamsize bytesPerProgressUpdate);
 
     ClientProgressIOS(std::istream& istr,
                       const BaseRequest& request,
                       const BaseResponse& response,
                       Context& context,
-                      AbstractResponseStreamListener& listener);
+                      AbstractResponseStreamListener& listener,
+                      std::streamsize bytesPerProgressUpdate);
 
     ~ClientProgressIOS();
 
@@ -142,7 +148,8 @@ public:
     ClientProgressRequestStream(std::ostream& ostr,
                                 const BaseRequest& request,
                                 Context& context,
-                                AbstractRequestStreamListener& listener);
+                                AbstractRequestStreamListener& listener,
+                                std::streamsize bytesPerProgressUpdate);
 
     /// Destroys the ProgressOutputStream.
     ~ClientProgressRequestStream();
@@ -159,7 +166,8 @@ public:
                                  const BaseRequest& request,
                                  const BaseResponse& response,
                                  Context& context,
-                                 AbstractResponseStreamListener& listener);
+                                 AbstractResponseStreamListener& listener,
+                                 std::streamsize bytesPerProgressUpdate);
 
     /// Destroys the stream.
     ~ClientProgressResponseStream();

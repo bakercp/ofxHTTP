@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ void ofApp::setup()
         // progress.  In this example, we register the taskId in the
         // taskStarted() callback.
 
-        Poco::UUID uuid = clientTaskQueue.get(url);
+        std::string uuid = clientTaskQueue.get(url);
 
         std::cout << "Getting: " << url << std::endl;
     }
@@ -70,7 +70,7 @@ void ofApp::draw()
 
         float progress = progressInfo.getProgress();
 
-        Poco::UUID taskId = progressInfo.getTaskId();
+        std::string taskId = progressInfo.getTaskId();
 
         std::string name = progressInfo.getTaskName();
 
@@ -104,7 +104,7 @@ void ofApp::draw()
 
         std::stringstream ss;
 
-        ss << taskId.toString() << ": " << statusString << " : " << name << std::endl;
+        ss << taskId << ": " << statusString << " : " << name << std::endl;
 
         ofPushMatrix();
         ofTranslate(0, y);
@@ -178,7 +178,7 @@ void ofApp::onClientBuffer(const ofx::HTTP::ClientBufferEventArgs& args)
 {
     // Note: Saving to disk could / should also be done in the task's thread.
 
-    // This is useful if you want to load the bytes into a GL texture.
+    // This is useful if you want to load the bytes into an openGL texture.
     const ofx::IO::ByteBuffer& buffer = args.getData().getByteBuffer();
 
     ofx::MediaTypeMap::SharedPtr mtm = ofx::MediaTypeMap::getDefault();
@@ -187,7 +187,7 @@ void ofApp::onClientBuffer(const ofx::HTTP::ClientBufferEventArgs& args)
 
     std::string extension = mtm->getBestFileExtensionsForMediaType(mediaType);
 
-    std::string path = ofToDataPath(args.getTaskId().toString() + "." + extension);
+    std::string path = ofToDataPath(args.getTaskId() + "." + extension);
 
     try
     {

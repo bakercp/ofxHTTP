@@ -1,6 +1,6 @@
 //// =============================================================================
 ////
-//// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+//// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 ////
 //// Permission is hereby granted, free of charge, to any person obtaining a copy
 //// of this software and associated documentation files (the "Software"), to deal
@@ -133,12 +133,6 @@
 //
 //    void add(const Poco::URI& uri, const Poco::Net::HTTPCookie& cookie);
 //    std::vector<Cookie> get(const Poco::URI& uri) const;
-//
-//
-//    static SharedPtr makeShared()
-//    {
-//        return SharedPtr(new CookieStore());
-//    }
 //
 //private:
 //    typedef std::map<std::string, Cookies> CookieIndex;

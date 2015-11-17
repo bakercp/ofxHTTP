@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,15 +51,15 @@ Context::~Context()
 }
 
 
-void Context::setSessionSettings(const SessionSettings& settings)
+void Context::setClientSessionSettings(const ClientSessionSettings& clientSessionSettings)
 {
-    _settings = settings;
+    _clientSessionSettings = clientSessionSettings;
 }
 
 
-const SessionSettings& Context::getSessionSettings() const
+const ClientSessionSettings& Context::getClientSessionSettings() const
 {
-    return _settings;
+    return _clientSessionSettings;
 }
 
 
@@ -119,6 +119,17 @@ void Context::setProxyRedirectURI(const Poco::URI& uri)
 const Poco::URI& Context::getProxyRedirectURI() const
 {
     return _proxyRedirectURI;
+}
+
+
+bool Context::getResubmit() const
+{
+    return _resubmit;
+}
+
+void Context::setResubmit(bool resubmit)
+{
+    _resubmit = resubmit;
 }
 
 

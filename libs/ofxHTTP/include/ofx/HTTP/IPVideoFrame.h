@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2012-2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2012-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,42 +28,69 @@
 
 #include "ofFileUtils.h"
 #include "ofImage.h"
-#include "ofx/HTTP/IPVideoFrameSettings.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
+class IPVideoFrameSettings
+{
+public:
+    IPVideoFrameSettings();
+    virtual ~IPVideoFrameSettings();
+
+    void setWidth(std::size_t width);
+    std::size_t getWidth() const;
+
+    void setHeight(std::size_t height);
+    std::size_t getHeight() const;
+
+    void setFlipHorizontal(bool flipHorizontal);
+    bool getFlipHorizontal() const;
+
+    void setFlipVertical(bool flipVertical);
+    bool getFlipVertical() const;
+
+    void setQuality(ofImageQualityType quality);
+    ofImageQualityType getQuality() const;
+
+    enum
+    {
+        DEFAULT_WIDTH = 320,
+        DEFAULT_HEIGHT = 240
+    };
+
+private:
+    std::size_t _width;
+    std::size_t _height;
+    bool _flipHorizontal;
+    bool _flipVertical;
+    ofImageQualityType _quality;
+
+};
+
+
 class IPVideoFrame
 {
 public:
-    typedef std::shared_ptr<IPVideoFrame> SharedPtr;
-    typedef std::weak_ptr<IPVideoFrame> WeakPtr;
-    typedef IPVideoFrameSettings Settings;
-
-    IPVideoFrame(const Settings& settings,
+    IPVideoFrame(const IPVideoFrameSettings& settings,
                  unsigned long long timestamp,
                  const ofBuffer& buffer);
     
     virtual ~IPVideoFrame();
 
-    Settings getSettings() const;
+    IPVideoFrameSettings getSettings() const;
+
     unsigned long long getTimestamp() const;
 
-    ofBuffer& getBufferRef();
-
-    static SharedPtr makeShared(const Settings& settings,
-                                unsigned long long timestamp,
-                                const ofBuffer& buffer)
-    {
-        return SharedPtr(new IPVideoFrame(settings,timestamp,buffer));
-    }
+    ofBuffer& getBuffer();
 
 private:
-    Settings _settings;
+    IPVideoFrameSettings _settings;
     unsigned long long _timestamp;
     ofBuffer _buffer;
+    
 };
 
 

@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,126 @@ namespace ofx {
 namespace HTTP {
 
 
+const std::string WebSocketRouteSettings::DEFAULT_WEBSOCKET_ROUTE_PATH_PATTERN = "/";
+const Poco::Timespan WebSocketRouteSettings::DEFAULT_RECEIVE_TIMEOUT = Poco::Timespan(60 * Poco::Timespan::SECONDS);
+const Poco::Timespan WebSocketRouteSettings::DEFAULT_SEND_TIMEOUT = Poco::Timespan(60 * Poco::Timespan::SECONDS);
+const Poco::Timespan WebSocketRouteSettings::DEFAULT_POLL_TIMEOUT = Poco::Timespan(10 * Poco::Timespan::MILLISECONDS);
+
+
+WebSocketRouteSettings::WebSocketRouteSettings(const std::string& routePathPattern,
+                                               bool requireSecurePort):
+    BaseRouteSettings(routePathPattern, requireSecurePort),
+    _autoPingPongResponse(true),
+    _keepAlive(true),
+    _receiveTimeout(DEFAULT_RECEIVE_TIMEOUT),
+    _sendTimeout(DEFAULT_SEND_TIMEOUT),
+    _pollTimeout(DEFAULT_POLL_TIMEOUT),
+    _bufferSize(DEFAULT_BUFFER_SIZE)
+{
+}
+
+
+WebSocketRouteSettings::~WebSocketRouteSettings()
+{
+}
+
+
+void WebSocketRouteSettings::setValidSubprotcols(const SubprotocolSet& validSubprotocols)
+{
+    _validSubprotocols = validSubprotocols;
+}
+
+
+const WebSocketRouteSettings::SubprotocolSet& WebSocketRouteSettings::getValidSubprotocols() const
+{
+    return _validSubprotocols;
+}
+
+
+void WebSocketRouteSettings::setValidOrigins(const OriginSet& validOrigins)
+{
+    _validOrigins = validOrigins;
+}
+
+
+const WebSocketRouteSettings::OriginSet& WebSocketRouteSettings::getValidOrigins() const
+{
+    return _validOrigins;
+}
+
+
+void WebSocketRouteSettings::setAutoPingPongResponse(bool autoPingPongResponse)
+{
+    _autoPingPongResponse = autoPingPongResponse;
+}
+
+
+bool WebSocketRouteSettings::getAutoPingPongResponse() const
+{
+    return _autoPingPongResponse;
+}
+
+
+void WebSocketRouteSettings::setKeepAlive(bool keepAlive)
+{
+    _keepAlive = keepAlive;
+}
+
+
+bool WebSocketRouteSettings::getKeepAlive() const
+{
+    return _keepAlive;
+}
+
+
+void WebSocketRouteSettings::setReceiveTimeout(const Poco::Timespan& receiveTimeout)
+{
+    _receiveTimeout = receiveTimeout;
+}
+
+
+Poco::Timespan WebSocketRouteSettings::getReceiveTimeout() const
+{
+    return _receiveTimeout;
+}
+
+
+void WebSocketRouteSettings::setSendTimeout(const Poco::Timespan& sendTimeout)
+{
+    _sendTimeout = sendTimeout;
+}
+
+
+Poco::Timespan WebSocketRouteSettings::getSendTimeout() const
+{
+    return _sendTimeout;
+}
+
+
+void WebSocketRouteSettings::setPollTimeout(const Poco::Timespan& pollTimeout)
+{
+    _pollTimeout = pollTimeout;
+}
+
+
+Poco::Timespan WebSocketRouteSettings::getPollTimeout() const
+{
+    return _pollTimeout;
+}
+
+
+void WebSocketRouteSettings::setBufferSize(std::size_t bufferSize)
+{
+    _bufferSize = bufferSize;
+}
+
+
+std::size_t WebSocketRouteSettings::getBufferSize() const
+{
+    return _bufferSize;
+}
+
+
 WebSocketRoute::WebSocketRoute(const Settings& settings):
     BaseRoute_<WebSocketRouteSettings>(settings)
 {
@@ -45,13 +165,13 @@ WebSocketRoute::~WebSocketRoute()
 bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
                                       bool isSecurePort) const
 {
-    if(!BaseRoute_<WebSocketRouteSettings>::canHandleRequest(request, isSecurePort))
+    if (!BaseRoute_<WebSocketRouteSettings>::canHandleRequest(request, isSecurePort))
     {
         return false;
     }
 
     // check to see if this is an websocket upgrade request
-    if(Poco::icompare(request.get("Upgrade", ""), "websocket")  != 0)
+    if (Poco::icompare(request.get("Upgrade", ""), "websocket")  != 0)
     {
         return false;
     }
@@ -61,8 +181,8 @@ bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& reques
     // this is all fixed in Poco 1.4.6 and 1.5.+
     std::string connectionHeader = Poco::toLower(request.get("Connection", ""));
 
-    if(Poco::icompare(connectionHeader, "Upgrade") != 0 &&
-       !ofIsStringInString(connectionHeader, "upgrade"))
+    if (Poco::icompare(connectionHeader, "Upgrade") != 0 &&
+        !ofIsStringInString(connectionHeader, "upgrade"))
     {
         // this request is coming from firefox, which is known to send things that look like:
         // Connection:keep-alive, Upgrade
@@ -75,7 +195,7 @@ bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& reques
 }
 
 
-Poco::Net::HTTPRequestHandler* WebSocketRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+Poco::Net::HTTPRequestHandler* WebSocketRoute::createRequestHandler(const Poco::Net::HTTPServerRequest&)
 {
     return new WebSocketConnection(*this);
 }
@@ -106,7 +226,7 @@ void WebSocketRoute::close(WebSocketConnection* connection)
 {
     if(connection)
     {
-        connection->close();
+        connection->stop();
     }
     else
     {
@@ -117,10 +237,10 @@ void WebSocketRoute::close(WebSocketConnection* connection)
 
 void WebSocketRoute::close()
 {
-    ofScopedLock lock(_mutex);
+    // std::unique_lock<std::mutex> lock(_mutex);
     WebSocketConnectionsIter iter = _connections.begin();
 
-    while(iter != _connections.end())
+    while (iter != _connections.end())
     {
         close(*iter);
         ++iter;
@@ -130,10 +250,10 @@ void WebSocketRoute::close()
 
 void WebSocketRoute::broadcast(const WebSocketFrame& frame)
 {
-    ofScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     WebSocketConnectionsIter iter = _connections.begin();
 
-    while(iter != _connections.end())
+    while (iter != _connections.end())
     {
         sendFrame(*iter,frame);
         ++iter;
@@ -143,8 +263,8 @@ void WebSocketRoute::broadcast(const WebSocketFrame& frame)
 
 void WebSocketRoute::registerWebSocketConnection(WebSocketConnection* connection)
 {
-    ofScopedLock lock(_mutex);
-    
+    std::unique_lock<std::mutex> lock(_mutex);
+
     if(!_connections.insert(connection).second)
     {
         ofLogError("BaseWebSocketSessionManager::registerRouteHandler") << "Element was already in set!";
@@ -154,7 +274,7 @@ void WebSocketRoute::registerWebSocketConnection(WebSocketConnection* connection
 
 void WebSocketRoute::unregisterWebSocketConnection(WebSocketConnection* connection)
 {
-    ofScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     // TODO: this will never return more than 1
     std::size_t numErased = _connections.erase(connection);
 
@@ -168,10 +288,9 @@ void WebSocketRoute::unregisterWebSocketConnection(WebSocketConnection* connecti
 
 std::size_t WebSocketRoute::getNumWebSocketConnections() const
 {
-    ofScopedLock lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     return _connections.size();
 }
-
 
 
 } } // namespace ofx::HTTP

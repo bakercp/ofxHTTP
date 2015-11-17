@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,15 +27,15 @@
 
 void ofApp::setup()
 {
-    ofx::HTTP::BasicServerSettings settings;
+    ofx::HTTP::SimpleFileServerSettings settings;
 
     // Many other settings are available.
     settings.setPort(7890);
 
     // Apply the settings.
-    server = ofx::HTTP::BasicServer::makeShared(settings);
+    server.setup(settings);
 
     // Start the server.
-    server->start();
-
+    server.start();
+    
 }

@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ DefaultProxyProcessor::~DefaultProxyProcessor()
 }
 
 
-void DefaultProxyProcessor::requestFilter(BaseRequest& request,
+void DefaultProxyProcessor::requestFilter(BaseRequest&,
                                           Context& context)
 {
     if (!context.getProxyRedirectURI().empty())
@@ -53,7 +53,7 @@ void DefaultProxyProcessor::requestFilter(BaseRequest& request,
     }
     else
     {
-        const ProxySettings& proxySettings = context.getSessionSettings().getProxySettings();
+        const ProxySettings& proxySettings = context.getClientSessionSettings().getProxySettings();
 
         if (!proxySettings.getHost().empty())
         {
@@ -106,9 +106,9 @@ void DefaultProxyProcessor::responseFilter(BaseRequest& request,
 }
 
 
-bool DefaultProxyProcessor::canFilterResponse(BaseRequest& request,
+bool DefaultProxyProcessor::canFilterResponse(BaseRequest&,
                                               BaseResponse& response,
-                                              Context& context) const
+                                              Context&) const
 {
     return Poco::Net::HTTPResponse::HTTP_USEPROXY == response.getStatus();
 }

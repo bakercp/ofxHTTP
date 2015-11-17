@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -59,9 +59,7 @@ public:
     ///
     /// \param method The HTTP method (e.g. GET, POST, PUT, etc).
     /// \param uri The endpoint URI.
-    /// \param formFields A collection of form fields to be processed.
     /// \param httpVersion Either HTTP/1.0 or HTTP/1.1.
-    /// \param requestId A unique UUID for this request.
     /// \throws Poco::SyntaxException if the uri is not valid.
     BaseRequest(const std::string& method,
                 const std::string& uri,
@@ -90,24 +88,39 @@ public:
     void setFormField(const std::string& name,
                       const std::string& value);
 
+    /// \brief Add additional form fields.
+    /// \param formFields The form fields to add.
     void addFormFields(const Poco::Net::NameValueCollection& formFields);
 
-    void setRequestId(const Poco::UUID& requestId);
+    /// \brief Set the id of the request.
+    /// \param requestId the id of the request.
+    void setRequestId(const std::string& requestId);
 
-    const Poco::UUID& getRequestId() const;
+    /// \brief Get the id of the request.
+    /// \returns the id of the request.
+    const std::string& getRequestId() const;
 
+    /// \brief Get a const reference to the raw form data.
+    /// \returns a const reference to the raw form data.
     const Poco::Net::HTMLForm& getForm() const;
 
-    Poco::Net::HTMLForm& getFormRef();
+    /// \brief Get a reference to the raw form data.
+    /// \returns a reference to the raw form data.
+    Poco::Net::HTMLForm& getForm();
 
-    static Poco::UUID generateUUID();
+    /// \brief Generate a UUID string.
+    /// \returns a UUID string.
+    static std::string generateId();
 
     /// \brief The default MIME type.
     static const std::string DEFAULT_MEDIA_TYPE;
 
 protected:
+    /// \brief Prepare the current request.
     virtual void prepareRequest();
 
+    /// \brief Write the body of the request.
+    /// \param requestStream The stream to write to.
     virtual void writeRequestBody(std::ostream& requestStream);
 
     /// \brief The original URI passed in during construction.
@@ -118,7 +131,7 @@ protected:
     /// Poco::URI _rawURI;
 
     /// \brief A unique request id generated for this request.
-    Poco::UUID _requestId;
+    std::string _requestId;
 
     /// \brief A form with all query terms / form parameters.
     Poco::Net::HTMLForm _form;

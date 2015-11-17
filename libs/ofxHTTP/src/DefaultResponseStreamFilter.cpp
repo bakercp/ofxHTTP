@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2014 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2014-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,32 +49,32 @@ DefaultResponseStreamFilter::~DefaultResponseStreamFilter()
 
 
 void DefaultResponseStreamFilter::requestFilter(BaseRequest& request,
-                                                Context& context)
+                                                Context&)
 {
     // Set the headers indicating the encodings we can decode.
     request.set(ACCEPT_ENCODING_HEADER, "gzip, deflate");
 }
 
 
-void DefaultResponseStreamFilter::responseFilter(BaseRequest& request,
-                                                 BaseResponse& response,
-                                                 Context& context)
+void DefaultResponseStreamFilter::responseFilter(BaseRequest&,
+                                                 BaseResponse&,
+                                                 Context&)
 {
 }
 
 
-bool DefaultResponseStreamFilter::canFilterResponse(BaseRequest& request,
-                                                    BaseResponse& response,
-                                                    Context& context) const
+bool DefaultResponseStreamFilter::canFilterResponse(BaseRequest&,
+                                                    BaseResponse&,
+                                                    Context&) const
 {
     return true;
 }
 
 
 std::istream& DefaultResponseStreamFilter::responseStreamFilter(std::istream& responseStream,
-                                                                const BaseRequest& request,
+                                                                const BaseRequest&,
                                                                 const BaseResponse& response,
-                                                                Context& context)
+                                                                Context&)
 {
     _pResponseStream.reset();
 
@@ -84,19 +84,19 @@ std::istream& DefaultResponseStreamFilter::responseStreamFilter(std::istream& re
 
         if (0 == Poco::UTF8::icompare(contentEncoding, "gzip"))
         {
-            _pResponseStream = std::shared_ptr<std::istream>(new Poco::InflatingInputStream(responseStream,
-                                                                                            Poco::InflatingStreamBuf::STREAM_GZIP));
+            _pResponseStream = std::make_shared<Poco::InflatingInputStream>(responseStream,
+                                                                            Poco::InflatingStreamBuf::STREAM_GZIP);
             return *_pResponseStream;
         }
         else if (0 == Poco::UTF8::icompare(contentEncoding, "deflate"))
         {
-            _pResponseStream = std::shared_ptr<std::istream>(new Poco::InflatingInputStream(responseStream,
-                                                                                            Poco::InflatingStreamBuf::STREAM_ZLIB));
+            _pResponseStream = std::make_shared<Poco::InflatingInputStream>(responseStream,
+                                                                            Poco::InflatingStreamBuf::STREAM_ZLIB);
             return *_pResponseStream;
         }
         else
         {
-            ofLogWarning() << "Returning with unknown content encoding: " << contentEncoding;
+            ofLogWarning("DefaultResponseStreamFilter") << "Returning with unknown content encoding: " << contentEncoding;
             return responseStream;
         }
     }

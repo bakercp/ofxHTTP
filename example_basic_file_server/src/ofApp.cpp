@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,27 +30,27 @@ void ofApp::setup()
 {
     ofSetFrameRate(30);
 
-    ofx::HTTP::BasicServerSettings settings;
+    ofx::HTTP::SimpleFileServerSettings settings;
 
     // Many other settings are available.
     settings.setPort(7890);
 
     // Create a whitelist.
-    ofx::Net::IPAddressRange::List whitelist;
-    whitelist.push_back(ofx::Net::IPAddressRange("127.0.0.1/32"));
+    // ofx::Net::IPAddressRange::List whitelist;
+    // whitelist.push_back(ofx::Net::IPAddressRange("127.0.0.1/32"));
 
     // Set the whitelist.
-    settings.setWhitelist(whitelist);
+    // settings.setWhitelist(whitelist);
 
     // Apply the settings.
-    server = ofx::HTTP::BasicServer::makeShared(settings);
+    server.setup(settings);
 
     // Start the server.
-    server->start();
+    server.start();
 
 #if !defined(TARGET_LINUX_ARM)
     // Launch a browser with the address of the server.
-    ofLaunchBrowser(server->getURL());
+    ofLaunchBrowser(server.getURL());
 #endif
 
 }
@@ -59,5 +59,5 @@ void ofApp::setup()
 void ofApp::draw()
 {
     ofBackground(255);
-    ofDrawBitmapStringHighlight("See " + server->getURL(), 10, 16);
+    ofDrawBitmapStringHighlight("See " + server.getURL(), 10, 16);
 }

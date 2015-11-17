@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,8 +43,8 @@ DefaultRedirectProcessor::~DefaultRedirectProcessor()
 }
 
 
-void DefaultRedirectProcessor::requestFilter(BaseRequest& request,
-                                             Context& context)
+void DefaultRedirectProcessor::requestFilter(BaseRequest&,
+                                             Context&)
 {
 }
 
@@ -54,7 +54,7 @@ void DefaultRedirectProcessor::responseFilter(BaseRequest& request,
 {
     if (canFilterResponse(request, response, context))
     {
-        if (context.getRedirects().size() < context.getSessionSettings().getMaxRedirects())
+        if (context.getRedirects().size() < context.getClientSessionSettings().getMaxRedirects())
         {
             Poco::URI currentURI(request.getURI());
 
@@ -139,9 +139,9 @@ void DefaultRedirectProcessor::responseFilter(BaseRequest& request,
 }
 
 
-bool DefaultRedirectProcessor::canFilterResponse(BaseRequest& request,
+bool DefaultRedirectProcessor::canFilterResponse(BaseRequest&,
                                                  BaseResponse& response,
-                                                 Context& context) const
+                                                 Context&) const
 {
     Poco::Net::HTTPResponse::HTTPStatus status = response.getStatus();
 

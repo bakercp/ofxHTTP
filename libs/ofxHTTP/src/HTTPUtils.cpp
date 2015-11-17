@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -66,18 +66,18 @@ Poco::Net::NameValueCollection HTTPUtils::splitAndURLDecode(const std::string& e
 
     std::vector<std::string>::const_iterator iter = arguments.begin();
 
-    while(iter != arguments.end())
+    while (iter != arguments.end())
     {
         std::vector<std::string> tokens = ofSplitString(*iter, "=", true);
 
-        if(tokens.size() > 0)
+        if (tokens.size() > 0)
         {
             std::string key;
             std::string value;
 
             Poco::URI::decode(tokens[0], key);
 
-            if(tokens.size() > 1)
+            if (tokens.size() > 1)
             {
                 Poco::URI::decode(tokens[1], value);
             }
@@ -93,14 +93,14 @@ Poco::Net::NameValueCollection HTTPUtils::splitAndURLDecode(const std::string& e
 
 Poco::Net::NameValueCollection HTTPUtils::getQueryMap(const Poco::URI& uri)
 {
-    if(uri.empty())
+    if (uri.empty())
     {
         return Poco::Net::NameValueCollection();
     }
 
     std::string query = uri.getRawQuery(); // we will decode later
 
-    if(query.empty())
+    if (query.empty())
     {
         return Poco::Net::NameValueCollection();
     }
@@ -157,11 +157,11 @@ void HTTPUtils::dumpHeaders(const Poco::Net::HTTPResponse& response,
 void HTTPUtils::dumpNameValueCollection(const Poco::Net::NameValueCollection& nvc,
                                         ofLogLevel logLevel)
 {
-    if(logLevel >= ofGetLogLevel())
+    if (logLevel >= ofGetLogLevel())
     {
         Poco::Net::NameValueCollection::ConstIterator iter = nvc.begin();
         ofLog(logLevel) << "Begin NameValueCollection =================";
-        while(iter != nvc.end())
+        while (iter != nvc.end())
         {
             ofLog(logLevel) << (*iter).first << ":" << (*iter).second;
             ++iter;

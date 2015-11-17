@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@
 #include "Poco/Net/HTTPClientSession.h"
 #include "ofx/HTTP/CookieStore.h"
 #include "ofx/HTTP/CredentialStore.h"
-#include "ofx/HTTP/SessionSettings.h"
+#include "ofx/HTTP/ClientSessionSettings.h"
 
 // a thread-safe shared context
 // -- in theory all members are thread safe
@@ -56,8 +56,8 @@ public:
     Context();
     virtual ~Context();
    
-    void setSessionSettings(const SessionSettings& settings);
-    const SessionSettings& getSessionSettings() const;
+    void setClientSessionSettings(const ClientSessionSettings& settings);
+    const ClientSessionSettings& getClientSessionSettings() const;
 
 //    void setCookieStore(CookieStore::SharedPtr cookieStore);
 //    CookieStore::WeakPtr getCookieStore();
@@ -74,15 +74,18 @@ public:
     void setProxyRedirectURI(const Poco::URI& uri);
     const Poco::URI& getProxyRedirectURI() const;
 
-    static const std::string KEY_PREFIX_RESERVED;
-    static const std::string KEY_SESSION_SETTINGS;
-    static const std::string KEY_COOKIE_STORE;
-    static const std::string KEY_CREDENTIAL_STORE;
-    static const std::string KEY_RESOLVED_URI;
-    static const std::string KEY_PROXY_REDIRECT_URI;
-    static const std::string KEY_REDIRECTS;
-    static const std::string KEY_SESSION;
-    static const std::string KEY_USE_ABSOLUTE_REQUEST_PATH;
+    bool getResubmit() const;
+    void setResubmit(bool resubmit);
+
+    const static std::string KEY_PREFIX_RESERVED;
+    const static std::string KEY_SESSION_SETTINGS;
+    const static std::string KEY_COOKIE_STORE;
+    const static std::string KEY_CREDENTIAL_STORE;
+    const static std::string KEY_RESOLVED_URI;
+    const static std::string KEY_PROXY_REDIRECT_URI;
+    const static std::string KEY_REDIRECTS;
+    const static std::string KEY_SESSION;
+    const static std::string KEY_USE_ABSOLUTE_REQUEST_PATH;
 
     template<typename TypeName>
     bool getValue(const std::string& key, TypeName& value) const
@@ -108,20 +111,10 @@ public:
         }
     }
 
-    bool getResubmit() const
-    {
-        return _resubmit;
-    }
-
-    void setResubmit(bool resubmit)
-    {
-        _resubmit = resubmit;
-    }
-
 private:
     std::map<std::string, Poco::Any> _map;
 
-    SessionSettings _settings;
+    ClientSessionSettings _clientSessionSettings;
 //    CookieStore::WeakPtr _cookieStore;
 
     std::vector<Poco::URI> _redirects;

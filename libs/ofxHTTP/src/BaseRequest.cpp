@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@
 #include "ofx/HTTP/BaseRequest.h"
 #include "ofx/HTTP/HTTPUtils.h"
 
+
 namespace ofx {
 namespace HTTP {
 
@@ -37,7 +38,7 @@ BaseRequest::BaseRequest(const std::string& method,
                          const std::string& uri,
                          const std::string& httpVersion):
     Poco::Net::HTTPRequest(method, uri, httpVersion),
-    _requestId(generateUUID())
+    _requestId(generateId())
 {
 }
 
@@ -53,7 +54,6 @@ void BaseRequest::write(std::ostream& ostr) const
     {
         Poco::URI uri(getURI());
 
-        cout << uri.toString() << endl;
         std::string pathAndQuery = uri.getPathAndQuery();
 
         if (pathAndQuery.empty())
@@ -104,13 +104,13 @@ void BaseRequest::setFormField(const std::string& name,
 }
 
 
-void BaseRequest::setRequestId(const Poco::UUID& requestId)
+void BaseRequest::setRequestId(const std::string& requestId)
 {
     _requestId = requestId;
 }
 
 
-const Poco::UUID& BaseRequest::getRequestId() const
+const std::string& BaseRequest::getRequestId() const
 {
     return _requestId;
 }
@@ -122,15 +122,15 @@ const Poco::Net::HTMLForm& BaseRequest::getForm() const
 }
 
 
-Poco::Net::HTMLForm& BaseRequest::getFormRef()
+Poco::Net::HTMLForm& BaseRequest::getForm()
 {
     return _form;
 }
 
 
-Poco::UUID BaseRequest::generateUUID()
+std::string BaseRequest::generateId()
 {
-    return Poco::UUIDGenerator::defaultGenerator().createOne();
+    return Poco::UUIDGenerator::defaultGenerator().createOne().toString();
 }
 
 

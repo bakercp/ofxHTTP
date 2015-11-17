@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -71,7 +71,7 @@ namespace HTTP {
 ////        response.getCookies(newCookies);
 ////
 ////        std::vector<Poco::Net::HTTPCookie>::iterator iter = newCookies.begin();
-////        while(iter != newCookies.end())
+////        while (iter != newCookies.end())
 ////        {
 ////            cout << "COOKIE: " << (*iter).toString() << endl;
 ////

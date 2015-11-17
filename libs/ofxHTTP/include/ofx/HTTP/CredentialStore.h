@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -97,7 +97,8 @@ public:
 protected:
     bool authenticateWithCache(const AuthScope& scope,
                                Poco::Net::HTTPRequest& pRequest);
-    // get credentials, with mutex already locked
+
+    // Get credentials, with mutex already locked.
     bool getCredentialsWithExistingLock(const AuthScope& targetScope,
                                         AuthScope& matchingScope,
                                         Credentials& matchingCredentials) const;
@@ -122,7 +123,7 @@ private:
     BasicCredentialCacheMap  basicCredentialCacheMap;
     DigestCredentialCacheMap digestCredentialCacheMap;
 
-    mutable Poco::FastMutex mutex;
+    mutable std::mutex _mutex;
     
 };
 

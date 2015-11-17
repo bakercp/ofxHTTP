@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ namespace HTTP {
 
 DefaultClientTaskQueue::DefaultClientTaskQueue(int maxTasks,
                                                Poco::ThreadPool& threadPool):
-    TaskQueue_<Poco::UUID>(maxTasks, threadPool)
+    TaskQueue_<std::string>(maxTasks, threadPool)
 {
 }
 
@@ -41,11 +41,11 @@ DefaultClientTaskQueue::~DefaultClientTaskQueue()
 }
 
 
-Poco::UUID DefaultClientTaskQueue::get(const std::string& uri,
-                                       const Poco::Net::NameValueCollection& formFields,
-                                       const std::string& httpVersion,
-                                       const Poco::UUID& requestId,
-                                       ThreadSettings threadSettings)
+std::string DefaultClientTaskQueue::get(const std::string& uri,
+                                        const Poco::Net::NameValueCollection& formFields,
+                                        const std::string& httpVersion,
+                                        const std::string& requestId,
+                                        ThreadSettings threadSettings)
 {
 
     GetRequest* req = new GetRequest(uri, httpVersion);
@@ -57,12 +57,12 @@ Poco::UUID DefaultClientTaskQueue::get(const std::string& uri,
 }
 
 
-Poco::UUID DefaultClientTaskQueue::post(const std::string& uri,
-                                        const Poco::Net::NameValueCollection formFields,
-                                        const PostRequest::FormParts formParts,
-                                        const std::string& httpVersion,
-                                        const Poco::UUID& requestId,
-                                        ThreadSettings threadSettings)
+std::string DefaultClientTaskQueue::post(const std::string& uri,
+                                         const Poco::Net::NameValueCollection formFields,
+                                         const PostRequest::FormParts formParts,
+                                         const std::string& httpVersion,
+                                         const std::string& requestId,
+                                         ThreadSettings threadSettings)
 {
     PostRequest* req = new PostRequest(uri, httpVersion);
 
@@ -74,8 +74,8 @@ Poco::UUID DefaultClientTaskQueue::post(const std::string& uri,
 }
 
 
-Poco::UUID DefaultClientTaskQueue::request(BaseRequest* pRequest,
-                                           ThreadSettings threadSettings)
+std::string DefaultClientTaskQueue::request(BaseRequest* pRequest,
+                                            ThreadSettings threadSettings)
 {
 
     DefaultClientTask* task = new DefaultClientTask(pRequest,
@@ -84,35 +84,35 @@ Poco::UUID DefaultClientTaskQueue::request(BaseRequest* pRequest,
 
 
 
-    return start(Poco::UUIDGenerator::defaultGenerator().createOne(), task);
+    return start(Poco::UUIDGenerator::defaultGenerator().createOne().toString(), task);
 }
 
 
-void DefaultClientTaskQueue::handleTaskCustomNotification(const Poco::UUID& taskID,
+void DefaultClientTaskQueue::handleTaskCustomNotification(const std::string& taskId,
                                                           Poco::AutoPtr<Poco::TaskNotification> pNotification)
 {
-    Poco::AutoPtr<Poco::TaskCustomNotification<ClientResponseBufferEventArgs> > taskCustomNotification = 0;
+    Poco::AutoPtr<Poco::TaskCustomNotification<ClientResponseBufferEventArgs>> taskCustomNotification = 0;
 
-    if (!(taskCustomNotification = pNotification.cast<Poco::TaskCustomNotification<ClientResponseBufferEventArgs> >()).isNull())
+    if (!(taskCustomNotification = pNotification.cast<Poco::TaskCustomNotification<ClientResponseBufferEventArgs>>()).isNull())
     {
-        TaskDataEventArgs_<Poco::UUID, ClientResponseBufferEventArgs> args(taskID,
-                                                                           pNotification->task()->name(),
-                                                                           pNotification->task()->state(),
-                                                                           pNotification->task()->progress(),
-                                                                           taskCustomNotification->custom());
+        TaskDataEventArgs_<std::string, ClientResponseBufferEventArgs> args(taskId,
+                                                                            pNotification->task()->name(),
+                                                                            pNotification->task()->state(),
+                                                                            pNotification->task()->progress(),
+                                                                            taskCustomNotification->custom());
 
         ofNotifyEvent(onClientBuffer, args, this);
 
     }
     else
     {
-        TaskCustomNotificationEventArgs_<Poco::UUID> args(taskID,
-                                                          pNotification->task()->name(),
-                                                          pNotification->task()->state(),
-                                                          pNotification->task()->progress(),
-                                                          pNotification);
+        TaskCustomNotificationEventArgs_<std::string> args(taskId,
+                                                           pNotification->task()->name(),
+                                                           pNotification->task()->state(),
+                                                           pNotification->task()->progress(),
+                                                           pNotification);
 
-        ofNotifyEvent(TaskQueue_<Poco::UUID>::onTaskCustomNotification, args, this);
+        ofNotifyEvent(TaskQueue_<std::string>::onTaskCustomNotification, args, this);
 
     }
 }

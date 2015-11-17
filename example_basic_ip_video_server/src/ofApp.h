@@ -37,7 +37,7 @@ public:
     void update();
     void draw();
 
-    ofx::HTTP::BasicIPVideoServer::SharedPtr server;
+    ofx::HTTP::SimpleIPVideoServer server;
 
     ofVideoPlayer player;
 

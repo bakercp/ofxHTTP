@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,11 +49,12 @@ public:
     BaseClient();
 
     BaseClient(RequestFilters requestFilters,
-               ResponseFilters responseFilters);
+               ResponseFilters responseFilters,
+               std::streamsize bytesPerProgressUpdate = DEFAULT_BYTES_PER_PROGRESS_UPDATE);
 
     virtual ~BaseClient();
 
-    // can throw a lot of different exceptions
+    // Can throw a lot of different exceptions.
     std::istream& execute(BaseRequest& request,
                           BaseResponse& response,
                           Context& context);
@@ -75,6 +76,9 @@ public:
     void removeRequestStreamFilter();
     void removeResponseStreamFilter();
 
+    void setBytesPerProgressUpdate(std::streamsize bytesPerProgressUpdate);
+    std::streamsize getBytesPerProgressUpdate() const;
+
     template<class ListenerClass>
     void registerClientEvents(ListenerClass* listener);
 
@@ -95,9 +99,17 @@ public:
 
     ClientEvents events;
 
+    enum
+    {
+        DEFAULT_BYTES_PER_PROGRESS_UPDATE = 1024
+    };
+    
+
 protected:
     RequestFilters _requestFilters;
     ResponseFilters _responseFilters;
+
+    std::streamsize _bytesPerProgressUpdate;
 
 private:
     std::shared_ptr<std::ostream> _pClientProgressRequestStream;

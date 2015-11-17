@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,10 +45,10 @@ ProgressMonitor::~ProgressMonitor()
 }
 
 
-void ProgressMonitor::update(std::streamsize totalBytesTransferred,
-                             std::streamsize totalBytes,
-                             std::size_t transferBufferSize,
-                             unsigned long long lastUpdate)
+void ProgressMonitor::update(std::streamsize,
+                             std::streamsize,
+                             std::size_t,
+                             unsigned long long)
 {
 //    _totalBytesTransferred  = totalBytesTransferred;
 //    _totalBytes             = totalBytes;

@@ -1,6 +1,6 @@
 //// =============================================================================
 ////
-//// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+//// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 ////
 //// Permission is hereby granted, free of charge, to any person obtaining a copy
 //// of this software and associated documentation files (the "Software"), to deal
@@ -292,7 +292,7 @@
 ////    Poco::FastMutex::ScopedLock lock(mutex);
 ////    std::vector<HTTPCookie>::iterator iter = newCookies.begin();
 ////    
-////    while(iter != newCookies.end())
+////    while (iter != newCookies.end())
 ////    {
 ////        Cookie cookie(*iter);
 ////
@@ -341,7 +341,7 @@
 ////    // did clear needed? 
 ////    //bool didClear = false; 
 ////    CookiesIter iter = cookies.begin();
-////    while(iter != cookies.end())
+////    while (iter != cookies.end())
 ////    {
 ////        ofLogVerbose("CookieStore::addCookieWithExistingLock") << "Adding cookie: " << (*iter).toString();
 ////
@@ -368,7 +368,7 @@
 ////
 ////    bool didClear = false;
 ////    CookiesIter iter = cookies.begin();
-////    while(iter != cookies.end())
+////    while (iter != cookies.end())
 ////    {
 ////        Cookie cookie = (*iter);
 ////        if(cookie.isExpired(expiredAt))
@@ -392,7 +392,7 @@
 ////    
 ////    bool didClear = false;
 ////    CookiesIter iter = cookies.begin();
-////    while(iter != cookies.end())
+////    while (iter != cookies.end())
 ////    {
 ////        if((*iter).getName() == name)
 ////        {
@@ -415,7 +415,7 @@
 ////    
 ////    bool didClear = false;
 ////    CookiesIter iter = cookies.begin();
-////    while(iter != cookies.end())
+////    while (iter != cookies.end())
 ////    {
 ////        if((*iter).getDomain() == domain)
 ////        {
@@ -438,7 +438,7 @@
 ////    
 ////    bool didClear = false;
 ////    CookiesIter iter = cookies.begin();
-////    while(iter != cookies.end())
+////    while (iter != cookies.end())
 ////    {
 ////        if((*iter).getPath() == path)
 ////        {
@@ -467,7 +467,7 @@
 ////    std::cout << "dumping: " << std::endl;
 ////    Poco::FastMutex::ScopedLock lock(mutex);
 ////    CookiesIter iter = cookies.begin();
-////    while(iter != cookies.end())
+////    while (iter != cookies.end())
 ////    {
 ////        std::cout << (*iter).toString() << std::endl;
 ////        ++iter;

@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2014 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2014-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ void ofApp::setup()
 
     ofx::HTTP::BaseResponse response;
 
-    ofx::HTTP::PutRequest putRequest(url);
+    ofx::HTTP::PutRequest putRequest(url, Poco::Net::HTTPMessage::HTTP_1_1);
 
     putRequest.set("My-special-request-header", "My-special-request-header-value");
 
@@ -66,11 +66,11 @@ void ofApp::setup()
 
 
     }
-    catch(const Poco::Exception& exc)
+    catch (const Poco::Exception& exc)
     {
         ofLogError("ofApp::setup") << "Got Exception " << exc.displayText() << " " << exc.code();
     }
-    catch(...)
+    catch (...)
     {
         ofLogError("ofApp::setup") << "Got unknown exception.";
     }

@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,20 +33,20 @@ void ofApp::setup()
 
     ofSetFrameRate(30);
 
-    ofx::HTTP::BasicServerSettings settings;
+    ofx::HTTP::SimpleFileServerSettings settings;
     settings.setPort(4433);
 
     // NOTE: the included private key / certificate
     // should not be used for production purposes.
     settings.setUseSSL(true);
 
-    server = ofx::HTTP::BasicServer::makeShared(settings);
+    server.setup(settings);
 
-    server->start();
+    server.start();
 
 #if !defined(TARGET_LINUX_ARM)
     // Launch a browser with the address of the server.
-    ofLaunchBrowser(server->getURL());
+    ofLaunchBrowser(server.getURL());
 #endif
 
 }
@@ -55,17 +55,16 @@ void ofApp::setup()
 void ofApp::draw()
 {
     ofBackground(255);
-    ofDrawBitmapStringHighlight("See " + server->getURL(), 10, 16);
+    ofDrawBitmapStringHighlight("See " + server.getURL(), 10, 16);
 }
 
 
 void ofApp::onSSLServerVerificationError(Poco::Net::VerificationErrorArgs& args)
 {
-
     ofLogNotice("ofApp::onSSLServerVerificationError") << std::endl << ofToString(args);
 
-    // If you want to proceed, you must allow the user to inspect the certificate
-    // and set `args.setIgnoreError(true);` if they want to continue.
+    // If you want to proceed, you must allow the user to inspect the
+    // certificate and set `args.setIgnoreError(true);` if they want to continue.
 
     args.setIgnoreError(true);
 }
@@ -73,8 +72,8 @@ void ofApp::onSSLServerVerificationError(Poco::Net::VerificationErrorArgs& args)
 
 void ofApp::onSSLPrivateKeyPassphraseRequired(std::string& passphrase)
 {
-    // If you want to proceed, you must allow the user to input the assign the private key's
-    // passphrase to the `passphrase` argument.  For example:
+    // If you want to proceed, you must allow the user to input the assign the
+    // private key's passphrase to the `passphrase` argument.  For example:
 
     passphrase = ofSystemTextBoxDialog("Enter the Private Key Passphrase", "");
 }
