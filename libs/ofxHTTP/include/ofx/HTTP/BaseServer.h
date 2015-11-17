@@ -246,10 +246,10 @@ public:
 
         try
         {
-            _server = std::shared_ptr<Poco::Net::HTTPServer>(new Poco::Net::HTTPServer(new BaseServerHandle(*this),
-                                                                                       getThreadPool(),
-                                                                                       socket,
-                                                                                       _toPoco(_settings)));
+            _server = std::make_shared<Poco::Net::HTTPServer>(new BaseServerHandle(*this),
+                                                              getThreadPool(),
+                                                              socket,
+                                                              _toPoco(_settings));
 
             _isSecurePort = socket.secure();
 

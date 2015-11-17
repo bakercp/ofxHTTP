@@ -84,14 +84,14 @@ std::istream& DefaultResponseStreamFilter::responseStreamFilter(std::istream& re
 
         if (0 == Poco::UTF8::icompare(contentEncoding, "gzip"))
         {
-            _pResponseStream = std::shared_ptr<std::istream>(new Poco::InflatingInputStream(responseStream,
-                                                                                            Poco::InflatingStreamBuf::STREAM_GZIP));
+            _pResponseStream = std::make_shared<Poco::InflatingInputStream>(responseStream,
+                                                                            Poco::InflatingStreamBuf::STREAM_GZIP);
             return *_pResponseStream;
         }
         else if (0 == Poco::UTF8::icompare(contentEncoding, "deflate"))
         {
-            _pResponseStream = std::shared_ptr<std::istream>(new Poco::InflatingInputStream(responseStream,
-                                                                                            Poco::InflatingStreamBuf::STREAM_ZLIB));
+            _pResponseStream = std::make_shared<Poco::InflatingInputStream>(responseStream,
+                                                                            Poco::InflatingStreamBuf::STREAM_ZLIB);
             return *_pResponseStream;
         }
         else

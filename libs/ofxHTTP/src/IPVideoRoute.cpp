@@ -276,7 +276,7 @@ void IPVideoRoute::send(ofPixels& pix) const
 //
 //        settings.quality = settings.quality;
 
-        std::shared_ptr<IPVideoFrame> frame = std::shared_ptr<IPVideoFrame>(new IPVideoFrame(settings, timestamp, compressedPixels));
+        std::shared_ptr<IPVideoFrame> frame = std::make_shared<IPVideoFrame>(settings, timestamp, compressedPixels);
 
         while (iter != _connections.end())
         {

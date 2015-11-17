@@ -78,12 +78,12 @@ public:
     /// \brief The default MIME type used for file parts.
     static const std::string DEFAULT_MEDIA_TYPE;
 
-    virtual void prepareRequest();
-    
-    virtual void writeRequestBody(std::ostream& requestStream);
+    virtual void prepareRequest() override;
+    virtual void writeRequestBody(std::ostream& requestStream) override;
 
 protected:
     std::size_t _startByte;
+    
     std::size_t _endByte;
 
     std::string _contentType;

@@ -270,18 +270,20 @@ std::ostream& BaseClient::send(BaseRequest& request, Context& context)
 {
     Context::ClientSession clientSession = context.getClientSession();
 
-    if (!clientSession)
+    if (clientSession == nullptr)
     {
         throw Poco::Exception("No session available for request.");
     }
 
     std::ostream& rawRequestStream = clientSession->sendRequest(request);
 
-    _pClientProgressRequestStream = std::shared_ptr<std::ostream>(new ClientProgressRequestStream(rawRequestStream,
-                                                                                                  request,
-                                                                                                  context,
-                                                                                                  *this,
-                                                                                                  _bytesPerProgressUpdate));
+
+    _pClientProgressRequestStream = std::make_shared<ClientProgressRequestStream>(rawRequestStream,
+                                                                                  request,
+                                                                                  context,
+                                                                                  *this,
+                                                                                  _bytesPerProgressUpdate);
+
     if (_pRequestStreamFilter)
     {
         return _pRequestStreamFilter->requestStreamFilter(*_pClientProgressRequestStream,
@@ -308,12 +310,13 @@ std::istream& BaseClient::receive(BaseRequest& request,
 
     std::istream& rawResponseStream = clientSession->receiveResponse(response);
 
-    _pClientProgressResponseStream = std::shared_ptr<std::istream>(new ClientProgressResponseStream(rawResponseStream,
-                                                                                                    request,
-                                                                                                    response,
-                                                                                                    context,
-                                                                                                    *this,
-                                                                                                    _bytesPerProgressUpdate));
+    _pClientProgressResponseStream = std::make_shared<ClientProgressResponseStream>(rawResponseStream,
+                                                                                    request,
+                                                                                    response,
+                                                                                    context,
+                                                                                    *this,
+                                                                                    _bytesPerProgressUpdate);
+
     if (_pResponseStreamFilter)
     {
         return _pResponseStreamFilter->responseStreamFilter(*_pClientProgressResponseStream,

@@ -182,7 +182,7 @@ AbstractSession& SimpleSessionStore::getSession(const std::string& sessionId)
 AbstractSession& SimpleSessionStore::createSession()
 {
     std::unique_lock<std::mutex> lock(_mutex);
-    std::shared_ptr<SimpleSession> session = std::shared_ptr<SimpleSession>(new SimpleSession());
+    std::shared_ptr<SimpleSession> session = std::make_shared<SimpleSession>();
     _sessionMap[session->getId()] = session;
     return *session;
 }

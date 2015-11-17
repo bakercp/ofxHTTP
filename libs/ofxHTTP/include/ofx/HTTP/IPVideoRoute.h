@@ -68,7 +68,7 @@ public:
     void clear();
 
 private:
-    std::deque<std::shared_ptr<IPVideoFrame> > _frames;
+    std::deque<std::shared_ptr<IPVideoFrame>> _frames;
     
     std::size_t _maxSize;
     

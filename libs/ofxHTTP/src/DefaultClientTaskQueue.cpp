@@ -91,9 +91,9 @@ std::string DefaultClientTaskQueue::request(BaseRequest* pRequest,
 void DefaultClientTaskQueue::handleTaskCustomNotification(const std::string& taskId,
                                                           Poco::AutoPtr<Poco::TaskNotification> pNotification)
 {
-    Poco::AutoPtr<Poco::TaskCustomNotification<ClientResponseBufferEventArgs> > taskCustomNotification = 0;
+    Poco::AutoPtr<Poco::TaskCustomNotification<ClientResponseBufferEventArgs>> taskCustomNotification = 0;
 
-    if (!(taskCustomNotification = pNotification.cast<Poco::TaskCustomNotification<ClientResponseBufferEventArgs> >()).isNull())
+    if (!(taskCustomNotification = pNotification.cast<Poco::TaskCustomNotification<ClientResponseBufferEventArgs>>()).isNull())
     {
         TaskDataEventArgs_<std::string, ClientResponseBufferEventArgs> args(taskId,
                                                                             pNotification->task()->name(),

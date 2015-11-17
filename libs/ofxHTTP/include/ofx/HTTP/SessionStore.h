@@ -88,7 +88,7 @@ protected:
     AbstractSession& createSession();
     void destroySession(const std::string& sessionId);
 
-    typedef std::map<std::string, std::shared_ptr<AbstractSession> > SessionMap;
+    typedef std::map<std::string, std::shared_ptr<AbstractSession>> SessionMap;
 
     SessionMap _sessionMap;
 
