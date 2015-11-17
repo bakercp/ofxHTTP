@@ -88,24 +88,39 @@ public:
     void setFormField(const std::string& name,
                       const std::string& value);
 
+    /// \brief Add additional form fields.
+    /// \param formFields The form fields to add.
     void addFormFields(const Poco::Net::NameValueCollection& formFields);
 
+    /// \brief Set the id of the request.
+    /// \param requestId the id of the request.
     void setRequestId(const std::string& requestId);
 
+    /// \brief Get the id of the request.
+    /// \returns the id of the request.
     const std::string& getRequestId() const;
 
+    /// \brief Get a const reference to the raw form data.
+    /// \returns a const reference to the raw form data.
     const Poco::Net::HTMLForm& getForm() const;
 
+    /// \brief Get a reference to the raw form data.
+    /// \returns a reference to the raw form data.
     Poco::Net::HTMLForm& getForm();
 
+    /// \brief Generate a UUID string.
+    /// \returns a UUID string.
     static std::string generateId();
 
     /// \brief The default MIME type.
     static const std::string DEFAULT_MEDIA_TYPE;
 
 protected:
+    /// \brief Prepare the current request.
     virtual void prepareRequest();
 
+    /// \brief Write the body of the request.
+    /// \param requestStream The stream to write to.
     virtual void writeRequestBody(std::ostream& requestStream);
 
     /// \brief The original URI passed in during construction.
