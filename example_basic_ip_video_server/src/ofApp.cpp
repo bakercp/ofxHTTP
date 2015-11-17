@@ -31,7 +31,7 @@ void ofApp::setup()
     ofSetFrameRate(30);
 
     // Set up our video to broadcast.
-    player.loadMovie("fingers.mp4");
+    player.load("fingers.mp4");
     player.play();
     player.setLoopState(OF_LOOP_NORMAL);
 
