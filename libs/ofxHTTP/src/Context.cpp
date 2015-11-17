@@ -122,4 +122,15 @@ const Poco::URI& Context::getProxyRedirectURI() const
 }
 
 
+bool Context::getResubmit() const
+{
+    return _resubmit;
+}
+
+void Context::setResubmit(bool resubmit)
+{
+    _resubmit = resubmit;
+}
+
+
 } } // namespace ofx::HTTP

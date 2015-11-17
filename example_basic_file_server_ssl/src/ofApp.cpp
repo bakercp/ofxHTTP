@@ -61,11 +61,10 @@ void ofApp::draw()
 
 void ofApp::onSSLServerVerificationError(Poco::Net::VerificationErrorArgs& args)
 {
-
     ofLogNotice("ofApp::onSSLServerVerificationError") << std::endl << ofToString(args);
 
-    // If you want to proceed, you must allow the user to inspect the certificate
-    // and set `args.setIgnoreError(true);` if they want to continue.
+    // If you want to proceed, you must allow the user to inspect the
+    // certificate and set `args.setIgnoreError(true);` if they want to continue.
 
     args.setIgnoreError(true);
 }
@@ -73,8 +72,8 @@ void ofApp::onSSLServerVerificationError(Poco::Net::VerificationErrorArgs& args)
 
 void ofApp::onSSLPrivateKeyPassphraseRequired(std::string& passphrase)
 {
-    // If you want to proceed, you must allow the user to input the assign the private key's
-    // passphrase to the `passphrase` argument.  For example:
+    // If you want to proceed, you must allow the user to input the assign the
+    // private key's passphrase to the `passphrase` argument.  For example:
 
     passphrase = ofSystemTextBoxDialog("Enter the Private Key Passphrase", "");
 }

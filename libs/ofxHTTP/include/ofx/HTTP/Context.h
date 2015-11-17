@@ -74,6 +74,9 @@ public:
     void setProxyRedirectURI(const Poco::URI& uri);
     const Poco::URI& getProxyRedirectURI() const;
 
+    bool getResubmit() const;
+    void setResubmit(bool resubmit);
+
     const static std::string KEY_PREFIX_RESERVED;
     const static std::string KEY_SESSION_SETTINGS;
     const static std::string KEY_COOKIE_STORE;
@@ -106,16 +109,6 @@ public:
         {
             return false;
         }
-    }
-
-    bool getResubmit() const
-    {
-        return _resubmit;
-    }
-
-    void setResubmit(bool resubmit)
-    {
-        _resubmit = resubmit;
     }
 
 private:

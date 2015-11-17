@@ -35,7 +35,7 @@ class ofApp: public ofBaseApp
 public:
     void setup();
 
-    // We do not have an draw() method.
+    // We do not have an draw() method since this is a headless display.
 
     ofx::HTTP::SimpleFileServer server;
 

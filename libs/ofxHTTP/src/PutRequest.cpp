@@ -38,8 +38,8 @@ PutRequest::PutRequest(const std::string& uri,
     BaseRequest(Poco::Net::HTTPRequest::HTTP_PUT,
                 uri,
                 httpVersion),
-    _startByte(std::numeric_limits<size_t>::max()),
-    _endByte(std::numeric_limits<size_t>::max()),
+    _startByte(std::numeric_limits<std::size_t>::max()),
+    _endByte(std::numeric_limits<std::size_t>::max()),
     _contentType(DEFAULT_MEDIA_TYPE)
 {
 }
@@ -67,6 +67,7 @@ void PutRequest::setContentRange(std::size_t startByte)
     _startByte = startByte;
 }
 
+
 void PutRequest::setContentRange(std::size_t startByte,
                                  std::size_t endByte)
 {
@@ -81,6 +82,7 @@ void PutRequest::setContentRange(std::size_t startByte,
     }
 }
 
+
 void PutRequest::setContentType(const std::string& contentType)
 {
     _contentType = contentType;
@@ -91,6 +93,7 @@ void PutRequest::prepareRequest()
 {
     set("Content-Length", ofToString(_buffer.size()));
 }
+
 
 void PutRequest::writeRequestBody(std::ostream& requestStream)
 {
