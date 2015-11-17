@@ -3,6 +3,7 @@ ofxHTTP
 
 ofxHTTP is designed to work best using Project Generator.
 
+ofxHTTP master branch is tested with 0.9.0+.  For previous versions, check the releases here https://github.com/bakercp/ofxHTTP/releases.
 
 NOTE: Requires the following addons:
 
