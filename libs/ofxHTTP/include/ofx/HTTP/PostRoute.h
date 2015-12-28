@@ -70,11 +70,11 @@ public:
 
     /// \brief Set the maximum file upload size in bytes.
     /// \param maximumFileUploadSize The maximum file upload size in bytes.
-    void setMaximumFileUploadSize(unsigned long long maximumFileUploadSize);
+    void setMaximumFileUploadSize(uint64_t maximumFileUploadSize);
 
     /// \brief Get the maximum file upload size.
     /// \returns The maximum file upload size in bytes.
-    unsigned long long getMaximumFileUploadSize() const;
+    uint64_t getMaximumFileUploadSize() const;
 
     static const std::string DEFAULT_POST_ROUTE;
     static const std::string DEFAULT_POST_FOLDER;
@@ -104,7 +104,7 @@ private:
     std::string _uploadRedirect;
     std::size_t _writeBufferSize;
     std::size_t _fieldLimit;
-    unsigned long long _maximumFileUploadSize;
+    uint64_t _maximumFileUploadSize;
     
 };
 

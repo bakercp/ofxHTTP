@@ -261,7 +261,7 @@ void IPVideoRoute::send(ofPixels& pix) const
 {
     if (pix.isAllocated())
     {
-        unsigned long long timestamp = ofGetElapsedTimeMillis();
+        uint64_t timestamp = ofGetElapsedTimeMillis();
 
         ofBuffer compressedPixels;
 
@@ -499,10 +499,10 @@ void IPVideoRouteHandler::handleRequest(ServerEventArgs& evt)
                         ostr << "\r\n";
                         ostr << buffer;
 
-                        unsigned long long now = ofGetElapsedTimeMillis();
+                        uint64_t now = ofGetElapsedTimeMillis();
                         _lastFrameDuration = now - _lastFrameSent;
                         _lastFrameSent = now;
-                        _bytesSent += static_cast<unsigned long long>(ostr.chars()); // add the counts
+                        _bytesSent += static_cast<uint64_t>(ostr.chars()); // add the counts
                         ostr.reset();               // reset the counts
                     }
                     else

@@ -48,7 +48,7 @@ ProgressMonitor::~ProgressMonitor()
 void ProgressMonitor::update(std::streamsize,
                              std::streamsize,
                              std::size_t,
-                             unsigned long long)
+                             uint64_t)
 {
 //    _totalBytesTransferred  = totalBytesTransferred;
 //    _totalBytes             = totalBytes;

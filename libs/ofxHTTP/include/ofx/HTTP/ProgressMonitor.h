@@ -43,7 +43,7 @@ public:
     void update(std::streamsize totalBytesTransferred,
                 std::streamsize totalBytes,
                 std::size_t transferBufferSize,
-                unsigned long long lastUpdate);
+                uint64_t lastUpdate);
 
     std::streamsize getTotalBytesTranferred() const;
     std::streamsize getTotalBytes() const;
@@ -59,7 +59,7 @@ private:
     std::streamsize _totalBytes;
     std::size_t _transferBufferSize;
 
-    unsigned long long _lastUpdateTime;
+    uint64_t _lastUpdateTime;
     float _bytesPerSecond;
 
     mutable Poco::FastMutex _mutex;

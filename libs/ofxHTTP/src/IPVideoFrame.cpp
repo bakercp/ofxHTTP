@@ -106,7 +106,7 @@ ofImageQualityType IPVideoFrameSettings::getQuality() const
 
         
 IPVideoFrame::IPVideoFrame(const IPVideoFrameSettings& settings,
-                           unsigned long long timestamp,
+                           uint64_t timestamp,
                            const ofBuffer& buffer):
     _settings(settings),
     _timestamp(timestamp),
@@ -126,7 +126,7 @@ IPVideoFrameSettings IPVideoFrame::getSettings() const
 }
 
 
-unsigned long long IPVideoFrame::getTimestamp() const
+uint64_t IPVideoFrame::getTimestamp() const
 {
     return _timestamp;
 }

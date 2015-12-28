@@ -362,7 +362,7 @@
 ////}
 ////
 ////
-////bool CookieStore::clearExpired(unsigned long long expiredAt)
+////bool CookieStore::clearExpired(uint64_t expiredAt)
 ////{
 ////    Poco::FastMutex::ScopedLock lock(mutex);
 ////

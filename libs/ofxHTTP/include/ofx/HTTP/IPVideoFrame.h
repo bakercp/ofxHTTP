@@ -75,20 +75,20 @@ class IPVideoFrame
 {
 public:
     IPVideoFrame(const IPVideoFrameSettings& settings,
-                 unsigned long long timestamp,
+                 uint64_t timestamp,
                  const ofBuffer& buffer);
     
     virtual ~IPVideoFrame();
 
     IPVideoFrameSettings getSettings() const;
 
-    unsigned long long getTimestamp() const;
+    uint64_t getTimestamp() const;
 
     ofBuffer& getBuffer();
 
 private:
     IPVideoFrameSettings _settings;
-    unsigned long long _timestamp;
+    uint64_t _timestamp;
     ofBuffer _buffer;
     
 };

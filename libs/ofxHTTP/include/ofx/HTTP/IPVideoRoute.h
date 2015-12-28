@@ -201,16 +201,16 @@ protected:
 
     bool _isRunning;
 
-    unsigned long long _startTime;
+    uint64_t _startTime;
 
-    unsigned long long _bytesSent;
-    unsigned long long _framesSent;
+    uint64_t _bytesSent;
+    uint64_t _framesSent;
 
-    unsigned long long _lastFrameSent;
-    unsigned long long _lastFrameDuration;
-    unsigned long long _targetFrameDuration;
+    uint64_t _lastFrameSent;
+    uint64_t _lastFrameDuration;
+    uint64_t _targetFrameDuration;
     
-    unsigned long long _nextScheduledFrame;
+    uint64_t _nextScheduledFrame;
     
     mutable std::mutex _mutex;
 
