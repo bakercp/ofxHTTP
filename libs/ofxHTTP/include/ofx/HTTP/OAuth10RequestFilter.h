@@ -47,7 +47,7 @@ public:
 
 	virtual ~OAuth10RequestFilter();
 
-    void requestFilter(BaseRequest& request, Context& context);
+    void requestFilter(BaseRequest& request, Context& context) override;
 
     OAuth10Credentials& credentials();
 

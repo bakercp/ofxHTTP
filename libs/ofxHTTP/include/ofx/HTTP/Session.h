@@ -43,7 +43,7 @@ public:
 
     virtual ~BaseSession();
 
-    std::string getId() const;
+    std::string getId() const override;
 
     /// \brief A utility function for generating unique session ids.
     /// \returns A unique session id string.
@@ -74,17 +74,18 @@ public:
 
     virtual ~SimpleSession();
 
-    bool has(const std::string& key) const;
+    bool has(const std::string& key) const override;
 
-    void put(const std::string& key, const std::string& value);
+    void put(const std::string& key, const std::string& value) override;
 
-    std::string get(const std::string& key, const std::string& defaultValue) const;
+    std::string get(const std::string& key,
+                    const std::string& defaultValue) const override;
 
-    std::string get(const std::string& key) const;
+    std::string get(const std::string& key) const override;
 
-    void remove(const std::string& key);
+    void remove(const std::string& key) override;
 
-    void clear();
+    void clear() override;
 
 protected:
     SimpleSession(const SimpleSession&);
