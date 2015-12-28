@@ -91,22 +91,30 @@ public:
     ///        will return all PINGs with a PONG.
     void setAutoPingPongResponse(bool autoPingPongResponse);
 
+    /// \returns true iff auto ping pong response is enabled.
     bool getAutoPingPongResponse() const;
 
+    /// \param keepAlive True iff keep alive should be enabled.
     void setKeepAlive(bool keepAlive);
 
+    /// \returns true iff keep alive is enabled.
     bool getKeepAlive() const;
 
     void setReceiveTimeout(const Poco::Timespan& receiveTimeout);
 
+    /// \returns the receive timeout.
     Poco::Timespan getReceiveTimeout() const;
 
     void setSendTimeout(const Poco::Timespan& sendTimeout);
 
+    /// \returns the send timeout.
     Poco::Timespan getSendTimeout() const;
 
+    /// \brief Set the polling timeout.
+    /// \param pollTimeout the polling timeout.
     void setPollTimeout(const Poco::Timespan& pollTimeout);
 
+    /// \returns the poll timeout.
     Poco::Timespan getPollTimeout() const;
 
     /// \brief Set the WebSocket buffers size.

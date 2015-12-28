@@ -60,7 +60,7 @@ public:
     /// \brief Destroy a WebSocketFrame.
     virtual ~WebSocketFrame();
 
-    /// \returns the WebSockFrame flags.
+    /// \returns the WebSocketFrame flags.
     int getFlags() const;
 
     /// \returns true iff a continuation frame.
