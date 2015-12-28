@@ -121,7 +121,6 @@ private:
 
     void handleExtensions(ServerEventArgs& evt);
 
-
     std::size_t sendFrames(Poco::Net::WebSocket& ws);
 
     // this is all fixed in Poco 1.4.6 and 1.5.+
