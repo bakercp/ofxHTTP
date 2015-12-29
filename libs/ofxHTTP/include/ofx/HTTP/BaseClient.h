@@ -132,12 +132,12 @@ private:
 
     void progress(const BaseRequest& request,
                   Context& context,
-                  std::streamsize totalBytesTransferred);
+                  std::streamsize totalBytesTransferred) override;
 
     void progress(const BaseRequest& request,
                   const BaseResponse& response,
                   Context& context,
-                  std::streamsize totalBytesTransferred);
+                  std::streamsize totalBytesTransferred) override;
 
 };
 
