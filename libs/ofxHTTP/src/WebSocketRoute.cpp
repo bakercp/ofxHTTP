@@ -171,7 +171,7 @@ bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& reques
     }
 
     // check to see if this is an websocket upgrade request
-    if (Poco::icompare(request.get("Upgrade", ""), "websocket")  != 0)
+    if (0 != Poco::icompare(request.get("Upgrade", ""), "websocket"))
     {
         return false;
     }

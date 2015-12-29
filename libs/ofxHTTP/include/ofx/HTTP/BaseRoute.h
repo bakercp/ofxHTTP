@@ -147,16 +147,20 @@ private:
 
 
 /// \brief The base implmentation of a server route.
+/// \tparam SettingsType The settings used for this templated route.
 template<typename SettingsType>
 class BaseRoute_: public AbstractRoute
 {
 public:
     /// \brief Create a BaseRoute.
+    /// \param settings The settings to use for route configuration.
     BaseRoute_(const SettingsType& settings = SettingsType());
 
     /// \brief Destroy a BaseRoute.
     virtual ~BaseRoute_();
 
+    /// \brief Setup the route with settings.
+    /// \param settings The seetings to use for setup.
     virtual void setup(const SettingsType& settings);
 
     virtual std::string getRoutePathPattern() const override;
@@ -176,8 +180,11 @@ public:
     /// \returns the route's Settings.
     const SettingsType& getSettings() const;
 
+    /// \returns a pointer to the server that owns this route.
     AbstractServer* getServer() override;
 
+    /// \brief Set the server that owns this route.
+    /// \param server A pointer to the server that owns this route.
     void setServer(AbstractServer* server) override;
 
 protected:

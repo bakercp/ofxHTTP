@@ -289,13 +289,13 @@ public:
                                   bool isSecurePort) const = 0;
 
     /// \brief Stop any pending activity and close this route.
-    /// \details This method may block until the route is fully stopped.
+    ///
+    /// This method may block until the route is fully stopped.
     virtual void stop() = 0;
-
 
     /// \brief Get a pointer to the server.
     ///
-    /// \returns NULL pointer if no server is specified.
+    /// \returns nullptr pointer if no server is specified.
     virtual AbstractServer* getServer() = 0;
 
     /// \brief Set the parent server.

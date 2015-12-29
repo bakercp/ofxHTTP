@@ -100,6 +100,8 @@ public:
     /// \returns true iff keep alive is enabled.
     bool getKeepAlive() const;
 
+    /// \brief Set the receive timeout.
+    /// \param receiveTimeout The amount of time to wait when receiving data.
     void setReceiveTimeout(const Poco::Timespan& receiveTimeout);
 
     /// \returns the receive timeout.
@@ -192,12 +194,26 @@ public:
 
     void close();
 
+    /// \brief Register event listeners for this route.
+    ///
+    /// The listener class must implement the following callbacks:
+    ///
+    /// onWebSocketOpenEvent(...), onWebSocketCloseEvent(...),
+    /// onWebSocketFrameReceivedEvent(...), onWebSocketFrameSentEvent(...),
+    /// onWebSocketErrorEvent(...).
+    ///
+    /// \tparam ListenerClass The lister class to register.
+    /// \param listener A pointer to the listener class.
     template<class ListenerClass>
     void registerWebSocketEvents(ListenerClass* listener);
 
+    /// \brief Unregister event listeners for this route.
+    /// \tparam ListenerClass The lister class to uregister.
+    /// \param listener A pointer to the listener class.
     template<class ListenerClass>
     void unregisterWebSocketEvents(ListenerClass* listener);
 
+    /// \returns The number of active WebSocketConnections.
     std::size_t getNumWebSocketConnections() const;
 
     /// \brief WebSocketEvents for WebSocket callbacks.
@@ -215,8 +231,10 @@ private:
     typedef WebSocketConnections::iterator WebSocketConnectionsIter;
 
     WebSocketConnections _connections;
+    /// \brief A collection of WebSocketConnections.
 
-    mutable std::mutex _mutex; // locks the handlers set
+    /// \brief The mutex that locks the handler set.
+    mutable std::mutex _mutex;
 
 };
 
