@@ -45,22 +45,22 @@ public:
 
     AuthScope(const std::string& host);
 
-    AuthScope(const std::string& host, unsigned short port);
+    AuthScope(const std::string& host, uint16_t port);
 
     AuthScope(const std::string& scheme,
               const std::string& host,
-              unsigned short port);
+              uint16_t port);
 
     AuthScope(const std::string& host,
               AuthenticationType authType);
 
     AuthScope(const std::string& host,
-              unsigned short port,
+              uint16_t port,
               AuthenticationType authType);
 
     AuthScope(const std::string& scheme,
               const std::string& host,
-              unsigned short port,
+              uint16_t port,
               const std::string& realm,
               AuthenticationType authType);
 
@@ -78,8 +78,8 @@ public:
 
     bool hasPort() const;
     void clearPort();
-    void setPort(unsigned short port);
-    unsigned short getPort() const;
+    void setPort(uint16_t port);
+    uint16_t getPort() const;
 
     bool hasRealm() const;
     void clearRealm();
@@ -107,7 +107,7 @@ private:
     std::string _host;
     
     bool _hasPort;
-    unsigned short _port;
+    uint16_t _port;
     
     bool _hasRealm;
     std::string _realm;

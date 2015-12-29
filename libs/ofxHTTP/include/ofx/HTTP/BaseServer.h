@@ -141,7 +141,7 @@ class BaseServerSettings: public HTTPServerParams
 {
 public:
     BaseServerSettings(const std::string& host = DEFAULT_HOST,
-                       unsigned short port = DEFAULT_PORT,
+                       uint16_t port = DEFAULT_PORT,
                        bool useSSL = DEFAULT_USE_SSL,
                        bool useSessions = DEFAULT_USE_SESSIONS);
 
@@ -150,8 +150,8 @@ public:
     void setHost(const std::string& host);
     std::string getHost() const;
 
-    void setPort(unsigned short port);
-    unsigned short getPort() const;
+    void setPort(uint16_t port);
+    uint16_t getPort() const;
 
     void setUseSSL(bool useSSL);
     bool useSSL() const;
@@ -169,13 +169,13 @@ public:
     void setBlacklist(const Net::IPAddressRange::List& blacklist);
     
     const static std::string DEFAULT_HOST;
-    const static unsigned short DEFAULT_PORT;
+    const static uint16_t DEFAULT_PORT;
     const static bool DEFAULT_USE_SSL;
     const static bool DEFAULT_USE_SESSIONS;
     
 private:
     std::string _host;
-    unsigned short _port;
+    uint16_t _port;
     bool _useSSL;
     bool _useSessions;
     

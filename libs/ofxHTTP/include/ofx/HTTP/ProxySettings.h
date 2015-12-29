@@ -41,12 +41,12 @@ public:
     ProxySettings();
 
     ProxySettings(const std::string& host,
-                  unsigned short port);
+                  uint16_t port);
 
     ProxySettings(const std::string& username,
                   const std::string& password,
                   const std::string& host,
-                  unsigned short port);
+                  uint16_t port);
 
     virtual ~ProxySettings();
     
@@ -55,15 +55,15 @@ public:
     std::string getHost() const;
     void setHost(const std::string& host);
 
-    unsigned short getPort() const;
-    void setPort(unsigned short port);
+    uint16_t getPort() const;
+    void setPort(uint16_t port);
 
-    static const std::string    DEFAULT_PROXY_HOST;
-    static const unsigned short DEFAULT_PROXY_PORT;
+    static const std::string DEFAULT_PROXY_HOST;
+    static const uint16_t DEFAULT_PROXY_PORT;
     
 protected:
     std::string _host;
-    unsigned short _port;
+    uint16_t _port;
 
 };
 

@@ -183,13 +183,13 @@ int HTTPServerParams::getMaxKeepAliveRequests() const
 
 
 const std::string BaseServerSettings::DEFAULT_HOST    = "127.0.0.1";
-const unsigned short BaseServerSettings::DEFAULT_PORT = 8998;
+const uint16_t BaseServerSettings::DEFAULT_PORT = 8998;
 const bool BaseServerSettings::DEFAULT_USE_SSL        = false;
 const bool BaseServerSettings::DEFAULT_USE_SESSIONS = true;
 
 
 BaseServerSettings::BaseServerSettings(const std::string& host,
-                                       unsigned short port,
+                                       uint16_t port,
                                        bool useSSL,
                                        bool useSessions):
     _host(host),
@@ -217,13 +217,13 @@ std::string BaseServerSettings::getHost() const
 }
 
 
-void BaseServerSettings::setPort(unsigned short port)
+void BaseServerSettings::setPort(uint16_t port)
 {
     _port = port;
 }
 
 
-unsigned short BaseServerSettings::getPort() const
+uint16_t BaseServerSettings::getPort() const
 {
     return _port;
 }

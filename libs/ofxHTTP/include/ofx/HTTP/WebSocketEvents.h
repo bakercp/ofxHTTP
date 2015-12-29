@@ -129,7 +129,7 @@ class WebSocketCloseEventArgs: public WebSocketEventArgs
 public:
     WebSocketCloseEventArgs(ServerEventArgs& evt,
                             WebSocketConnection& connection,
-                            unsigned short code,
+                            uint16_t code,
                             const std::string& reason):
         WebSocketEventArgs(evt, connection),
         _code(code),
@@ -138,7 +138,7 @@ public:
     }
 
     /// \returns A code, 0 if unset.
-    unsigned short getCode() const
+    uint16_t getCode() const
     {
         return _code;
     }
@@ -155,7 +155,7 @@ protected:
     /// This is parsed during frame close events, otherwise 0.
     ///
     /// \sa http://tools.ietf.org/html/rfc6455#section-5.5.1
-    unsigned short _code;
+    uint16_t _code;
 
     /// \brief The WebSocket UTF-8 encoded reason code (optional)
     ///

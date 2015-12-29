@@ -62,7 +62,7 @@ AuthScope::AuthScope(const std::string& host):
 
 AuthScope::AuthScope(const std::string& scheme,
                      const std::string& host,
-                     unsigned short port):
+                     uint16_t port):
     _hasScheme(true),
     _scheme(scheme),
     _hasHost(true),
@@ -77,7 +77,7 @@ AuthScope::AuthScope(const std::string& scheme,
 }
 
 
-AuthScope::AuthScope(const std::string& host, unsigned short port):
+AuthScope::AuthScope(const std::string& host, uint16_t port):
     _hasScheme(false),
     _scheme(""),
     _hasHost(true),
@@ -108,7 +108,7 @@ AuthScope::AuthScope(const std::string& host, AuthenticationType authType):
 
 
 AuthScope::AuthScope(const std::string& host,
-                     unsigned short port,
+                     uint16_t port,
                      AuthenticationType authType):
     _hasScheme(false),
     _scheme(""),
@@ -126,7 +126,7 @@ AuthScope::AuthScope(const std::string& host,
 
 AuthScope::AuthScope(const std::string& scheme,
                      const std::string& host,
-                     unsigned short port,
+                     uint16_t port,
                      const std::string& realm,
                      AuthenticationType authType):
     _hasScheme(true),
@@ -235,7 +235,7 @@ bool AuthScope::hasPort() const
 }
 
 
-void AuthScope::setPort(unsigned short port)
+void AuthScope::setPort(uint16_t port)
 {
     if (0 == port)
     {
@@ -256,7 +256,7 @@ void AuthScope::clearPort()
 }
 
 
-unsigned short AuthScope::getPort() const
+uint16_t AuthScope::getPort() const
 {
     return _port;
 }
