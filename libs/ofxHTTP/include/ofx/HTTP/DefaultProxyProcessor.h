@@ -37,13 +37,14 @@ class DefaultProxyProcessor: public AbstractRequestResponseFilter
 {
 public:
     DefaultProxyProcessor();
+
     virtual ~DefaultProxyProcessor();
 
-    virtual void requestFilter(BaseRequest& request, Context& context);
+    virtual void requestFilter(BaseRequest& request, Context& context) override;
 
     virtual void responseFilter(BaseRequest& request,
                                 BaseResponse& response,
-                                Context& context);
+                                Context& context) override;
 
     virtual bool canFilterResponse(BaseRequest& request,
                                    BaseResponse& response,

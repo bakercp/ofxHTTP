@@ -61,15 +61,13 @@ public:
     /// \brief Destroy the WebSocketConnection.
     virtual ~WebSocketConnection();
 
-    /// \brief Handle an ServerEventArgs.
-    /// \param evt The ServerEventArgs to handle.
-    void handleRequest(ServerEventArgs& evt);
+    void handleRequest(ServerEventArgs& evt) override;
 
     /// \brief Queue a frame to be sent.
     /// \returns false iff frame not queued
     bool sendFrame(const WebSocketFrame& frame) const;
 
-    void stop();
+    void stop() override;
 
 //    /// \brief Called when a WebSocketFrame is received.
 //    /// \details Subclasses can implement this method.

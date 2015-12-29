@@ -120,7 +120,7 @@ public:
     
     virtual ~PostRoute();
 
-    Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
+    Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request) override;
 
     PostRouteEvents& getEvents();
 

@@ -159,32 +159,32 @@ public:
 
     virtual void setup(const SettingsType& settings);
 
-    virtual std::string getRoutePathPattern() const;
+    virtual std::string getRoutePathPattern() const override;
 
     virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
-                                  bool isSecurePort) const;
+                                  bool isSecurePort) const override;
 
-    virtual Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
+    virtual Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request) override;
 
     void handleRequest(Poco::Net::HTTPServerRequest& request,
-                       Poco::Net::HTTPServerResponse& response);
+                       Poco::Net::HTTPServerResponse& response) override;
 
-    virtual void handleRequest(ServerEventArgs& evt);
+    virtual void handleRequest(ServerEventArgs& evt) override;
 
-    virtual void stop();
+    virtual void stop() override;
 
     /// \returns the route's Settings.
     const SettingsType& getSettings() const;
 
-    AbstractServer* getServer();
+    AbstractServer* getServer() override;
 
-    void setServer(AbstractServer* server);
+    void setServer(AbstractServer* server) override;
 
 protected:
     /// \brief The settings.
     SettingsType _settings;
 
-    /// \brief A
+    /// \brief A pointer to the server.
     AbstractServer* _server;
 
 private:
@@ -441,11 +441,11 @@ public:
     virtual ~BaseRouteHandler_();
 
     void handleRequest(Poco::Net::HTTPServerRequest& request,
-                       Poco::Net::HTTPServerResponse& response);
+                       Poco::Net::HTTPServerResponse& response) override;
 
-    virtual void handleRequest(ServerEventArgs& evt) = 0;
+    virtual void handleRequest(ServerEventArgs& evt) override = 0;
 
-    virtual void stop();
+    virtual void stop() override;
 
     /// \brief Get the dispatching route.
     RouteType& getRoute();

@@ -143,15 +143,14 @@ protected:
 class ClientProgressRequestStream: public ClientProgressIOS, public std::ostream
 {
 public:
-    /// Creates the CountingOutputStream and connects it
-    /// to the given input stream.
+    /// \brief Creates the CountingOutputStream and connects it to the given input stream.
     ClientProgressRequestStream(std::ostream& ostr,
                                 const BaseRequest& request,
                                 Context& context,
                                 AbstractRequestStreamListener& listener,
                                 std::streamsize bytesPerProgressUpdate);
 
-    /// Destroys the ProgressOutputStream.
+    /// \brief Destroys the ProgressOutputStream.
     ~ClientProgressRequestStream();
     
 };
@@ -160,8 +159,7 @@ public:
 class ClientProgressResponseStream: public ClientProgressIOS, public std::istream
 {
 public:
-    /// Creates the CountingInputStream and connects it
-    /// to the given input stream.
+    /// \brief Creates the CountingInputStream and connects it to the given input stream.
     ClientProgressResponseStream(std::istream& istr,
                                  const BaseRequest& request,
                                  const BaseResponse& response,
@@ -169,7 +167,7 @@ public:
                                  AbstractResponseStreamListener& listener,
                                  std::streamsize bytesPerProgressUpdate);
 
-    /// Destroys the stream.
+    /// \brief Destroys the stream.
     ~ClientProgressResponseStream();
 
 };

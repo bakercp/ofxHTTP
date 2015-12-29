@@ -42,11 +42,11 @@ public:
     DefaultResponseStreamFilter();
     virtual ~DefaultResponseStreamFilter();
     
-    void requestFilter(BaseRequest& request, Context& context);
+    void requestFilter(BaseRequest& request, Context& context) override;
 
     void responseFilter(BaseRequest& request,
                         BaseResponse& response,
-                        Context& context);
+                        Context& context) override;
 
     bool canFilterResponse(BaseRequest& request,
                            BaseResponse& response,
@@ -55,7 +55,7 @@ public:
     std::istream& responseStreamFilter(std::istream& responseStream,
                                        const BaseRequest& request,
                                        const BaseResponse& response,
-                                       Context& context);
+                                       Context& context) override;
 
     static const std::string ACCEPT_ENCODING_HEADER;
     static const std::string CONTENT_ENCODING_HEADER;

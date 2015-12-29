@@ -56,7 +56,7 @@ WebSocketFrame::WebSocketFrame(const unsigned char* buffer,
 WebSocketFrame::WebSocketFrame(const char* buffer,
                                std::size_t size,
                                int flags):
-    ofBuffer(buffer,size),
+    ofBuffer(buffer, size),
     _flags(flags)
 {
 }

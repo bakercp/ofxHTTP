@@ -157,7 +157,7 @@ public:
     
     virtual ~IPVideoRoute();
 
-    Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
+    Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request) override;
 
     void send(ofPixels& pix) const;
 
@@ -167,7 +167,7 @@ public:
 
     std::size_t getNumConnections() const;
 
-    virtual void stop();
+    virtual void stop() override;
 
 protected:
     typedef std::vector<IPVideoRouteHandler*> Connections;
@@ -187,9 +187,9 @@ public:
     IPVideoRouteHandler(IPVideoRoute& route);
     virtual ~IPVideoRouteHandler();
 
-    void handleRequest(ServerEventArgs& evt);
+    void handleRequest(ServerEventArgs& evt) override;
 
-    void stop();
+    void stop() override;
 
     float getCurrentBitRate() const;   // bits / second
     float getCurrentFrameRate() const; // frames / second

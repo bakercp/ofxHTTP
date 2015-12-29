@@ -96,11 +96,11 @@ public:
 
     virtual ~FileSystemRoute();
 
-    virtual void handleRequest(ServerEventArgs& evt);
+    virtual void handleRequest(ServerEventArgs& evt) override;
 
     virtual void handleErrorResponse(ServerEventArgs& evt);
 
-    Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
+    Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request) override;
 
 };
 

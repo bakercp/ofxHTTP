@@ -52,11 +52,11 @@ public:
     virtual ~DefaultRedirectProcessor();
 
     virtual void requestFilter(BaseRequest& request,
-                               Context& context);
+                               Context& context) override;
 
     virtual void responseFilter(BaseRequest& request,
                                 BaseResponse& response,
-                                Context& context);
+                                Context& context) override;
 
     virtual bool canFilterResponse(BaseRequest& request,
                                    BaseResponse& response,
