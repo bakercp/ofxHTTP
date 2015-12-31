@@ -109,9 +109,27 @@ public:
 };
 
 
+/// \brief An abstract Server Event request handler.
+class AbstractServerEventRequestHandler
+{
+public:
+    /// \brief Destroy the AbstractServerEventRequestHandler.
+    virtual ~AbstractServerEventRequestHandler()
+    {
+    }
+
+    /// \brief Handle the ServerEventArgs.
+    /// \param evt The server request event.
+    virtual void handleRequest(ServerEventArgs& evt) = 0;
+
+};
+
+
 /// \brief An AbstractHTTPRequestHandler.
 /// \note This layer of abstraction is to make documentation simpler.
-class AbstractHTTPRequestHandler: public Poco::Net::HTTPRequestHandler
+class AbstractHTTPRequestHandler:
+    public Poco::Net::HTTPRequestHandler,
+    public AbstractServerEventRequestHandler
 {
 public:
     /// \brief Destroy the AbstractHTTPRequestHandler.
@@ -125,8 +143,6 @@ public:
     /// \note Redeclared here for documentation puposes.
     virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
                                Poco::Net::HTTPServerResponse& response) = 0;
-
-    virtual void handleRequest(ServerEventArgs& evt) = 0;
 
 };
 
@@ -304,6 +320,61 @@ public:
 
 };
 
+
+class WebSocketFrame;
+
+
+/// \brief Represents an abstract WebSocketFrame filter.
+///
+/// Can modify incoming and outgoing WebSocketFrames.
+class AbstractWebSocketFilter
+{
+public:
+    /// \brief Destroy the AbstractWebSocketFilter.
+    virtual ~AbstractWebSocketFilter()
+    {
+    }
+
+    /// \brief Process a frame that was received.
+    /// \param frame A reference to the frame that was recieved.
+    /// \note The frame contents and flags may be modified.
+    virtual void receiveFilter(WebSocketFrame& frame) = 0;
+
+    /// \brief Process a frame before sending.
+    /// \param frame A reference to the frame that will be sent.
+    /// \note The frame contents and flags may be modified.
+    virtual void sendFilter(WebSocketFrame& frame) = 0;
+
+};
+
+
+
+/// \brief Represents an abstract WebSocketExtension factory.
+///
+/// Can process and respond to headers in WebSocket Upgrade request. Returns an
+/// approprately configured AbstractWebSocketFilter for use with a
+/// WebSocketConnection.
+class AbstractWebSocketFilterFactory
+{
+public:
+    /// \brief Destroy the AbstractWebSocketFilterFactory.
+    virtual ~AbstractWebSocketFilterFactory()
+    {
+    }
+
+    /// \brief Create an AbstractWebSocketFilter based on the ServerEventArgs.
+    ///
+    /// This function will set the appropriate response headers in the
+    /// evt.getResponse() if applicable.
+    ///
+    /// The function will return an AbstractWebSocketFilter or a nullptr if no
+    /// matching AbstractWebSocketFilter can be configured.
+    ///
+    /// \param evt The server request and response.
+    /// \returns an AbstractWebSocketFilter or nullptr if none could be created.
+    virtual std::unique_ptr<AbstractWebSocketFilter> makeFilterForRequest(ServerEventArgs& evt) const = 0;
+
+};
 
 
 } } // namespace ofx::HTTP

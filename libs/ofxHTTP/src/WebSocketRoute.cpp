@@ -24,6 +24,7 @@
 
 
 #include "ofx/HTTP/WebSocketRoute.h"
+#include "ofx/HTTP/WebSocketExtensions.h"
 #include "ofx/HTTP/WebSocketConnection.h"
 
 
@@ -154,6 +155,7 @@ std::size_t WebSocketRouteSettings::getBufferSize() const
 WebSocketRoute::WebSocketRoute(const Settings& settings):
     BaseRoute_<WebSocketRouteSettings>(settings)
 {
+    _filterFactories.push_back(std::make_unique<WebSocketPerMessageCompressionFactory>());
 }
 
 
@@ -203,59 +205,66 @@ Poco::Net::HTTPRequestHandler* WebSocketRoute::createRequestHandler(const Poco::
 
 void WebSocketRoute::stop()
 {
-    close(); // close all connections
-}
-
-
-bool WebSocketRoute::sendFrame(const WebSocketConnection* connection,
-                               const WebSocketFrame& frame)
-{
-    if(connection)
-    {
-        return connection->sendFrame(frame);
-    }
-    else
-    {
-        ofLogError("WebSocketRoute::sendFrame") << "0 == handler";
-        return false;
-    }
-}
-
-
-void WebSocketRoute::close(WebSocketConnection* connection)
-{
-    if(connection)
-    {
-        connection->stop();
-    }
-    else
-    {
-        ofLogError("WebSocketRoute::close") << "0 == handler";
-    }
-}
-
-
-void WebSocketRoute::close()
-{
     // std::unique_lock<std::mutex> lock(_mutex);
-    WebSocketConnectionsIter iter = _connections.begin();
+    auto iter = _connections.begin();
 
     while (iter != _connections.end())
     {
-        close(*iter);
+        (*iter)->stop();
         ++iter;
     }
 }
 
 
+//bool WebSocketRoute::sendFrame(const WebSocketConnection* connection,
+//                               const WebSocketFrame& frame)
+//{
+//    if (connection)
+//    {
+//        return connection->sendFrame(frame);
+//    }
+//    else
+//    {
+//        ofLogError("WebSocketRoute::sendFrame") << "0 == handler";
+//        return false;
+//    }
+//}
+//
+
+//void WebSocketRoute::close(WebSocketConnection* connection)
+//{
+//    if (connection)
+//    {
+//        connection->stop();
+//    }
+//    else
+//    {
+//        ofLogError("WebSocketRoute::close") << "0 == handler";
+//    }
+//}
+
+
+//void WebSocketRoute::close()
+//{
+//    // std::unique_lock<std::mutex> lock(_mutex);
+//    auto iter = _connections.begin();
+//
+//    while (iter != _connections.end())
+//    {
+//        close(*iter);
+//        ++iter;
+//    }
+//}
+
+
 void WebSocketRoute::broadcast(const WebSocketFrame& frame)
 {
     std::unique_lock<std::mutex> lock(_mutex);
-    WebSocketConnectionsIter iter = _connections.begin();
+    auto iter = _connections.begin();
 
     while (iter != _connections.end())
     {
-        sendFrame(*iter,frame);
+        (*iter)->sendFrame(frame);
         ++iter;
     }
 }
@@ -265,7 +274,7 @@ void WebSocketRoute::registerWebSocketConnection(WebSocketConnection* connection
 {
     std::unique_lock<std::mutex> lock(_mutex);
 
-    if(!_connections.insert(connection).second)
+    if (!_connections.insert(connection).second)
     {
         ofLogError("BaseWebSocketSessionManager::registerRouteHandler") << "Element was already in set!";
     }
@@ -279,7 +288,7 @@ void WebSocketRoute::unregisterWebSocketConnection(WebSocketConnection* connecti
     std::size_t numErased = _connections.erase(connection);
 
     // TODO: this is strange.
-    if(1 != numErased)
+    if (1 != numErased)
     {
         ofLogError("BaseWebSocketSessionManager::unregisterRouteHandler") << "1 != numErased" << numErased;
     }
@@ -290,6 +299,12 @@ std::size_t WebSocketRoute::getNumWebSocketConnections() const
 {
     std::unique_lock<std::mutex> lock(_mutex);
     return _connections.size();
+}
+
+
+const std::vector<std::unique_ptr<AbstractWebSocketFilterFactory>>& WebSocketRoute::getFilterFactories() const
+{
+    return _filterFactories;
 }
 
 

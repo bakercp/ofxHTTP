@@ -81,8 +81,8 @@ public:
 //    virtual void frameSent(const WebSocketFrame& frame,
 //                           std::size_t numBytesSent);
 
-    /// \brief Called when a WebSocketConnection is closed.
-    /// \details Subclasses can implement this method.
+//    /// \brief Called when a WebSocketConnection is closed.
+//    /// \details Subclasses can implement this method.
 //    virtual void socketClosed();
 
     /// \returns The original http request headers.
@@ -108,9 +108,9 @@ public:
     /// \returns the total bytes received from the client.
     std::size_t getTotalBytesReceived() const;
 
-protected:
-    /// \brief A reference to the parent WebSocketRoute.
-//    WebSocketRoute& _parent;
+    /// \brief Take ownership of the passed std::unique_ptr<ExtensionType>.
+    /// \param filter the rvalue reference to the filter.
+    void addWebSocketFilter(std::unique_ptr<AbstractWebSocketFilter> filter);
 
 private:
     void handleOrigin(ServerEventArgs& evt);
@@ -138,6 +138,9 @@ private:
 
     /// \brief The total number of bytes received from the client.
     std::size_t _totalBytesReceived;
+
+    /// \brief A collection of WebSocketFilters.
+    std::vector<std::unique_ptr<AbstractWebSocketFilter>> _filters;
 
     /// \brief A queue of the WebSocketFrames scheduled for delivery.
     mutable std::queue<WebSocketFrame> _frameQueue;

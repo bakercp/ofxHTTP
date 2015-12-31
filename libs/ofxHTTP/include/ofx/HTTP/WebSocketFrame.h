@@ -27,6 +27,7 @@
 
 
 #include "Poco/Net/WebSocket.h"
+#include "ofx/IO/ByteBuffer.h"
 #include "ofFileUtils.h"
 
 
@@ -36,9 +37,16 @@ namespace HTTP {
 
 /// \brief A WebSocketFrame frame.
 /// \todo replace ofBuffer with Poco::FIFOBuffer or ofx::IO::ByteBuffer
-class WebSocketFrame: public ofBuffer
+class WebSocketFrame: public IO::ByteBuffer
 {
 public:
+    /// \brief Create a WebSocketFrame.
+    WebSocketFrame(int flags = Poco::Net::WebSocket::FRAME_TEXT);
+
+    /// \brief Create a WebSocketFrame.
+    WebSocketFrame(const IO::ByteBuffer& buffer,
+                   int flags = Poco::Net::WebSocket::FRAME_TEXT);
+
     /// \brief Create a WebSocketFrame.
     WebSocketFrame(const ofBuffer& buffer,
                    int flags = Poco::Net::WebSocket::FRAME_TEXT);
@@ -84,14 +92,30 @@ public:
     /// \returns true iff a final frame.
     bool isFinal() const;
 
+    /// \brief Set the FIN bit.
+    /// \param value The bit's value.
+    void setFinal(bool value);
+
     /// \returns true iff a RSV1 frame.
     bool isRSV1() const;
+
+    /// \brief Set the RSV1 bit.
+    /// \param value The bit's value.
+    void setRSV1(bool value);
 
     /// \returns true iff a RSV2 frame.
     bool isRSV2() const;
 
+    /// \brief Set the RSV2 bit.
+    /// \param value The bit's value.
+    void setRSV2(bool value);
+
     /// \returns true iff a RSV3 frame.
     bool isRSV3() const;
+
+    /// \brief Set the RSV3 bit.
+    /// \param value The bit's value.
+    void setRSV3(bool value);
 
     /// \returns a string representing the WebSocketFrame.
     std::string toString() const;

@@ -25,7 +25,6 @@
 
 #include "ofx/HTTP/WebSocketConnection.h"
 #include "ofx/HTTP/WebSocketRoute.h"
-//#include "ofx/HTTP/BaseSe"
 #include "Poco/ByteOrder.h"
 
 
@@ -101,6 +100,7 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
                 {
                     WebSocketFrame frame(buffer.begin(), numBytesReceived, flags);
 
+                    // Send a return frame.
                     if (frame.isPing() || frame.isPong())
                     {
                         if (getRoute().getSettings().getAutoPingPongResponse())
@@ -125,22 +125,19 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
                     }
                     else if (frame.isClose())
                     {
-                        unsigned short code = 0;
+                        uint16_t code = 0;
                         
                         std::string reason = "";
 
                         // TODO: it is possible, per the spec send
                         std::size_t n = frame.size();
 
-#if OF_VERSION_MINOR > 8
-                        const char* p = frame.getData();
-#else
-                        const char* p = frame.getBinaryBuffer();
-#endif
+                        const char* pData = frame.getCharPtr();
+
                         if (n >= 2)
                         {
-                            // Get thec close code.
-                            code = static_cast<unsigned short>(Poco::ByteOrder::fromNetwork((p[0] << 8) | p[1]));
+                            // Get the close code.
+                            code = static_cast<uint16_t>(Poco::ByteOrder::fromNetwork((pData[0] << 8) | pData[1]));
                         }
                         else
                         {
@@ -150,8 +147,7 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
                         if (n > 2)
                         {
                             // Skip the first two bytes of the code.
-                            reason = std::string(frame.getText().begin() + 2,
-                                                 frame.getText().end());
+                            reason = frame.getText().substr(2);
                         }
                         else
                         {
@@ -176,13 +172,24 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
                                                                *this,
                                                                code,
                                                                reason);
+
                         ofNotifyEvent(getRoute().events.onCloseEvent,
                                       closeEventArgs,
                                       this);
+
+                        ofLogVerbose("WebSocketConnection::handleRequest") << "WebSocket connection closed: code=" << code << " reason: " << reason;
+
                     }
                     else
                     {
+                        // Apply receive filters to received frame.
+                        for (auto& filter: _filters)
+                        {
+                            filter->receiveFilter(frame);
+                        }
+
                         WebSocketFrameEventArgs frameArgs(evt, *this, frame);
+
                         ofNotifyEvent(getRoute().events.onFrameReceivedEvent,
                                       frameArgs,
                                       this);
@@ -190,7 +197,7 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
                 }
                 else
                 {
-                    // clean shutdown if we read and no bytes were available.
+                    // Clean shutdown if we read and no bytes were available.
                     stop();
                 }
             }
@@ -208,14 +215,17 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
                     if (ws.poll(getRoute().getSettings().getPollTimeout(),
                                 Poco::Net::Socket::SELECT_WRITE))
                     {
+                        // Apply send filters to queued frame.
+                        for (auto& filter: _filters)
+                        {
+                            filter->sendFilter(frame);
+                        }
+
                         int numBytesSent = 0;
 
-#if OF_VERSION_MINOR > 8
-                        const char* p = frame.getData();
-#else
-                        const char* p = frame.getBinaryBuffer();
-#endif
-                        numBytesSent = ws.sendFrame(p,
+                        const char* pData = frame.getCharPtr();
+
+                        numBytesSent = ws.sendFrame(pData,
                                                     frame.size(),
                                                     frame.getFlags());
 
@@ -234,9 +244,12 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
                             ofLogWarning("WebSocketConnection::handleRequest") << "WebSocket numBytesSent < frame.size()";
                             // error = WS_ERROR_INCOMPLETE_FRAME_SENT;
                         }
-                        
+
                         WebSocketFrameEventArgs eventArgs(evt, *this, frame);
-                        ofNotifyEvent(getRoute().events.onFrameSentEvent, eventArgs, this);
+                        
+                        ofNotifyEvent(getRoute().events.onFrameSentEvent,
+                                      eventArgs,
+                                      this);
                     }
                 }
             }
@@ -301,6 +314,14 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
         WebSocketErrorEventArgs eventArgs(evt, *this, WS_ERR_NET_EXCEPTION);
         ofNotifyEvent(getRoute().events.onErrorEvent, eventArgs, this);
         // response socket has already been closed (!?)
+    }
+    catch (const Poco::Exception& exc)
+    {
+        ofLogError("WebSocketConnection::handleRequest") << "Exception: " << exc.displayText();
+        evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        getRoute().handleRequest(evt);
+        WebSocketErrorEventArgs eventArgs(evt, *this, WS_ERR_OTHER);
+        ofNotifyEvent(getRoute().events.onErrorEvent, eventArgs, this);
     }
     catch (const std::exception& exc)
     {
@@ -431,14 +452,55 @@ void WebSocketConnection::handleSubprotocols(ServerEventArgs&)
 }
 
 
-void WebSocketConnection::handleExtensions(ServerEventArgs&)
+void WebSocketConnection::handleExtensions(ServerEventArgs& evt)
 {
-//    if(request.has("Sec-WebSocket-Extensions"))
-//    {
-//        // TODO: support these
-//        // http://tools.ietf.org/html/draft-tyoshino-hybi-websocket-perframe-deflate-05
-//        // http://tools.ietf.org/html/draft-ietf-hybi-websocket-multiplexing-09
-//    }
+    // Combine multiple headers, if needed.
+
+    std::stringstream extensionValues;
+
+    bool alreadyFoundOne = false;
+
+    auto iter = evt.getRequest().begin();
+
+    while (iter != evt.getRequest().end())
+    {
+        const auto& key = (*iter).first;
+        const auto& value = (*iter).second;
+
+        if (0 == Poco::icompare(key, "Sec-WebSocket-Extensions"))
+        {
+            extensionValues << value;
+
+            if (alreadyFoundOne)
+            {
+                extensionValues << ", ";
+            }
+            else
+            {
+                alreadyFoundOne = true;
+            }
+        }
+        
+        ++iter;
+    }
+
+    // Remove all Sec-WebSocket-Extensions headers.
+    evt.getRequest().erase("Sec-WebSocket-Extensions");
+
+    // Add the sanitized, combined header.
+    evt.getRequest().add("Sec-WebSocket-Extensions", extensionValues.str());
+
+    const auto& filterFactories = getRoute().getFilterFactories();
+
+    for (const auto& factory : filterFactories)
+    {
+        auto filter = factory->makeFilterForRequest(evt);
+
+        if (nullptr != filter)
+        {
+            _filters.push_back(std::move(filter));
+        }
+    }
 }
 
 

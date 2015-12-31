@@ -74,7 +74,7 @@ public:
     /// \brief Set the list of valid origins.
     ///
     /// An empty set means that any Origin header in the request will be
-    /// accepted.  A non-empty set means that the request origin MUST be in the
+    /// accepted. A non-empty set means that the request origin MUST be in the
     /// set.
     ///
     /// \param origins A set of valid origins.
@@ -172,27 +172,16 @@ public:
     /// \brief Destroy the WebSocketRoute.
     virtual ~WebSocketRoute();
 
-    /// \brief A custom canHandleRequest extends the BaseRoute to check
-    ///        for WebSocket upgrade headers.
-    /// \param request The HTTPServerRequest to test.
-    /// \param isSecurePort Indicates whether the request was passed on
-    ///        an SSL encrypted port.
-    /// \sa BaseRoute_<WebSocketRouteSettings>::canHandleRequest()
     virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
-                                  bool isSecurePort) const;
+                                  bool isSecurePort) const override;
 
-    virtual Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
+    virtual Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request) override;
 
-    virtual void stop();
+    virtual void stop() override;
 
-    bool sendFrame(const WebSocketConnection* connection,
-                   const WebSocketFrame& frame);
-
+    /// \brief Send a WebSocketFrame to all connected websockets.
+    /// \param frame The frame to send.
     void broadcast(const WebSocketFrame& frame);
-
-    void close(WebSocketConnection* connection);
-
-    void close();
 
     /// \brief Register event listeners for this route.
     ///
@@ -216,9 +205,11 @@ public:
     /// \returns The number of active WebSocketConnections.
     std::size_t getNumWebSocketConnections() const;
 
+    /// \returns a reference to the filter factories.
+    const std::vector<std::unique_ptr<AbstractWebSocketFilterFactory>>& getFilterFactories() const;
+
     /// \brief WebSocketEvents for WebSocket callbacks.
     WebSocketEvents events;
-
 
 protected:
     void registerWebSocketConnection(WebSocketConnection* connection);
@@ -227,11 +218,11 @@ protected:
     friend class WebSocketConnection;
     
 private:
-    typedef std::set<WebSocketConnection*> WebSocketConnections;
-    typedef WebSocketConnections::iterator WebSocketConnectionsIter;
+    /// \brief A collection of filter factories.
+    std::vector<std::unique_ptr<AbstractWebSocketFilterFactory>> _filterFactories;
 
-    WebSocketConnections _connections;
     /// \brief A collection of WebSocketConnections.
+    std::set<WebSocketConnection*> _connections;
 
     /// \brief The mutex that locks the handler set.
     mutable std::mutex _mutex;

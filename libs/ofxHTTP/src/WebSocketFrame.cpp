@@ -30,15 +30,28 @@ namespace ofx {
 namespace HTTP {
 
 
+WebSocketFrame::WebSocketFrame(int flags):
+    _flags(flags)
+{
+}
+
+
+WebSocketFrame::WebSocketFrame(const IO::ByteBuffer& buffer, int flags):
+    IO::ByteBuffer(buffer),
+    _flags(flags)
+{
+}
+
+
 WebSocketFrame::WebSocketFrame(const ofBuffer& buffer, int flags):
-    ofBuffer(buffer),
+    IO::ByteBuffer(buffer),
     _flags(flags)
 {
 }
 
 
 WebSocketFrame::WebSocketFrame(const std::string& text, int flags):
-    ofBuffer(text),
+    IO::ByteBuffer(text),
     _flags(flags)
 {
 }
@@ -47,7 +60,7 @@ WebSocketFrame::WebSocketFrame(const std::string& text, int flags):
 WebSocketFrame::WebSocketFrame(const unsigned char* buffer,
                                std::size_t size,
                                int flags):
-    ofBuffer(reinterpret_cast<const char*>(buffer), size),
+    IO::ByteBuffer(buffer, size),
     _flags(flags)
 {
 }
@@ -56,7 +69,7 @@ WebSocketFrame::WebSocketFrame(const unsigned char* buffer,
 WebSocketFrame::WebSocketFrame(const char* buffer,
                                std::size_t size,
                                int flags):
-    ofBuffer(buffer, size),
+    IO::ByteBuffer(buffer, size),
     _flags(flags)
 {
 }
@@ -115,9 +128,35 @@ bool WebSocketFrame::isFinal() const
 }
 
 
+void WebSocketFrame::setFinal(bool value)
+{
+    if (value)
+    {
+        _flags |= Poco::Net::WebSocket::FRAME_FLAG_FIN;
+    }
+    else
+    {
+        _flags &= ~(Poco::Net::WebSocket::FRAME_FLAG_FIN);
+    }
+}
+
+
 bool WebSocketFrame::isRSV1() const
 {
     return _flags & Poco::Net::WebSocket::FRAME_FLAG_RSV1;
+}
+
+
+void WebSocketFrame::setRSV1(bool value)
+{
+    if (value)
+    {
+        _flags |= Poco::Net::WebSocket::FRAME_FLAG_RSV1;
+    }
+    else
+    {
+        _flags &= ~(Poco::Net::WebSocket::FRAME_FLAG_RSV1);
+    }
 }
 
 
@@ -127,12 +166,38 @@ bool WebSocketFrame::isRSV2() const
 }
 
 
+void WebSocketFrame::setRSV2(bool value)
+{
+    if (value)
+    {
+        _flags |= Poco::Net::WebSocket::FRAME_FLAG_RSV2;
+    }
+    else
+    {
+        _flags &= ~(Poco::Net::WebSocket::FRAME_FLAG_RSV2);
+    }
+}
+
+
 bool WebSocketFrame::isRSV3() const
 {
     return _flags & Poco::Net::WebSocket::FRAME_FLAG_RSV3;
 }
 
 
+void WebSocketFrame::setRSV3(bool value)
+{
+    if (value)
+    {
+        _flags |= Poco::Net::WebSocket::FRAME_FLAG_RSV3;
+    }
+    else
+    {
+        _flags &= ~(Poco::Net::WebSocket::FRAME_FLAG_RSV3);
+    }
+}
+
+    
 std::string WebSocketFrame::toString() const
 {
     std::stringstream ss;
