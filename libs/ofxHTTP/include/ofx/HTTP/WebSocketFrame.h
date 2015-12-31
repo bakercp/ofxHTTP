@@ -36,7 +36,6 @@ namespace HTTP {
 
 
 /// \brief A WebSocketFrame frame.
-/// \todo replace ofBuffer with Poco::FIFOBuffer or ofx::IO::ByteBuffer
 class WebSocketFrame: public IO::ByteBuffer
 {
 public:
