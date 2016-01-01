@@ -221,21 +221,17 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
                             filter->sendFilter(frame);
                         }
 
-                        int numBytesSent = 0;
-
                         const char* pData = frame.getCharPtr();
 
-                        numBytesSent = ws.sendFrame(pData,
-                                                    frame.size(),
-                                                    frame.getFlags());
-
-                        _totalBytesSent += numBytesSent;
+                        int numBytesSent = ws.sendFrame(pData,
+                                                        frame.size(),
+                                                        frame.getFlags());
 
                         // WebSocketError error = WS_ERR_NONE;
 
-                        if (0 == numBytesSent)
+                        if (0 >= numBytesSent)
                         {
-                            ofLogWarning("WebSocketConnection::handleRequest") << "WebSocket numBytesSent == 0";
+                            ofLogWarning("WebSocketConnection::handleRequest") << "WebSocket numBytesSent <= 0";
                             // error = WS_ERROR_ZERO_BYTE_FRAME_SENT;
                         }
                         // TODO ofBuffer::size() returns long ... sendFrame returns int ... :/
@@ -244,6 +240,8 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
                             ofLogWarning("WebSocketConnection::handleRequest") << "WebSocket numBytesSent < frame.size()";
                             // error = WS_ERROR_INCOMPLETE_FRAME_SENT;
                         }
+
+                        _totalBytesSent += numBytesSent;
 
                         WebSocketFrameEventArgs eventArgs(evt, *this, frame);
                         
