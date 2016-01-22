@@ -126,30 +126,43 @@ public:
 
     PostRouteEvents events;
 
-    template<class ListenerClass>
-    void registerPostEvents(ListenerClass* listener);
+    /// \brief Register event listeners for this route.
+    ///
+    /// The listener class must implement the following callbacks:
+    ///
+    /// onHTTPPostEvent(...), onHTTPFormEvent(...), onHTTPUploadEvent(...)
+    ///
+    /// \tparam ListenerClass The lister class to register.
+    /// \param listener A pointer to the listener class.
+    /// \param priority The listener priority.
+    template <class ListenerClass>
+    void registerPostEvents(ListenerClass* listener, int priority = OF_EVENT_ORDER_AFTER_APP);
 
-    template<class ListenerClass>
-    void unregisterPostEvents(ListenerClass* listener);
+    /// \brief Unregister event listeners for this route.
+    /// \tparam ListenerClass The lister class to uregister.
+    /// \param listener A pointer to the listener class.
+    /// \param priority The listener priority.
+    template <class ListenerClass>
+    void unregisterPostEvents(ListenerClass* listener, int priority = OF_EVENT_ORDER_AFTER_APP);
 
 };
 
 
-template<class ListenerClass>
-void PostRoute::registerPostEvents(ListenerClass* listener)
+template <class ListenerClass>
+void PostRoute::registerPostEvents(ListenerClass* listener, int priority)
 {
-    ofAddListener(events.onHTTPPostEvent, listener, &ListenerClass::onHTTPPostEvent);
-    ofAddListener(events.onHTTPFormEvent, listener, &ListenerClass::onHTTPFormEvent);
-    ofAddListener(events.onHTTPUploadEvent, listener, &ListenerClass::onHTTPUploadEvent);
+    ofAddListener(events.onHTTPPostEvent, listener, &ListenerClass::onHTTPPostEvent, priority);
+    ofAddListener(events.onHTTPFormEvent, listener, &ListenerClass::onHTTPFormEvent, priority);
+    ofAddListener(events.onHTTPUploadEvent, listener, &ListenerClass::onHTTPUploadEvent, priority);
 }
 
 
-template<class ListenerClass>
-void PostRoute::unregisterPostEvents(ListenerClass* listener)
+template <class ListenerClass>
+void PostRoute::unregisterPostEvents(ListenerClass* listener, int priority)
 {
-    ofRemoveListener(events.onHTTPPostEvent, listener, &ListenerClass::onHTTPPostEvent);
-    ofRemoveListener(events.onHTTPFormEvent, listener, &ListenerClass::onHTTPFormEvent);
-    ofRemoveListener(events.onHTTPUploadEvent, listener, &ListenerClass::onHTTPUploadEvent);
+    ofRemoveListener(events.onHTTPPostEvent, listener, &ListenerClass::onHTTPPostEvent, priority);
+    ofRemoveListener(events.onHTTPFormEvent, listener, &ListenerClass::onHTTPFormEvent, priority);
+    ofRemoveListener(events.onHTTPUploadEvent, listener, &ListenerClass::onHTTPUploadEvent, priority);
 }
 
 

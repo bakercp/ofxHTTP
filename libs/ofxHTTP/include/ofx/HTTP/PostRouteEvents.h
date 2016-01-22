@@ -30,8 +30,8 @@
 #include "Poco/Net/MediaType.h"
 #include "Poco/Net/NameValueCollection.h"
 #include "ofEvents.h"
-#include "ofFileUtils.h"
 #include "ofUtils.h"
+#include "ofx/IO/ByteBuffer.h"
 #include "ofx/HTTP/ServerEvents.h"
 
 
@@ -49,6 +49,7 @@ public:
     {
     }
 
+    /// \brief Destroy the BasePostEventArgs.
     virtual ~BasePostEventArgs()
     {
     }
@@ -65,6 +66,7 @@ public:
     }
 
 protected:
+    /// \brief The post id.
     std::string _postId;
 
 };
@@ -79,25 +81,27 @@ class PostEventArgs: public BasePostEventArgs
 public:
     PostEventArgs(ServerEventArgs& evt,
                   const std::string& postId,
-                  const ofBuffer& data):
-        BasePostEventArgs(evt,
-                          postId),
+                  const IO::ByteBuffer& data):
+        BasePostEventArgs(evt, postId),
         _data(data)
     {
     }
 
+    /// \brief Destroy the PostEventArgs.
     virtual ~PostEventArgs()
     {
     }
 
-    const ofBuffer& getBuffer() const
+    /// \brief Get the raw POST form data.
+    /// \returns the raw POST form data.
+    const IO::ByteBuffer& getBuffer() const
     {
         return _data;
     }
 
 protected:
     /// \brief The raw form data sent with the POST.
-    const ofBuffer& _data;
+    const IO::ByteBuffer& _data;
 
 };
 
@@ -117,12 +121,14 @@ public:
     {
     }
 
+    /// \returns the form data.
     const Poco::Net::NameValueCollection& getForm() const
     {
         return _form;
     }
 
 protected:
+    /// \brief The form data.
     const Poco::Net::NameValueCollection _form;
 
 };

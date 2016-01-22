@@ -201,11 +201,11 @@ typedef WebSocketEventArgs WebSocketOpenEventArgs;
 class WebSocketEvents
 {
 public:
-    ofEvent<WebSocketOpenEventArgs>  onOpenEvent;
-    ofEvent<WebSocketCloseEventArgs> onCloseEvent;
-    ofEvent<WebSocketFrameEventArgs> onFrameReceivedEvent;
-    ofEvent<WebSocketFrameEventArgs> onFrameSentEvent;
-    ofEvent<WebSocketErrorEventArgs> onErrorEvent;
+    ofEvent<WebSocketOpenEventArgs>  onWebSocketOpenEvent;
+    ofEvent<WebSocketCloseEventArgs> onWebSocketCloseEvent;
+    ofEvent<WebSocketFrameEventArgs> onWebSocketFrameReceivedEvent;
+    ofEvent<WebSocketFrameEventArgs> onWebSocketFrameSentEvent;
+    ofEvent<WebSocketErrorEventArgs> onWebSocketErrorEvent;
     
 };
 

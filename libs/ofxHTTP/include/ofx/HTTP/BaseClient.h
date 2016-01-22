@@ -79,23 +79,29 @@ public:
     void setBytesPerProgressUpdate(std::streamsize bytesPerProgressUpdate);
     std::streamsize getBytesPerProgressUpdate() const;
 
-    template<class ListenerClass>
-    void registerClientEvents(ListenerClass* listener);
+    template <class ListenerClass>
+    void registerClientEvents(ListenerClass* listener,
+                              int priority = OF_EVENT_ORDER_AFTER_APP);
 
-    template<class ListenerClass>
-    void unregisterClientEvents(ListenerClass* listener);
+    template <class ListenerClass>
+    void unregisterClientEvents(ListenerClass* listener,
+                                int priority = OF_EVENT_ORDER_AFTER_APP);
 
-    template<class ListenerClass>
-    void registerClientProgressEvents(ListenerClass* listener);
+    template <class ListenerClass>
+    void registerClientProgressEvents(ListenerClass* listener,
+                                      int priority = OF_EVENT_ORDER_AFTER_APP);
 
-    template<class ListenerClass>
-    void unregisterClientProgressEvents(ListenerClass* listener);
+    template <class ListenerClass>
+    void unregisterClientProgressEvents(ListenerClass* listener,
+                                        int priority = OF_EVENT_ORDER_AFTER_APP);
 
-    template<class ListenerClass>
-    void registerClientFilterEvents(ListenerClass* listener);
+    template <class ListenerClass>
+    void registerClientFilterEvents(ListenerClass* listener,
+                                    int priority = OF_EVENT_ORDER_AFTER_APP);
 
-    template<class ListenerClass>
-    void unregisterClientFilterEvents(ListenerClass* listener);
+    template <class ListenerClass>
+    void unregisterClientFilterEvents(ListenerClass* listener,
+                                      int priority = OF_EVENT_ORDER_AFTER_APP);
 
     ClientEvents events;
 
@@ -142,51 +148,51 @@ private:
 };
 
 
-template<class ListenerClass>
-void BaseClient::registerClientEvents(ListenerClass* listener)
+template <class ListenerClass>
+void BaseClient::registerClientEvents(ListenerClass* listener, int priority)
 {
-    ofAddListener(events.onHTTPClientErrorEvent, listener, &ListenerClass::onHTTPClientErrorEvent);
-    ofAddListener(events.onHTTPClientResponseEvent, listener, &ListenerClass::onHTTPClientResponseEvent);
+    ofAddListener(events.onHTTPClientErrorEvent, listener, &ListenerClass::onHTTPClientErrorEvent, priority);
+    ofAddListener(events.onHTTPClientResponseEvent, listener, &ListenerClass::onHTTPClientResponseEvent, priority);
 }
 
 
-template<class ListenerClass>
-void BaseClient::unregisterClientEvents(ListenerClass* listener)
+template <class ListenerClass>
+void BaseClient::unregisterClientEvents(ListenerClass* listener, int priority)
 {
-    ofRemoveListener(events.onHTTPClientErrorEvent, listener, &ListenerClass::onHTTPClientErrorEvent);
-    ofRemoveListener(events.onHTTPClientResponseEvent, listener, &ListenerClass::onHTTPClientResponseEvent);
+    ofRemoveListener(events.onHTTPClientErrorEvent, listener, &ListenerClass::onHTTPClientErrorEvent, priority);
+    ofRemoveListener(events.onHTTPClientResponseEvent, listener, &ListenerClass::onHTTPClientResponseEvent, priority);
 }
 
 
-template<class ListenerClass>
-void BaseClient::registerClientProgressEvents(ListenerClass* listener)
+template <class ListenerClass>
+void BaseClient::registerClientProgressEvents(ListenerClass* listener, int priority)
 {
-    ofAddListener(events.onHTTPClientRequestProgress, listener, &ListenerClass::onHTTPClientRequestProgress);
-    ofAddListener(events.onHTTPClientResponseProgress, listener, &ListenerClass::onHTTPClientResponseProgress);
+    ofAddListener(events.onHTTPClientRequestProgress, listener, &ListenerClass::onHTTPClientRequestProgress, priority);
+    ofAddListener(events.onHTTPClientResponseProgress, listener, &ListenerClass::onHTTPClientResponseProgress, priority);
 }
 
 
-template<class ListenerClass>
-void BaseClient::unregisterClientProgressEvents(ListenerClass* listener)
+template <class ListenerClass>
+void BaseClient::unregisterClientProgressEvents(ListenerClass* listener, int priority)
 {
-    ofRemoveListener(events.onHTTPClientRequestProgress, listener, &ListenerClass::onHTTPClientRequestProgress);
-    ofRemoveListener(events.onHTTPClientResponseProgress, listener, &ListenerClass::onHTTPClientResponseProgress);
+    ofRemoveListener(events.onHTTPClientRequestProgress, listener, &ListenerClass::onHTTPClientRequestProgress, priority);
+    ofRemoveListener(events.onHTTPClientResponseProgress, listener, &ListenerClass::onHTTPClientResponseProgress, priority);
 }
 
 
-template<class ListenerClass>
-void BaseClient::registerClientFilterEvents(ListenerClass* listener)
+template <class ListenerClass>
+void BaseClient::registerClientFilterEvents(ListenerClass* listener, int priority)
 {
-    ofAddListener(events.onHTTPClientRequestFilterEvent, listener, &ListenerClass::onHTTPClientRequestFilterEvent);
-    ofAddListener(events.onHTTPClientResponseFilterEvent, listener, &ListenerClass::onHTTPClientResponseFilterEvent);
+    ofAddListener(events.onHTTPClientRequestFilterEvent, listener, &ListenerClass::onHTTPClientRequestFilterEvent, priority);
+    ofAddListener(events.onHTTPClientResponseFilterEvent, listener, &ListenerClass::onHTTPClientResponseFilterEvent, priority);
 }
 
 
-template<class ListenerClass>
-void BaseClient::unregisterClientFilterEvents(ListenerClass* listener)
+template <class ListenerClass>
+void BaseClient::unregisterClientFilterEvents(ListenerClass* listener, int priority)
 {
-    ofRemoveListener(events.onHTTPClientRequestFilterEvent, listener, &ListenerClass::onHTTPClientRequestFilterEvent);
-    ofRemoveListener(events.onHTTPClientResponseFilterEvent, listener, &ListenerClass::onHTTPClientResponseFilterEvent);
+    ofRemoveListener(events.onHTTPClientRequestFilterEvent, listener, &ListenerClass::onHTTPClientRequestFilterEvent, priority);
+    ofRemoveListener(events.onHTTPClientResponseFilterEvent, listener, &ListenerClass::onHTTPClientResponseFilterEvent, priority);
 }
 
 

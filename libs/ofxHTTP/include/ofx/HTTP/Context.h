@@ -87,7 +87,7 @@ public:
     const static std::string KEY_SESSION;
     const static std::string KEY_USE_ABSOLUTE_REQUEST_PATH;
 
-    template<typename TypeName>
+    template <typename TypeName>
     bool getValue(const std::string& key, TypeName& value) const
     {
         std::map<std::string, Poco::Any>::const_iterator iter = _map.find(key);

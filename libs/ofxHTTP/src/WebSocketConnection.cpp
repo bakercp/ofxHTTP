@@ -82,7 +82,7 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
         int flags = 0;
 
         WebSocketOpenEventArgs eventArgs(evt, *this);
-        ofNotifyEvent(getRoute().events.onOpenEvent, eventArgs, this);
+        ofNotifyEvent(getRoute().events.onWebSocketOpenEvent, eventArgs, this);
 
         do
         {
@@ -173,7 +173,7 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
                                                                code,
                                                                reason);
 
-                        ofNotifyEvent(getRoute().events.onCloseEvent,
+                        ofNotifyEvent(getRoute().events.onWebSocketCloseEvent,
                                       closeEventArgs,
                                       this);
 
@@ -190,7 +190,7 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
 
                         WebSocketFrameEventArgs frameArgs(evt, *this, frame);
 
-                        ofNotifyEvent(getRoute().events.onFrameReceivedEvent,
+                        ofNotifyEvent(getRoute().events.onWebSocketFrameReceivedEvent,
                                       frameArgs,
                                       this);
                     }
@@ -247,7 +247,7 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
 
                         WebSocketFrameEventArgs eventArgs(evt, *this, frame);
                         
-                        ofNotifyEvent(getRoute().events.onFrameSentEvent,
+                        ofNotifyEvent(getRoute().events.onWebSocketFrameSentEvent,
                                       eventArgs,
                                       this);
                     }
@@ -295,7 +295,7 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
 
         getRoute().handleRequest(evt);
         WebSocketErrorEventArgs eventArgs(evt, *this, (WebSocketError)exc.code());
-        ofNotifyEvent(getRoute().events.onErrorEvent, eventArgs, this);
+        ofNotifyEvent(getRoute().events.onWebSocketErrorEvent, eventArgs, this);
     }
     catch (const Poco::TimeoutException& exc)
     {
@@ -303,7 +303,7 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
         evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         getRoute().handleRequest(evt);
         WebSocketErrorEventArgs eventArgs(evt, *this, WS_ERR_TIMEOUT);
-        ofNotifyEvent(getRoute().events.onErrorEvent, eventArgs, this);
+        ofNotifyEvent(getRoute().events.onWebSocketErrorEvent, eventArgs, this);
         // response socket has already been closed (!?)
     }
     catch (const Poco::Net::NetException& exc)
@@ -312,7 +312,7 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
         evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         getRoute().handleRequest(evt);
         WebSocketErrorEventArgs eventArgs(evt, *this, WS_ERR_NET_EXCEPTION);
-        ofNotifyEvent(getRoute().events.onErrorEvent, eventArgs, this);
+        ofNotifyEvent(getRoute().events.onWebSocketErrorEvent, eventArgs, this);
         // response socket has already been closed (!?)
     }
     catch (const Poco::Exception& exc)
@@ -321,7 +321,7 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
         evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         getRoute().handleRequest(evt);
         WebSocketErrorEventArgs eventArgs(evt, *this, WS_ERR_OTHER);
-        ofNotifyEvent(getRoute().events.onErrorEvent, eventArgs, this);
+        ofNotifyEvent(getRoute().events.onWebSocketErrorEvent, eventArgs, this);
     }
     catch (const std::exception& exc)
     {
@@ -329,7 +329,7 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
         evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         getRoute().handleRequest(evt);
         WebSocketErrorEventArgs eventArgs(evt, *this, WS_ERR_OTHER);
-        ofNotifyEvent(getRoute().events.onErrorEvent, eventArgs, this);
+        ofNotifyEvent(getRoute().events.onWebSocketErrorEvent, eventArgs, this);
     }
     catch ( ... )
     {
@@ -337,7 +337,7 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
         evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         getRoute().handleRequest(evt);
         WebSocketErrorEventArgs eventArgs(evt, *this, WS_ERR_OTHER);
-        ofNotifyEvent(getRoute().events.onErrorEvent, eventArgs, this);
+        ofNotifyEvent(getRoute().events.onWebSocketErrorEvent, eventArgs, this);
     }
 }
 

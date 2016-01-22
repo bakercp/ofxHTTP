@@ -148,7 +148,7 @@ private:
 
 /// \brief The base implmentation of a server route.
 /// \tparam SettingsType The settings used for this templated route.
-template<typename SettingsType>
+template <typename SettingsType>
 class BaseRoute_: public AbstractRoute
 {
 public:
@@ -204,7 +204,7 @@ private:
 typedef BaseRoute_<BaseRouteSettings> DefaultRoute;
 
 
-template<typename SettingsType>
+template <typename SettingsType>
 BaseRoute_<SettingsType>::BaseRoute_(const SettingsType& settings):
     _settings(settings),
     _server(0)
@@ -212,27 +212,27 @@ BaseRoute_<SettingsType>::BaseRoute_(const SettingsType& settings):
 }
 
 
-template<typename SettingsType>
+template <typename SettingsType>
 BaseRoute_<SettingsType>::~BaseRoute_()
 {
 }
 
 
-template<typename SettingsType>
+template <typename SettingsType>
 void BaseRoute_<SettingsType>::setup(const SettingsType& settings)
 {
     _settings = settings;
 }
 
 
-template<typename SettingsType>
+template <typename SettingsType>
 std::string BaseRoute_<SettingsType>::getRoutePathPattern() const
 {
     return _settings.getRoutePathPattern();
 }
 
 
-template<typename SettingsType>
+template <typename SettingsType>
 bool BaseRoute_<SettingsType>::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
                                                 bool isSecurePort) const
 {
@@ -313,7 +313,7 @@ bool BaseRoute_<SettingsType>::canHandleRequest(const Poco::Net::HTTPServerReque
 }
 
 
-template<typename SettingsType>
+template <typename SettingsType>
 Poco::Net::HTTPRequestHandler* BaseRoute_<SettingsType>::createRequestHandler(const Poco::Net::HTTPServerRequest&)
 {
     // A route handler adapter adapts the factory class (e.g. the BaseRoute_)
@@ -323,7 +323,7 @@ Poco::Net::HTTPRequestHandler* BaseRoute_<SettingsType>::createRequestHandler(co
 }
 
 
-template<typename SettingsType>
+template <typename SettingsType>
 void BaseRoute_<SettingsType>::handleRequest(Poco::Net::HTTPServerRequest& request,
                                              Poco::Net::HTTPServerResponse& response)
 {
@@ -360,7 +360,7 @@ void BaseRoute_<SettingsType>::handleRequest(Poco::Net::HTTPServerRequest& reque
 }
 
 
-template<typename SettingsType>
+template <typename SettingsType>
 void BaseRoute_<SettingsType>::handleRequest(ServerEventArgs& evt)
 {
     if (evt.getResponse().sent())
@@ -408,28 +408,28 @@ void BaseRoute_<SettingsType>::handleRequest(ServerEventArgs& evt)
 }
 
 
-template<typename SettingsType>
+template <typename SettingsType>
 void BaseRoute_<SettingsType>::stop()
 {
     // empty
 }
 
 
-template<typename SettingsType>
+template <typename SettingsType>
 const SettingsType& BaseRoute_<SettingsType>::getSettings() const
 {
     return _settings;
 }
 
 
-template<typename SettingsType>
+template <typename SettingsType>
 AbstractServer* BaseRoute_<SettingsType>::getServer()
 {
     return _server;
 }
 
 
-template<typename SettingsType>
+template <typename SettingsType>
 void BaseRoute_<SettingsType>::setServer(AbstractServer* server)
 {
     _server = server;
@@ -437,7 +437,7 @@ void BaseRoute_<SettingsType>::setServer(AbstractServer* server)
 
 
 /// \brief The base implmentation of a server route.
-template<typename RouteType>
+template <typename RouteType>
 class BaseRouteHandler_: public AbstractRouteHandler
 {
 public:
@@ -467,20 +467,20 @@ private:
 };
 
 
-template<typename RouteType>
+template <typename RouteType>
 BaseRouteHandler_<RouteType>::BaseRouteHandler_(RouteType& route):
     _route(route)
 {
 }
 
 
-template<typename RouteType>
+template <typename RouteType>
 BaseRouteHandler_<RouteType>::~BaseRouteHandler_()
 {
 }
 
 
-template<typename RouteType>
+template <typename RouteType>
 void BaseRouteHandler_<RouteType>::handleRequest(Poco::Net::HTTPServerRequest& request,
                                                  Poco::Net::HTTPServerResponse& response)
 {
@@ -517,13 +517,13 @@ void BaseRouteHandler_<RouteType>::handleRequest(Poco::Net::HTTPServerRequest& r
 }
 
 
-template<typename RouteType>
+template <typename RouteType>
 void BaseRouteHandler_<RouteType>::stop()
 {
 }
 
 
-template<typename RouteType>
+template <typename RouteType>
 RouteType& BaseRouteHandler_<RouteType>::getRoute()
 {
     return _route;

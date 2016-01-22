@@ -99,9 +99,11 @@ protected:
 };
 
 
+/// \brief A class describing a set of low level HTTP server events.
 class ServerEvents
 {
 public:
+    /// \brief The onHTTPServerEvent event.
     ofEvent<ServerEventArgs> onHTTPServerEvent;
 
 };

@@ -74,7 +74,7 @@ public:
     /// \param key The key.
     /// \param value The boolean value.
     ///     otherwise will set the value as a "true" or "false".
-    template<typename T>
+    template <typename T>
     void set(const std::string& key, const T& value)
     {
         std::ostringstream ss;
@@ -89,7 +89,7 @@ public:
     /// \param key The key.
     /// \param value The boolean value.
     ///     otherwise will set the value as a "true" or "false".
-    template<typename T>
+    template <typename T>
     void add(const std::string& key, const T& value)
     {
         std::ostringstream ss;

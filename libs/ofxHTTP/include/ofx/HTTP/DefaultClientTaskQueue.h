@@ -88,14 +88,18 @@ public:
     /// \brief Register event listeners.
     /// \tparam ListenerClass The class type with the required callback methods.
     /// \param listener a pointer to the listening class (usually "this").
-    template<class ListenerClass>
-    void registerAllEvents(ListenerClass* listener);
+    /// \param priority The listener priority.
+    template <class ListenerClass>
+    void registerAllEvents(ListenerClass* listener,
+                           int priority = OF_EVENT_ORDER_AFTER_APP);
 
     /// \brief Unregister event listeners.
     /// \tparam ListenerClass The class type with the required callback methods.
     /// \param listener a pointer to the listening class (usually "this").
-    template<class ListenerClass>
-    void unregisterAllEvents(ListenerClass* listener);
+    /// \param priority The listener priority.
+    template <class ListenerClass>
+    void unregisterAllEvents(ListenerClass* listener,
+                             int priority = OF_EVENT_ORDER_AFTER_APP);
 
     ofEvent<const ClientBufferEventArgs> onClientBuffer;
 
@@ -115,19 +119,19 @@ private:
 };
 
 
-template<typename ListenerClass>
-void DefaultClientTaskQueue::registerAllEvents(ListenerClass* listener)
+template <typename ListenerClass>
+void DefaultClientTaskQueue::registerAllEvents(ListenerClass* listener, int priority)
 {
     TaskQueue_<std::string>::registerTaskProgressEvents(listener);
-    ofAddListener(onClientBuffer, listener, &ListenerClass::onClientBuffer);
+    ofAddListener(onClientBuffer, listener, &ListenerClass::onClientBuffer, priority);
 }
 
 
-template<typename ListenerClass>
-void DefaultClientTaskQueue::unregisterAllEvents(ListenerClass* listener)
+template <typename ListenerClass>
+void DefaultClientTaskQueue::unregisterAllEvents(ListenerClass* listener, int priority)
 {
     TaskQueue_<std::string>::unregisterTaskProgressEvents(listener);
-    ofRemoveListener(onClientBuffer, listener, &ListenerClass::onClientBuffer);
+    ofRemoveListener(onClientBuffer, listener, &ListenerClass::onClientBuffer, priority);
 }
 
 
