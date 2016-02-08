@@ -26,12 +26,11 @@
 #pragma once
 
 
-#include "Poco/UUID.h"
 #include "Poco/Net/MediaType.h"
 #include "Poco/Net/NameValueCollection.h"
 #include "ofEvents.h"
-#include "ofFileUtils.h"
 #include "ofUtils.h"
+#include "ofx/IO/ByteBuffer.h"
 #include "ofx/HTTP/ServerEvents.h"
 
 
@@ -39,16 +38,21 @@ namespace ofx {
 namespace HTTP {
 
 
+/// \brief A base class for a POST event data callback.
 class BasePostEventArgs: public ServerEventArgs
 {
 public:
-    BasePostEventArgs(ServerEventArgs& evt,
+    /// \Create a BasePostEventArgs.
+    /// \param e The server event data associated with this post.
+    /// \param postId The post id associated with this post data.
+    BasePostEventArgs(ServerEventArgs& e,
                       const std::string& postId):
-        ServerEventArgs(evt),
+        ServerEventArgs(e),
         _postId(postId)
     {
     }
 
+    /// \brief Destroy the BasePostEventArgs.
     virtual ~BasePostEventArgs()
     {
     }
@@ -58,13 +62,14 @@ public:
     /// Each time a POST request, is processed it is assigned a unique id.
     /// This id allows us to track post progress updates and multi-part posts.
     ///
-    /// \returns the session id or Poco::UUID::null if not set.
+    /// \returns the session id or null UUID if not set.
     const std::string& getPostId() const
     {
         return _postId;
     }
 
 protected:
+    /// \brief The post id.
     std::string _postId;
 
 };
@@ -79,29 +84,32 @@ class PostEventArgs: public BasePostEventArgs
 public:
     PostEventArgs(ServerEventArgs& evt,
                   const std::string& postId,
-                  const ofBuffer& data):
-        BasePostEventArgs(evt,
-                          postId),
+                  const IO::ByteBuffer& data):
+        BasePostEventArgs(evt, postId),
         _data(data)
     {
     }
 
+    /// \brief Destroy the PostEventArgs.
     virtual ~PostEventArgs()
     {
     }
 
-    const ofBuffer& getBuffer() const
+    /// \brief Get the raw POST form data.
+    /// \returns the raw POST form data.
+    const IO::ByteBuffer& getBuffer() const
     {
         return _data;
     }
 
 protected:
     /// \brief The raw form data sent with the POST.
-    const ofBuffer& _data;
+    const IO::ByteBuffer& _data;
 
 };
 
 
+/// \brief Event data for POST form events.
 class PostFormEventArgs: public BasePostEventArgs
 {
 public:
@@ -117,12 +125,14 @@ public:
     {
     }
 
+    /// \returns the form data.
     const Poco::Net::NameValueCollection& getForm() const
     {
         return _form;
     }
 
 protected:
+    /// \brief The form data.
     const Poco::Net::NameValueCollection _form;
 
 };

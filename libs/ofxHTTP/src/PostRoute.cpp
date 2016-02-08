@@ -224,7 +224,7 @@ void PostRouteHandler::handleRequest(ServerEventArgs& evt)
             Poco::StreamCopier::copyToString(evt.getRequest().stream(),
                                              result);
 
-            ofBuffer buffer(result);
+            IO::ByteBuffer buffer(result);
 
             PostEventArgs args(evt,
                                postId,

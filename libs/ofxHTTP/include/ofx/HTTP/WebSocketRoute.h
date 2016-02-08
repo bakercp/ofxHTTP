@@ -193,14 +193,18 @@ public:
     ///
     /// \tparam ListenerClass The lister class to register.
     /// \param listener A pointer to the listener class.
-    template<class ListenerClass>
-    void registerWebSocketEvents(ListenerClass* listener);
+    /// \param priority The listener priority.
+    template <class ListenerClass>
+    void registerWebSocketEvents(ListenerClass* listener,
+                                 int priority = OF_EVENT_ORDER_AFTER_APP);
 
     /// \brief Unregister event listeners for this route.
     /// \tparam ListenerClass The lister class to uregister.
     /// \param listener A pointer to the listener class.
-    template<class ListenerClass>
-    void unregisterWebSocketEvents(ListenerClass* listener);
+    /// \param priority The listener priority.
+    template <class ListenerClass>
+    void unregisterWebSocketEvents(ListenerClass* listener,
+                                   int priority = OF_EVENT_ORDER_AFTER_APP);
 
     /// \returns The number of active WebSocketConnections.
     std::size_t getNumWebSocketConnections() const;
@@ -230,25 +234,25 @@ private:
 };
 
 
-template<class ListenerClass>
-void WebSocketRoute::registerWebSocketEvents(ListenerClass* listener)
+template <class ListenerClass>
+void WebSocketRoute::registerWebSocketEvents(ListenerClass* listener, int priority)
 {
-    ofAddListener(events.onOpenEvent, listener, &ListenerClass::onWebSocketOpenEvent);
-    ofAddListener(events.onCloseEvent,listener, &ListenerClass::onWebSocketCloseEvent);
-    ofAddListener(events.onFrameReceivedEvent, listener, &ListenerClass::onWebSocketFrameReceivedEvent);
-    ofAddListener(events.onFrameSentEvent,listener,&ListenerClass::onWebSocketFrameSentEvent);
-    ofAddListener(events.onErrorEvent,listener,&ListenerClass::onWebSocketErrorEvent);
+    ofAddListener(events.onWebSocketOpenEvent, listener, &ListenerClass::onWebSocketOpenEvent, priority);
+    ofAddListener(events.onWebSocketCloseEvent, listener, &ListenerClass::onWebSocketCloseEvent, priority);
+    ofAddListener(events.onWebSocketFrameReceivedEvent, listener, &ListenerClass::onWebSocketFrameReceivedEvent, priority);
+    ofAddListener(events.onWebSocketFrameSentEvent,listener, &ListenerClass::onWebSocketFrameSentEvent, priority);
+    ofAddListener(events.onWebSocketErrorEvent, listener, &ListenerClass::onWebSocketErrorEvent, priority);
 }
 
 
-template<class ListenerClass>
-void WebSocketRoute::unregisterWebSocketEvents(ListenerClass* listener)
+template <class ListenerClass>
+void WebSocketRoute::unregisterWebSocketEvents(ListenerClass* listener, int priority)
 {
-    ofRemoveListener(events.onOpenEvent,listener,&ListenerClass::onWebSocketOpenEvent);
-    ofRemoveListener(events.onCloseEvent,listener,&ListenerClass::onWebSocketCloseEvent);
-    ofRemoveListener(events.onFrameReceivedEvent,listener,&ListenerClass::onWebSocketFrameReceivedEvent);
-    ofRemoveListener(events.onFrameSentEvent,listener,&ListenerClass::onWebSocketFrameSentEvent);
-    ofRemoveListener(events.onErrorEvent,listener,&ListenerClass::onWebSocketErrorEvent);
+    ofRemoveListener(events.onWebSocketOpenEvent, listener, &ListenerClass::onWebSocketOpenEvent, priority);
+    ofRemoveListener(events.onWebSocketCloseEvent, listener, &ListenerClass::onWebSocketCloseEvent, priority);
+    ofRemoveListener(events.onWebSocketFrameReceivedEvent, listener, &ListenerClass::onWebSocketFrameReceivedEvent, priority);
+    ofRemoveListener(events.onWebSocketFrameSentEvent, listener, &ListenerClass::onWebSocketFrameSentEvent, priority);
+    ofRemoveListener(events.onWebSocketErrorEvent, listener, &ListenerClass::onWebSocketErrorEvent, priority);
 }
 
 
