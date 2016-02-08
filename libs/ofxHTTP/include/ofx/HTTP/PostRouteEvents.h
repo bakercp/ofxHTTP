@@ -26,7 +26,6 @@
 #pragma once
 
 
-#include "Poco/UUID.h"
 #include "Poco/Net/MediaType.h"
 #include "Poco/Net/NameValueCollection.h"
 #include "ofEvents.h"
@@ -39,12 +38,16 @@ namespace ofx {
 namespace HTTP {
 
 
+/// \brief A base class for a POST event data callback.
 class BasePostEventArgs: public ServerEventArgs
 {
 public:
-    BasePostEventArgs(ServerEventArgs& evt,
+    /// \Create a BasePostEventArgs.
+    /// \param e The server event data associated with this post.
+    /// \param postId The post id associated with this post data.
+    BasePostEventArgs(ServerEventArgs& e,
                       const std::string& postId):
-        ServerEventArgs(evt),
+        ServerEventArgs(e),
         _postId(postId)
     {
     }
@@ -59,7 +62,7 @@ public:
     /// Each time a POST request, is processed it is assigned a unique id.
     /// This id allows us to track post progress updates and multi-part posts.
     ///
-    /// \returns the session id or Poco::UUID::null if not set.
+    /// \returns the session id or null UUID if not set.
     const std::string& getPostId() const
     {
         return _postId;
@@ -106,6 +109,7 @@ protected:
 };
 
 
+/// \brief Event data for POST form events.
 class PostFormEventArgs: public BasePostEventArgs
 {
 public:
