@@ -137,13 +137,6 @@ public:
     {
     }
 
-    /// \brief Handle an HTTPServerRequest with an HTTPServerResponse.
-    /// \param request The HTTPServerRequest to handle.
-    /// \param response The HTTPServerResponse to return.
-    /// \note Redeclared here for documentation puposes.
-    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
-                               Poco::Net::HTTPServerResponse& response) = 0;
-
 };
 
 
@@ -187,7 +180,7 @@ protected:
     /// \param sessionId The id of the session to query.
     virtual bool hasSession(const std::string& sessionId) const = 0;
 
-    /// \brief Get a session
+    /// \brief Get a session by \p sesssionId.
     /// \param sessionId The id of the session to get.
     /// \throws Poco::InvalidAccessException if no session is found.
     virtual AbstractSession& getSession(const std::string& sessionId) = 0;
