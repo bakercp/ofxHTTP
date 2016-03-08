@@ -48,9 +48,9 @@ public:
     enum FormEncoding
     {
         /// \brief Equivalent to application/x-www-form-urlencoded.
-        FORM_ENCODING_URL,
+        FORM_ENCODING_URL = 0,
         /// \brief Equivalent to multipart/form-data.
-        FORM_ENCODING_MULTIPART
+        FORM_ENCODING_MULTIPART = 1
     };
 
     /// \brief Construct a PostRequest with a given uri and http version.
