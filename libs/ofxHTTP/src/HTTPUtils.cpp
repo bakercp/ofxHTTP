@@ -163,7 +163,7 @@ void HTTPUtils::dumpNameValueCollection(const Poco::Net::NameValueCollection& nv
         ofLog(logLevel) << "Begin NameValueCollection =================";
         while (iter != nvc.end())
         {
-            ofLog(logLevel) << (*iter).first << ":" << (*iter).second;
+            ofLog(logLevel) << (*iter).first << ">" << (*iter).second << "<";
             ++iter;
         }
         ofLog(logLevel) << "End NameValueCollection =================";
