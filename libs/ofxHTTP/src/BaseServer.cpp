@@ -182,9 +182,9 @@ int HTTPServerParams::getMaxKeepAliveRequests() const
 }
 
 
-const std::string BaseServerSettings::DEFAULT_HOST    = "127.0.0.1";
+const std::string BaseServerSettings::DEFAULT_HOST = "127.0.0.1";
 const uint16_t BaseServerSettings::DEFAULT_PORT = 8998;
-const bool BaseServerSettings::DEFAULT_USE_SSL        = false;
+const bool BaseServerSettings::DEFAULT_USE_SSL = false;
 const bool BaseServerSettings::DEFAULT_USE_SESSIONS = true;
 
 
@@ -265,7 +265,6 @@ Poco::URI BaseServerSettings::getURI() const
 }    
 
 
-
 const Net::IPAddressRange::List& BaseServerSettings::getWhitelist() const
 {
     return _whitelist;
@@ -288,7 +287,6 @@ void BaseServerSettings::setBlacklist(const Net::IPAddressRange::List& blacklist
 {
     _blacklist = blacklist;
 }
-
 
 
 } } // namespace ofx::HTTP
