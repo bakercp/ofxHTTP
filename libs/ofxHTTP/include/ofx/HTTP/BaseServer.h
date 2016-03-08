@@ -321,7 +321,7 @@ public:
 
     bool isRunning() const
     {
-        return 0 != _server;
+        return  _server != nullptr;
     }
 
     virtual void setup(const SettingsType& settings)
