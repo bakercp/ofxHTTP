@@ -30,8 +30,7 @@ namespace ofx {
 namespace HTTP {
 
 
-DefaultClient::DefaultClient():
-    BaseClient(RequestFilters(), ResponseFilters())
+DefaultClient::DefaultClient()
 {
     addRequestFilter(&_defaultClientSessionProvider);
     addRequestFilter(&_defaultProxyProcessor);
