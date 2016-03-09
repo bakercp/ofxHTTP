@@ -90,7 +90,7 @@ public:
     template <typename TypeName>
     bool getValue(const std::string& key, TypeName& value) const
     {
-        std::map<std::string, Poco::Any>::const_iterator iter = _map.find(key);
+        auto iter = _map.find(key);
 
         if (iter != _map.end())
         {
@@ -99,7 +99,7 @@ public:
                 value = Poco::AnyCast<TypeName>(iter->second);
                 return true;
             }
-            catch (Poco::BadCastException& exc)
+            catch (const Poco::BadCastException& exc)
             {
                 ofLogError("Context::getValue") << "Unable to cast value for key : " << key;
                 return false;
