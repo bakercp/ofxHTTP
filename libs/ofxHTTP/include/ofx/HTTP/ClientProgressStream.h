@@ -95,20 +95,20 @@ protected:
     int writeToDevice(char c);
 
 private:
-    const BaseRequest* _pRequest;
-    const BaseResponse* _pResponse;
-    Context* _pContext;
+    const BaseRequest* _pRequest = nullptr;;
+    const BaseResponse* _pResponse = nullptr;;
+    Context* _pContext = nullptr;;
 
-    std::ostream* _pRequestStream;
-    std::istream* _pResponseStream;
+    std::ostream* _pRequestStream = nullptr;
+    std::istream* _pResponseStream = nullptr;;
 
-    AbstractRequestStreamListener*  _pRequestStreamListener;
-    AbstractResponseStreamListener* _pResponseStreamListener;
+    AbstractRequestStreamListener*  _pRequestStreamListener = nullptr;;
+    AbstractResponseStreamListener* _pResponseStreamListener = nullptr;;
 
-    std::streamsize _requestStreamBytes;
-    std::streamsize _responseStreamBytes;
+    std::streamsize _requestStreamBytes = 0;
+    std::streamsize _responseStreamBytes = 0;
 
-    std::streamsize _bytesPerProgressUpdate;
+    std::streamsize _bytesPerProgressUpdate = 0;
 
 };
 
