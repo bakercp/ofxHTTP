@@ -239,6 +239,12 @@ std::string JSONWebToken::generateToken(const std::string& privateKey,
                                         const JSONWebSignatureHeader& header,
                                         const JSONWebTokenPayload& payload)
 {
+    if (privateKey.empty())
+    {
+        ofLogError("JSONWebToken::generateToken") << "Private key is empty.";
+        return "";
+    }
+
     if (header.data()[JSONWebSignatureHeader::ALG].is_string())
     {
         std::string alg = header.data()[JSONWebSignatureHeader::ALG].get<std::string>();
