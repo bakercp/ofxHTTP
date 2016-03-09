@@ -83,8 +83,8 @@ int ClientProgressStreamBuf::readFromDevice()
         if (c != -1)
         {
             ++_responseStreamBytes;
-
-            if (0 == (_responseStreamBytes % _bytesPerProgressUpdate))
+            
+            if (_bytesPerProgressUpdate > 0 && 0 == (_responseStreamBytes % _bytesPerProgressUpdate))
             {
                 _pResponseStreamListener->progress(*_pRequest,
                                                    *_pResponse,
