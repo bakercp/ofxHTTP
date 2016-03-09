@@ -135,12 +135,15 @@ public:
     ClientProgressStreamBuf* rdbuf();
 
 protected:
+    /// \brief The client progress stream buffer.
     ClientProgressStreamBuf _buf;
 
 };
 
 
-class ClientProgressRequestStream: public ClientProgressIOS, public std::ostream
+class ClientProgressRequestStream:
+    public ClientProgressIOS,
+    public std::ostream
 {
 public:
     /// \brief Creates the CountingOutputStream and connects it to the given input stream.
@@ -156,7 +159,9 @@ public:
 };
 
 
-class ClientProgressResponseStream: public ClientProgressIOS, public std::istream
+class ClientProgressResponseStream:
+    public ClientProgressIOS,
+    public std::istream
 {
 public:
     /// \brief Creates the CountingInputStream and connects it to the given input stream.
