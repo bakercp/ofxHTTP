@@ -204,7 +204,7 @@ void BaseClient::removeRequestStreamFilter()
         removeRequestFilter(_pRequestStreamFilter);
     }
 
-    _pRequestStreamFilter = 0;
+    _pRequestStreamFilter = nullptr;
 }
 
 
@@ -216,7 +216,7 @@ void BaseClient::removeResponseStreamFilter()
         removeResponseFilter(_pResponseStreamFilter);
     }
 
-    _pResponseStreamFilter = 0;
+    _pResponseStreamFilter = nullptr;
 }
 
 
@@ -326,7 +326,6 @@ std::istream& BaseClient::receive(BaseRequest& request,
     }
     else
     {
-
         return *_pClientProgressResponseStream;
     }
 }
