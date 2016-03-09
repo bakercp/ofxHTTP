@@ -103,18 +103,28 @@ public:
     void unregisterClientFilterEvents(ListenerClass* listener,
                                       int priority = OF_EVENT_ORDER_AFTER_APP);
 
+    /// \brief A collection of client events.
     ClientEvents events;
 
     enum
     {
+        /// \brief The default number of bytes to wait between progress update events.
         DEFAULT_BYTES_PER_PROGRESS_UPDATE = 1024
     };
     
 
 protected:
+    /// \brief A list of request filters.
+    ///
+    /// These filters are automatically applied to the outgoing request.
     RequestFilters _requestFilters;
+
+    /// \brief A list of response filters.
+    ///
+    /// These filters are automatically applied to the incoming response.
     ResponseFilters _responseFilters;
 
+    /// \brief The number of bytes to wait between progress update events.
     std::streamsize _bytesPerProgressUpdate;
 
 private:
