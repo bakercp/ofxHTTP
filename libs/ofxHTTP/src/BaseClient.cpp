@@ -129,7 +129,7 @@ void BaseClient::submit(BaseRequest& request,
         ClientErrorEventArgs evt(request, response, context, exc);
         ofNotifyEvent(events.onHTTPClientErrorEvent, evt);
     }
-    catch (std::exception& exception)
+    catch (const std::exception& exception)
     {
         Poco::Exception exc(exception.what());
         ClientErrorEventArgs evt(request, response, context, exc);
