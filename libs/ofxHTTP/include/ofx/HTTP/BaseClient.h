@@ -128,8 +128,11 @@ protected:
     std::streamsize _bytesPerProgressUpdate;
 
 private:
-    std::shared_ptr<std::ostream> _pClientProgressRequestStream;
-    std::shared_ptr<std::istream> _pClientProgressResponseStream;
+    /// \brief A pointer to the client progress request output stream.
+    std::unique_ptr<std::ostream> _pClientProgressRequestStream;
+
+    /// \brief A pointer to the client progress request input stream.
+    std::unique_ptr<std::istream> _pClientProgressResponseStream;
 
     AbstractRequestStreamFilter* _pRequestStreamFilter;
     AbstractResponseStreamFilter* _pResponseStreamFilter;

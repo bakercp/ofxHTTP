@@ -278,7 +278,7 @@ std::ostream& BaseClient::send(BaseRequest& request, Context& context)
     std::ostream& rawRequestStream = clientSession->sendRequest(request);
 
 
-    _pClientProgressRequestStream = std::make_shared<ClientProgressRequestStream>(rawRequestStream,
+    _pClientProgressRequestStream = std::make_unique<ClientProgressRequestStream>(rawRequestStream,
                                                                                   request,
                                                                                   context,
                                                                                   *this,
@@ -310,7 +310,7 @@ std::istream& BaseClient::receive(BaseRequest& request,
 
     std::istream& rawResponseStream = clientSession->receiveResponse(response);
 
-    _pClientProgressResponseStream = std::make_shared<ClientProgressResponseStream>(rawResponseStream,
+    _pClientProgressResponseStream = std::make_unique<ClientProgressResponseStream>(rawResponseStream,
                                                                                     request,
                                                                                     response,
                                                                                     context,
