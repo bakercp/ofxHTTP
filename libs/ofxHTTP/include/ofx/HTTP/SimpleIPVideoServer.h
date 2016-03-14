@@ -56,7 +56,7 @@ public:
 
     virtual void setup(const Settings& settings);
 
-    void send(ofPixels& pix);
+    void send(const ofPixels& pix);
 
     std::size_t getNumConnections() const;
 
