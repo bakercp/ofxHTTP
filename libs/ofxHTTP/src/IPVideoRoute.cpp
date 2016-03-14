@@ -144,6 +144,18 @@ IPVideoRouteSettings::~IPVideoRouteSettings()
 }
 
 
+void IPVideoRouteSettings::setFrameSettings(const IPVideoFrameSettings& frameSettings)
+{
+    _frameSettings = frameSettings;
+}
+
+
+IPVideoFrameSettings IPVideoRouteSettings::getFrameSettings() const
+{
+    return _frameSettings;
+}
+
+
 void IPVideoRouteSettings::setMaxClientConnections(std::size_t maxClientConnections)
 {
     _maxClientConnections = maxClientConnections;
@@ -257,7 +269,7 @@ Poco::Net::HTTPRequestHandler* IPVideoRoute::createRequestHandler(const Poco::Ne
 }
 
 
-void IPVideoRoute::send(ofPixels& pix) const
+void IPVideoRoute::send(const ofPixels& pix) const
 {
     if (pix.isAllocated())
     {
@@ -265,22 +277,47 @@ void IPVideoRoute::send(ofPixels& pix) const
 
         ofBuffer compressedPixels;
 
-        // TODO: turbo jpeg an option here?
-        ofSaveImage(pix, compressedPixels, OF_IMAGE_FORMAT_JPEG, OF_IMAGE_QUALITY_MEDIUM);
+        IPVideoFrameSettings frameSettings = _settings.getFrameSettings();
+
+        if (frameSettings.getWidth() != IPVideoFrameSettings::NO_RESIZE
+        ||  frameSettings.getHeight() != IPVideoFrameSettings::NO_RESIZE
+        ||  frameSettings.getFlipHorizontal()
+        ||  frameSettings.getFlipVertical())
+        {
+            int newWidth = frameSettings.getWidth() != IPVideoFrameSettings::NO_RESIZE ? frameSettings.getWidth() : pix.getWidth();
+            int newHeight = frameSettings.getHeight() != IPVideoFrameSettings::NO_RESIZE ? frameSettings.getHeight() : pix.getHeight();
+
+            ofPixels pixels = pix;
+
+            if (newWidth != pix.getWidth() || newHeight != pix.getHeight())
+            {
+                pixels.resize(newWidth, newHeight);
+            }
+
+            if (frameSettings.getFlipVertical() || frameSettings.getFlipHorizontal())
+            {
+                pixels.mirror(frameSettings.getFlipVertical(),
+                              frameSettings.getFlipHorizontal());
+            }
+
+            ofSaveImage(pixels, compressedPixels, OF_IMAGE_FORMAT_JPEG, frameSettings.getQuality());
+        }
+        else
+        {
+//            ofSaveImage(pix, (ofGetTimestampString() + ".jpg"), frameSettings.getQuality());
+
+            ofSaveImage(pix, compressedPixels, OF_IMAGE_FORMAT_JPEG, frameSettings.getQuality());
+        }
 
         std::unique_lock<std::mutex> lock(_mutex);
 
         Connections::const_iterator iter = _connections.begin();
 
-        IPVideoFrameSettings settings;
-//
-//        settings.quality = settings.quality;
-
-        std::shared_ptr<IPVideoFrame> frame = std::make_shared<IPVideoFrame>(settings, timestamp, compressedPixels);
+        std::shared_ptr<IPVideoFrame> frame = std::make_shared<IPVideoFrame>(frameSettings, timestamp, compressedPixels);
 
         while (iter != _connections.end())
         {
-            if(*iter)
+            if (*iter != nullptr)
             {
                 (*iter)->push(frame);
             }
@@ -288,9 +325,9 @@ void IPVideoRoute::send(ofPixels& pix) const
             {
                 ofLogError("IPVideoRoute::send") << "Found a NULL IPVideoRouteHandler*.  This should not happen.";
             }
+            
             ++iter;
         }
-            
     }
     else
     {
@@ -488,7 +525,7 @@ void IPVideoRouteHandler::handleRequest(ServerEventArgs& evt)
 
                     if (0 != frame)
                     {
-                        const ofBuffer& buffer = frame->getBuffer();
+                        const ofBuffer& buffer = frame->buffer();
 
                         ostr << getRoute().getSettings().getBoundaryMarker();
                         ostr << "\r\n";
@@ -548,14 +585,14 @@ IPVideoFrameSettings IPVideoRouteHandler::getFrameSettings() const
 float IPVideoRouteHandler::getCurrentBitRate() const
 {
     std::unique_lock<std::mutex> lock(_mutex);
-    return (float)_bytesSent * 8.0f / (ofGetElapsedTimeMillis() - _startTime);
+    return static_cast<float>(_bytesSent) * 8.0f / (ofGetElapsedTimeMillis() - _startTime);
 }
 
 
 float IPVideoRouteHandler::getCurrentFrameRate() const
 {
     std::unique_lock<std::mutex> lock(_mutex);
-    return (float)_framesSent / (ofGetElapsedTimeMillis() - _startTime);
+    return static_cast<float>(_framesSent) / (ofGetElapsedTimeMillis() - _startTime);
 }
 
 

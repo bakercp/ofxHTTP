@@ -89,6 +89,9 @@ public:
 
     virtual ~IPVideoRouteSettings();
 
+    void setFrameSettings(const IPVideoFrameSettings& frameSettings);
+    IPVideoFrameSettings getFrameSettings() const;
+
     void setMaxClientConnections(std::size_t maxClientConnections);
     std::size_t getMaxClientConnections() const;
 
@@ -132,6 +135,8 @@ public:
     static const Poco::Net::MediaType DEFAULT_MEDIA_TYPE;
 
 private:
+    IPVideoFrameSettings _frameSettings;
+
     std::size_t _maxClientConnections;
     std::size_t _maxClientBitRate;
     std::size_t _maxClientFrameRate;
@@ -159,7 +164,7 @@ public:
 
     Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request) override;
 
-    void send(ofPixels& pix) const;
+    void send(const ofPixels& pix) const;
 
     void addConnection(IPVideoRouteHandler* handler);
 

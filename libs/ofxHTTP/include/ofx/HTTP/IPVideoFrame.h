@@ -40,11 +40,11 @@ public:
     IPVideoFrameSettings();
     virtual ~IPVideoFrameSettings();
 
-    void setWidth(std::size_t width);
-    std::size_t getWidth() const;
+    void setWidth(int width);
+    int getWidth() const;
 
-    void setHeight(std::size_t height);
-    std::size_t getHeight() const;
+    void setHeight(int height);
+    int getHeight() const;
 
     void setFlipHorizontal(bool flipHorizontal);
     bool getFlipHorizontal() const;
@@ -57,16 +57,15 @@ public:
 
     enum
     {
-        DEFAULT_WIDTH = 320,
-        DEFAULT_HEIGHT = 240
+        NO_RESIZE = -1,
     };
 
 private:
-    std::size_t _width;
-    std::size_t _height;
-    bool _flipHorizontal;
-    bool _flipVertical;
-    ofImageQualityType _quality;
+    std::size_t _width = NO_RESIZE;
+    std::size_t _height = NO_RESIZE;
+    bool _flipHorizontal = false;
+    bool _flipVertical = false;
+    ofImageQualityType _quality = OF_IMAGE_QUALITY_BEST;
 
 };
 
@@ -80,11 +79,11 @@ public:
     
     virtual ~IPVideoFrame();
 
-    IPVideoFrameSettings getSettings() const;
+    const IPVideoFrameSettings& settings() const;
 
-    uint64_t getTimestamp() const;
+    uint64_t timestamp() const;
 
-    ofBuffer& getBuffer();
+    ofBuffer& buffer();
 
 private:
     IPVideoFrameSettings _settings;
