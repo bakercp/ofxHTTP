@@ -4,6 +4,8 @@ docs/*.tag
 
 raw/
 
+.compiler_flags*
+
 Project.xcconfig
 *.xcodeproj
 *.plist
