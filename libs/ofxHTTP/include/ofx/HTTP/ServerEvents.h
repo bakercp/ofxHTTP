@@ -63,21 +63,21 @@ public:
 
     /// \brief Get the Poco::Net::HTTPServerRequest.
     /// \return the Poco::Net::HTTPServerRequest.
-    Poco::Net::HTTPServerRequest& getRequest()
+    Poco::Net::HTTPServerRequest& request()
     {
         return _request;
     }
 
     /// \brief Get the Poco::Net::HTTPServerResponse.
     /// \return the Poco::Net::HTTPServerResponse.
-    Poco::Net::HTTPServerResponse& getResponse()
+    Poco::Net::HTTPServerResponse& response()
     {
         return _response;
     }
 
     /// \brief Get the session associated with this event.
     /// \returns the session associated with this event.
-    AbstractSession& getSession()
+    AbstractSession& session()
     {
         return _session;
     }

@@ -87,7 +87,7 @@ public:
     {
     }
 
-    WebSocketConnection& getConnection()
+    WebSocketConnection& connection()
     {
         return _connection;
     }
@@ -111,7 +111,7 @@ public:
     }
 
     /// \returns the error code if any, otherwise WS_ERROR_NONE.
-    WebSocketError getError() const
+    WebSocketError error() const
     {
         return _error;
     }
@@ -138,13 +138,13 @@ public:
     }
 
     /// \returns A code, 0 if unset.
-    uint16_t getCode() const
+    uint16_t code() const
     {
         return _code;
     }
 
     /// \returns A UTF-8 encoded client close reason, empty if unset.
-    const std::string& getReason() const
+    const std::string& reason() const
     {
         return _reason;
     }
@@ -182,8 +182,8 @@ public:
     {
     }
 
-    /// \returns A reference to the WebSocketFrame associated with the event.
-    const WebSocketFrame& getFrame() const
+    /// \returns A const reference to the WebSocketFrame associated with the event.
+    const WebSocketFrame& frame() const
     {
         return _frame;
     }
@@ -195,16 +195,27 @@ private:
 };
 
 
+/// \brief A typedef for WebSocketOpenEventArgs.
 typedef WebSocketEventArgs WebSocketOpenEventArgs;
 
 
+/// \brief A collection of events called by WebSocketConnections.
 class WebSocketEvents
 {
 public:
+    /// \brief An event that is called when a Web Socket connection is opened.
     ofEvent<WebSocketOpenEventArgs>  onWebSocketOpenEvent;
+
+    /// \brief An event that is called when a Web Socket connection is closed.
     ofEvent<WebSocketCloseEventArgs> onWebSocketCloseEvent;
+
+    /// \brief An event that is called when a Web Socket frame is received.
     ofEvent<WebSocketFrameEventArgs> onWebSocketFrameReceivedEvent;
+
+    /// \brief An event that is called when a Web Socket frame is sent.
     ofEvent<WebSocketFrameEventArgs> onWebSocketFrameSentEvent;
+
+    /// \brief An event that is called when a Web Socket encounters an error.
     ofEvent<WebSocketErrorEventArgs> onWebSocketErrorEvent;
     
 };

@@ -30,12 +30,9 @@ namespace ofx {
 namespace HTTP {
 
 
-const std::string PutRequest::DEFAULT_MEDIA_TYPE = "application/octet-stream";
-
-
 PutRequest::PutRequest(const std::string& uri,
                        const std::string& httpVersion):
-    BaseRequest(Poco::Net::HTTPRequest::HTTP_PUT,
+    FormRequest(Poco::Net::HTTPRequest::HTTP_PUT,
                 uri,
                 httpVersion),
     _startByte(std::numeric_limits<std::size_t>::max()),
@@ -91,12 +88,14 @@ void PutRequest::setContentType(const std::string& contentType)
 
 void PutRequest::prepareRequest()
 {
+    // The underlying _form data is being ignored.
     set("Content-Length", ofToString(_buffer.size()));
 }
 
 
 void PutRequest::writeRequestBody(std::ostream& requestStream)
 {
+    // TODO don't read it all into memory.
     requestStream << _buffer;
 }
 

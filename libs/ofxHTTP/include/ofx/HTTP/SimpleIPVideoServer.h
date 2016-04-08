@@ -36,15 +36,22 @@ namespace ofx {
 namespace HTTP {
 
 
+/// \brief Settings for a SimpleIPVideoServer.
 class SimpleIPVideoServerSettings: public BaseServerSettings
 {
 public:
+    /// \brief File system route settings.
     FileSystemRouteSettings fileSystemRouteSettings;
+
+    /// \brief Post route settings.
     PostRouteSettings postRouteSettings;
+
+    /// \brief IPVideo route settings.
     IPVideoRouteSettings ipVideoRouteSettings;
 };
 
 
+/// \brief A simple IPVideo server implementation.
 class SimpleIPVideoServer: public BaseServer_<SimpleIPVideoServerSettings, SimpleSessionStore>
 {
 public:
@@ -54,19 +61,25 @@ public:
 
     virtual ~SimpleIPVideoServer();
 
-    virtual void setup(const Settings& settings);
+    virtual void setup(const Settings& settings) override;
 
     void send(const ofPixels& pix);
 
-    std::size_t getNumConnections() const;
+    std::size_t numConnections() const;
 
-    FileSystemRoute& getFileSystemRoute();
-    PostRoute& getPostRoute();
-    IPVideoRoute& getIPVideoRoute();
+    /// \return A reference to the file system route.
+    FileSystemRoute& fileSystemRoute();
+
+    PostRoute& postRoute();
+    
+    IPVideoRoute& ipVideoRoute();
 
 protected:
+    /// \brief The FileSystemRoute attached to this server.
     FileSystemRoute _fileSystemRoute;
+
     PostRoute _postRoute;
+
     IPVideoRoute _ipVideoRoute;
 
 };

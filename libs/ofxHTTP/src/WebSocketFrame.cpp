@@ -80,7 +80,7 @@ WebSocketFrame::~WebSocketFrame()
 }
 
 
-int WebSocketFrame::getFlags() const
+int WebSocketFrame::flags() const
 {
     return _flags;
 }

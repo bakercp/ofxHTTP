@@ -50,12 +50,14 @@ public:
     /// \brief Construct an HTTPRequest
     ///
     /// This simple constructor passes the raw URI as is with the HTTPRequest.
-    /// query and fragment parameters included in the URI will not be available
-    /// for additional processing (e.g. for use in OAuth signatures).  Any
-    /// query parameters / form fields added later using the addField() method
-    /// will be processed separately according to the provided HTTP method (e.g.
-    /// form fields added to a GET requests will be URL-encoded and added to the
-    /// request URI before submission).
+    /// Query and fragment parameters included in the URI _will not_ be
+    /// automatically available for additional processing (e.g. for use in OAuth
+    /// 1.0 signatures, which require validation of the query/form parameters).
+    /// Any query parameters added later using the `FormRequest::addFormField()`
+    /// methods will be treated as either form fields or URI query parameters
+    /// depending on the request's HTTP method.  Form fields added to POST and
+    /// PUT requests will be submitted as requests POST and PUT (e.g. GET) will
+    /// be URL-encoded and appended to the request URI before submission.
     ///
     /// \param method The HTTP method (e.g. GET, POST, PUT, etc).
     /// \param uri The endpoint URI.
@@ -76,22 +78,6 @@ public:
     /// URI paths.
     virtual void write(std::ostream& ostr) const;
 
-    /// \brief Add a name value pair to upload with this request.
-    /// \param name The field name.
-    /// \param value The field value.
-    void addFormField(const std::string& name,
-                      const std::string& value);
-
-    /// \brief Set a name value pair to upload with this request.
-    /// \param name The field name.
-    /// \param value The field value.
-    void setFormField(const std::string& name,
-                      const std::string& value);
-
-    /// \brief Add additional form fields.
-    /// \param formFields The form fields to add.
-    void addFormFields(const Poco::Net::NameValueCollection& formFields);
-
     /// \brief Set the id of the request.
     /// \param requestId the id of the request.
     void setRequestId(const std::string& requestId);
@@ -100,20 +86,17 @@ public:
     /// \returns the id of the request.
     const std::string& getRequestId() const;
 
-    /// \brief Get a const reference to the raw form data.
-    /// \returns a const reference to the raw form data.
-    const Poco::Net::HTMLForm& getForm() const;
-
-    /// \brief Get a reference to the raw form data.
-    /// \returns a reference to the raw form data.
-    Poco::Net::HTMLForm& getForm();
-
     /// \brief Generate a UUID string.
     /// \returns a UUID string.
     static std::string generateId();
 
-    /// \brief The default MIME type.
-    static const std::string DEFAULT_MEDIA_TYPE;
+    /// \brief Get a const reference to the raw form data.
+    ///
+    /// This allows read-only access to the raw form data, which prevents
+    /// inappropriately adding form parts to non POST / PUT requests.
+    ///
+    /// \returns a const reference to the raw form data.
+    const Poco::Net::HTMLForm& form() const;
 
 protected:
     /// \brief Prepare the current request.

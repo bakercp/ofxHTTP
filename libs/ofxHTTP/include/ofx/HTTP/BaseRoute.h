@@ -163,7 +163,7 @@ public:
     /// \param settings The seetings to use for setup.
     virtual void setup(const SettingsType& settings);
 
-    virtual std::string getRoutePathPattern() const override;
+    virtual std::string routePathPattern() const override;
 
     virtual bool canHandleRequest(const Poco::Net::HTTPServerRequest& request,
                                   bool isSecurePort) const override;
@@ -178,7 +178,7 @@ public:
     virtual void stop() override;
 
     /// \returns the route's Settings.
-    const SettingsType& getSettings() const;
+    const SettingsType& settings() const;
 
     /// \returns a pointer to the server that owns this route.
     AbstractServer* getServer() override;
@@ -192,7 +192,7 @@ protected:
     SettingsType _settings;
 
     /// \brief A pointer to the server.
-    AbstractServer* _server;
+    AbstractServer* _server = nullptr;
 
 private:
     BaseRoute_(const BaseRoute_&);
@@ -207,7 +207,7 @@ typedef BaseRoute_<BaseRouteSettings> DefaultRoute;
 template <typename SettingsType>
 BaseRoute_<SettingsType>::BaseRoute_(const SettingsType& settings):
     _settings(settings),
-    _server(0)
+    _server(nullptr)
 {
 }
 
@@ -226,7 +226,7 @@ void BaseRoute_<SettingsType>::setup(const SettingsType& settings)
 
 
 template <typename SettingsType>
-std::string BaseRoute_<SettingsType>::getRoutePathPattern() const
+std::string BaseRoute_<SettingsType>::routePathPattern() const
 {
     return _settings.getRoutePathPattern();
 }
@@ -302,7 +302,7 @@ bool BaseRoute_<SettingsType>::canHandleRequest(const Poco::Net::HTTPServerReque
     try
     {
         // \TODO cache this regex
-        return Poco::RegularExpression(getRoutePathPattern()).match(path);
+        return Poco::RegularExpression(routePathPattern()).match(path);
     }
     catch (const Poco::RegularExpressionException& exc)
     {
@@ -316,6 +316,9 @@ bool BaseRoute_<SettingsType>::canHandleRequest(const Poco::Net::HTTPServerReque
 template <typename SettingsType>
 Poco::Net::HTTPRequestHandler* BaseRoute_<SettingsType>::createRequestHandler(const Poco::Net::HTTPServerRequest&)
 {
+    std::cout << "--------------------------------------------------------------------------" << std::endl;
+    std::cout << "BaseRoute_<SettingsType>::createRequestHandler" << std::endl;
+
     // A route handler adapter adapts the factory class (e.g. the BaseRoute_)
     // to act as a reusable instance. The instance passed to the RouteHandler
     // adapter should not modify the internal state of the route itself.
@@ -327,13 +330,14 @@ template <typename SettingsType>
 void BaseRoute_<SettingsType>::handleRequest(Poco::Net::HTTPServerRequest& request,
                                              Poco::Net::HTTPServerResponse& response)
 {
+//    std::cout << "BaseRoute_<SettingsType>::handleRequest" << std::endl;
     // We assert that the server must be set on a route.
     poco_assert(_server);
 
     // All requests pass through the server's handleRequest method first.
     // The server broadcasts the request / response to any listeners.
     // Generally these listeners should only modify headers, not send a response.
-    AbstractSession& session = _server->getSessionStore().getSession(request, response);
+    AbstractSession& session = _server->sessionStore().getSession(request, response);
 
     ServerEventArgs evt(request, response, session);
 
@@ -363,7 +367,9 @@ void BaseRoute_<SettingsType>::handleRequest(Poco::Net::HTTPServerRequest& reque
 template <typename SettingsType>
 void BaseRoute_<SettingsType>::handleRequest(ServerEventArgs& evt)
 {
-    if (evt.getResponse().sent())
+//    std::cout << "BaseRoute_<SettingsType>::handleRequest(ServerEventArgs& evt" << std::endl;
+
+    if (evt.response().sent())
     {
         return;
     }
@@ -374,24 +380,25 @@ void BaseRoute_<SettingsType>::handleRequest(ServerEventArgs& evt)
     {
         // If we got this far and our status is still marked as 200,
         // that constitutes a server error.
-        if (Poco::Net::HTTPResponse::HTTP_OK == evt.getResponse().getStatus())
+        if (Poco::Net::HTTPResponse::HTTP_OK == evt.response().getStatus())
         {
-            evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR,
-                                                 "No handlers for route.");
+            evt.response().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR,
+                                              "No handlers for route.");
         }
 
-        evt.getResponse().setChunkedTransferEncoding(true);
-        evt.getResponse().setContentType("text/html");
+        evt.response().setChunkedTransferEncoding(true);
+        evt.response().setContentType("text/html");
 
         std::stringstream ss;
-        ss << evt.getResponse().getStatus() << " - " << evt.getResponse().getReason();
+        ss << evt.response().getStatus() << " - " << evt.response().getReason();
 
-        std::ostream& ostr = evt.getResponse().send(); // get output stream
+        std::ostream& ostr = evt.response().send(); // get output stream
         ostr << "<!DOCTYPE html><html><head><meta charset=\"utf-8\"/><title>";
         ostr << ss.str();
         ostr << "</title></head><body><h1>";
         ostr << ss.str();
         ostr << "</h1></body></html>";
+        ostr.flush();
     }
     catch (const Poco::Exception& exc)
     {
@@ -416,7 +423,7 @@ void BaseRoute_<SettingsType>::stop()
 
 
 template <typename SettingsType>
-const SettingsType& BaseRoute_<SettingsType>::getSettings() const
+const SettingsType& BaseRoute_<SettingsType>::settings() const
 {
     return _settings;
 }
@@ -455,14 +462,15 @@ public:
     virtual void stop() override;
 
     /// \brief Get the dispatching route.
-    RouteType& getRoute();
+    RouteType& route();
+
+protected:
+    /// \brief The route.
+    RouteType& _route;
 
 private:
     BaseRouteHandler_(const BaseRouteHandler_&);
     BaseRouteHandler_& operator = (const BaseRouteHandler_&);
-
-    /// \brief The route.
-    RouteType& _route;
 
 };
 
@@ -485,16 +493,16 @@ void BaseRouteHandler_<RouteType>::handleRequest(Poco::Net::HTTPServerRequest& r
                                                  Poco::Net::HTTPServerResponse& response)
 {
     // We assert that the server must be set on a route.
-    poco_assert(getRoute().getServer());
+    poco_assert(route().getServer());
 
     // All requests pass through the server's handleRequest method first.
     // The server broadcasts the request / response to any listeners.
     // Generally these listeners should only modify headers, not send a response.
-    AbstractSession& session = getRoute().getServer()->getSessionStore().getSession(request, response);
+    AbstractSession& session = route().getServer()->sessionStore().getSession(request, response);
 
     ServerEventArgs evt(request, response, session);
 
-    getRoute().getServer()->onHTTPServerEvent(this, evt);
+    route().getServer()->onHTTPServerEvent(this, evt);
 
     // If the response was sent from the server or its delegates, we finish.
     if (response.sent())
@@ -512,7 +520,7 @@ void BaseRouteHandler_<RouteType>::handleRequest(Poco::Net::HTTPServerRequest& r
     // A failsafe.
     if (!response.sent())
     {
-        getRoute().handleRequest(evt);
+        route().handleRequest(evt);
     }
 }
 
@@ -524,9 +532,170 @@ void BaseRouteHandler_<RouteType>::stop()
 
 
 template <typename RouteType>
-RouteType& BaseRouteHandler_<RouteType>::getRoute()
+RouteType& BaseRouteHandler_<RouteType>::route()
 {
     return _route;
+}
+
+
+
+template <typename RouteType, typename FrameType>
+class BaseConnection_: public BaseRouteHandler_<RouteType>
+{
+public:
+    /// \brief Create a BaseConnection_.
+    /// \param route A reference to the parent route.
+    BaseConnection_(RouteType& route);
+
+    /// \brief Destroy the BaseConnection_.
+    virtual ~BaseConnection_();
+
+    void handleRequest(ServerEventArgs& evt) override;
+
+    void stop() override;
+
+    /// \brief Queue data to be sent to the client.
+    /// \param frame The data to send to the client.
+    /// \param cache True if the frame should be cached.
+    /// \returns false iff frame was not queued.
+    bool send(const FrameType& frame) const;
+
+    /// \returns The original http request headers.
+    Poco::Net::NameValueCollection requestHeaders() const;
+
+    /// \returns the client's SocketAddress.
+    Poco::Net::SocketAddress clientAddress() const;
+
+    /// \returns true iff this BaseConnection_ is connected to a client.
+    bool isConnected() const;
+
+    /// \returns the size of the send queue.
+    std::size_t sendQueueSize() const;
+
+    /// \brief Clears the send queue.
+    void clearSendQueue();
+
+    /// \brief Get the total bytes sent to the client.
+    /// \returns the total bytes sent to the client.
+    std::size_t totalBytesSent() const;
+
+protected:
+    /// \brief The original request headers for reference.
+    Poco::Net::NameValueCollection _requestHeaders;
+
+    /// \brief The client's SocketAddress for reference.
+    Poco::Net::SocketAddress _clientAddress;
+
+    /// \brief True iff the BaseConnection_ is connected to a client.
+    bool _isConnected = false;
+
+    /// \brief The total number of bytes sent to the client.
+    std::size_t _totalBytesSent = 0;
+
+    /// \brief A queue of the SSEFrames scheduled for delivery.
+    mutable std::queue<FrameType> _frameQueue;
+
+    /// \brief A mutex for threadsafe access to the frame queue, etc.
+    mutable std::mutex _mutex;
+
+};
+
+
+
+template <typename RouteType, typename FrameType>
+BaseConnection_<RouteType, FrameType>::BaseConnection_(RouteType& _route):
+    BaseRouteHandler_<RouteType>(_route)
+{
+//    BaseRouteHandler_<RouteType>::route().registerConnection(static_cast<this);
+}
+
+
+template <typename RouteType, typename FrameType>
+BaseConnection_<RouteType, FrameType>::~BaseConnection_()
+{
+    cout << "closing the connection " << std::endl;
+
+//    BaseRouteHandler_<RouteType>::route().unregisterConnection(this);
+
+    if (_isConnected)
+        stop();
+}
+
+
+template <typename RouteType, typename FrameType>
+void BaseConnection_<RouteType, FrameType>::stop()
+{
+    std::unique_lock<std::mutex> lock(_mutex);
+    _isConnected = false;
+    //    _condition.notify_all();
+}
+
+
+template <typename RouteType, typename FrameType>
+bool BaseConnection_<RouteType, FrameType>::send(const FrameType& frame) const
+{
+    std::unique_lock<std::mutex> lock(_mutex);
+    
+    if (_isConnected)
+    {
+        _frameQueue.push(frame);
+//        _condition.notify_all();
+        return true;
+    }
+    else
+    {
+        ofLogError("BaseConnection_::send") << "Not connected, frame not sent.";
+        return false;
+    }
+}
+
+
+template <typename RouteType, typename FrameType>
+std::size_t BaseConnection_<RouteType, FrameType>::sendQueueSize() const
+{
+    std::unique_lock<std::mutex> lock(_mutex);
+    return _frameQueue.size();
+}
+
+
+template <typename RouteType, typename FrameType>
+void BaseConnection_<RouteType, FrameType>::clearSendQueue()
+{
+    std::unique_lock<std::mutex> lock(_mutex);
+    std::queue<FrameType> empty; // a way to clear queues.
+    std::swap(_frameQueue, empty);
+}
+
+
+template <typename RouteType, typename FrameType>
+Poco::Net::NameValueCollection BaseConnection_<RouteType, FrameType>::requestHeaders() const
+{
+    std::unique_lock<std::mutex> lock(_mutex);
+    return _requestHeaders;
+}
+
+
+template <typename RouteType, typename FrameType>
+Poco::Net::SocketAddress BaseConnection_<RouteType, FrameType>::clientAddress() const
+{
+    std::unique_lock<std::mutex> lock(_mutex);
+    return _clientAddress;
+}
+
+
+template <typename RouteType, typename FrameType>
+bool BaseConnection_<RouteType, FrameType>::isConnected() const
+{
+    std::unique_lock<std::mutex> lock(_mutex);
+    return _isConnected;
+}
+
+
+template <typename RouteType, typename FrameType>
+std::size_t BaseConnection_<RouteType, FrameType>::totalBytesSent() const
+{
+    std::unique_lock<std::mutex> lock(_mutex);
+    return _totalBytesSent;
 }
 
 

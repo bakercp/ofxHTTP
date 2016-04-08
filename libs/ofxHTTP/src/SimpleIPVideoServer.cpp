@@ -65,25 +65,25 @@ void SimpleIPVideoServer::send(const ofPixels& pix)
 }
 
 
-std::size_t SimpleIPVideoServer::getNumConnections() const
+std::size_t SimpleIPVideoServer::numConnections() const
 {
-    return _ipVideoRoute.getNumConnections();
+    return _ipVideoRoute.numConnections();
 }
 
 
-FileSystemRoute& SimpleIPVideoServer::getFileSystemRoute()
+FileSystemRoute& SimpleIPVideoServer::fileSystemRoute()
 {
     return _fileSystemRoute;
 }
 
 
-PostRoute& SimpleIPVideoServer::getPostRoute()
+PostRoute& SimpleIPVideoServer::postRoute()
 {
     return _postRoute;
 }
 
 
-IPVideoRoute& SimpleIPVideoServer::getIPVideoRoute()
+IPVideoRoute& SimpleIPVideoServer::ipVideoRoute()
 {
     return _ipVideoRoute;
 }

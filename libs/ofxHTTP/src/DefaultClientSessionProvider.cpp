@@ -46,9 +46,9 @@ DefaultClientSessionProvider::~DefaultClientSessionProvider()
 void DefaultClientSessionProvider::requestFilter(BaseRequest& request,
                                                  Context& context)
 {
-    Context::ClientSession clientSession = context.getClientSession();
+    std::shared_ptr<Poco::Net::HTTPClientSession> clientSession = context.getClientSession();
 
-    if (!clientSession)
+    if (clientSession == nullptr)
     {
         const ClientSessionSettings& settings = context.getClientSessionSettings();
 
@@ -57,14 +57,11 @@ void DefaultClientSessionProvider::requestFilter(BaseRequest& request,
         if (0 == uri.getScheme().compare("https"))
         {
             ofSSLManager::initializeClient(); // Initialize SSL context if needed.
-
-            clientSession = Context::ClientSession(new Poco::Net::HTTPSClientSession(uri.getHost(),
-                                                                                     uri.getPort()));
+            clientSession = std::make_shared<Poco::Net::HTTPSClientSession>(uri.getHost(), uri.getPort());
         }
         else
         {
-            clientSession = Context::ClientSession(new Poco::Net::HTTPClientSession(uri.getHost(),
-                                                                                    uri.getPort()));
+            clientSession = std::make_shared<Poco::Net::HTTPClientSession>(uri.getHost(), uri.getPort());
         }
 
         clientSession->setKeepAlive(settings.getKeepAlive());

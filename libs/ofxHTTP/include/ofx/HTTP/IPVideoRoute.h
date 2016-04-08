@@ -46,32 +46,50 @@ namespace ofx {
 namespace HTTP {
 
 
+/// \brief A wrapper for a FIFO IPVideoFrame queue.
+///
+/// The maximum number of frames that can be queued is noted by the \p maxSize.
 class IPVideoFrameQueue
 {
 public:
+    /// \brief Create an IPVideoFrameQueue with a given \p maxSize.
+    /// \param maxSize The maximum size of the frame queue.
     IPVideoFrameQueue(std::size_t maxSize);
 
+    /// \brief Destroy the IPVideoFrameQueue.
     virtual ~IPVideoFrameQueue();
 
+    /// \returns the oldest frame in the queue and removes it.
     std::shared_ptr<IPVideoFrame> pop();
 
+    /// \brief Push a frame onto the queue.
+    /// \param frame The frame to push.
     void push(std::shared_ptr<IPVideoFrame> frame);
 
+    /// \returns the maximum size of the frame queue.
     std::size_t getMaxSize() const;
 
+    /// \brief Set the maximum size of the queue.
+    /// \param maxSize The maximum size of the frame queue.
     void setMaxSize(std::size_t maxSize);
 
+    /// \returns the number of frames in the frame queue.
     std::size_t size() const;
 
+    /// \returns true iff the frame queue is empty.
     bool empty() const;
 
+    /// \brief Clear all frames from the frame queue.
     void clear();
 
 private:
+    /// \brief The queue of IPVideoFrames to send.
     std::deque<std::shared_ptr<IPVideoFrame>> _frames;
-    
+
+    /// \brief The maximum size of the frame queue.
     std::size_t _maxSize;
-    
+
+    /// \brief THe mutex to protect multi-threaded data access.
     mutable std::mutex _mutex;
     
 };
@@ -150,7 +168,7 @@ private:
 };
 
 
-class IPVideoRouteHandler;
+class IPVideoConnection;
 
 
 class IPVideoRoute: public BaseRoute_<IPVideoRouteSettings>
@@ -166,57 +184,84 @@ public:
 
     void send(const ofPixels& pix) const;
 
-    void addConnection(IPVideoRouteHandler* handler);
-
-    void removeConnection(IPVideoRouteHandler* handler);
-
-    std::size_t getNumConnections() const;
+    std::size_t numConnections() const;
 
     virtual void stop() override;
 
 protected:
-    typedef std::vector<IPVideoRouteHandler*> Connections;
+    void addConnection(IPVideoConnection* handler);
+
+    void removeConnection(IPVideoConnection* handler);
+    
+    typedef std::vector<IPVideoConnection*> Connections;
 
     Connections _connections;
 
     mutable std::mutex _mutex;
 
+    friend class IPVideoConnection;
+
 };
 
 
-class IPVideoRouteHandler:
+/// \brief The IPVideo route handler.
+class IPVideoConnection:
     public BaseRouteHandler_<IPVideoRoute>,
     public IPVideoFrameQueue
 {
 public:
-    IPVideoRouteHandler(IPVideoRoute& route);
-    virtual ~IPVideoRouteHandler();
+    /// \brief Create an IPVideoConnection.
+    /// \param route The parent route.
+    IPVideoConnection(IPVideoRoute& route);
+
+    /// \brief Destroy the IPVideoConnection.
+    virtual ~IPVideoConnection();
 
     void handleRequest(ServerEventArgs& evt) override;
 
     void stop() override;
 
-    float getCurrentBitRate() const;   // bits / second
-    float getCurrentFrameRate() const; // frames / second
+    /// \brief Get the current bit rate in bits / second.
+    /// \return the current bit rate in bits / second.
+    float currentBitRate() const;
 
-    IPVideoFrameSettings getFrameSettings() const;
+    /// \brief Get the current frame rate in frames / second.
+    /// \returns the current frame rate in frames / second.
+    float currentFrameRate() const;
+
+    /// \brief Get the current frame settings.
+    /// \returns the frame settings.
+    IPVideoFrameSettings frameSettings() const;
 
 protected:
+    /// \brief The frame settings for this handler.
     IPVideoFrameSettings _frameSettings;
 
-    bool _isRunning;
+    /// \brief True if the handler is running.
+    bool _isRunning = true;
 
-    uint64_t _startTime;
+    /// \brief The start time fo the connection.
+    uint64_t _startTime = 0;
 
-    uint64_t _bytesSent;
-    uint64_t _framesSent;
+    /// \brief The number of bytes sent to the client from this connection.
+    uint64_t _bytesSent = 0;
 
-    uint64_t _lastFrameSent;
-    uint64_t _lastFrameDuration;
-    uint64_t _targetFrameDuration;
-    
-    uint64_t _nextScheduledFrame;
-    
+    /// \brief The number of frames sent to the client from this connection.
+    uint64_t _framesSent = 0;
+
+    /// \brief The time of the last frame sent.
+    uint64_t _lastFrameSent = 0;
+
+    /// \brief The amount of time required for the last frame.
+    uint64_t _lastFrameDuration = 0;
+
+    /// \brief The target frame duration.
+    uint64_t _targetFrameDuration = 0;
+
+    /// \brief The time the next frame should be sent.
+    uint64_t _nextScheduledFrame = 0;
+
+    /// \brief The mutex for protecting data.
     mutable std::mutex _mutex;
 
 };

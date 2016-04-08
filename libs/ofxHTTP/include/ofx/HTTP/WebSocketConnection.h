@@ -86,27 +86,27 @@ public:
 //    virtual void socketClosed();
 
     /// \returns The original http request headers.
-    Poco::Net::NameValueCollection getRequestHeaders() const;
+    Poco::Net::NameValueCollection requestHeaders() const;
 
     /// \returns the client's SocketAddress.
-    Poco::Net::SocketAddress getClientAddress() const;
+    Poco::Net::SocketAddress clientAddress() const;
 
     /// \returns true iff this WebSocketConnect is connected to a client.
     bool isConnected() const;
 
     /// \returns the size of the send queue.
-    std::size_t getSendQueueSize() const;
+    std::size_t sendQueueSize() const;
 
     /// \brief Clears the send queue.
     void clearSendQueue();
 
     /// \brief Get the total bytes sent to the client.
     /// \returns the total bytes sent to the client.
-    std::size_t getTotalBytesSent() const;
+    std::size_t totalBytesSent() const;
 
     /// \brief Get the total bytes received from the client.
     /// \returns the total bytes received from the client.
-    std::size_t getTotalBytesReceived() const;
+    std::size_t totalBytesReceived() const;
 
     /// \brief Take ownership of the passed std::unique_ptr<ExtensionType>.
     /// \param filter the rvalue reference to the filter.
@@ -131,13 +131,13 @@ private:
     Poco::Net::SocketAddress _clientAddress;
 
     /// \brief True iff the WebSocketConnection is connected to a client.
-    bool _isConnected;
+    bool _isConnected = false;
 
     /// \brief The total number of bytes sent to the client.
-    std::size_t _totalBytesSent;
+    std::size_t _totalBytesSent = 0;
 
     /// \brief The total number of bytes received from the client.
-    std::size_t _totalBytesReceived;
+    std::size_t _totalBytesReceived = 0;
 
     /// \brief A collection of WebSocketFilters.
     std::vector<std::unique_ptr<AbstractWebSocketFilter>> _filters;

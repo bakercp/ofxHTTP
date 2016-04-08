@@ -55,7 +55,7 @@ void SimplePostServer::setup(const Settings& settings)
 }
 
 
-PostRoute& SimplePostServer::getPostRoute()
+PostRoute& SimplePostServer::postRoute()
 {
     return _postRoute;
 }

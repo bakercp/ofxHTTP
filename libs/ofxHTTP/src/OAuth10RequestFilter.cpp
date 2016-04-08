@@ -66,7 +66,7 @@ void OAuth10RequestFilter::requestFilter(BaseRequest& request, Context& context)
 {
     _credentials.authenticate(request,
                               Poco::URI(request.getURI()),
-                              request.getForm(),
+                              request.form(),
                               OAuth10Credentials::SIGN_HMAC_SHA1);
 }
 

@@ -68,7 +68,7 @@ public:
     virtual ~WebSocketFrame();
 
     /// \returns the WebSocketFrame flags.
-    int getFlags() const;
+    int flags() const;
 
     /// \returns true iff a continuation frame.
     bool isContinuation() const;

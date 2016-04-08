@@ -168,13 +168,13 @@ void PostRouteHandler::handleRequest(ServerEventArgs& evt)
 {
     try
     {
-        Poco::Net::HTTPServerResponse& response = evt.getResponse();
+        Poco::Net::HTTPServerResponse& response = evt.response();
 
         // This uuid helps us track form progress updates.
         std::string postId = Poco::UUIDGenerator::defaultGenerator().createOne().toString();
 
         // Get the content type header (already checked in parent route).
-        Poco::Net::MediaType contentType(evt.getRequest().get("Content-Type", ""));
+        Poco::Net::MediaType contentType(evt.request().get("Content-Type", ""));
 
         if (contentType.matches(POST_CONTENT_TYPE_URLENCODED) ||
             contentType.matches(POST_CONTENT_TYPE_MULTIPART))
@@ -182,30 +182,28 @@ void PostRouteHandler::handleRequest(ServerEventArgs& evt)
             // Prepare the upload directory if needed.
             if (contentType.matches(POST_CONTENT_TYPE_MULTIPART))
             {
-                ofDirectory _uploadFolder(getRoute().getSettings().getUploadFolder());
+                ofDirectory _uploadFolder(route().settings().getUploadFolder());
 
                 if (!_uploadFolder.exists())
                 {
                     ofLogError("PostRouteHandler::handleRequest") << "Upload folder does not exist and cannot be created.";
                     response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-                    getRoute().handleRequest(evt);
+                    route().handleRequest(evt);
                     return;
                 }
             }
 
-            PostRouteFileHandler postRoutePartHandler(getRoute(),
+            PostRouteFileHandler postRoutePartHandler(route(),
                                                       evt,
                                                       postId);
 
             Poco::Net::HTMLForm form(contentType.toString());
-            form.setFieldLimit(getRoute().getSettings().getFieldLimit());
-            form.load(evt.getRequest(), evt.getRequest().stream(), postRoutePartHandler);
+            form.setFieldLimit(route().settings().getFieldLimit());
+            form.load(evt.request(), evt.request().stream(), postRoutePartHandler);
 
-            PostFormEventArgs args(evt,
-                                   postId,
-                                   form);
+            PostFormEventArgs args(evt, postId, form);
 
-            ofNotifyEvent(getRoute().events.onHTTPFormEvent, args, &getRoute());
+            ofNotifyEvent(route().events.onHTTPFormEvent, args, &route());
 
             if (form.has("destination") && !form.get("destination").empty())
             {
@@ -221,25 +219,22 @@ void PostRouteHandler::handleRequest(ServerEventArgs& evt)
 
             std::string result;
 
-            Poco::StreamCopier::copyToString(evt.getRequest().stream(),
-                                             result);
+            Poco::StreamCopier::copyToString(evt.request().stream(), result);
 
             IO::ByteBuffer buffer(result);
 
-            PostEventArgs args(evt,
-                               postId,
-                               buffer);
+            PostEventArgs args(evt, postId, buffer);
 
-            ofNotifyEvent(getRoute().events.onHTTPPostEvent, args, &getRoute());
+            ofNotifyEvent(route().events.onHTTPPostEvent, args, &route());
         }
 
         if (response.sent())
         {
             return;
         }
-        else if (!getRoute().getSettings().getUploadRedirect().empty())
+        else if (!route().settings().getUploadRedirect().empty())
         {
-            response.redirect(getRoute().getSettings().getUploadRedirect());
+            response.redirect(route().settings().getUploadRedirect());
             return;
         }
         else
@@ -253,15 +248,15 @@ void PostRouteHandler::handleRequest(ServerEventArgs& evt)
     }
     catch (const Poco::Exception& exc)
     {
-        evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, exc.displayText());
+        evt.response().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, exc.displayText());
     }
     catch (const std::exception& exc)
     {
-        evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, exc.what());
+        evt.response().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, exc.what());
     }
     catch (...)
     {
-        evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        evt.response().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
 }
 
@@ -288,7 +283,7 @@ void PostRouteFileHandler::handlePart(const Poco::Net::MessageHeader& header,
     {
         std::string contentType = header["Content-Type"];
 
-        if (!_route.getSettings().getValidContentTypes().empty() && !isContentTypeValid(contentType))
+        if (!_route.settings().getValidContentTypes().empty() && !isContentTypeValid(contentType))
         {
             ofLogError("PostRouteFileHandler::handlePart") << "Invalid content type: " << contentType;
             return; // reject
@@ -303,7 +298,7 @@ void PostRouteFileHandler::handlePart(const Poco::Net::MessageHeader& header,
 
     // Is this an uploaded file and are we allowing files to be uploaded?
     if (header.has("Content-Disposition") &&
-        _route.getSettings().getMaximumFileUploadSize() > 0)
+        _route.settings().getMaximumFileUploadSize() > 0)
     {
         std::string contentDisposition = header["Content-Disposition"];
 
@@ -316,13 +311,13 @@ void PostRouteFileHandler::handlePart(const Poco::Net::MessageHeader& header,
         std::string formFileName = parameters.get("filename", "");
         std::string formFieldName = parameters.get("name", "");
 
-        if(!formFileName.empty())
+        if (!formFileName.empty())
         {
             try
             {
                 std::stringstream ss;
 
-                ss << _route.getSettings().getUploadFolder();
+                ss << _route.settings().getUploadFolder();
                 ss << "/";
                 ss << Poco::UUIDGenerator::defaultGenerator().createOne().toString();
                 ss << ".";
@@ -330,7 +325,7 @@ void PostRouteFileHandler::handlePart(const Poco::Net::MessageHeader& header,
 
                 std::string newFilename = ofToDataPath(ss.str(), true);
 
-                ofFile file(newFilename, ofFile::WriteOnly,true);
+                ofFile file(newFilename, ofFile::WriteOnly, true);
 
                 Poco::Net::MediaType contentType(header["Content-Type"]);
 
@@ -350,16 +345,16 @@ void PostRouteFileHandler::handlePart(const Poco::Net::MessageHeader& header,
                 // The section below is from StreamCopier::copyStream,
                 // and might be used for upload progress feedback
 
-                Poco::Buffer<char> buffer(_route.getSettings().getWriteBufferSize());
+                Poco::Buffer<char> buffer(_route.settings().getWriteBufferSize());
 
-                stream.read(buffer.begin(), _route.getSettings().getWriteBufferSize());
+                stream.read(buffer.begin(), _route.settings().getWriteBufferSize());
 
                 unsigned long long sz = 0;
                 unsigned long long n = stream.gcount();
 
                 while (n > 0)
                 {
-                    if (sz > _route.getSettings().getMaximumFileUploadSize())
+                    if (sz > _route.settings().getMaximumFileUploadSize())
                     {
                         ofLogError("PostRouteFileHandler::handlePart") << "File upload size exceeded.  Removing file.";
                         file.close();
@@ -375,7 +370,7 @@ void PostRouteFileHandler::handlePart(const Poco::Net::MessageHeader& header,
                     if (stream && file)
                     {
                         stream.read(buffer.begin(),
-                                    _route.getSettings().getWriteBufferSize());
+                                    _route.settings().getWriteBufferSize());
 
                         n = stream.gcount();
                     }
@@ -439,7 +434,7 @@ bool PostRouteFileHandler::isContentTypeValid(const std::string& contentType) co
 {
     Poco::Net::MediaType mediaType(contentType);
     
-    const BaseRouteSettings::MediaTypeSet& validContentTypes = _route.getSettings().getValidContentTypes();
+    const BaseRouteSettings::MediaTypeSet& validContentTypes = _route.settings().getValidContentTypes();
 
     BaseRouteSettings::MediaTypeSet::const_iterator iter = validContentTypes.begin();
     

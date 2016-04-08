@@ -23,37 +23,48 @@
 // =============================================================================
 
 
-#pragma once
-
-
-#include "ofx/HTTP/BaseClient.h"
-#include "ofx/HTTP/DefaultClientSessionProvider.h"
-#include "ofx/HTTP/DefaultRedirectProcessor.h"
-#include "ofx/HTTP/DefaultProxyProcessor.h"
-#include "ofx/HTTP/DefaultClientHeaders.h"
-#include "ofx/HTTP/CredentialStore.h"
-#include "ofx/HTTP/DefaultResponseStreamFilter.h"
+#include "ofx/HTTP/SimpleSSEServer.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class DefaultClient: public BaseClient
+SimpleSSEServer::SimpleSSEServer(const Settings& settings):
+    BaseServer_<SimpleSSEServerSettings, SimpleSessionStore>(settings),
+    _fileSystemRoute(settings.fileSystemRouteSettings),
+    _sseRoute(settings.sseRouteSettings)
 {
-public:
-    DefaultClient();
-    virtual ~DefaultClient();
+    addRoute(&_fileSystemRoute);
+    addRoute(&_sseRoute);
+}
 
-private:
-    DefaultClientSessionProvider _defaultClientSessionProvider;
-    DefaultClientHeaders _defaultClientHeaders;
-    DefaultProxyProcessor _defaultProxyProcessor;
-    DefaultCredentialStore _defaultAuthenticationProcessor;
-    DefaultRedirectProcessor _defaultRedirectProcessor;
-    DefaultResponseStreamFilter _responseStreamFilter;
 
-};
+SimpleSSEServer::~SimpleSSEServer()
+{
+    removeRoute(&_sseRoute);
+    removeRoute(&_fileSystemRoute);
+}
+
+
+void SimpleSSEServer::setup(const Settings& settings)
+{
+    BaseServer_<SimpleSSEServerSettings, SimpleSessionStore>::setup(settings);
+    _fileSystemRoute.setup(settings.fileSystemRouteSettings);
+    _sseRoute.setup(settings.sseRouteSettings);
+}
+
+
+FileSystemRoute& SimpleSSEServer::fileSystemRoute()
+{
+    return _fileSystemRoute;
+}
+
+
+SSERoute& SimpleSSEServer::sseRoute()
+{
+    return _sseRoute;
+}
 
 
 } } // namespace ofx::HTTP

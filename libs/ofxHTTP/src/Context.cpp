@@ -41,7 +41,7 @@ const std::string Context::KEY_SESSION            = "HTTP_SESSION";
 const std::string Context::KEY_USE_ABSOLUTE_REQUEST_PATH = "USE_ABSOLUTE_REQUEST_PATH";
 
 
-Context::Context(): _resubmit(false)
+Context::Context()
 {
 }
 
@@ -75,13 +75,13 @@ const ClientSessionSettings& Context::getClientSessionSettings() const
 //}
 
 
-void Context::setClientSession(ClientSession clientSession)
+void Context::setClientSession(std::shared_ptr<Poco::Net::HTTPClientSession> clientSession)
 {
     _clientSession = clientSession;
 }
 
 
-Context::ClientSession& Context::getClientSession()
+std::shared_ptr<Poco::Net::HTTPClientSession>& Context::getClientSession()
 {
     return _clientSession;
 }

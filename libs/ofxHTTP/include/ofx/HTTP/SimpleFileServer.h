@@ -38,6 +38,7 @@ namespace HTTP {
 class SimpleFileServerSettings: public BaseServerSettings
 {
 public:
+    /// \brief File system route settings.
     FileSystemRouteSettings fileSystemRouteSettings;
 };
 
@@ -56,9 +57,10 @@ public:
     /// \brief Destroy the BasicServer.
     virtual ~SimpleFileServer();
 
-    virtual void setup(const Settings& settings);
+    virtual void setup(const Settings& settings) override;
 
-    FileSystemRoute& getFileSystemRoute();
+    /// \return A reference to the file system route.
+    FileSystemRoute& fileSystemRoute();
 
 protected:
     /// \brief The FileSystemRoute attached to this server.

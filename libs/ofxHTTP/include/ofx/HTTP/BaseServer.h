@@ -60,19 +60,11 @@ namespace HTTP {
 class BaseServerHandle: public Poco::Net::HTTPRequestHandlerFactory
 {
 public:
-    BaseServerHandle(Poco::Net::HTTPRequestHandlerFactory& factory):
-        _factory(factory)
-    {
-    }
+    BaseServerHandle(Poco::Net::HTTPRequestHandlerFactory& factory);
 
-    virtual ~BaseServerHandle()
-    {
-    }
+    virtual ~BaseServerHandle();
 
-    Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request)
-    {
-        return _factory.createRequestHandler(request);
-    }
+    Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
 
 private:
     Poco::Net::HTTPRequestHandlerFactory& _factory;
@@ -159,8 +151,7 @@ public:
     void setUseSessions(bool useSession);
     bool useSessions() const;
 
-    Poco::URI getURI() const;
-
+    Poco::URI uri() const;
 
     const Net::IPAddressRange::List& getWhitelist() const;
     void setWhitelist(const Net::IPAddressRange::List& whitelist);
@@ -168,10 +159,10 @@ public:
     const Net::IPAddressRange::List& getBlacklist() const;
     void setBlacklist(const Net::IPAddressRange::List& blacklist);
     
-    const static std::string DEFAULT_HOST;
-    const static uint16_t DEFAULT_PORT;
-    const static bool DEFAULT_USE_SSL;
-    const static bool DEFAULT_USE_SESSIONS;
+    static const std::string DEFAULT_HOST;
+    static const uint16_t DEFAULT_PORT;
+    static const bool DEFAULT_USE_SSL;
+    static const bool DEFAULT_USE_SESSIONS;
     
 private:
     std::string _host;
@@ -334,14 +325,14 @@ public:
         }
     }
 
-    const SettingsType& getSettings() const
+    const SettingsType& settings() const
     {
         return _settings;
     }
 
-    std::string getURL() const
+    std::string url() const
     {
-        return _settings.getURI().toString();
+        return _settings.uri().toString();
     }
 
     void addRoute(AbstractRoute* pRoute)
@@ -353,7 +344,7 @@ public:
     void removeRoute(AbstractRoute* pRoute)
     {
         _routes.erase(std::remove(_routes.begin(), _routes.end(), pRoute), _routes.end());
-        pRoute->setServer(0);
+        pRoute->setServer(nullptr);
     }
 
 
@@ -370,7 +361,7 @@ public:
             // We start with the last factory that was added.
             // Thus, factories with overlapping routes should be
             // carefully ordered.
-            Routes::const_reverse_iterator iter = _routes.rbegin();
+            auto iter = _routes.rbegin();
 
             while (iter != _routes.rend())
             {
@@ -392,11 +383,12 @@ public:
         ofRemoveListener(ofEvents().exit, this, &BaseServer_::exit);
     }
 
-    SessionStoreType& getSessionStore()
+    SessionStoreType& sessionStore()
     {
         return _sessionStore;
     }
 
+    /// \brief A collection of server events.
     ServerEvents events;
 
 protected:

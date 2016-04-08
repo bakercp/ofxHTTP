@@ -51,7 +51,7 @@ void ofApp::setup()
 
 #if !defined(TARGET_LINUX_ARM)
     // Launch a browser with the address of the server.
-    ofLaunchBrowser(server.getURL());
+    ofLaunchBrowser(server.url());
 #endif
 
 }
@@ -80,7 +80,7 @@ void ofApp::draw()
     std::stringstream ss;
 
     ss << "Num clients connected: ";
-    ss << server.getNumConnections();
+    ss << server.numConnections();
 
     ofDrawBitmapStringHighlight(ss.str(), 20, 20);
 }

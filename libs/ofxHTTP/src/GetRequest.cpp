@@ -32,7 +32,7 @@ namespace HTTP {
 
 GetRequest::GetRequest(const std::string& uri,
                        const std::string& httpVersion):
-    BaseRequest(Poco::Net::HTTPRequest::HTTP_GET,
+    FormRequest(Poco::Net::HTTPRequest::HTTP_GET,
                 uri,
                 httpVersion)
 {

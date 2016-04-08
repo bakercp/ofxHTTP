@@ -24,70 +24,109 @@
 
 
 #include "ofx/HTTP/BaseResponse.h"
-//#include "Poco/CountingStream.h"
-//#include "Poco/TeeStream.h"
+#include "ofImage.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-BaseResponse::BaseResponse():
-    Poco::Net::HTTPResponse()//,
-//    _pResponseStream(0),
-//    _pException(0)
-{
-}
-
-
 BaseResponse::~BaseResponse()
 {
-//    // deleting a null pointer is a noop
-//    delete _pResponseStream; // cleans up the stream and the backing session
-//    _pResponseStream = 0;
-//
-//    delete _pException;
-//    _pException = 0;
 }
 
 
-//bool BaseResponse::hasResponseStream() const
-//{
-//    return 0 != _pResponseStream;
-//}
-//
-//std::istream& BaseResponse::getResponseStream()
-//{
-//    poco_assert(_pResponseStream);
-//    
-//    return *_pResponseStream;
-//}
-//
-//
-//void BaseResponse::setResponseStream(std::istream* pResponseStream)
-//{
-//    delete _pResponseStream;
-//    _pResponseStream = pResponseStream;
-//}
-//
-//
-//bool BaseResponse::hasException() const
-//{
-//    return 0 != _pException;
-//}
-//
-//
-//const Poco::Exception* BaseResponse::getException() const
-//{
-//    return _pException;
-//}
-//
-//
-//void BaseResponse::setException(Poco::Exception* pException)
-//{
-//    delete _pException;
-//    _pException = pException;
-//}
+BaseBufferedResponse::~BaseBufferedResponse()
+{
+}
+
+
+std::string BaseBufferedResponse::error() const
+{
+    std::stringstream ss;
+
+    if (getStatus() < 200 && getStatus() >= 300)
+    {
+        ss << "HTTPStatus: " << getStatus() << " Reason: " << getReason() << " ";
+    }
+
+    if (hasException())
+    {
+        ss << "Exception: " << _exception->displayText();
+    }
+
+    return ss.str();
+}
+
+
+const Poco::Exception* BaseBufferedResponse::exception() const
+{
+    return _exception.get();
+}
+
+
+bool BaseBufferedResponse::hasException() const
+{
+    return _exception != nullptr;
+}
+
+bool BaseBufferedResponse::isSuccess() const
+{
+    return !hasException() && getStatus() >= 200 && getStatus() < 300;
+}
+
+
+void BaseBufferedResponse::setException(std::unique_ptr<Poco::Exception>&& exception)
+{
+    _exception = std::move(exception);
+}
+
+
+BufferedResponse::~BufferedResponse()
+{
+}
+
+
+const ofBuffer& BufferedResponse::data() const
+{
+    return _buffer;
+}
+
+
+ofPixels BufferedResponse::pixels() const
+{
+    ofPixels _pixels;
+    
+    if (!ofLoadImage(_pixels, _buffer))
+    {
+        ofLogError("BufferedResponse::pixels") << "Unable to interpret data as ofPixels.";
+    }
+
+    return _pixels;
+}
+
+
+ofJson BufferedResponse::json() const
+{
+    ofJson _json;
+
+    try
+    {
+        _json = ofJson::parse(_buffer);
+    }
+    catch (const std::exception& exc)
+    {
+        ofLogError("BufferedResponse::json") << "Unable to interpret data as json: " << exc.what();
+    }
+
+    return _json;
+}
+
+
+void BufferedResponse::bufferStream(std::istream& responseStream)
+{
+    responseStream >> _buffer;
+}
 
 
 } } // namespace ofx::HTTP

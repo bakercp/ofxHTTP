@@ -51,7 +51,7 @@ void SimpleFileServer::setup(const Settings& settings)
 }
 
 
-FileSystemRoute& SimpleFileServer::getFileSystemRoute()
+FileSystemRoute& SimpleFileServer::fileSystemRoute()
 {
     return _fileSystemRoute;
 }

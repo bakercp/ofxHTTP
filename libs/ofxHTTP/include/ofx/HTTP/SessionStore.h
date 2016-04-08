@@ -83,10 +83,10 @@ protected:
     SimpleSessionStore(const SimpleSessionStore&);
     SimpleSessionStore& operator = (const SimpleSessionStore&);
 
-    bool hasSession(const std::string& sessionId) const;
-    AbstractSession& getSession(const std::string& sessionId);
-    AbstractSession& createSession();
-    void destroySession(const std::string& sessionId);
+    bool hasSession(const std::string& sessionId) const override;
+    AbstractSession& getSession(const std::string& sessionId) override;
+    AbstractSession& createSession() override;
+    void destroySession(const std::string& sessionId) override;
 
     typedef std::map<std::string, std::shared_ptr<AbstractSession>> SessionMap;
 

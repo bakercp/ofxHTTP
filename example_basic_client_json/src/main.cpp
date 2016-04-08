@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2014-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,33 +23,11 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/DefaultClient.h"
+#include "ofApp.h"
 
 
-namespace ofx {
-namespace HTTP {
-
-
-DefaultClient::DefaultClient()
+int main()
 {
-    addRequestFilter(&_defaultClientSessionProvider);
-    addRequestFilter(&_defaultProxyProcessor);
-    addRequestFilter(&_defaultAuthenticationProcessor);
-    addRequestFilter(&_defaultRedirectProcessor);
-    addRequestFilter(&_defaultClientHeaders);
-
-    // response processors
-    addResponseFilter(&_defaultProxyProcessor);
-    addResponseFilter(&_defaultAuthenticationProcessor);
-    addResponseFilter(&_defaultRedirectProcessor);
-
-    setResponseStreamFilter(&_responseStreamFilter);
+	ofSetupOpenGL(250, 50, OF_WINDOW);
+    ofRunApp(std::make_shared<ofApp>());
 }
-
-
-DefaultClient::~DefaultClient()
-{
-}
-
-
-} } // namespace ofx::HTTP

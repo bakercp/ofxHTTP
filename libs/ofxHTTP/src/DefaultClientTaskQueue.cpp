@@ -42,7 +42,7 @@ DefaultClientTaskQueue::~DefaultClientTaskQueue()
 
 
 std::string DefaultClientTaskQueue::get(const std::string& uri,
-                                        const Poco::Net::NameValueCollection& formFields,
+                                        const std::multimap<std::string, std::string>& formFields,
                                         const std::string& httpVersion,
                                         const std::string& requestId,
                                         ThreadSettings threadSettings)
@@ -58,8 +58,8 @@ std::string DefaultClientTaskQueue::get(const std::string& uri,
 
 
 std::string DefaultClientTaskQueue::post(const std::string& uri,
-                                         const Poco::Net::NameValueCollection formFields,
-                                         const PostRequest::FormParts formParts,
+                                         const std::multimap<std::string, std::string> formFields,
+                                         const std::vector<FormPart>& formParts,
                                          const std::string& httpVersion,
                                          const std::string& requestId,
                                          ThreadSettings threadSettings)
@@ -81,8 +81,6 @@ std::string DefaultClientTaskQueue::request(BaseRequest* pRequest,
     DefaultClientTask* task = new DefaultClientTask(pRequest,
                                                     createDefaultResponse(),
                                                     createDefaultContext());
-
-
 
     return start(Poco::UUIDGenerator::defaultGenerator().createOne().toString(), task);
 }

@@ -37,33 +37,105 @@
 #include "ofSSLManager.h"
 #include "ofx/HTTP/BaseRequest.h"
 #include "ofx/HTTP/Context.h"
+#include "ofx/IO/ByteBuffer.h"
 #include "ofTypes.h"
+#include "ofPixels.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
+/// \brief A BaseResponse is used to capture exceptions and response headers.
+///
+/// The user must ask for the input stream from the client or use a Buffered
+/// Response to receive the data.
 class BaseResponse: public Poco::Net::HTTPResponse
 {
 public:
-//    typedef std::shared_ptr<BaseResponse> SharedPtr;
-
-    BaseResponse();
+    /// \brief Destroy the BaseResponse.
     virtual ~BaseResponse();
 
-//    bool hasResponseStream() const;
-//    std::istream& getResponseStream();
+private:
+    friend class BaseClient;
 
-//    bool hasException() const;
-//    const Poco::Exception* getException() const;
+};
+
+
+/// \brief The base class for a buffered response.
+///
+/// A buffered response buffers and packages all response data.
+class BaseBufferedResponse: public BaseResponse
+{
+public:
+    /// \brief Destroy the BaseBufferedResponse.
+    virtual ~BaseBufferedResponse();
+
+    /// \brief Get an error display message.
+    ///
+    /// This returns a string containing a human readable description of why
+    /// a response may have failed.
+    ///
+    /// \returns erros as a string or an empty string if none.
+    std::string error() const;
+
+    /// \returns a const pointer to the exception or nullptr if none.
+    const Poco::Exception* exception() const;
+
+    /// \returns true if there is an exception.
+    bool hasException() const;
+
+    /// \returns true if the status is a 2xx Success code with no exceptions.
+    bool isSuccess() const;
+
+protected:
+    /// \brief Set an exception.
+    /// \param exception The exception to set.
+    void setException(std::unique_ptr<Poco::Exception>&& exception);
+
+    /// \brief Buffers the input stream.
+    ///
+    /// This section is allowed to throw exceptions that should be caught by the
+    /// calling party. Those exceptions should be handled or set or added to the
+    /// response by calling setException().
+    ///
+    /// \param istr The input stream to buffer.
+    /// \throws Any number of exceptions.
+    virtual void bufferStream(std::istream& responseStream) = 0;
 
 private:
-//    void setResponseStream(std::istream* pResponseStream);
-//    void setException(Poco::Exception* pException);
-//
-//    std::istream* _pResponseStream;
-//    Poco::Exception* _pException;
+    /// \brief The captured exception.
+    std::unique_ptr<Poco::Exception> _exception = nullptr;
+
+    friend class BaseClient;
+
+};
+
+
+/// \brief A BufferedResponse reads the bytes into a raw byte buffer.
+class BufferedResponse: public BaseBufferedResponse
+{
+public:
+    /// \brief Destroy a BufferedResponse.
+    virtual ~BufferedResponse();
+
+    /// \returns the buffered input stream in a byte buffer.
+    const ofBuffer& data() const;
+
+    /// \brief Attempt to load the data as ofPixels.
+    /// \returns filled ofPixels or an empty pixels if not possible.
+    ofPixels pixels() const;
+
+    /// \brief Attempt to load the data as parsed JSON data.
+    /// \returns parsed JSON data or a null element if not possible.
+    ofJson json() const;
+
+protected:
+    virtual void bufferStream(std::istream& responseStream) override;
+
+private:
+    /// \brief The buffered input stream data.
+    ofBuffer _buffer;
 
     friend class BaseClient;
 

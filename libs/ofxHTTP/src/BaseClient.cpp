@@ -38,8 +38,8 @@ BaseClient::BaseClient():
 }
 
 
-BaseClient::BaseClient(RequestFilters requestFilters,
-                       ResponseFilters responseFilters,
+BaseClient::BaseClient(std::vector<AbstractRequestFilter*> requestFilters,
+                       std::vector<AbstractResponseFilter*> responseFilters,
                        streamsize bytesPerProgressUpdate):
     _requestFilters(requestFilters),
     _responseFilters(responseFilters),
@@ -62,17 +62,17 @@ std::istream& BaseClient::execute(BaseRequest& request,
 {
     context.setResubmit(false);
 
-    requestFilter(request, context);
+    _filterRequest(request, context);
 
     request.prepareRequest();
 
-    std::ostream& requestStream = send(request, context);
+    std::ostream& requestStream = _send(request, context);
 
     request.writeRequestBody(requestStream);
 
-    std::istream& responseStream = receive(request, response, context);
+    std::istream& responseStream = _receive(request, response, context);
 
-    responseFilter(request, response, context);
+    _filterResponse(request, response, context);
 
     if (context.getResubmit())
     {
@@ -89,6 +89,13 @@ std::istream& BaseClient::execute(BaseRequest& request,
     {
         return responseStream;
     }
+}
+
+std::istream& BaseClient::execute(BaseRequest& request,
+                                  BaseResponse& response)
+{
+    Context context;
+    return execute(request, response, context);
 }
 
 
@@ -144,6 +151,14 @@ void BaseClient::submit(BaseRequest& request,
 }
 
 
+void BaseClient::submit(BaseRequest& request, BaseResponse& response)
+{
+    Context context;
+    submit(request, response, context);
+}
+
+
+
 void BaseClient::addRequestFilter(AbstractRequestFilter* filter)
 {
     _requestFilters.push_back(filter);
@@ -158,27 +173,19 @@ void BaseClient::addResponseFilter(AbstractResponseFilter* filter)
 
 void BaseClient::removeRequestFilter(AbstractRequestFilter* filter)
 {
-    RequestFilters::iterator iter = std::find(_requestFilters.begin(),
-                                              _requestFilters.end(),
-                                              filter);
-
-    if (iter != _requestFilters.end())
-    {
-        _requestFilters.erase(iter);
-    }
+    _requestFilters.erase(std::remove(_requestFilters.begin(),
+                                      _requestFilters.end(),
+                                      filter),
+                           _requestFilters.end());
 }
 
 
-void BaseClient::removeResponseFilter(AbstractResponseFilter* handler)
+void BaseClient::removeResponseFilter(AbstractResponseFilter* filter)
 {
-    ResponseFilters::iterator iter = std::find(_responseFilters.begin(),
-                                               _responseFilters.end(),
-                                               handler);
-    
-    if (iter != _responseFilters.end())
-    {
-        _responseFilters.erase(iter);
-    }
+    _responseFilters.erase(std::remove(_responseFilters.begin(),
+                                       _responseFilters.end(),
+                                       filter),
+                           _responseFilters.end());
 }
 
 
@@ -232,14 +239,11 @@ std::streamsize BaseClient::getBytesPerProgressUpdate() const
 }
 
 
-void BaseClient::requestFilter(BaseRequest& request, Context& context)
+void BaseClient::_filterRequest(BaseRequest& request, Context& context)
 {
-    RequestFilters::iterator requestFilterIter = _requestFilters.begin();
-
-    while (requestFilterIter != _requestFilters.end())
+    for (auto& filter: _requestFilters)
     {
-        (*requestFilterIter)->requestFilter(request, context);
-        ++requestFilterIter;
+        filter->requestFilter(request, context);
     }
 
     MutableClientRequestArgs requestFilterEvent(request, context);
@@ -247,17 +251,13 @@ void BaseClient::requestFilter(BaseRequest& request, Context& context)
 }
 
 
-void BaseClient::responseFilter(BaseRequest& request,
-                                BaseResponse& response,
-                                Context& context)
+void BaseClient::_filterResponse(BaseRequest& request,
+                                 BaseResponse& response,
+                                 Context& context)
 {
-    // Apply attached filters.
-    ResponseFilters::iterator responseFilterIter = _responseFilters.begin();
-
-    while (responseFilterIter != _responseFilters.end())
+    for (auto& filter: _responseFilters)
     {
-        (*responseFilterIter)->responseFilter(request, response, context);
-        ++responseFilterIter;
+        filter->responseFilter(request, response, context);
     }
 
     // Apply event based filters.
@@ -266,9 +266,9 @@ void BaseClient::responseFilter(BaseRequest& request,
 }
 
 
-std::ostream& BaseClient::send(BaseRequest& request, Context& context)
+std::ostream& BaseClient::_send(BaseRequest& request, Context& context)
 {
-    Context::ClientSession clientSession = context.getClientSession();
+    auto clientSession = context.getClientSession();
 
     if (clientSession == nullptr)
     {
@@ -297,11 +297,11 @@ std::ostream& BaseClient::send(BaseRequest& request, Context& context)
 }
 
 
-std::istream& BaseClient::receive(BaseRequest& request,
-                                  BaseResponse& response,
-                                  Context& context)
+std::istream& BaseClient::_receive(BaseRequest& request,
+                                   BaseResponse& response,
+                                   Context& context)
 {
-    Context::ClientSession clientSession = context.getClientSession();
+    auto clientSession = context.getClientSession();
 
     if (!clientSession)
     {

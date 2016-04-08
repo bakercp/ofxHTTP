@@ -37,7 +37,7 @@ namespace HTTP {
 DefaultClientTask::DefaultClientTask(BaseRequest* request,
                                      BaseResponse* response,
                                      Context* context):
-    DefaultClient(),
+    HTTPClient(),
     Poco::Task(request->getURI()),
     _request(request),
     _response(response),
@@ -56,15 +56,17 @@ DefaultClientTask::~DefaultClientTask()
 
 void DefaultClientTask::runTask()
 {
-    registerClientEvents(this);
-    registerClientProgressEvents(this);
-    registerClientFilterEvents(this);
+    std::vector<ofEventListener> listeners;
+    listeners.emplace_back(events.onHTTPClientErrorEvent.newListener(this, &DefaultClientTask::onHTTPClientErrorEvent));
+    listeners.emplace_back(events.onHTTPClientResponseEvent.newListener(this, &DefaultClientTask::onHTTPClientResponseEvent));
+    listeners.emplace_back(events.onHTTPClientRequestProgress.newListener(this, &DefaultClientTask::onHTTPClientRequestProgress));
+    listeners.emplace_back(events.onHTTPClientResponseProgress.newListener(this, &DefaultClientTask::onHTTPClientResponseProgress));
+    listeners.emplace_back(events.onHTTPClientRequestFilterEvent.newListener(this, &DefaultClientTask::onHTTPClientRequestFilterEvent));
+    listeners.emplace_back(events.onHTTPClientResponseFilterEvent.newListener(this, &DefaultClientTask::onHTTPClientResponseFilterEvent));
 
     submit(*_request, *_response, *_context);
 
-    unregisterClientFilterEvents(this);
-    unregisterClientProgressEvents(this);
-    unregisterClientEvents(this);
+    // Listeners are removed when the go out of scope.
 }
 
 
@@ -72,9 +74,9 @@ bool DefaultClientTask::onHTTPClientResponseEvent(HTTP::ClientResponseEventArgs&
 {
     const std::size_t bufferSize = IO::ByteBufferUtils::DEFAULT_BUFFER_SIZE;
 
-    std::istream& istr = args.getResponseStream();
+    std::istream& istr = args.responseStream();
 
-    std::streamsize contentLength = args.getResponse().getContentLength();
+    std::streamsize contentLength = args.response().getContentLength();
 
     IO::ByteBuffer _byteBuffer;
 
@@ -109,9 +111,9 @@ bool DefaultClientTask::onHTTPClientResponseEvent(HTTP::ClientResponseEventArgs&
     if (!isCancelled())
     {
         ClientResponseBufferEventArgs bufferEvent(_byteBuffer,
-                                                  args.getRequest(),
-                                                  args.getResponse(),
-                                                  args.getContext());
+                                                  args.request(),
+                                                  args.response(),
+                                                  args.context());
         handleBufferEvent(bufferEvent);
     }
 
@@ -128,20 +130,20 @@ void DefaultClientTask::handleBufferEvent(const ClientResponseBufferEventArgs& b
 bool DefaultClientTask::onHTTPClientErrorEvent(HTTP::ClientErrorEventArgs& args)
 {
     // We throw an exception to be caught by the task manager.
-    throw args.getException();
+    throw args.exception();
     return true;
 }
 
 
 bool DefaultClientTask::onHTTPClientRequestProgress(HTTP::ClientRequestProgressArgs& args)
 {
-    if (args.getProgress() == Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH)
+    if (args.progress() == HTTP::ClientRequestProgressArgs::UNKNOWN_CONTENT_LENGTH)
     {
         setProgress(0);
     }
     else
     {
-        setProgress(args.getProgress());
+        setProgress(args.progress());
     }
 
     return true;
@@ -150,13 +152,13 @@ bool DefaultClientTask::onHTTPClientRequestProgress(HTTP::ClientRequestProgressA
 
 bool DefaultClientTask::onHTTPClientResponseProgress(HTTP::ClientResponseProgressArgs& args)
 {
-    if (args.getProgress() == Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH)
+    if (args.progress() == HTTP::ClientRequestProgressArgs::UNKNOWN_CONTENT_LENGTH)
     {
         setProgress(0);
     }
     else
     {
-        setProgress(args.getProgress());
+        setProgress(args.progress());
     }
 
     return true;

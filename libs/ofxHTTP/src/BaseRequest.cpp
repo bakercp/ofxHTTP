@@ -31,9 +31,6 @@ namespace ofx {
 namespace HTTP {
 
 
-const std::string BaseRequest::DEFAULT_MEDIA_TYPE = "application/octet-stream";
-
-
 BaseRequest::BaseRequest(const std::string& method,
                          const std::string& uri,
                          const std::string& httpVersion):
@@ -78,32 +75,6 @@ void BaseRequest::write(std::ostream& ostr) const
 }
 
 
-void BaseRequest::addFormFields(const Poco::Net::NameValueCollection& formFields)
-{
-    Poco::Net::NameValueCollection::ConstIterator iter = formFields.begin();
-
-    while (iter != formFields.end())
-    {
-        _form.add(iter->first, iter->second);
-        ++iter;
-    }
-}
-
-
-void BaseRequest::addFormField(const std::string& name,
-                               const std::string& value)
-{
-    _form.add(name, value);
-}
-
-
-void BaseRequest::setFormField(const std::string& name,
-                               const std::string& value)
-{
-    _form.set(name, value);
-}
-
-
 void BaseRequest::setRequestId(const std::string& requestId)
 {
     _requestId = requestId;
@@ -116,21 +87,15 @@ const std::string& BaseRequest::getRequestId() const
 }
 
 
-const Poco::Net::HTMLForm& BaseRequest::getForm() const
-{
-    return _form;
-}
-
-
-Poco::Net::HTMLForm& BaseRequest::getForm()
-{
-    return _form;
-}
-
-
 std::string BaseRequest::generateId()
 {
     return Poco::UUIDGenerator::defaultGenerator().createOne().toString();
+}
+
+
+const Poco::Net::HTMLForm& BaseRequest::form() const
+{
+    return _form;
 }
 
 

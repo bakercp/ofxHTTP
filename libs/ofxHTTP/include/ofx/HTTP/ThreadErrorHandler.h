@@ -63,7 +63,7 @@ public:
         _threadName = threadName;
     }
     
-    std::string getName() const
+    std::string getThreadName() const
     {
         return _threadName;
     }

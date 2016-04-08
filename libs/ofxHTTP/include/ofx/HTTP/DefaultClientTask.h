@@ -29,7 +29,7 @@
 #include "Poco/Task.h"
 #include "Poco/TaskNotification.h"
 #include "ofx/HTTP/ClientEvents.h"
-#include "ofx/HTTP/DefaultClient.h"
+#include "ofx/HTTP/HTTPClient.h"
 #include "ofx/HTTP/ThreadSettings.h"
 
 
@@ -37,7 +37,7 @@ namespace ofx {
 namespace HTTP {
 
 
-class DefaultClientTask: public DefaultClient, public Poco::Task
+class DefaultClientTask: public HTTPClient, public Poco::Task
 {
 public:
     DefaultClientTask(BaseRequest* request,
@@ -61,9 +61,9 @@ protected:
     virtual void handleBufferEvent(const ClientResponseBufferEventArgs& buffer);
 
 private:
-    BaseRequest* _request;
-    BaseResponse* _response;
-    Context* _context;
+    BaseRequest* _request = nullptr;
+    BaseResponse* _response = nullptr;
+    Context* _context = nullptr;
 
 };
 

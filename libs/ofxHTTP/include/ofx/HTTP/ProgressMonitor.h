@@ -45,12 +45,12 @@ public:
                 std::size_t transferBufferSize,
                 uint64_t lastUpdate);
 
-    std::streamsize getTotalBytesTranferred() const;
-    std::streamsize getTotalBytes() const;
+    std::streamsize totalBytesTranferred() const;
+    std::streamsize totalBytes() const;
     
-    float getPercentageTransferred() const;
+    float percentageTransferred() const;
     
-    std::size_t getTransferBufferSize() const;
+    std::size_t transferBufferSize() const;
 
     void reset();
     

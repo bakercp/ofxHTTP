@@ -43,14 +43,14 @@ void ofApp::setup()
     // The client can listen for POST form and multi-part upload events.
     // User be aware, these methods are called from other threads.
     // The user is responsible for protecting shared resources (e.g. ofMutex).
-    server.getPostRoute().registerPostEvents(this);
+    server.postRoute().registerPostEvents(this);
 
     // Start the server.
     server.start();
 
 #if !defined(TARGET_LINUX_ARM)
     // Launch a browser with the address of the server.
-    ofLaunchBrowser(server.getURL());
+    ofLaunchBrowser(server.url());
 #endif
 
 }
@@ -59,7 +59,7 @@ void ofApp::setup()
 void ofApp::draw()
 {
     ofBackground(255);
-    ofDrawBitmapStringHighlight("See " + server.getURL(), 10, 16);
+    ofDrawBitmapStringHighlight("See " + server.url(), 10, 16);
     ofDrawBitmapStringHighlight("See the Console", 10, 42);
 }
 

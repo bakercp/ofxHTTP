@@ -43,8 +43,8 @@ class MutableClientRequestArgs: public ofEventArgs
 public:
     MutableClientRequestArgs(BaseRequest& request, Context& context);
     virtual ~MutableClientRequestArgs();
-    BaseRequest& getRequest() const;
-    Context& getContext();
+    BaseRequest& request() const;
+    Context& context();
 
 protected:
     BaseRequest& _request;
@@ -59,8 +59,10 @@ public:
     MutableClientResponseArgs(BaseRequest& request,
                               BaseResponse& response,
                               Context& context);
+    
     virtual ~MutableClientResponseArgs();
-    BaseResponse& getResponse();
+
+    BaseResponse& response();
 
 protected:
     BaseResponse& _response;
@@ -73,40 +75,62 @@ class BaseClientRequestArgs: public ofEventArgs
 {
 public:
     BaseClientRequestArgs(const BaseRequest& request, Context& context);
+
     virtual ~BaseClientRequestArgs();
-    const BaseRequest& getRequest() const;
-    Context& getContext();
-    const std::string getRequestId() const;
+
+    const BaseRequest& request() const;
+
+    Context& context();
+
+    std::string requestId() const;
 
 protected:
     const BaseRequest& _request;
+
     Context& _context;
     
 };
 
 
+/// \brief A base class for progress event data.
 class BaseProgressArgs
 {
 public:
+    /// \brief Create BaseProgressArgs with the total bytes transfered.
+    /// \param totalBytesTransferred The total number of bytes transferred.
     BaseProgressArgs(std::streamsize totalBytesTransferred);
+
+    /// \brief Destroy the BaseProgressArgs.
     virtual ~BaseProgressArgs();
-    virtual std::streamsize getContentLength() const = 0;
+
+    /// \brief Get the total content length associated with this request.
+    ///
+    /// If the total content length is unknown (e.g. during chunked-transfer)
+    /// UNKNOWN_CONTENT_LENGTH is returned.
+    ///
+    /// \returns the total length of the content in bytes iff the content length
+    /// is known.  Otherwise returns UNKNOWN_CONTENT_LENGTH.
+    virtual std::streamsize contentLength() const = 0;
 
     /// \brief Get the total number of bytes transferred during this request.
     /// \returns the total number of bytes transferred.
-    std::streamsize getTotalBytesTransferred() const;
+    std::streamsize totalBytesTransferred() const;
 
     /// \brief Get the progress of the request upload or download.
     ///
     /// If the total content length is unknown (e.g. during chunked-transfer)
-    /// progress of Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH will be
+    /// progress of UNKNOWN_CONTENT_LENGTH will be
     /// returned.
     ///
-    /// \returns a value 0.0 - 1.0 iff the content length is known.  Otherwise
-    /// returns Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH.
-    float getProgress() const;
+    /// \returns a value 0.0 - 1.0 iff the content length is known. Otherwise
+    /// returns UNKNOWN_CONTENT_LENGTH.
+    float progress() const;
+
+    /// \brief A constant indicating an unknown content length.
+    static const int UNKNOWN_CONTENT_LENGTH;
 
 protected:
+    /// \brief The total number of bytes transferred so far.
     std::streamsize _totalBytesTransferred;
 
 };
@@ -123,15 +147,7 @@ public:
 
     virtual ~ClientRequestProgressArgs();
 
-    /// \brief Get the total content length associated with this request.
-    ///
-    /// If the total content length is unknown (e.g. during chunked-transfer)
-    /// Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH is returned.
-    ///
-    /// \returns the total length of the content in bytes iff the content length
-    /// is known.  Otherwise returns
-    /// Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH.
-    std::streamsize getContentLength() const;
+    std::streamsize contentLength() const override;
 
 };
 
@@ -145,8 +161,7 @@ public:
 
     virtual ~BaseClientResponseArgs();
 
-
-    const BaseResponse& getResponse() const;
+    const BaseResponse& response() const;
 
 protected:
     const BaseResponse& _response;
@@ -166,15 +181,7 @@ public:
 
     virtual ~ClientResponseProgressArgs();
 
-    /// \brief Get the total content length associated with this request.
-    ///
-    /// If the total content length is unknown (e.g. during chunked-transfer)
-    /// Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH is returned.
-    ///
-    /// \returns the total length of the content in bytes iff the content length
-    /// is known.  Otherwise returns
-    /// Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH.
-    std::streamsize getContentLength() const;
+    std::streamsize contentLength() const override;
 
 };
 
@@ -186,22 +193,11 @@ public:
     ClientResponseEventArgs(std::istream& responseStream,
                             const BaseRequest& request,
                             const BaseResponse& response,
-                            Context& context):
-        BaseClientResponseArgs(request, response, context),
-        _responseStream(responseStream)
-    {
-    }
+                            Context& context);
 
+    virtual ~ClientResponseEventArgs();
 
-    virtual ~ClientResponseEventArgs()
-    {
-    }
-
-
-    std::istream& getResponseStream() const
-    {
-        return _responseStream;
-    }
+    std::istream& responseStream() const;
 
 protected:
     std::istream& _responseStream;
@@ -212,29 +208,17 @@ protected:
 class ClientResponseBufferEventArgs: public BaseClientResponseArgs
 {
 public:
-    ClientResponseBufferEventArgs(const IO::ByteBuffer& byteBuffer,
+    ClientResponseBufferEventArgs(const IO::ByteBuffer& buffer,
                                   const BaseRequest& request,
                                   const BaseResponse& response,
-                                  Context& context):
-        BaseClientResponseArgs(request, response, context),
-            _byteBuffer(byteBuffer)
-    {
-    }
+                                  Context& context);
 
+    virtual ~ClientResponseBufferEventArgs();
 
-    virtual ~ClientResponseBufferEventArgs()
-    {
-    }
-    
-
-    const IO::ByteBuffer& getByteBuffer() const
-    {
-        return _byteBuffer;
-    }
-
+    const IO::ByteBuffer& buffer() const;
 
 protected:
-    const IO::ByteBuffer _byteBuffer;
+    const IO::ByteBuffer _buffer;
     
 };
 
@@ -245,22 +229,11 @@ public:
     ClientErrorEventArgs(const BaseRequest& request,
                          const BaseResponse& response,
                          Context& context,
-                         const Poco::Exception& exception):
-        BaseClientResponseArgs(request, response, context),
-        _exception(exception)
-    {
-    }
+                         const Poco::Exception& exception);
 
+    virtual ~ClientErrorEventArgs();
 
-    virtual ~ClientErrorEventArgs()
-    {
-    }
-
-
-    const Poco::Exception& getException() const
-    {
-        return _exception;
-    }
+    const Poco::Exception& exception() const;
 
 protected:
     const Poco::Exception& _exception;
@@ -271,10 +244,10 @@ protected:
 class ClientEvents
 {
 public:
-    ofEvent<MutableClientRequestArgs>   onHTTPClientRequestFilterEvent;
-    ofEvent<MutableClientResponseArgs>  onHTTPClientResponseFilterEvent;
+    ofEvent<MutableClientRequestArgs> onHTTPClientRequestFilterEvent;
+    ofEvent<MutableClientResponseArgs> onHTTPClientResponseFilterEvent;
 
-    ofEvent<ClientErrorEventArgs>    onHTTPClientErrorEvent;
+    ofEvent<ClientErrorEventArgs> onHTTPClientErrorEvent;
     ofEvent<ClientResponseEventArgs> onHTTPClientResponseEvent;
 
     ofEvent<ClientRequestProgressArgs> onHTTPClientRequestProgress;

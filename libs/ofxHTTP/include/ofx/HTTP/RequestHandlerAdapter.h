@@ -51,11 +51,11 @@ public:
     /// \brief Destroy the RequestHandlerAdapter.
     virtual ~RequestHandlerAdapter();
 
-    void handleRequest(Poco::Net::HTTPServerRequest& request,
-                       Poco::Net::HTTPServerResponse& response);
+    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
+                               Poco::Net::HTTPServerResponse& response) override;
 
 protected:
-    /// \breif The the handler to adapt.
+    /// \brief The the handler to adapt.
     Poco::Net::HTTPRequestHandler& _handler;
 
 };

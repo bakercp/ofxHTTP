@@ -37,7 +37,7 @@ namespace HTTP {
     
 PostRequest::PostRequest(const std::string& uri,
                          const std::string& httpVersion):
-    BaseRequest(Poco::Net::HTTPRequest::HTTP_POST, uri, httpVersion)
+    FormRequest(Poco::Net::HTTPRequest::HTTP_POST, uri, httpVersion)
 {
 }
 
@@ -73,24 +73,55 @@ PostRequest::FormEncoding PostRequest::getFormEncoding() const
 }
 
 
+Poco::Net::HTMLForm& PostRequest::form()
+{
+    return _form;
+}
+
+
 void PostRequest::addFormPart(const FormPart& part)
 {
-    _form.addPart(part.name, part.pSource);
+    switch (part.type())
+    {
+        case FormPart::Type::STRING:
+        {
+            // _form takes ownership of StringPartSource.
+            _form.addPart(part.name(), new Poco::Net::StringPartSource(part.value(),
+                                                                       part.mediaType()));
+            break;
+        }
+        case FormPart::Type::FILE:
+        {
+            try
+            {
+                // _form takes ownership of FilePartSource.
+                _form.addPart(part.name(), new Poco::Net::FilePartSource(ofToDataPath(part.value(), true),
+                                                                         part.mediaType()));
+            }
+            catch (const Poco::FileNotFoundException& exc)
+            {
+                ofLogError("PostRequest::addFile") << exc.displayText();
+            }
+            catch (const Poco::OpenFileException& exc)
+            {
+                ofLogError("PostRequest::addFile") << exc.displayText();
+            }
+
+            break;
+        }
+    }
+
+    // We must set encoding to multipart.
     _form.setEncoding(Poco::Net::HTMLForm::ENCODING_MULTIPART);
 }
 
 
-void PostRequest::addFormParts(const FormParts& parts)
+void PostRequest::addFormParts(const std::vector<FormPart>& parts)
 {
-    FormParts::const_iterator iter = parts.begin();
-
-    while (iter != parts.end())
+    for (auto& part: parts)
     {
-        _form.addPart((*iter).name, (*iter).pSource);
-        ++iter;
+        addFormPart(part);
     }
-
-    _form.setEncoding(Poco::Net::HTMLForm::ENCODING_MULTIPART);
 }
 
 
@@ -98,33 +129,21 @@ void PostRequest::addFormFile(const std::string& name,
                               const std::string& path,
                               const std::string& mediaType)
 {
-
-    std::string absPath = ofToDataPath(path, true);
-
-    try
-    {
-        _form.addPart(name, new Poco::Net::FilePartSource(absPath, mediaType));
-        _form.setEncoding(Poco::Net::HTMLForm::ENCODING_MULTIPART);
-    }
-    catch (Poco::FileNotFoundException& exc)
-    {
-        ofLogError("PostRequest::addFile") << exc.displayText();
-    }
-    catch (Poco::OpenFileException& exc)
-    {
-        ofLogError("PostRequest::addFile") << exc.displayText();
-    }
+    addFormPart(FormPart(FormPart::Type::FILE,
+                         name,
+                         path,
+                         mediaType));
 }
 
 
-void PostRequest::addFormBuffer(const std::string& name,
-                                const ofBuffer& buffer,
+void PostRequest::addFormString(const std::string& name,
+                                const std::string& buffer,
                                 const std::string& mediaType)
 {
-    _form.addPart(name, new Poco::Net::StringPartSource(buffer.getText(),
-                                                        mediaType));
-
-    _form.setEncoding(Poco::Net::HTMLForm::ENCODING_MULTIPART);
+    addFormPart(FormPart(FormPart::Type::STRING,
+                         name,
+                         buffer,
+                         mediaType));
 }
 
 

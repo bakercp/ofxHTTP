@@ -26,17 +26,14 @@
 #pragma once
 
 
-#include <string>
-#include "Poco/Net/HTTPMessage.h"
-#include "ofx/HTTP/HTTPUtils.h"
-#include "ofx/HTTP/BaseRequest.h"
+#include "ofx/HTTP/FormRequest.h"
 
 
 namespace ofx {
 namespace HTTP {
 
     
-class GetRequest: public BaseRequest
+class GetRequest: public FormRequest
 {
 public:
     GetRequest(const std::string& uri,

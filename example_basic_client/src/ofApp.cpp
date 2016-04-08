@@ -31,35 +31,16 @@ void ofApp::setup()
     // Testing redirects and https.
     std::string url = "http://httpbin.org/redirect-to?url=http://httpbin.org/redirect-to?url=https://google.com";
 
-    ofx::HTTP::DefaultClient client;
-    ofx::HTTP::Context context;
+    // Testing redirects and https.
+    auto response = ofx::HTTP::HTTPClient::get(url);
 
-    ofx::HTTP::BaseResponse response;
-    ofx::HTTP::GetRequest request(url, Poco::Net::HTTPMessage::HTTP_1_1);
-
-    try
+    if (response->isSuccess())
     {
-        // Execute the request and get the response stream.
-        std::istream& responseStream = client.execute(request,
-                                                      response,
-                                                      context);
-
-        // Request and response headers can be examined here.
-
-        // Copy the output to the terminal.
-        Poco::StreamCopier::copyStream(responseStream, std::cout);
-
-        // Flush the input stream.
-        std::cout << std::endl;
-
+        std::cout << response->data() << std::endl;
     }
-    catch (const Poco::Exception& exc)
+    else
     {
-        ofLogError("ofApp::setup") << "Got Exception " << exc.displayText() << " " << exc.code();
-    }
-    catch (...)
-    {
-        ofLogError("ofApp::setup") << "Got unknown exception.";
+        std::cout << response->error() << std::endl;
     }
 }
 

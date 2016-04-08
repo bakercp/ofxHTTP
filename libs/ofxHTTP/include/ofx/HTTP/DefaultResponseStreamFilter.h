@@ -61,7 +61,7 @@ public:
     static const std::string CONTENT_ENCODING_HEADER;
 
 private:
-    std::shared_ptr<std::istream> _pResponseStream;
+    std::unique_ptr<std::istream> _pResponseStream;
     
 };
 

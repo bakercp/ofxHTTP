@@ -179,11 +179,11 @@ void ofApp::onClientBuffer(const ofx::HTTP::ClientBufferEventArgs& args)
     // Note: Saving to disk could / should also be done in the task's thread.
 
     // This is useful if you want to load the bytes into an openGL texture.
-    const ofx::IO::ByteBuffer& buffer = args.getData().getByteBuffer();
+    const ofx::IO::ByteBuffer& buffer = args.getData().buffer();
 
     ofx::MediaTypeMap::SharedPtr mtm = ofx::MediaTypeMap::getDefault();
 
-    Poco::Net::MediaType mediaType(args.getData().getResponse().getContentType());
+    Poco::Net::MediaType mediaType(args.getData().response().getContentType());
 
     std::string extension = mtm->getBestFileExtensionsForMediaType(mediaType);
 

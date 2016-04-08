@@ -30,7 +30,7 @@
 #include "Poco/Exception.h"
 #include "Poco/ThreadPool.h"
 #include "ofx/HTTP/ThreadSettings.h"
-#include "ofx/HTTP/DefaultClient.h"
+#include "ofx/HTTP/HTTPClient.h"
 #include "ofx/HTTP/DefaultClientTask.h"
 #include "ofx/HTTP/ClientEvents.h"
 #include "ofx/HTTP/BaseRequest.h"
@@ -55,22 +55,28 @@ public:
 
     virtual ~DefaultClientTaskQueue();
 
+    /// \brief Construct a GetRequest with a given uri and http version.
+    /// \param uri the GET endpoint uri.
+    /// \param formFields A collection of form fields.
+    /// \param httpVersion Either HTTP/1.0 or HTTP/1.1.
+    /// \param requestId A unique UUID for this request.
+    /// \returns a UUID associated with the BaseRequest.
     std::string get(const std::string& uri,
-                    const Poco::Net::NameValueCollection& formFields = Poco::Net::NameValueCollection(),
+                    const std::multimap<std::string, std::string>& formFields = { },
                     const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1,
                     const std::string& requestId = BaseRequest::generateId(),
                     ThreadSettings threadSettings = ThreadSettings());
 
     /// \brief Construct a PostRequest with a given uri and http version.
-    /// \param uri the Post endpoint uri.
+    /// \param uri the POST endpoint uri.
     /// \param formFields A collection of form fields.
     /// \param formParts A collection of form parts.
     /// \param httpVersion Either HTTP/1.0 or HTTP/1.1.
     /// \param requestId A unique UUID for this request.
     /// \returns a UUID associated with the BaseRequest.
     std::string post(const std::string& uri,
-                     const Poco::Net::NameValueCollection formFields = Poco::Net::NameValueCollection(),
-                     const PostRequest::FormParts formParts = PostRequest::FormParts(),
+                     const std::multimap<std::string, std::string> formFields = { },
+                     const std::vector<FormPart>& formParts = { },
                      const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1,
                      const std::string& requestId = BaseRequest::generateId(),
                      ThreadSettings threadSettings = ThreadSettings());
@@ -78,8 +84,8 @@ public:
     /// \brief Submit a request.
     ///
     /// The DefaultClientPool will take ownership of the pointer and destroy
-    /// it after use.  Users must not attempt to modify the request after it
-    /// has been submitted.
+    /// it after use. Users must not attempt to modify the request via its
+    /// pointer after it has been submitted.
     ///
     /// \returns a UUID associated with the BaseRequest.
     std::string request(BaseRequest* pRequest,
@@ -101,6 +107,7 @@ public:
     void unregisterAllEvents(ListenerClass* listener,
                              int priority = OF_EVENT_ORDER_AFTER_APP);
 
+    /// \brief Client event buffer events.
     ofEvent<const ClientBufferEventArgs> onClientBuffer;
 
 private:

@@ -39,8 +39,12 @@ namespace HTTP {
 class SimpleWebSocketServerSettings: public BaseServerSettings
 {
 public:
+    /// \brief File system route settings.
     FileSystemRouteSettings fileSystemRouteSettings;
-    WebSocketRouteSettings webSocketServerSettings;
+
+    /// \brief Web Socket route settings.
+    WebSocketRouteSettings webSocketRouteSettings;
+
 };
 
 
@@ -58,12 +62,13 @@ public:
     /// \brief Destroy the SimpleWebSocketServer.
     virtual ~SimpleWebSocketServer();
 
-    virtual void setup(const Settings& settings);
+    virtual void setup(const Settings& settings) override;
 
-    FileSystemRoute& getFileSystemRoute();
+    /// \return A reference to the file system route.
+    FileSystemRoute& fileSystemRoute();
 
     /// \returns the WebSocketRoute attached to this server.
-    WebSocketRoute& getWebSocketRoute();
+    WebSocketRoute& webSocketRoute();
 
 private:
     /// \brief The FileSystemRoute attached to this server.

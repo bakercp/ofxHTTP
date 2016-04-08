@@ -31,7 +31,7 @@ void ofApp::setup()
     // Testing redirects and https.
     std::string url = "http://httpbin.org/put";
 
-    ofx::HTTP::DefaultClient client;
+    ofx::HTTP::HTTPClient client;
     ofx::HTTP::Context context;
 
     ofx::HTTP::BaseResponse response;

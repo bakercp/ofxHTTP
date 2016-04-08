@@ -58,25 +58,25 @@ void ProgressMonitor::update(std::streamsize,
 }
 
 
-std::streamsize ProgressMonitor::getTotalBytesTranferred() const
+std::streamsize ProgressMonitor::totalBytesTranferred() const
 {
     return 0;
 }
 
 
-std::streamsize ProgressMonitor::getTotalBytes() const
+std::streamsize ProgressMonitor::totalBytes() const
 {
     return 0;
 }
 
 
-float ProgressMonitor::getPercentageTransferred() const
+float ProgressMonitor::percentageTransferred() const
 {
     return 0;
 }
 
 
-std::size_t ProgressMonitor::getTransferBufferSize() const
+std::size_t ProgressMonitor::transferBufferSize() const
 {
     return 0;
 }

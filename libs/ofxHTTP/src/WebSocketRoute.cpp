@@ -199,6 +199,7 @@ bool WebSocketRoute::canHandleRequest(const Poco::Net::HTTPServerRequest& reques
 
 Poco::Net::HTTPRequestHandler* WebSocketRoute::createRequestHandler(const Poco::Net::HTTPServerRequest&)
 {
+    // The caller takes ownership of the WebSocketConnection's memory.
     return new WebSocketConnection(*this);
 }
 
@@ -206,71 +207,25 @@ Poco::Net::HTTPRequestHandler* WebSocketRoute::createRequestHandler(const Poco::
 void WebSocketRoute::stop()
 {
     // std::unique_lock<std::mutex> lock(_mutex);
-    auto iter = _connections.begin();
-
-    while (iter != _connections.end())
+    for (auto& connection : _connections)
     {
-        (*iter)->stop();
-        ++iter;
+        connection->stop();
     }
 }
-
-
-//bool WebSocketRoute::sendFrame(const WebSocketConnection* connection,
-//                               const WebSocketFrame& frame)
-//{
-//    if (connection)
-//    {
-//        return connection->sendFrame(frame);
-//    }
-//    else
-//    {
-//        ofLogError("WebSocketRoute::sendFrame") << "0 == handler";
-//        return false;
-//    }
-//}
-//
-
-//void WebSocketRoute::close(WebSocketConnection* connection)
-//{
-//    if (connection)
-//    {
-//        connection->stop();
-//    }
-//    else
-//    {
-//        ofLogError("WebSocketRoute::close") << "0 == handler";
-//    }
-//}
-
-
-//void WebSocketRoute::close()
-//{
-//    // std::unique_lock<std::mutex> lock(_mutex);
-//    auto iter = _connections.begin();
-//
-//    while (iter != _connections.end())
-//    {
-//        close(*iter);
-//        ++iter;
-//    }
-//}
 
 
 void WebSocketRoute::broadcast(const WebSocketFrame& frame)
 {
     std::unique_lock<std::mutex> lock(_mutex);
-    auto iter = _connections.begin();
 
-    while (iter != _connections.end())
+    for (auto& connection : _connections)
     {
-        (*iter)->sendFrame(frame);
-        ++iter;
+        connection->sendFrame(frame);
     }
 }
 
 
-void WebSocketRoute::registerWebSocketConnection(WebSocketConnection* connection)
+void WebSocketRoute::registerConnection(WebSocketConnection* connection)
 {
     std::unique_lock<std::mutex> lock(_mutex);
 
@@ -281,7 +236,7 @@ void WebSocketRoute::registerWebSocketConnection(WebSocketConnection* connection
 }
 
 
-void WebSocketRoute::unregisterWebSocketConnection(WebSocketConnection* connection)
+void WebSocketRoute::unregisterConnection(WebSocketConnection* connection)
 {
     std::unique_lock<std::mutex> lock(_mutex);
     // TODO: this will never return more than 1
@@ -295,14 +250,14 @@ void WebSocketRoute::unregisterWebSocketConnection(WebSocketConnection* connecti
 }
 
 
-std::size_t WebSocketRoute::getNumWebSocketConnections() const
+std::size_t WebSocketRoute::numConnections() const
 {
     std::unique_lock<std::mutex> lock(_mutex);
     return _connections.size();
 }
 
 
-const std::vector<std::unique_ptr<AbstractWebSocketFilterFactory>>& WebSocketRoute::getFilterFactories() const
+const std::vector<std::unique_ptr<AbstractWebSocketFilterFactory>>& WebSocketRoute::filterFactories() const
 {
     return _filterFactories;
 }

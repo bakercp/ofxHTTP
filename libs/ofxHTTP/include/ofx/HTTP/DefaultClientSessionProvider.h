@@ -36,6 +36,7 @@ namespace ofx {
 namespace HTTP {
 
 
+/// \brief Set up a client session based on the reques URI scheme.
 class DefaultClientSessionProvider: public AbstractRequestFilter
 {
 public:

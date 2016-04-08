@@ -26,14 +26,14 @@
 #pragma once
 
 #include "ofFileUtils.h"
-#include "ofx/HTTP/BaseRequest.h"
+#include "ofx/HTTP/FormRequest.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class PutRequest: public BaseRequest
+class PutRequest: public FormRequest
 {
 public:
     /// \brief Construct a PutRequest with a given uri and http version.
@@ -74,9 +74,6 @@ public:
     ///
     /// \contentType The content type of the PUT request.
     void setContentType(const std::string& contentType);
-
-    /// \brief The default MIME type used for file parts.
-    static const std::string DEFAULT_MEDIA_TYPE;
 
     virtual void prepareRequest() override;
     virtual void writeRequestBody(std::ostream& requestStream) override;

@@ -51,7 +51,7 @@ namespace HTTP {
 class Context
 {
 public:
-    typedef std::shared_ptr<Poco::Net::HTTPClientSession> ClientSession;
+//    typedef std::shared_ptr<Poco::Net::HTTPClientSession> ClientSession;
 
     Context();
     virtual ~Context();
@@ -62,8 +62,8 @@ public:
 //    void setCookieStore(CookieStore::SharedPtr cookieStore);
 //    CookieStore::WeakPtr getCookieStore();
 
-    void setClientSession(ClientSession clientSession);
-    ClientSession& getClientSession();
+    void setClientSession(std::shared_ptr<Poco::Net::HTTPClientSession> clientSession);
+    std::shared_ptr<Poco::Net::HTTPClientSession>& getClientSession();
 
     void addRedirect(const Poco::URI& uri);
     const std::vector<Poco::URI>& getRedirects() const;
@@ -77,15 +77,15 @@ public:
     bool getResubmit() const;
     void setResubmit(bool resubmit);
 
-    const static std::string KEY_PREFIX_RESERVED;
-    const static std::string KEY_SESSION_SETTINGS;
-    const static std::string KEY_COOKIE_STORE;
-    const static std::string KEY_CREDENTIAL_STORE;
-    const static std::string KEY_RESOLVED_URI;
-    const static std::string KEY_PROXY_REDIRECT_URI;
-    const static std::string KEY_REDIRECTS;
-    const static std::string KEY_SESSION;
-    const static std::string KEY_USE_ABSOLUTE_REQUEST_PATH;
+    static const std::string KEY_PREFIX_RESERVED;
+    static const std::string KEY_SESSION_SETTINGS;
+    static const std::string KEY_COOKIE_STORE;
+    static const std::string KEY_CREDENTIAL_STORE;
+    static const std::string KEY_RESOLVED_URI;
+    static const std::string KEY_PROXY_REDIRECT_URI;
+    static const std::string KEY_REDIRECTS;
+    static const std::string KEY_SESSION;
+    static const std::string KEY_USE_ABSOLUTE_REQUEST_PATH;
 
     template <typename TypeName>
     bool getValue(const std::string& key, TypeName& value) const
@@ -122,9 +122,9 @@ private:
 //    Poco::URI _resolvedURI;
     Poco::URI _proxyRedirectURI;
 
-    ClientSession _clientSession;
+    std::shared_ptr<Poco::Net::HTTPClientSession> _clientSession;
 
-    bool _resubmit;
+    bool _resubmit = false;
 
 };
 

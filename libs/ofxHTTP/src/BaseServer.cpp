@@ -30,6 +30,23 @@ namespace ofx {
 namespace HTTP {
 
 
+BaseServerHandle::BaseServerHandle(Poco::Net::HTTPRequestHandlerFactory& factory):
+    _factory(factory)
+{
+}
+
+
+BaseServerHandle::~BaseServerHandle()
+{
+}
+
+
+Poco::Net::HTTPRequestHandler* BaseServerHandle::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+{
+    return _factory.createRequestHandler(request);
+}
+
+
 TCPServerParams::TCPServerParams():
     _threadIdleTime(10000000),
     _maxThreads(0),
@@ -253,7 +270,7 @@ bool BaseServerSettings::useSessions() const
 }
 
 
-Poco::URI BaseServerSettings::getURI() const
+Poco::URI BaseServerSettings::uri() const
 {
     Poco::URI uri;
     
