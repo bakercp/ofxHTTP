@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2014-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,32 +23,33 @@
 // =============================================================================
 
 
-#pragma once
+#include "ofApp.h"
 
 
-#include "ofMain.h"
-#include "ofxIO.h"
-#include "ofxHTTP.h"
-
-
-class ofApp: public ofBaseApp
+void ofApp::setup()
 {
-public:
-    void setup();
-    void draw();
+    std::string uri = "http://httpbin.org/post";
 
-    void keyPressed(int key);
+    ofJson json = {
+        "hello", "jello"
+    };
 
-    void onTaskQueued(const ofx::TaskQueueEventArgs& args);
-    void onTaskStarted(const ofx::TaskQueueEventArgs& args);
-    void onTaskCancelled(const ofx::TaskQueueEventArgs& args);
-    void onTaskFinished(const ofx::TaskQueueEventArgs& args);
-    void onTaskFailed(const ofx::TaskFailedEventArgs& args);
-    void onTaskProgress(const ofx::TaskProgressEventArgs& args);
+    auto response = ofxHTTP::HTTPClient::post(uri, json);
 
-    void onClientBuffer(const ofx::HTTP::ClientBufferEventArgs& args);
+    if (response->isSuccess())
+    {
+        std::cout << response->json().dump(4) << std::endl;
+    }
+    else
+    {
+        std::cout << response->error() << std::endl;
+    }
+}
 
-    /// \brief An HTTP client task queue.
-    ofxHTTP::DefaultClientTaskQueue clientTaskQueue;
 
-};
+void ofApp::draw()
+{
+    ofBackgroundGradient(ofColor::white, ofColor::black);
+
+    ofDrawBitmapStringHighlight("See console for output.", ofPoint(30, 30));
+}

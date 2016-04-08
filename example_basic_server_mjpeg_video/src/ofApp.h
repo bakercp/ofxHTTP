@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2012-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,6 @@
 
 
 #include "ofMain.h"
-#include "ofxIO.h"
 #include "ofxHTTP.h"
 
 
@@ -35,20 +34,11 @@ class ofApp: public ofBaseApp
 {
 public:
     void setup();
+    void update();
     void draw();
 
-    void keyPressed(int key);
+    ofxHTTP::SimpleIPVideoServer server;
 
-    void onTaskQueued(const ofx::TaskQueueEventArgs& args);
-    void onTaskStarted(const ofx::TaskQueueEventArgs& args);
-    void onTaskCancelled(const ofx::TaskQueueEventArgs& args);
-    void onTaskFinished(const ofx::TaskQueueEventArgs& args);
-    void onTaskFailed(const ofx::TaskFailedEventArgs& args);
-    void onTaskProgress(const ofx::TaskProgressEventArgs& args);
-
-    void onClientBuffer(const ofx::HTTP::ClientBufferEventArgs& args);
-
-    /// \brief An HTTP client task queue.
-    ofxHTTP::DefaultClientTaskQueue clientTaskQueue;
+    ofVideoPlayer player;
 
 };

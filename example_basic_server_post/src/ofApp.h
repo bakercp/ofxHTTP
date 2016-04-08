@@ -27,7 +27,6 @@
 
 
 #include "ofMain.h"
-#include "ofxIO.h"
 #include "ofxHTTP.h"
 
 
@@ -37,18 +36,10 @@ public:
     void setup();
     void draw();
 
-    void keyPressed(int key);
+    void onHTTPPostEvent(ofxHTTP::PostEventArgs& evt);
+    void onHTTPFormEvent(ofxHTTP::PostFormEventArgs& evt);
+    void onHTTPUploadEvent(ofxHTTP::PostUploadEventArgs& evt);
 
-    void onTaskQueued(const ofx::TaskQueueEventArgs& args);
-    void onTaskStarted(const ofx::TaskQueueEventArgs& args);
-    void onTaskCancelled(const ofx::TaskQueueEventArgs& args);
-    void onTaskFinished(const ofx::TaskQueueEventArgs& args);
-    void onTaskFailed(const ofx::TaskFailedEventArgs& args);
-    void onTaskProgress(const ofx::TaskProgressEventArgs& args);
-
-    void onClientBuffer(const ofx::HTTP::ClientBufferEventArgs& args);
-
-    /// \brief An HTTP client task queue.
-    ofxHTTP::DefaultClientTaskQueue clientTaskQueue;
+    ofxHTTP::SimplePostServer server;
 
 };

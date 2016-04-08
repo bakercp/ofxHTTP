@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2014-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,32 +23,31 @@
 // =============================================================================
 
 
-#pragma once
+#include "ofApp.h"
 
 
-#include "ofMain.h"
-#include "ofxIO.h"
-#include "ofxHTTP.h"
-
-
-class ofApp: public ofBaseApp
+void ofApp::setup()
 {
-public:
-    void setup();
-    void draw();
+    // Testing redirects and https.
+    std::string url = "http://httpbin.org/redirect-to?url=http://httpbin.org/redirect-to?url=https://google.com";
 
-    void keyPressed(int key);
+    // Testing redirects and https.
+    auto response = ofxHTTP::HTTPClient::get(url);
 
-    void onTaskQueued(const ofx::TaskQueueEventArgs& args);
-    void onTaskStarted(const ofx::TaskQueueEventArgs& args);
-    void onTaskCancelled(const ofx::TaskQueueEventArgs& args);
-    void onTaskFinished(const ofx::TaskQueueEventArgs& args);
-    void onTaskFailed(const ofx::TaskFailedEventArgs& args);
-    void onTaskProgress(const ofx::TaskProgressEventArgs& args);
+    if (response->isSuccess())
+    {
+        std::cout << response->data() << std::endl;
+    }
+    else
+    {
+        std::cout << response->error() << std::endl;
+    }
+}
 
-    void onClientBuffer(const ofx::HTTP::ClientBufferEventArgs& args);
 
-    /// \brief An HTTP client task queue.
-    ofxHTTP::DefaultClientTaskQueue clientTaskQueue;
+void ofApp::draw()
+{
+    ofBackgroundGradient(ofColor::white, ofColor::black);
 
-};
+    ofDrawBitmapStringHighlight("See console for output.", ofPoint(30, 30));
+}

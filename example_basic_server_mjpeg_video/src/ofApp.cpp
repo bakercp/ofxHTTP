@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2012-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,20 +28,23 @@
 
 void ofApp::setup()
 {
-    ofSetLogLevel(OF_LOG_NOTICE);
-
     ofSetFrameRate(30);
 
-    ofxHTTP::SimpleSSEServerSettings settings;
+    // Set up our video to broadcast.
+    player.load("fingers.mp4");
+    player.play();
+    player.setLoopState(OF_LOOP_NORMAL);
+
+    ofxHTTP::SimpleIPVideoServerSettings settings;
 
     // Many other settings are available.
     settings.setPort(7890);
 
+    // The default maximum number of client connections is 5.
+    settings.ipVideoRouteSettings.setMaxClientConnections(1);
+
     // Apply the settings.
     server.setup(settings);
-
-    // Register listeners.
-    server.sseRoute().registerEventListeners(this);
 
     // Start the server.
     server.start();
@@ -54,47 +57,30 @@ void ofApp::setup()
 }
 
 
+void ofApp::update()
+{
+    // Update the video player.
+    player.update();
+
+    // If the frame is new, then send it to the server to be broadcast.
+    if(player.isFrameNew())
+    {
+        // This can be any kind of pixels.
+        server.send(player.getPixels());
+    }
+}
+
+
 void ofApp::draw()
 {
-    ofBackground(255);
-    ofDrawBitmapStringHighlight("See " + server.url(), 10, 16);
-    ofDrawBitmapStringHighlight("See the Console", 10, 42);
-}
+    // Draw the video on the server screen.
+    player.draw(0,0);
 
+    // Display the number of connected clients for reference.
+    std::stringstream ss;
 
-void ofApp::keyPressed(int key)
-{
-    if (key == 'c')
-    {
-        ofJson json;
+    ss << "Num clients connected: ";
+    ss << server.numConnections();
 
-        json["cached"] = true;
-        json["date"] = ofGetTimestampString();
-
-        ofx::HTTP::SSEFrame frame(json.dump());
-        server.sseRoute().send(frame, true);
-    }
-    else if (key == 'd')
-    {
-        ofx::HTTP::SSEFrame frame("not");
-        server.sseRoute().send(frame);
-    }
-}
-
-
-void ofApp::onSSEOpenEvent(ofx::HTTP::SSEOpenEventArgs& evt)
-{
-    ofLogNotice("ofApp::onSSEOpenEvent") << "Connection opened from: " << evt.connection().clientAddress().toString();
-}
-
-
-void ofApp::onSSECloseEvent(ofx::HTTP::SSECloseEventArgs& evt)
-{
-    ofLogNotice("ofApp::onSSECloseEvent") << "Connection closed: " << evt.code() << " : " << evt.reason();
-}
-
-
-void ofApp::onSSEFrameSentEvent(ofx::HTTP::SSEFrameEventArgs& evt)
-{
-    ofLogNotice("ofApp::onSSEFrameSentEvent") << "Frame sent: " << evt.frame().data();
+    ofDrawBitmapStringHighlight(ss.str(), 20, 20);
 }

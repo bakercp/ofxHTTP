@@ -30,7 +30,7 @@ void ofApp::setup()
 {
     // Hack to make sure that the net sybsystem is initialized on windows.
     Poco::Net::initializeNetwork();
-   
+
     // Register for client events.
     clientTaskQueue.registerAllEvents(this);
 
@@ -57,9 +57,9 @@ void ofApp::draw()
 
     std::stringstream ps;
 
-    ofx::HTTP::DefaultClientTaskQueue::ProgressMap progress = clientTaskQueue.getTaskProgress();
+    ofxHTTP::DefaultClientTaskQueue::ProgressMap progress = clientTaskQueue.getTaskProgress();
 
-    ofx::HTTP::DefaultClientTaskQueue::ProgressMap::const_iterator progressIter = progress.begin();
+    ofxHTTP::DefaultClientTaskQueue::ProgressMap::const_iterator progressIter = progress.begin();
 
     int height = 20;
     int y = height * 2;
@@ -120,11 +120,11 @@ void ofApp::draw()
         ofFill();
         ofSetColor(255);
         ofDrawBitmapString(ss.str(), 4, 14);
-        
+
         ofPopMatrix();
-        
+
         y += height;
-        
+
         ++progressIter;
     }
 
@@ -174,7 +174,7 @@ void ofApp::onTaskProgress(const ofx::TaskProgressEventArgs& args)
 }
 
 
-void ofApp::onClientBuffer(const ofx::HTTP::ClientBufferEventArgs& args)
+void ofApp::onClientBuffer(const ofxHTTP::ClientBufferEventArgs& args)
 {
     // Note: Saving to disk could / should also be done in the task's thread.
 

@@ -32,7 +32,7 @@ void ofApp::setup()
 
     ofSetFrameRate(30);
 
-    ofxHTTP::SimpleSSEServerSettings settings;
+    ofxHTTP::SimplePostServerSettings settings;
 
     // Many other settings are available.
     settings.setPort(7890);
@@ -40,8 +40,10 @@ void ofApp::setup()
     // Apply the settings.
     server.setup(settings);
 
-    // Register listeners.
-    server.sseRoute().registerEventListeners(this);
+    // The client can listen for POST form and multi-part upload events.
+    // User be aware, these methods are called from other threads.
+    // The user is responsible for protecting shared resources (e.g. ofMutex).
+    server.postRoute().registerPostEvents(this);
 
     // Start the server.
     server.start();
@@ -62,39 +64,41 @@ void ofApp::draw()
 }
 
 
-void ofApp::keyPressed(int key)
+void ofApp::onHTTPPostEvent(ofxHTTP::PostEventArgs& args)
 {
-    if (key == 'c')
+    ofLogNotice("ofApp::onHTTPPostEvent") << "Data: " << args.getBuffer().getText();
+}
+
+
+void ofApp::onHTTPFormEvent(ofxHTTP::PostFormEventArgs& args)
+{
+    ofLogNotice("ofApp::onHTTPFormEvent") << "";
+    ofxHTTP::HTTPUtils::dumpNameValueCollection(args.getForm(), ofGetLogLevel());
+}
+
+
+void ofApp::onHTTPUploadEvent(ofxHTTP::PostUploadEventArgs& args)
+{
+    std::string stateString = "";
+
+    switch (args.getState())
     {
-        ofJson json;
-
-        json["cached"] = true;
-        json["date"] = ofGetTimestampString();
-
-        ofx::HTTP::SSEFrame frame(json.dump());
-        server.sseRoute().send(frame, true);
+        case ofxHTTP::PostUploadEventArgs::UPLOAD_STARTING:
+            stateString = "STARTING";
+            break;
+        case ofxHTTP::PostUploadEventArgs::UPLOAD_PROGRESS:
+            stateString = "PROGRESS";
+            break;
+        case ofxHTTP::PostUploadEventArgs::UPLOAD_FINISHED:
+            stateString = "FINISHED";
+            break;
     }
-    else if (key == 'd')
-    {
-        ofx::HTTP::SSEFrame frame("not");
-        server.sseRoute().send(frame);
-    }
-}
 
-
-void ofApp::onSSEOpenEvent(ofx::HTTP::SSEOpenEventArgs& evt)
-{
-    ofLogNotice("ofApp::onSSEOpenEvent") << "Connection opened from: " << evt.connection().clientAddress().toString();
-}
-
-
-void ofApp::onSSECloseEvent(ofx::HTTP::SSECloseEventArgs& evt)
-{
-    ofLogNotice("ofApp::onSSECloseEvent") << "Connection closed: " << evt.code() << " : " << evt.reason();
-}
-
-
-void ofApp::onSSEFrameSentEvent(ofx::HTTP::SSEFrameEventArgs& evt)
-{
-    ofLogNotice("ofApp::onSSEFrameSentEvent") << "Frame sent: " << evt.frame().data();
+    ofLogNotice("ofApp::onHTTPUploadEvent") << "";
+    ofLogNotice("ofApp::onHTTPUploadEvent") << "         state: " << stateString;
+    ofLogNotice("ofApp::onHTTPUploadEvent") << " formFieldName: " << args.getFormFieldName();
+    ofLogNotice("ofApp::onHTTPUploadEvent") << "orig. filename: " << args.getOriginalFilename();
+    ofLogNotice("ofApp::onHTTPUploadEvent") <<  "     filename: " << args.getFilename();
+    ofLogNotice("ofApp::onHTTPUploadEvent") <<  "     fileType: " << args.getFileType().toString();
+    ofLogNotice("ofApp::onHTTPUploadEvent") << "# bytes xfer'd: " << args.getNumBytesTransferred();
 }

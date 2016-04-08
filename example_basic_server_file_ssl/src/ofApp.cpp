@@ -28,22 +28,20 @@
 
 void ofApp::setup()
 {
-    ofSetLogLevel(OF_LOG_NOTICE);
+    // Register for SSL Context events.
+    ofSSLManager::registerServerEvents(this);
 
     ofSetFrameRate(30);
 
-    ofxHTTP::SimpleSSEServerSettings settings;
+    ofxHTTP::SimpleFileServerSettings settings;
+    settings.setPort(4433);
 
-    // Many other settings are available.
-    settings.setPort(7890);
+    // NOTE: the included private key / certificate
+    // should not be used for production purposes.
+    settings.setUseSSL(true);
 
-    // Apply the settings.
     server.setup(settings);
 
-    // Register listeners.
-    server.sseRoute().registerEventListeners(this);
-
-    // Start the server.
     server.start();
 
 #if !defined(TARGET_LINUX_ARM)
@@ -58,43 +56,24 @@ void ofApp::draw()
 {
     ofBackground(255);
     ofDrawBitmapStringHighlight("See " + server.url(), 10, 16);
-    ofDrawBitmapStringHighlight("See the Console", 10, 42);
 }
 
 
-void ofApp::keyPressed(int key)
+void ofApp::onSSLServerVerificationError(Poco::Net::VerificationErrorArgs& args)
 {
-    if (key == 'c')
-    {
-        ofJson json;
+    ofLogNotice("ofApp::onSSLServerVerificationError") << std::endl << ofToString(args);
 
-        json["cached"] = true;
-        json["date"] = ofGetTimestampString();
+    // If you want to proceed, you must allow the user to inspect the
+    // certificate and set `args.setIgnoreError(true);` if they want to continue.
 
-        ofx::HTTP::SSEFrame frame(json.dump());
-        server.sseRoute().send(frame, true);
-    }
-    else if (key == 'd')
-    {
-        ofx::HTTP::SSEFrame frame("not");
-        server.sseRoute().send(frame);
-    }
+    args.setIgnoreError(true);
 }
 
 
-void ofApp::onSSEOpenEvent(ofx::HTTP::SSEOpenEventArgs& evt)
+void ofApp::onSSLPrivateKeyPassphraseRequired(std::string& passphrase)
 {
-    ofLogNotice("ofApp::onSSEOpenEvent") << "Connection opened from: " << evt.connection().clientAddress().toString();
-}
+    // If you want to proceed, you must allow the user to input the assign the
+    // private key's passphrase to the `passphrase` argument.  For example:
 
-
-void ofApp::onSSECloseEvent(ofx::HTTP::SSECloseEventArgs& evt)
-{
-    ofLogNotice("ofApp::onSSECloseEvent") << "Connection closed: " << evt.code() << " : " << evt.reason();
-}
-
-
-void ofApp::onSSEFrameSentEvent(ofx::HTTP::SSEFrameEventArgs& evt)
-{
-    ofLogNotice("ofApp::onSSEFrameSentEvent") << "Frame sent: " << evt.frame().data();
+    passphrase = ofSystemTextBoxDialog("Enter the Private Key Passphrase", "");
 }

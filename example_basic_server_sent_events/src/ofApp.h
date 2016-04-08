@@ -38,10 +38,10 @@ public:
 
     void keyPressed(int key);
 
-    void onSSEOpenEvent(ofx::HTTP::SSEOpenEventArgs& evt);
-    void onSSECloseEvent(ofx::HTTP::SSECloseEventArgs& evt);
-    void onSSEFrameSentEvent(ofx::HTTP::SSEFrameEventArgs& evt);
+    void onSSEOpenEvent(ofxHTTP::SSEOpenEventArgs& evt);
+    void onSSECloseEvent(ofxHTTP::SSECloseEventArgs& evt);
+    void onSSEFrameSentEvent(ofxHTTP::SSEFrameEventArgs& evt);
 
-    ofx::HTTP::SimpleSSEServer server;
+    ofxHTTP::SimpleSSEServer server;
 
 };

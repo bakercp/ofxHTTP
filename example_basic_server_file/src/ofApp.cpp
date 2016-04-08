@@ -28,20 +28,22 @@
 
 void ofApp::setup()
 {
-    ofSetLogLevel(OF_LOG_NOTICE);
-
     ofSetFrameRate(30);
 
-    ofxHTTP::SimpleSSEServerSettings settings;
+    ofxHTTP::SimpleFileServerSettings settings;
 
     // Many other settings are available.
     settings.setPort(7890);
 
+    // Create a whitelist.
+    // ofx::Net::IPAddressRange::List whitelist;
+    // whitelist.push_back(ofx::Net::IPAddressRange("127.0.0.1/32"));
+
+    // Set the whitelist.
+    // settings.setWhitelist(whitelist);
+
     // Apply the settings.
     server.setup(settings);
-
-    // Register listeners.
-    server.sseRoute().registerEventListeners(this);
 
     // Start the server.
     server.start();
@@ -58,43 +60,4 @@ void ofApp::draw()
 {
     ofBackground(255);
     ofDrawBitmapStringHighlight("See " + server.url(), 10, 16);
-    ofDrawBitmapStringHighlight("See the Console", 10, 42);
-}
-
-
-void ofApp::keyPressed(int key)
-{
-    if (key == 'c')
-    {
-        ofJson json;
-
-        json["cached"] = true;
-        json["date"] = ofGetTimestampString();
-
-        ofx::HTTP::SSEFrame frame(json.dump());
-        server.sseRoute().send(frame, true);
-    }
-    else if (key == 'd')
-    {
-        ofx::HTTP::SSEFrame frame("not");
-        server.sseRoute().send(frame);
-    }
-}
-
-
-void ofApp::onSSEOpenEvent(ofx::HTTP::SSEOpenEventArgs& evt)
-{
-    ofLogNotice("ofApp::onSSEOpenEvent") << "Connection opened from: " << evt.connection().clientAddress().toString();
-}
-
-
-void ofApp::onSSECloseEvent(ofx::HTTP::SSECloseEventArgs& evt)
-{
-    ofLogNotice("ofApp::onSSECloseEvent") << "Connection closed: " << evt.code() << " : " << evt.reason();
-}
-
-
-void ofApp::onSSEFrameSentEvent(ofx::HTTP::SSEFrameEventArgs& evt)
-{
-    ofLogNotice("ofApp::onSSEFrameSentEvent") << "Frame sent: " << evt.frame().data();
 }

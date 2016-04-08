@@ -28,8 +28,6 @@
 
 void ofApp::setup()
 {
-    using namespace ofx::HTTP;
-
     // Testing redirects and https.
     std::string uri = "http://httpbin.org/post";
 
@@ -40,11 +38,11 @@ void ofApp::setup()
         { "123", "test" }
     };
 
-    std::vector<FormPart> formFiles = {
-        FormPart(FormPart::Type::FILE, "one pixel", "pixel.gif")
+    std::vector<ofxHTTP::FormPart> formFiles = {
+        FormPart(ofxHTTP::FormPart::Type::FILE, "one pixel", "pixel.gif")
     };
 
-    auto response = HTTPClient::form(uri, formFields, formFiles);
+    auto response = ofxHTTP::HTTPClient::form(uri, formFields, formFiles);
 
     if (response->isSuccess())
     {
