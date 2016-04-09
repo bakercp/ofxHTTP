@@ -27,6 +27,7 @@
 
 
 #include <string>
+#include "json.hpp"
 #include "ofTypes.h"
 #include "ofLog.h"
 #include "ofUtils.h"

@@ -27,6 +27,7 @@
 #include "Poco/CountingStream.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTimeFormatter.h"
+#include "ofImage.h"
 
 
 #undef min // for windows
@@ -305,8 +306,9 @@ void IPVideoRoute::send(const ofPixels& pix) const
         }
         else
         {
-            ofSaveImage(pix, compressedPixels, OF_IMAGE_FORMAT_JPEG, frameSettings.getQuality());
-        }
+            ofPixels pixels = pix;
+	    ofSaveImage(pixels, compressedPixels, OF_IMAGE_FORMAT_JPEG, frameSettings.getQuality());
+        } 
 
         std::unique_lock<std::mutex> lock(_mutex);
 

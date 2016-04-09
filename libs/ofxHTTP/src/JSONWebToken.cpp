@@ -136,6 +136,8 @@ std::string JSONWebSignatureHeader::toString(Algorithm algorithm)
         default:
             return "UNKNOWN";
     }
+
+    return "UNKNOWN";
 }
 
 

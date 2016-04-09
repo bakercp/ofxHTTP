@@ -24,6 +24,7 @@
 
 
 #include "ofx/HTTP/DefaultClientTaskQueue.h"
+#include "ofEvents.h"
 
 
 namespace ofx {

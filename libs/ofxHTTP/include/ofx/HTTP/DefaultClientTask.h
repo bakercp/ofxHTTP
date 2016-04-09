@@ -28,6 +28,7 @@
 
 #include "Poco/Task.h"
 #include "Poco/TaskNotification.h"
+#include "ofEvents.h"
 #include "ofx/HTTP/ClientEvents.h"
 #include "ofx/HTTP/HTTPClient.h"
 #include "ofx/HTTP/ThreadSettings.h"

@@ -26,6 +26,7 @@
 #pragma once
 
 
+#include "json.hpp"
 #include "ofx/HTTP/BaseRequest.h"
 
 
