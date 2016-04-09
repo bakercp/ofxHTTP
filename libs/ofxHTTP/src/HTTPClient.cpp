@@ -56,18 +56,16 @@ HTTPClient::~HTTPClient()
 
 std::unique_ptr<BufferedResponse> HTTPClient::get(const std::string& uri)
 {
-    HTTPClient client;
     GetRequest request(uri, Poco::Net::HTTPMessage::HTTP_1_1);
-    return client.execute<BufferedResponse>(request);
+    return execute<BufferedResponse>(request);
 }
 
 
 std::unique_ptr<BufferedResponse> HTTPClient::post(const std::string& uri,
                                                    const ofJson& json)
 {
-    HTTPClient client;
     JSONRequest request(uri, json, Poco::Net::HTTPMessage::HTTP_1_1);
-    return client.execute<BufferedResponse>(request);
+    return execute<BufferedResponse>(request);
 }
 
 
@@ -75,18 +73,16 @@ std::unique_ptr<BufferedResponse> HTTPClient::form(const std::string& uri,
                                                    const std::multimap<std::string, std::string> formFields,
                                                    const std::vector<FormPart>& formParts)
 {
-    HTTPClient client;
     PostRequest request(uri, Poco::Net::HTTPMessage::HTTP_1_1);
     request.addFormFields(formFields);
     request.addFormParts(formParts);
-    return client.execute<BufferedResponse>(request);
+    return execute<BufferedResponse>(request);
 }
 
 
 std::unique_ptr<BufferedResponse> HTTPClient::request(BaseRequest& request)
 {
-    HTTPClient client;
-    return client.execute<BufferedResponse>(request);
+    return execute<BufferedResponse>(request);
 }
 
 

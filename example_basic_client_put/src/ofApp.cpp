@@ -36,7 +36,9 @@ void ofApp::setup()
 
     request.setPutBuffer(ofBuffer("My body buffer."));
 
-    auto response = ofxHTTP::HTTPClient::request(request);
+    ofxHTTP::HTTPClient client;
+
+    auto response = client.request(request);
 
     if (response->isSuccess())
     {

@@ -34,7 +34,9 @@ void ofApp::setup()
         "hello", "jello"
     };
 
-    auto response = ofxHTTP::HTTPClient::post(uri, json);
+    ofxHTTP::HTTPClient client;
+
+    auto response = client.post(uri, json);
 
     if (response->isSuccess())
     {

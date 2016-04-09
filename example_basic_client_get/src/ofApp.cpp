@@ -32,7 +32,9 @@ void ofApp::setup()
     std::string url = "http://httpbin.org/redirect-to?url=http://httpbin.org/redirect-to?url=https://google.com";
 
     // Testing redirects and https.
-    auto response = ofxHTTP::HTTPClient::get(url);
+    ofxHTTP::HTTPClient client;
+
+    auto response = client.get(url);
 
     if (response->isSuccess())
     {
