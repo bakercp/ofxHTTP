@@ -29,6 +29,7 @@
 #include <deque>
 #include "Poco/Exception.h"
 #include "Poco/ThreadPool.h"
+#include "ofEvents.h"
 #include "ofx/HTTP/ThreadSettings.h"
 #include "ofx/HTTP/HTTPClient.h"
 #include "ofx/HTTP/DefaultClientTask.h"

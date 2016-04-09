@@ -26,6 +26,7 @@
 #pragma once
 
 
+#include "json.hpp"
 #include "ofx/HTTP/BaseClient.h"
 #include "ofx/HTTP/CredentialStore.h"
 #include "ofx/HTTP/DefaultClientHeaders.h"
