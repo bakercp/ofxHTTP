@@ -65,7 +65,12 @@ public:
                                                   const std::vector<FormPart>& formParts = { });
 
 
+    static std::unique_ptr<BufferedResponse> put(const std::string& uri,
+                                                  const std::multimap<std::string, std::string> formFields = { },
+                                                  const std::vector<FormPart>& formParts = { });
 
+
+    static std::unique_ptr<BufferedResponse> request(BaseRequest& request);
 
 
 private:

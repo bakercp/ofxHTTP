@@ -28,51 +28,23 @@
 
 void ofApp::setup()
 {
-    // Testing redirects and https.
-    std::string url = "http://httpbin.org/put";
+    std::string uri = "http://httpbin.org/put";
 
-    ofx::HTTP::HTTPClient client;
-    ofx::HTTP::Context context;
+    ofxHTTP::PutRequest request(uri, Poco::Net::HTTPMessage::HTTP_1_1);
 
-    ofx::HTTP::BaseResponse response;
+    request.set("My-special-request-header", "My-special-request-header-value");
 
-    ofx::HTTP::PutRequest putRequest(url, Poco::Net::HTTPMessage::HTTP_1_1);
+    request.setPutBuffer(ofBuffer("My body buffer."));
 
-    putRequest.set("My-special-request-header", "My-special-request-header-value");
+    auto response = ofxHTTP::HTTPClient::request(request);
 
-    ofBuffer bodyBuffer;
-    bodyBuffer.set("Test body data.");
-
-    putRequest.setPutBuffer(bodyBuffer);
-
-    try
+    if (response->isSuccess())
     {
-        // Execute the request and get the response stream.
-        std::istream& responseStream = client.execute(putRequest,
-                                                      response,
-                                                      context);
-
-        // Request and response headers can be examined here.
-
-
-        std::cout << "============" << endl;
-        // Copy the output to the terminal.
-        Poco::StreamCopier::copyStream(responseStream, std::cout);
-
-        // Flush the input stream.
-        std::cout << std::endl;
-
-        std::cout << "============" << endl;
-
-
+        std::cout << response->data() << std::endl;
     }
-    catch (const Poco::Exception& exc)
+    else
     {
-        ofLogError("ofApp::setup") << "Got Exception " << exc.displayText() << " " << exc.code();
-    }
-    catch (...)
-    {
-        ofLogError("ofApp::setup") << "Got unknown exception.";
+        std::cout << response->error() << std::endl;
     }
 }
 
