@@ -46,7 +46,7 @@ public:
     void onTaskFailed(const ofx::TaskFailedEventArgs& args);
     void onTaskProgress(const ofx::TaskProgressEventArgs& args);
 
-    void onClientBuffer(const ofx::HTTP::ClientBufferEventArgs& args);
+    void onClientBuffer(const ofxHTTP::ClientBufferEventArgs& args);
 
     /// \brief An HTTP client task queue.
     ofxHTTP::DefaultClientTaskQueue clientTaskQueue;

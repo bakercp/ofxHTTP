@@ -36,7 +36,7 @@
 namespace ofx {
 namespace HTTP {
 
-    
+
 IPVideoFrameQueue::IPVideoFrameQueue(std::size_t maxSize):
     _maxSize(maxSize)
 {
@@ -91,7 +91,7 @@ void IPVideoFrameQueue::setMaxSize(std::size_t maxSize)
 {
     std::unique_lock<std::mutex> lock(_mutex);
     _maxSize = maxSize;
-    
+
     while (_frames.size() > _maxSize)
     {
         _frames.pop_front();
@@ -324,7 +324,7 @@ void IPVideoRoute::send(const ofPixels& pix) const
             {
                 ofLogError("IPVideoRoute::send") << "Found a NULL IPVideoRouteHandler*.  This should not happen.";
             }
-            
+
             ++iter;
         }
     }
@@ -546,7 +546,7 @@ void IPVideoConnection::handleRequest(ServerEventArgs& evt)
             {
                 throw Poco::Exception("Response stream failed or went bad -- it was probably interrupted.");
             }
-            
+
             Poco::Thread::sleep(30);  // TODO: smarter ways of doing for rate / fps limiting
         }
     }
@@ -554,7 +554,7 @@ void IPVideoConnection::handleRequest(ServerEventArgs& evt)
     {
         ofLogError("IPVideoRouteHandler::handleRequest") << "Exception: " << e.displayText();
     }
-    
+
     route().removeConnection(this);
 }
 

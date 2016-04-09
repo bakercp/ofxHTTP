@@ -45,7 +45,7 @@ public:
                          const std::string& token,
                          const std::string& tokenSecret);
 
-	virtual ~OAuth10RequestFilter();
+    virtual ~OAuth10RequestFilter();
 
     void requestFilter(BaseRequest& request, Context& context) override;
 

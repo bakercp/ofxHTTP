@@ -106,25 +106,25 @@ bool DefaultClientTask::onHTTPClientResponseEvent(HTTP::ClientResponseEventArgs&
 
     Poco::Buffer<char> buffer(bufferSize);
     std::streamsize len = 0;
-	istr.read(buffer.begin(), bufferSize);
+    istr.read(buffer.begin(), bufferSize);
     std::streamsize n = istr.gcount();
-    
+
     while (n > 0)
-	{
-		len += n;
+    {
+        len += n;
         _byteBuffer.writeBytes(reinterpret_cast<uint8_t*>(buffer.begin()), n);
 
         // Check for task cancellation.
         if (istr && !isCancelled())
-		{
-			istr.read(buffer.begin(), bufferSize);
-            n = istr.gcount();
-		}
+        {
+          istr.read(buffer.begin(), bufferSize);
+          n = istr.gcount();
+        }
         else
         {
             n = 0;
         }
-	}
+    }
 
     // Don't return cancelled data.
     if (!isCancelled())

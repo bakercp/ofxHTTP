@@ -43,7 +43,7 @@ public:
     OAuth20RequestFilter(const std::string& bearerToken,
                          const std::string& scheme = OAuth20Credentials::SCHEME);
 
-	virtual ~OAuth20RequestFilter();
+    virtual ~OAuth20RequestFilter();
 
     void requestFilter(BaseRequest& request, Context& context) override;
 

@@ -39,7 +39,7 @@ void ofApp::setup()
     };
 
     std::vector<ofxHTTP::FormPart> formFiles = {
-        FormPart(ofxHTTP::FormPart::Type::FILE, "one pixel", "pixel.gif")
+        ofxHTTP::FormPart(ofxHTTP::FormPart::Type::FILE, "one pixel", "pixel.gif")
     };
 
     auto response = ofxHTTP::HTTPClient::form(uri, formFields, formFiles);

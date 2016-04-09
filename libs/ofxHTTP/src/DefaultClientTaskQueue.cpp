@@ -123,7 +123,7 @@ Context* DefaultClientTaskQueue::createDefaultContext()
 
     Context* c = new Context();
 
-//    ofx::HTTP::SessionSettings sessionSettings;
+//    ofxHTTP::SessionSettings sessionSettings;
 //    sessionSettings.setProxy(ofx::HTTP::ProxySettings("127.0.0.1", 8888));
 //
 //    c->setSessionSettings(sessionSettings);

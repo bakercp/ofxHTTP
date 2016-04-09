@@ -71,30 +71,30 @@ void ofApp::keyPressed(int key)
         json["cached"] = true;
         json["date"] = ofGetTimestampString();
 
-        ofx::HTTP::SSEFrame frame(json.dump());
+        ofxHTTP::SSEFrame frame(json.dump());
         server.sseRoute().send(frame, true);
     }
     else if (key == 'd')
     {
-        ofx::HTTP::SSEFrame frame("not");
+        ofxHTTP::SSEFrame frame("not");
         server.sseRoute().send(frame);
     }
 }
 
 
-void ofApp::onSSEOpenEvent(ofx::HTTP::SSEOpenEventArgs& evt)
+void ofApp::onSSEOpenEvent(ofxHTTP::SSEOpenEventArgs& evt)
 {
     ofLogNotice("ofApp::onSSEOpenEvent") << "Connection opened from: " << evt.connection().clientAddress().toString();
 }
 
 
-void ofApp::onSSECloseEvent(ofx::HTTP::SSECloseEventArgs& evt)
+void ofApp::onSSECloseEvent(ofxHTTP::SSECloseEventArgs& evt)
 {
     ofLogNotice("ofApp::onSSECloseEvent") << "Connection closed: " << evt.code() << " : " << evt.reason();
 }
 
 
-void ofApp::onSSEFrameSentEvent(ofx::HTTP::SSEFrameEventArgs& evt)
+void ofApp::onSSEFrameSentEvent(ofxHTTP::SSEFrameEventArgs& evt)
 {
     ofLogNotice("ofApp::onSSEFrameSentEvent") << "Frame sent: " << evt.frame().data();
 }

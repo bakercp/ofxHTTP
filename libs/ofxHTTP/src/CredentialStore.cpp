@@ -62,21 +62,21 @@ void DefaultCredentialStore::setCredentialsFromURI(const Poco::URI& uri)
 {
     std::string username;
     std::string password;
-    
+
     std::string userInfo = uri.getUserInfo();
-    
+
     const std::string::size_type p = userInfo.find(':');
-    
-	if (p != string::npos)
+
+    if (p != string::npos)
     {
-		username.assign(userInfo, 0, p);
-		password.assign(userInfo, p + 1, std::string::npos);
-	}
+        username.assign(userInfo, 0, p);
+        password.assign(userInfo, p + 1, std::string::npos);
+    }
     else
     {
-		username.assign(userInfo);
-		password.clear();
-	}
+        username.assign(userInfo);
+        password.clear();
+    }
 
 //    std::cout << uri.toString() << " / " << username << " / " << password << std::endl;
 
@@ -127,7 +127,7 @@ bool DefaultCredentialStore::getCredentialsWithExistingLock(const AuthScope& tar
 //    cout << "TARGET Scope = " << targetScope.toString() << endl;
 //    cout << "TARGET CREDZ = " << targetScope.toString() << endl;
 
-    
+
 
     if (iter != credentialMap.end())
     {
@@ -143,7 +143,7 @@ bool DefaultCredentialStore::getCredentialsWithExistingLock(const AuthScope& tar
         while (iter != credentialMap.end())
         {
             int factor = (*iter).first.match(targetScope);
-            
+
             if (factor > bestMatchFactor)
             {
                 bestMatch = iter;
@@ -151,7 +151,7 @@ bool DefaultCredentialStore::getCredentialsWithExistingLock(const AuthScope& tar
             }
             ++iter;
         }
-        
+
         if (bestMatch != credentialMap.end())
         {
             matchingScope       = (*bestMatch).first;
@@ -198,7 +198,7 @@ void DefaultCredentialStore::requestFilter(BaseRequest& request,
     AuthScope    targetScope(uri.getHost(), uri.getPort());
     Credentials  matchingCredentials;
     AuthScope    matchingScope;
-    
+
     std::unique_lock<std::mutex> lock(_mutex);
 
     // mutex locking happens in getCredentials() and authenticateWithCache()
@@ -215,7 +215,7 @@ void DefaultCredentialStore::requestFilter(BaseRequest& request,
         }
 
         // if there are no digest credentials, search for basic credentials
-        
+
         HTTPBasicCredentialCacheMapIter iterBasic = basicCredentialCacheMap.find(matchingScope);
 
         if (iterBasic != basicCredentialCacheMap.end())
@@ -224,7 +224,7 @@ void DefaultCredentialStore::requestFilter(BaseRequest& request,
             ofLogVerbose("CredentialStore::updateAuthentication") << "Found and updated basic credentials.";
             return;
         }
-        
+
         ofLogVerbose("CredentialStore::updateAuthentication") << "Had no matching cached credentials for preemptive authentication.";
         return;
     }
@@ -232,7 +232,7 @@ void DefaultCredentialStore::requestFilter(BaseRequest& request,
     {
         ofLogVerbose("CredentialStore::authenticate") << "Had no matching credentials for preemptive authentication.";
         return;
-    }    
+    }
 }
 
 
@@ -250,7 +250,7 @@ void DefaultCredentialStore::responseFilter(BaseRequest& request,
             Poco::URI uri(request.getURI());
 
             AuthenticationType requestedAuthType;
-            
+
             if (Poco::Net::HTTPCredentials::isBasicCredentials(iter->second))
             {
                 requestedAuthType = BASIC;
@@ -267,7 +267,7 @@ void DefaultCredentialStore::responseFilter(BaseRequest& request,
 
             // extract the realm
             Poco::Net::HTTPAuthenticationParams params;
-            
+
             try
             {
                 params.fromResponse(response);
@@ -298,7 +298,7 @@ void DefaultCredentialStore::responseFilter(BaseRequest& request,
             Credentials matchingCredentials;
 
             AuthScope matchingScope;
-            
+
             std::unique_lock<std::mutex> lock(_mutex);
 
             if(getCredentialsWithExistingLock(targetScope,
@@ -330,7 +330,7 @@ void DefaultCredentialStore::responseFilter(BaseRequest& request,
                 return;
             }
         }
-        
+
         ofLogVerbose("CredentialStore::authenticate") << "Response was unauthorized, but could not find WWW-Authenticate header.";
         return;
     }
@@ -339,7 +339,7 @@ void DefaultCredentialStore::responseFilter(BaseRequest& request,
         ofLogVerbose("CredentialStore::authenticate") << "Response was not unauthorized.  Nothing to be done.";
         return;
     }
-    
+
 }
 
 
@@ -376,13 +376,13 @@ void ofxHTTPCredentialStore::dump() {
     ofScopedLock lock(mutex);
 
     ofxHTTPCredentialMapIter iter = credentialMap.begin();
-    
+
     if(iter != credentialMap.end()) {
         ofxHTTPAuthScope   scope       = (*iter).first;
         ofxHTTPCredentials credentials = (*iter).second;
-        
+
         ofLogVerbose("ofxHTTPCredentialStore::dump") << scope;
-        
+
     }
 }
 */

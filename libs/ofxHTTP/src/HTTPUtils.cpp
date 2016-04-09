@@ -118,7 +118,7 @@ std::string HTTPUtils::makeQueryString(const Poco::Net::NameValueCollection& que
 
     while (it != query.end())
     {
-		if (it != query.begin()) ostr << "&";
+    if (it != query.begin()) ostr << "&";
         std::string name;
         Poco::URI::encode(it->first, "=&+;", name);
         std::string value;

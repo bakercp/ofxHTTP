@@ -130,19 +130,19 @@ public:
 private:
     /// \brief the route's regex route pattern.
     std::string _routePathPattern;
-    
+
     /// \brief true if route requires requests on an SSL encrypted port.
     bool _requireSecurePort;
-    
+
     /// \brief true if route requires authentication.
     bool _requireAuthentication;
-    
+
     /// \brief A set of valid HTTP methods.
     HTTPMethodSet _validHTTPMethods;
-    
+
     /// \brief A set of valid Content-Type variables.
     MediaTypeSet _validContentTypes;
-    
+
 };
 
 
@@ -196,7 +196,7 @@ protected:
 
 private:
     BaseRoute_(const BaseRoute_&);
-	BaseRoute_& operator = (const BaseRoute_&);
+    BaseRoute_& operator = (const BaseRoute_&);
 
 };
 
@@ -635,7 +635,7 @@ template <typename RouteType, typename FrameType>
 bool BaseConnection_<RouteType, FrameType>::send(const FrameType& frame) const
 {
     std::unique_lock<std::mutex> lock(_mutex);
-    
+
     if (_isConnected)
     {
         _frameQueue.push(frame);

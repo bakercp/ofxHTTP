@@ -92,7 +92,7 @@ public:
 
 protected:
     uint16_t _code;
-    
+
     const std::string& _reason;
 
 };
@@ -112,21 +112,21 @@ public:
         _frame(frame)
     {
     }
-    
+
     /// \returns A const reference to the SSEFrame associated with the event.
     const SSEFrame& frame() const
     {
         return _frame;
     }
-    
+
 private:
     /// \brief A reference to the SSEFrame associated with the event.
     const SSEFrame& _frame;
-    
+
 };
 
 
-/// \breif A typedef for SSEOpenEventArgs.
+/// \brief A typedef for SSEOpenEventArgs.
 typedef SSEEventArgs SSEOpenEventArgs;
 
 
