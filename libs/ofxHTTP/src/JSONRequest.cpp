@@ -49,7 +49,8 @@ JSONRequest::JSONRequest(const std::string& uri,
 JSONRequest::JSONRequest(const std::string& uri,
                          const ofJson& json,
                          const std::string& httpVersion):
-    BaseRequest(Poco::Net::HTTPRequest::HTTP_POST, uri, httpVersion)
+    BaseRequest(Poco::Net::HTTPRequest::HTTP_POST, uri, httpVersion),
+    _json(json)
 {
     setContentType(JSON_MEDIA_TYPE);
 }
