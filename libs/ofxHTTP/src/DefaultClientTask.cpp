@@ -56,6 +56,14 @@ DefaultClientTask::~DefaultClientTask()
 
 void DefaultClientTask::runTask()
 {
+#if defined(TARGET_LINUX)
+    ofAddListener(events.onHTTPClientErrorEvent, this, &DefaultClientTask::onHTTPClientErrorEvent);
+    ofAddListener(events.onHTTPClientResponseEvent, this, &DefaultClientTask::onHTTPClientResponseEvent);
+    ofAddListener(events.onHTTPClientRequestProgress, this, &DefaultClientTask::onHTTPClientRequestProgress);
+    ofAddListener(events.onHTTPClientResponseProgress, this, &DefaultClientTask::onHTTPClientResponseProgress);
+    ofAddListener(events.onHTTPClientRequestFilterEvent, this, &DefaultClientTask::onHTTPClientRequestFilterEvent);
+    ofAddListener(events.onHTTPClientResponseFilterEvent, this, &DefaultClientTask::onHTTPClientResponseFilterEvent);
+#else
     std::vector<ofEventListener> listeners;
     listeners.emplace_back(events.onHTTPClientErrorEvent.newListener(this, &DefaultClientTask::onHTTPClientErrorEvent));
     listeners.emplace_back(events.onHTTPClientResponseEvent.newListener(this, &DefaultClientTask::onHTTPClientResponseEvent));
@@ -63,10 +71,21 @@ void DefaultClientTask::runTask()
     listeners.emplace_back(events.onHTTPClientResponseProgress.newListener(this, &DefaultClientTask::onHTTPClientResponseProgress));
     listeners.emplace_back(events.onHTTPClientRequestFilterEvent.newListener(this, &DefaultClientTask::onHTTPClientRequestFilterEvent));
     listeners.emplace_back(events.onHTTPClientResponseFilterEvent.newListener(this, &DefaultClientTask::onHTTPClientResponseFilterEvent));
+#endif
 
     submit(*_request, *_response, *_context);
 
+#if defined(TARGET_LINUX)
+    ofRemoveListener(events.onHTTPClientErrorEvent, this, &DefaultClientTask::onHTTPClientErrorEvent);
+    ofRemoveListener(events.onHTTPClientResponseEvent, this, &DefaultClientTask::onHTTPClientResponseEvent);
+    ofRemoveListener(events.onHTTPClientRequestProgress, this, &DefaultClientTask::onHTTPClientRequestProgress);
+    ofRemoveListener(events.onHTTPClientResponseProgress, this, &DefaultClientTask::onHTTPClientResponseProgress);
+    ofRemoveListener(events.onHTTPClientRequestFilterEvent, this, &DefaultClientTask::onHTTPClientRequestFilterEvent);
+    ofRemoveListener(events.onHTTPClientResponseFilterEvent, this, &DefaultClientTask::onHTTPClientResponseFilterEvent);
+#else
     // Listeners are removed when the go out of scope.
+#endif
+
 }
 
 
