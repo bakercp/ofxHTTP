@@ -83,7 +83,7 @@ std::unique_ptr<BufferedResponse> HTTPClient::form(const std::string& uri,
 }
 
 
-static std::unique_ptr<BufferedResponse> request(BaseRequest& request)
+std::unique_ptr<BufferedResponse> HTTPClient::request(BaseRequest& request)
 {
     HTTPClient client;
     return client.execute<BufferedResponse>(request);
