@@ -34,8 +34,7 @@ namespace ofx {
 namespace HTTP {
 
 
-
-/// \brief An HTTP POST Request with a JSON request body.
+/// \brief An HTTP POST Request with a JSON request body.
 class JSONRequest: public BaseRequest
 {
 public:
@@ -82,8 +81,6 @@ private:
     std::stringstream _outBuffer;
     
 };
-
-
 
 
 } } // namespace ofx::HTTP
