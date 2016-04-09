@@ -48,82 +48,122 @@ namespace ofx {
 namespace HTTP {
 
 
+/// \brief A Context is a collection of data that supports a client session.
+///
+/// This Context stores various attributes including session settings, redirects
+/// cookie stores, etc.
 class Context
 {
 public:
-//    typedef std::shared_ptr<Poco::Net::HTTPClientSession> ClientSession;
-
+    /// \brief Create a default Context.
     Context();
+
+    /// \brief Destroy the Context.
     virtual ~Context();
-   
+
+    /// \brief Set the ClientSessionSettings.
+    /// \param settings The ClientSessionSettings to set.
     void setClientSessionSettings(const ClientSessionSettings& settings);
+
+    /// \returns the ClientSessionSettings.
     const ClientSessionSettings& getClientSessionSettings() const;
 
 //    void setCookieStore(CookieStore::SharedPtr cookieStore);
 //    CookieStore::WeakPtr getCookieStore();
 
+    /// \brief Set the client session to use.
+    ///
+    /// This is typically provided by the DefaultClientSessionProvider.
+    ///
+    /// \param clientSession The client session to use.
     void setClientSession(std::shared_ptr<Poco::Net::HTTPClientSession> clientSession);
+
+    /// \returns the current client session, or nullptr if it is not set.
     std::shared_ptr<Poco::Net::HTTPClientSession>& getClientSession();
 
+    /// \brief Add to the history of redirects.
+    /// \param uri The URI to add.
     void addRedirect(const Poco::URI& uri);
+
+    /// \returns A list of all redurects followed by this client session.
     const std::vector<Poco::URI>& getRedirects() const;
 
 //    void setResolvedURI(const Poco::URI& uri);
 //    const Poco::URI& getResolvedURI() const;
 
+    /// \brief Set the URI that should be used if a proxy is required.
+    /// \param uri The proxy redirect URI.
+    /// \sa DefaultProxyProcessor::responseFilter.
     void setProxyRedirectURI(const Poco::URI& uri);
+
+    /// \returns the proxy redirect URI.
+    /// \sa DefaultProxyProcessor::requestFilter
     const Poco::URI& getProxyRedirectURI() const;
 
-    bool getResubmit() const;
+    /// \brief Set whether the current session should be resubmitted.
+    ///
+    /// Resubmits can be set if request filters require it (e.g. Proxy filters).
+    ///
+    /// \param resubmit true if the associated request should be resubmitted.
     void setResubmit(bool resubmit);
 
-    static const std::string KEY_PREFIX_RESERVED;
-    static const std::string KEY_SESSION_SETTINGS;
-    static const std::string KEY_COOKIE_STORE;
-    static const std::string KEY_CREDENTIAL_STORE;
-    static const std::string KEY_RESOLVED_URI;
-    static const std::string KEY_PROXY_REDIRECT_URI;
-    static const std::string KEY_REDIRECTS;
-    static const std::string KEY_SESSION;
-    static const std::string KEY_USE_ABSOLUTE_REQUEST_PATH;
+    /// \brief
+    bool getResubmit() const;
 
-    template <typename TypeName>
-    bool getValue(const std::string& key, TypeName& value) const
-    {
-        auto iter = _map.find(key);
+//    static const std::string KEY_PREFIX_RESERVED;
+//    static const std::string KEY_SESSION_SETTINGS;
+//    static const std::string KEY_COOKIE_STORE;
+//    static const std::string KEY_CREDENTIAL_STORE;
+//    static const std::string KEY_RESOLVED_URI;
+//    static const std::string KEY_PROXY_REDIRECT_URI;
+//    static const std::string KEY_REDIRECTS;
+//    static const std::string KEY_SESSION;
+//    static const std::string KEY_USE_ABSOLUTE_REQUEST_PATH;
 
-        if (iter != _map.end())
-        {
-            try
-            {
-                value = Poco::AnyCast<TypeName>(iter->second);
-                return true;
-            }
-            catch (const Poco::BadCastException& exc)
-            {
-                ofLogError("Context::getValue") << "Unable to cast value for key : " << key;
-                return false;
-            }
-        }
-        else
-        {
-            return false;
-        }
-    }
+//    template <typename TypeName>
+//    bool getValue(const std::string& key, TypeName& value) const
+//    {
+//        auto iter = _map.find(key);
+//
+//        if (iter != _map.end())
+//        {
+//            try
+//            {
+//                value = Poco::AnyCast<TypeName>(iter->second);
+//                return true;
+//            }
+//            catch (const Poco::BadCastException& exc)
+//            {
+//                ofLogError("Context::getValue") << "Unable to cast value for key : " << key;
+//                return false;
+//            }
+//        }
+//        else
+//        {
+//            return false;
+//        }
+//    }
 
 private:
-    std::map<std::string, Poco::Any> _map;
+//    /// \brief A collection of additional session parameters.
+//    std::map<std::string, Poco::Any> _map;
 
     ClientSessionSettings _clientSessionSettings;
 //    CookieStore::WeakPtr _cookieStore;
 
+    /// \brief A list of all redirects followed by this context.
     std::vector<Poco::URI> _redirects;
 
 //    Poco::URI _resolvedURI;
+
+    /// \brief The URI that should be used if a proxy is required.
+    /// \sa DefaultProxyProcessor::responseFilter.
     Poco::URI _proxyRedirectURI;
 
+    /// \brief The client session that may be reused.
     std::shared_ptr<Poco::Net::HTTPClientSession> _clientSession;
 
+    /// \brief True if the current redirect should be pursued.
     bool _resubmit = false;
 
 };

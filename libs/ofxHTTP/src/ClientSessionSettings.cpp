@@ -30,18 +30,20 @@ namespace ofx {
 namespace HTTP {
 
 
-const std::string    ClientSessionSettings::DEFAULT_USER_AGENT        = "Mozilla/5.0 (compatible; Client/1.0 +https://github.com/bakercp/ofxHTTP)";
-const int            ClientSessionSettings::DEFAULT_MAX_REDIRECTS     = 20;
+const std::string ClientSessionSettings::DEFAULT_USER_AGENT = "Mozilla/5.0 (compatible; Client/1.0 +https://github.com/bakercp/ofxHTTP)";
+const std::size_t ClientSessionSettings::DEFAULT_MAX_REDIRECTS = 20;
 const Poco::Timespan ClientSessionSettings::DEFAULT_KEEPALIVE_TIMEOUT = Poco::Timespan::SECONDS * 8;
+const Poco::Timespan ClientSessionSettings::DEFAULT_TIMEOUT = Poco::Timespan::SECONDS * 60;
 
 
 ClientSessionSettings::ClientSessionSettings():
-    _virtualHost(""),
-    _defaultHost(""),
+//    _virtualHost(""),
+//    _defaultHost(""),
     _userAgent(DEFAULT_USER_AGENT),
     _maxRedirects(DEFAULT_MAX_REDIRECTS),
     _keepAlive(true),
-    _keepAliveTimeout(DEFAULT_KEEPALIVE_TIMEOUT)
+    _keepAliveTimeout(DEFAULT_KEEPALIVE_TIMEOUT),
+    _timeout(DEFAULT_TIMEOUT)
 {
 }
 
@@ -51,28 +53,28 @@ ClientSessionSettings::~ClientSessionSettings()
 }
 
 
-void ClientSessionSettings::setVirtualHost(const std::string& virtualHost)
-{
-    _virtualHost = virtualHost;
-}
-
-
-std::string ClientSessionSettings::getVirtualHost() const
-{
-    return _virtualHost;
-}
-
-
-void ClientSessionSettings::setDefaultHost(const std::string& defaultHost)
-{
-    _defaultHost = defaultHost;
-}
-
-
-std::string ClientSessionSettings::getDefaultHost() const
-{
-    return _defaultHost;
-}
+//void ClientSessionSettings::setVirtualHost(const std::string& virtualHost)
+//{
+//    _virtualHost = virtualHost;
+//}
+//
+//
+//std::string ClientSessionSettings::getVirtualHost() const
+//{
+//    return _virtualHost;
+//}
+//
+//
+//void ClientSessionSettings::setDefaultHost(const std::string& defaultHost)
+//{
+//    _defaultHost = defaultHost;
+//}
+//
+//
+//std::string ClientSessionSettings::getDefaultHost() const
+//{
+//    return _defaultHost;
+//}
 
 
 void ClientSessionSettings::setUserAgent(const std::string& userAgent)
@@ -132,6 +134,18 @@ void ClientSessionSettings::setKeepAliveTimeout(Poco::Timespan keepAliveTimeout)
 Poco::Timespan ClientSessionSettings::getKeepAliveTimeout() const
 {
     return _keepAliveTimeout;
+}
+
+
+void ClientSessionSettings::setTimeout(Poco::Timespan timeout)
+{
+    _timeout = timeout;
+}
+
+
+Poco::Timespan ClientSessionSettings::getTimeout() const
+{
+    return _timeout;
 }
 
 

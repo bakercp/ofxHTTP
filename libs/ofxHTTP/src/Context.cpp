@@ -30,15 +30,15 @@ namespace ofx {
 namespace HTTP {
 
 
-const std::string Context::KEY_PREFIX_RESERVED    = "HTTP_";
-const std::string Context::KEY_SESSION_SETTINGS   = "HTTP_SESSION_SETTINGS";
-const std::string Context::KEY_COOKIE_STORE       = "HTTP_COOKIE_STORE";
-const std::string Context::KEY_CREDENTIAL_STORE   = "HTTP_CREDENTIAL_STORE";
-const std::string Context::KEY_RESOLVED_URI       = "HTTP_RESOLVED_URI";
-const std::string Context::KEY_PROXY_REDIRECT_URI = "HTTP_PROXY_REDIRECT_URI";
-const std::string Context::KEY_REDIRECTS          = "HTTP_REDIRECTS";
-const std::string Context::KEY_SESSION            = "HTTP_SESSION";
-const std::string Context::KEY_USE_ABSOLUTE_REQUEST_PATH = "USE_ABSOLUTE_REQUEST_PATH";
+//const std::string Context::KEY_PREFIX_RESERVED    = "HTTP_";
+//const std::string Context::KEY_SESSION_SETTINGS   = "HTTP_SESSION_SETTINGS";
+//const std::string Context::KEY_COOKIE_STORE       = "HTTP_COOKIE_STORE";
+//const std::string Context::KEY_CREDENTIAL_STORE   = "HTTP_CREDENTIAL_STORE";
+//const std::string Context::KEY_RESOLVED_URI       = "HTTP_RESOLVED_URI";
+//const std::string Context::KEY_PROXY_REDIRECT_URI = "HTTP_PROXY_REDIRECT_URI";
+//const std::string Context::KEY_REDIRECTS          = "HTTP_REDIRECTS";
+//const std::string Context::KEY_SESSION            = "HTTP_SESSION";
+//const std::string Context::KEY_USE_ABSOLUTE_REQUEST_PATH = "USE_ABSOLUTE_REQUEST_PATH";
 
 
 Context::Context()
@@ -122,15 +122,15 @@ const Poco::URI& Context::getProxyRedirectURI() const
 }
 
 
-bool Context::getResubmit() const
-{
-    return _resubmit;
-}
-
 void Context::setResubmit(bool resubmit)
 {
     _resubmit = resubmit;
 }
 
+
+bool Context::getResubmit() const
+{
+    return _resubmit;
+}
 
 } } // namespace ofx::HTTP
