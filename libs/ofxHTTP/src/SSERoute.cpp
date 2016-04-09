@@ -126,7 +126,7 @@ void SSERoute::send(const SSEFrame& frame, bool cache)
 
     uint64_t cacheIndex = cache ? (++_cacheIndex) : IndexedSSEFrame::NOT_INDEXED;
 
-    IndexedSSEFrame indexedFrame(frame, _cacheIndex);
+    IndexedSSEFrame indexedFrame(frame, cacheIndex);
 
     if (cache)
     {
