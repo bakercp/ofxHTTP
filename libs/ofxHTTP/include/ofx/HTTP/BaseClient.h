@@ -53,15 +53,16 @@ public:
     /// \brief Create a BaseClient with the given filters.
     /// \param requestFilters A collection of request header filters.
     /// \param responseFilters A collection of response header filters.
-    /// \param bytesPerProgressUpdate Number of bytes per progress update.
     BaseClient(std::vector<AbstractRequestFilter*> requestFilters,
-               std::vector<AbstractResponseFilter*> responseFilters,
-               std::streamsize bytesPerProgressUpdate = DEFAULT_BYTES_PER_PROGRESS_UPDATE);
+               std::vector<AbstractResponseFilter*> responseFilters);
 
     /// \brief Destroy the BaseClient.
     virtual ~BaseClient();
 
     /// \brief Execute a request and get the raw input stream.
+    ///
+    /// This is the workhorse function for all client/server interactions. All
+    /// functions eventually call this function for exectution.
     ///
     /// \param request The request to execute.
     /// \param response The response data.
@@ -71,67 +72,45 @@ public:
                           BaseResponse& response,
                           Context& context);
 
-    /// \brief Execute a request and get the raw input stream.
-    ///
-    /// \param request The request to execute.
-    /// \param response The response data.
-    /// \throws Various exceptions.
-    std::istream& execute(BaseRequest& request,
-                          BaseResponse& response);
 
-
-    template <typename ResponseType>
-    std::unique_ptr<ResponseType> execute(BaseRequest& request, Context& context)
+    template <typename RequestType>
+    std::unique_ptr<BufferedResponse<RequestType>> executeBuffered(std::unique_ptr<RequestType> request)
     {
-        std::unique_ptr<ResponseType> response = std::make_unique<ResponseType>();
+        return executeBuffered<RequestType, BufferedResponse<RequestType>>(std::move(request));
+    }
+
+    
+    template <typename RequestType, typename ResponseType>
+    std::unique_ptr<ResponseType> executeBuffered(std::unique_ptr<RequestType> request)
+    {
+        auto response = std::make_unique<ResponseType>(std::move(request),
+                                                       std::move(createContext()));
 
         try
         {
-            response->bufferStream(execute(request, *response, context));
+            // The response now owns the request and context, so we use it from there.
+            response->bufferStream(execute(response->request(),
+                                           *response,
+                                           response->context()));
         }
         catch (const Poco::Exception& exc)
         {
-            response->setException(std::make_unique<Poco::Exception>(exc));
+            auto exception = std::make_unique<Poco::Exception>(exc);
+            response->setException(std::move(exception));
         }
         catch (const std::exception& exc)
         {
-            response->setException(std::make_unique<Poco::Exception>(exc.what()));
+            auto exception = std::make_unique<Poco::Exception>(exc.what());
+            response->setException(std::move(exception));
         }
         catch (...)
         {
-            response->setException(std::make_unique<Poco::Exception>("Unknown exception in BaseClient::execute."));
+            auto exception = std::make_unique<Poco::Exception>("Unknown exception in BaseClient::execute.");
+            response->setException(std::move(exception));
         }
 
         return response;
     }
-
-    template <typename ResponseType>
-    std::unique_ptr<ResponseType> execute(BaseRequest& request)
-    {
-        Context context;
-        return execute<ResponseType>(request, context);
-    }
-
-//    /// \brief Execute a request and return the buffered data.
-//    /// \param request The request to execute.
-//    /// \param response The response data.
-//    /// \param context The context data used for the transation.
-//    /// \returns an IO::ByteBuffer with the buffered data.
-//    /// \throws Various exceptions.
-//    IO::ByteBuffer executeAndBuffer(BaseRequest& request,
-//                                    BaseResponse& response,
-//                                    Context& context);
-
-
-    //IO::ByteBuffer BaseClient::executeAndBuffer(BaseRequest& request,
-    //                                            BaseResponse& response,
-    //                                            Context& context)
-    //{
-    //    std::istream& responseStream = execute(request, response, context);
-    //    IO::ByteBuffer buffer;
-    //    IO::ByteBufferUtils::copyStreamToBuffer(responseStream, buffer);
-    //    return buffer;
-    //}
 
     /// \brief Submit a request and get the results via callback.
     ///
@@ -240,29 +219,26 @@ public:
     /// \brief Remove the current request stream filter.
     void removeResponseStreamFilter();
 
-    /// \brief Set the number of bytes per progress update.
+    /// \brief Set the client session settings.
     ///
-    /// This is the default number of bytes to wait between progress update
-    /// events events. If this number is very low, then too many events may be
-    /// sent. If this number is too high, the progress updates may not come
-    /// frequently enough to be useful.
+    /// A copy of these settings are passed with the session Context.
     ///
-    /// A value of 0 will disable the progress updates.
-    ///
-    /// \bytesPerProgressUpdate The number of bytes to set.
-    void setBytesPerProgressUpdate(std::streamsize bytesPerProgressUpdate);
+    /// \param sessionSettings The client session settings to set.
+    void setSessionSettings(const ClientSessionSettings& sessionSettings);
 
-    /// \returns The number of bytes per progress update.
-    std::streamsize getBytesPerProgressUpdate() const;
+    /// \brief Get the this client's session settings.
+    /// \returns a reference to theis client's session settings.
+    ClientSessionSettings& getSessionSettings();
+
+    /// \brief This client's session settings.
+    /// \returns a reference to theis client's session settings.
+    const ClientSessionSettings& getSessionSettings() const;
 
     /// \brief A collection of client events.
     ClientEvents events;
 
-    enum
-    {
-        /// \brief The default number of bytes to wait between progress update events.
-        DEFAULT_BYTES_PER_PROGRESS_UPDATE = 1024
-    };
+    /// \brief Create a client context to use for a request.
+    virtual std::unique_ptr<Context> createContext();
 
 protected:
     /// \brief A list of request filters.
@@ -275,24 +251,10 @@ protected:
     /// These filters are automatically applied to the incoming response headers.
     std::vector<AbstractResponseFilter*> _responseFilters;
 
-    /// \brief The number of bytes to wait between progress update events.
-    ///
-    /// A value of 0 will disable the progress updates.
-    std::streamsize _bytesPerProgressUpdate;
+    /// \brief This client's session settings.
+    ClientSessionSettings _sessionSettings;
 
 private:
-    /// \brief A pointer to the client progress request output stream.
-    std::unique_ptr<std::ostream> _pClientProgressRequestStream = nullptr;
-
-    /// \brief A pointer to the client progress request input stream.
-    std::unique_ptr<std::istream> _pClientProgressResponseStream = nullptr;
-
-    /// \brief A pointer to the request stream filter.
-    AbstractRequestStreamFilter* _pRequestStreamFilter = nullptr;
-
-    /// \brief A pointer to the response stream filter.
-    AbstractResponseStreamFilter* _pResponseStreamFilter = nullptr;
-
     /// \brief An internal function that applies the request filters.
     /// \param request The request to filter.
     /// \param context The context of the request.
@@ -330,6 +292,18 @@ private:
                   Context& context,
                   std::streamsize totalBytesTransferred) override;
 
+    /// \brief A pointer to the client progress request output stream.
+    std::unique_ptr<std::ostream> _pClientProgressRequestStream = nullptr;
+
+    /// \brief A pointer to the client progress request input stream.
+    std::unique_ptr<std::istream> _pClientProgressResponseStream = nullptr;
+
+    /// \brief A pointer to the request stream filter.
+    AbstractRequestStreamFilter* _pRequestStreamFilter = nullptr;
+
+    /// \brief A pointer to the response stream filter.
+    AbstractResponseStreamFilter* _pResponseStreamFilter = nullptr;
+    
 };
 
 

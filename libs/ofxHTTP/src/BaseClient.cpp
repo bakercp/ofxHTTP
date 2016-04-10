@@ -31,19 +31,16 @@ namespace HTTP {
 
 
 BaseClient::BaseClient():
-    _bytesPerProgressUpdate(DEFAULT_BYTES_PER_PROGRESS_UPDATE),
-    _pRequestStreamFilter(nullptr),
-    _pResponseStreamFilter(nullptr)
+    BaseClient(std::vector<AbstractRequestFilter*>(),
+               std::vector<AbstractResponseFilter*>())
 {
 }
 
 
 BaseClient::BaseClient(std::vector<AbstractRequestFilter*> requestFilters,
-                       std::vector<AbstractResponseFilter*> responseFilters,
-                       streamsize bytesPerProgressUpdate):
+                       std::vector<AbstractResponseFilter*> responseFilters):
     _requestFilters(requestFilters),
     _responseFilters(responseFilters),
-    _bytesPerProgressUpdate(bytesPerProgressUpdate),
     _pRequestStreamFilter(nullptr),
     _pResponseStreamFilter(nullptr)
 {
@@ -60,42 +57,51 @@ std::istream& BaseClient::execute(BaseRequest& request,
                                   BaseResponse& response,
                                   Context& context)
 {
+    // We set resubmit falls because we are executing a new request.
     context.setResubmit(false);
 
+    // Apply request filters.
     _filterRequest(request, context);
 
+    // Prepare the request.  Depending on the request type, this may involve
+    // signing a requests, counting Content-Bytes, etc.
     request.prepareRequest();
 
+    // Submit the request, apply request output stream filters
+    // (for byte-counting etc.) and return a valid std::output stream.
     std::ostream& requestStream = _send(request, context);
 
+    // Write the request body to the output stream.
     request.writeRequestBody(requestStream);
 
+    // Receive the response headers and stream with input stream filters (for
+    // byte-counting etc.) and return a valid std::input stream.
     std::istream& responseStream = _receive(request, response, context);
 
+    // Apply response filters. Response filters determine whether redirects
+    // will be needed and whether resubmits will be needed.
     _filterResponse(request, response, context);
 
+    // Check to see if a response filter requested a resubmission.
     if (context.getResubmit())
     {
-        // If a response handler did not reset the session, then we must
+        // If a response filter did not reset the session, then we must
         // consume the stream in order to reuse the HTTP session.
-        if (context.getClientSession())
+        if (context.getClientSession() != nullptr)
         {
+            // Consume the current response stream so we are ready to re-use
+            // the existing session.
             HTTPUtils::consume(responseStream);
         }
 
+        // Re-submit the update request.
         return execute(request, response, context);
     }
     else
     {
+        // Return the current response stream.
         return responseStream;
     }
-}
-
-std::istream& BaseClient::execute(BaseRequest& request,
-                                  BaseResponse& response)
-{
-    Context context;
-    return execute(request, response, context);
 }
 
 
@@ -153,8 +159,8 @@ void BaseClient::submit(BaseRequest& request,
 
 void BaseClient::submit(BaseRequest& request, BaseResponse& response)
 {
-    Context context;
-    submit(request, response, context);
+    auto context = createContext();
+    submit(request, response, *context);
 }
 
 
@@ -227,15 +233,27 @@ void BaseClient::removeResponseStreamFilter()
 }
 
 
-void BaseClient::setBytesPerProgressUpdate(std::streamsize bytesPerProgressUpdate)
+void BaseClient::setSessionSettings(const ClientSessionSettings& sessionSettings)
 {
-    _bytesPerProgressUpdate = bytesPerProgressUpdate;
+    _sessionSettings = sessionSettings;
 }
 
 
-std::streamsize BaseClient::getBytesPerProgressUpdate() const
+ClientSessionSettings& BaseClient::getSessionSettings()
 {
-    return _bytesPerProgressUpdate;
+    return _sessionSettings;
+}
+
+
+const ClientSessionSettings& BaseClient::getSessionSettings() const
+{
+    return _sessionSettings;
+}
+
+
+std::unique_ptr<Context> BaseClient::createContext()
+{
+    return std::make_unique<Context>(getSessionSettings());
 }
 
 
@@ -282,7 +300,7 @@ std::ostream& BaseClient::_send(BaseRequest& request, Context& context)
                                                                                   request,
                                                                                   context,
                                                                                   *this,
-                                                                                  _bytesPerProgressUpdate);
+                                                                                  context.getClientSessionSettings().getBytesPerProgressUpdate());
 
     if (_pRequestStreamFilter)
     {
@@ -315,7 +333,7 @@ std::istream& BaseClient::_receive(BaseRequest& request,
                                                                                     response,
                                                                                     context,
                                                                                     *this,
-                                                                                    _bytesPerProgressUpdate);
+                                                                                    context.getClientSessionSettings().getBytesPerProgressUpdate());
 
     if (_pResponseStreamFilter)
     {

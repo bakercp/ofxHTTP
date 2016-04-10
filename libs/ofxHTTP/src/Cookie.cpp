@@ -51,7 +51,7 @@ Cookie::~Cookie()
 }
 
 
-Poco::Timestamp Cookie::getCreatedAt() const
+Poco::Timestamp Cookie::createdAt() const
 {
     return _createdAt;
 }

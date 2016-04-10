@@ -46,7 +46,9 @@ public:
 
     virtual ~Cookie();
 
-    Poco::Timestamp getCreatedAt() const;
+    /// \returns The Cooke's created-at timestamp.
+    Poco::Timestamp createdAt() const;
+
 //    bool isExpired(Poco::Timestamp expiredAt = Poco::Timestamp()) const;
 //    bool isSession() const;
 //    
@@ -61,6 +63,7 @@ public:
 //    std::string toString() const;
 
 protected:
+    /// \brief The Cookie's created-at timestamp.
     Poco::Timestamp _createdAt;
       
 };

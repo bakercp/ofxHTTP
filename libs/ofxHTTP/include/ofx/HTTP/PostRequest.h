@@ -124,7 +124,8 @@ public:
     /// \brief Construct a PostRequest with a given uri and http version.
     /// \param uri the Post endpoint uri.
     /// \param httpVersion Either HTTP/1.0 or HTTP/1.1.
-    PostRequest(const std::string& uri, const std::string& httpVersion);
+    PostRequest(const std::string& uri,
+                const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1);
 
     /// \brief Destroy the PostRequest.
     virtual ~PostRequest();

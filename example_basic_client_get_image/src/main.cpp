@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2014-2016 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2014-2015 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,30 +26,8 @@
 #include "ofApp.h"
 
 
-void ofApp::setup()
+int main()
 {
-    // Testing redirects and https.
-    std::string url = "https://httpbin.org/get";
-
-    // Testing redirects and https.
-    ofxHTTP::HTTPClient client;
-
-    auto response = client.get(url);
-
-    if (response->isSuccess())
-    {
-        std::cout << response->data() << std::endl;
-    }
-    else
-    {
-        std::cout << response->error() << std::endl;
-    }
-}
-
-
-void ofApp::draw()
-{
-    ofBackgroundGradient(ofColor::white, ofColor::black);
-
-    ofDrawBitmapStringHighlight("See console for output.", ofPoint(30, 30));
+    ofSetupOpenGL(100, 100, OF_WINDOW);
+    ofRunApp(std::make_shared<ofApp>());
 }

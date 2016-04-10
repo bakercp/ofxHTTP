@@ -82,9 +82,8 @@ void DefaultRedirectProcessor::responseFilter(BaseRequest& request,
             {
                 // Delete the session since this is a
                 // redirect to a different authority.
-                // NOTE: ->reset() and .reset() are not
-                // the same thing.
-                context.getClientSession().reset();
+                // NOTE: We avoid calling reset() because it can be confused.
+                context.destroyClientSession();
 
                 // Strip out any host header files that were set.
                 request.erase(Poco::Net::HTTPRequest::HOST);
@@ -106,7 +105,7 @@ void DefaultRedirectProcessor::responseFilter(BaseRequest& request,
             // to respect server query re-writes such as those re-written by
             // permalinks on blogs.
             // TODO: not sure about this ...
-            // request.getFormRef().clear();
+            // request.getForm().clear();
 
             // If the method is entity containing method (e.g. POST or PUT), we
             // will not redirect with the entity or parameters (which might

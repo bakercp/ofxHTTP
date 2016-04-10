@@ -28,17 +28,23 @@
 
 void ofApp::setup()
 {
-    std::string uri = "http://httpbin.org/put";
+    std::string uri = "https://httpbin.org/put";
 
-    ofxHTTP::PutRequest request(uri, Poco::Net::HTTPMessage::HTTP_1_1);
+    auto request = std::make_unique<ofxHTTP::PutRequest>(uri);
 
-    request.set("My-special-request-header", "My-special-request-header-value");
+    request->set("My-special-request-header", "My-special-request-header-value");
 
-    request.setPutBuffer(ofBuffer("My body buffer."));
+    request->setPutBuffer(ofBuffer("My body buffer."));
 
+
+    // Create a client.
     ofxHTTP::HTTPClient client;
 
-    auto response = client.request(request);
+    // When requesting with a custom request, we must transfer ownership of the
+    // request. The original request will be available for reference in the
+    // completed PackagedResponse, in addition to the context and the buffered
+    // response data..
+    auto response = client.executeBuffered<ofxHTTP::PutRequest>(std::move(request));
 
     if (response->isSuccess())
     {

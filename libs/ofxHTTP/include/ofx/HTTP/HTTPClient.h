@@ -35,6 +35,8 @@
 #include "ofx/HTTP/DefaultRedirectProcessor.h"
 #include "ofx/HTTP/DefaultResponseStreamFilter.h"
 #include "ofx/HTTP/BaseResponse.h"
+#include "ofx/HTTP/GetRequest.h"
+#include "ofx/HTTP/JSONRequest.h"
 #include "ofx/HTTP/PostRequest.h"
 
 
@@ -46,27 +48,25 @@ class HTTPClient: public BaseClient
 {
 public:
     HTTPClient();
+    
     virtual ~HTTPClient();
 
     /// \brief GET data from the given URI.
     /// \param uri The endpoint URI.
     /// \returns a buffered response.
-    virtual std::unique_ptr<BufferedResponse> get(const std::string& uri);
+    std::unique_ptr<BufferedResponse<GetRequest>> get(const std::string& uri);
 
     /// \brief POST JSON to the given URI using application/json type.
     /// \param uri The endpoint URI.
     /// \param json The JSON to post.
     /// \returns a buffered response.
-    virtual std::unique_ptr<BufferedResponse> post(const std::string& uri,
-                                                   const ofJson& json);
+    std::unique_ptr<BufferedResponse<JSONRequest>> post(const std::string& uri,
+                                                        const ofJson& json);
 
 
-    virtual std::unique_ptr<BufferedResponse> form(const std::string& uri,
-                                                   const std::multimap<std::string, std::string> formFields = { },
-                                                   const std::vector<FormPart>& formParts = { });
-
-    virtual std::unique_ptr<BufferedResponse> request(BaseRequest& request);
-
+    std::unique_ptr<BufferedResponse<PostRequest>> form(const std::string& uri,
+                                                        const std::multimap<std::string, std::string> formFields = { },
+                                                        const std::vector<FormPart>& formParts = { });
 
 private:
     DefaultClientSessionProvider _defaultClientSessionProvider;

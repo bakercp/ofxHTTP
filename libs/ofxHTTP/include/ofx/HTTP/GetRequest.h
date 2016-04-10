@@ -37,7 +37,7 @@ class GetRequest: public FormRequest
 {
 public:
     GetRequest(const std::string& uri,
-               const std::string& httpVersion);
+               const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1);
 
     virtual ~GetRequest();
 

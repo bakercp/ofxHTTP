@@ -46,20 +46,26 @@ Context::Context()
 }
 
 
+Context::Context(const ClientSessionSettings& sessionSettings):
+    _sessionSettings(sessionSettings)
+{
+}
+
+
 Context::~Context()
 {
 }
 
 
-void Context::setClientSessionSettings(const ClientSessionSettings& clientSessionSettings)
+void Context::setClientSessionSettings(const ClientSessionSettings& sessionSettings)
 {
-    _clientSessionSettings = clientSessionSettings;
+    _sessionSettings = sessionSettings;
 }
 
 
 const ClientSessionSettings& Context::getClientSessionSettings() const
 {
-    return _clientSessionSettings;
+    return _sessionSettings;
 }
 
 
@@ -81,10 +87,19 @@ void Context::setClientSession(std::shared_ptr<Poco::Net::HTTPClientSession> cli
 }
 
 
-std::shared_ptr<Poco::Net::HTTPClientSession>& Context::getClientSession()
+std::shared_ptr<Poco::Net::HTTPClientSession> Context::getClientSession()
 {
     return _clientSession;
 }
+
+
+void Context::destroyClientSession()
+{
+    // We don't call .reset() because Poco::Net::HTTPClientSession also has a
+    // reset method that can be confusing.
+    _clientSession = nullptr;
+}
+
 
 //void Context::setResolvedURI(const Poco::URI& uri)
 //{

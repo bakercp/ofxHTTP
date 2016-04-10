@@ -39,8 +39,8 @@
 #include "ofx/HTTP/BaseRequest.h"
 #include "ofx/HTTP/Context.h"
 #include "ofx/IO/ByteBuffer.h"
+#include "ofImage.h"
 #include "ofTypes.h"
-#include "ofPixels.h"
 
 
 namespace ofx {
@@ -55,9 +55,133 @@ class BaseResponse: public Poco::Net::HTTPResponse
 {
 public:
     /// \brief Destroy the BaseResponse.
-    virtual ~BaseResponse();
+    virtual ~BaseResponse()
+    {
+    }
 
 private:
+    friend class BaseClient;
+
+};
+
+
+/// \brief A PackagedResponse owns both the Session and Request.
+///
+/// It is used at a high level to return all data used during a session.
+///
+/// \tparam RequestType The subclass of BaseRequest captured in the response.
+template<typename RequestType>
+class PackagedResponse: public BaseResponse
+{
+public:
+    /// \brief Create a packaged response from a Request and a Context.
+    ///
+    /// It is assumed that the PackagedResponse will take ownership of the
+    /// request and response. After creating the response, the request and
+    /// context used to create the packaged response will be empty.
+    ///
+    /// \param request The RequestType to package.
+    /// \param context The Context to package.
+    PackagedResponse(std::unique_ptr<RequestType> request,
+                     std::unique_ptr<Context> context):
+        _request(std::move(request)),
+        _context(std::move(context))
+    {
+    }
+
+    /// \brief Destroy the PackagedResponse response.
+    virtual ~PackagedResponse()
+    {
+    }
+
+    /// \returns a reference to the request.
+    RequestType& request()
+    {
+        return *_request;
+    }
+
+    /// \returns a const reference to the request.
+    const RequestType& request() const
+    {
+        return *_request;
+    }
+
+    /// \returns a reference to the Context.
+    Context& context()
+    {
+        return *_context;
+    }
+
+    /// \returns a const reference to the Context.
+    const Context& context() const
+    {
+        return *_context;
+    }
+
+    /// \brief Get an error display message.
+    ///
+    /// This returns a string containing a human readable description of why
+    /// a response may have failed.
+    ///
+    /// \returns errors as a string or an empty string if none.
+    virtual std::string error() const
+    {
+        std::stringstream ss;
+
+        if (getStatus() < 200 || getStatus() >= 300)
+        {
+            ss << "HTTPStatus: " << getStatus() << " Reason: " << getReason();
+        }
+
+        if (hasException())
+        {
+            if (!ss.str().empty())
+            {
+                ss << " ";
+            }
+
+            ss << _exception->displayText();
+        }
+        
+        return ss.str();
+    }
+
+    /// \returns a const pointer to the exception or nullptr if none.
+    const Poco::Exception* exception() const
+    {
+        return _exception.get();
+    }
+
+    /// \returns true if there is an exception.
+    bool hasException() const
+    {
+        return _exception != nullptr;
+    }
+
+    /// \returns true if the status is a 2xx Success code with no exceptions.
+    virtual bool isSuccess() const
+    {
+        return !hasException() && getStatus() >= 200 && getStatus() < 300;
+    }
+
+protected:
+    /// \brief Take ownership of an exception.
+    /// \param exception The exception to set.
+    void setException(std::unique_ptr<Poco::Exception> exception)
+    {
+        _exception = std::move(exception);
+    }
+
+private:
+    /// \brief The request owned by this response.
+    std::unique_ptr<RequestType> _request = nullptr;
+
+    /// \brief The context owned by this response.
+    std::unique_ptr<Context> _context = nullptr;
+
+    /// \brief The captured exception, if any.
+    std::unique_ptr<Poco::Exception> _exception = nullptr;
+
     friend class BaseClient;
 
 };
@@ -66,34 +190,18 @@ private:
 /// \brief The base class for a buffered response.
 ///
 /// A buffered response buffers and packages all response data.
-class BaseBufferedResponse: public BaseResponse
+template<typename RequestType>
+class BaseBufferedResponse: public PackagedResponse<RequestType>
 {
 public:
+    using PackagedResponse<RequestType>::PackagedResponse;
+
     /// \brief Destroy the BaseBufferedResponse.
-    virtual ~BaseBufferedResponse();
-
-    /// \brief Get an error display message.
-    ///
-    /// This returns a string containing a human readable description of why
-    /// a response may have failed.
-    ///
-    /// \returns erros as a string or an empty string if none.
-    std::string error() const;
-
-    /// \returns a const pointer to the exception or nullptr if none.
-    const Poco::Exception* exception() const;
-
-    /// \returns true if there is an exception.
-    bool hasException() const;
-
-    /// \returns true if the status is a 2xx Success code with no exceptions.
-    bool isSuccess() const;
+    virtual ~BaseBufferedResponse()
+    {
+    }
 
 protected:
-    /// \brief Set an exception.
-    /// \param exception The exception to set.
-    void setException(std::unique_ptr<Poco::Exception>&& exception);
-
     /// \brief Buffers the input stream.
     ///
     /// This section is allowed to throw exceptions that should be caught by the
@@ -105,34 +213,66 @@ protected:
     virtual void bufferStream(std::istream& responseStream) = 0;
 
 private:
-    /// \brief The captured exception.
-    std::unique_ptr<Poco::Exception> _exception = nullptr;
-
     friend class BaseClient;
 
 };
 
 
 /// \brief A BufferedResponse reads the bytes into a raw byte buffer.
-class BufferedResponse: public BaseBufferedResponse
+template<typename RequestType>
+class BufferedResponse: public BaseBufferedResponse<RequestType>
 {
 public:
+    using BaseBufferedResponse<RequestType>::BaseBufferedResponse;
+
     /// \brief Destroy a BufferedResponse.
-    virtual ~BufferedResponse();
+    virtual ~BufferedResponse()
+    {
+    }
 
     /// \returns the buffered input stream in a byte buffer.
-    const ofBuffer& data() const;
+    const ofBuffer& data() const
+    {
+        return _buffer;
+    }
 
     /// \brief Attempt to load the data as ofPixels.
     /// \returns filled ofPixels or an empty pixels if not possible.
-    ofPixels pixels() const;
+    ofPixels pixels() const
+    {
+        ofPixels _pixels;
+
+        if (!ofLoadImage(_pixels, _buffer))
+        {
+            ofLogError("BufferedResponse::pixels") << "Unable to interpret data as ofPixels.";
+        }
+        
+        return _pixels;
+    }
 
     /// \brief Attempt to load the data as parsed JSON data.
     /// \returns parsed JSON data or a null element if not possible.
-    ofJson json() const;
+    ofJson json() const
+    {
+        ofJson _json;
 
+        try
+        {
+            _json = ofJson::parse(_buffer);
+        }
+        catch (const std::exception& exc)
+        {
+            ofLogError("BufferedResponse::json") << "Unable to interpret data as json: " << exc.what();
+        }
+        
+        return _json;
+    }
+    
 protected:
-    virtual void bufferStream(std::istream& responseStream) override;
+    virtual void bufferStream(std::istream& responseStream) override
+    {
+        responseStream >> _buffer;
+    }
 
 private:
     /// \brief The buffered input stream data.

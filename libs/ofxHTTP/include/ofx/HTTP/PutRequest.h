@@ -40,7 +40,7 @@ public:
     /// \param uri the Put endpoint uri.
     /// \param httpVersion Either HTTP/1.0 or HTTP/1.1.
     PutRequest(const std::string& uri,
-               const std::string& httpVersion);
+               const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1);
 
     virtual ~PutRequest();
 

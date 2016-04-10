@@ -58,12 +58,16 @@ public:
     /// \brief Create a default Context.
     Context();
 
+    /// \brief Create a Context with the given settings.
+    /// \param settings The ClientSessionSettings to use.
+    Context(const ClientSessionSettings& sessionSettings);
+
     /// \brief Destroy the Context.
     virtual ~Context();
 
     /// \brief Set the ClientSessionSettings.
     /// \param settings The ClientSessionSettings to set.
-    void setClientSessionSettings(const ClientSessionSettings& settings);
+    void setClientSessionSettings(const ClientSessionSettings& sessionSettings);
 
     /// \returns the ClientSessionSettings.
     const ClientSessionSettings& getClientSessionSettings() const;
@@ -79,7 +83,10 @@ public:
     void setClientSession(std::shared_ptr<Poco::Net::HTTPClientSession> clientSession);
 
     /// \returns the current client session, or nullptr if it is not set.
-    std::shared_ptr<Poco::Net::HTTPClientSession>& getClientSession();
+    std::shared_ptr<Poco::Net::HTTPClientSession> getClientSession();
+
+    /// \brief Destroy the session to force a new session to be generated.
+    void destroyClientSession();
 
     /// \brief Add to the history of redirects.
     /// \param uri The URI to add.
@@ -148,7 +155,10 @@ private:
 //    /// \brief A collection of additional session parameters.
 //    std::map<std::string, Poco::Any> _map;
 
-    ClientSessionSettings _clientSessionSettings;
+    /// \brief A copy of the client's session settings.
+    ClientSessionSettings _sessionSettings;
+
+
 //    CookieStore::WeakPtr _cookieStore;
 
     /// \brief A list of all redirects followed by this context.

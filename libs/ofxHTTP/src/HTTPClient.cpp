@@ -54,35 +54,27 @@ HTTPClient::~HTTPClient()
 }
 
 
-std::unique_ptr<BufferedResponse> HTTPClient::get(const std::string& uri)
+std::unique_ptr<BufferedResponse<GetRequest>> HTTPClient::get(const std::string& uri)
 {
-    GetRequest request(uri, Poco::Net::HTTPMessage::HTTP_1_1);
-    return execute<BufferedResponse>(request);
+    return executeBuffered<GetRequest, BufferedResponse<GetRequest>>(std::make_unique<GetRequest>(uri));
 }
 
 
-std::unique_ptr<BufferedResponse> HTTPClient::post(const std::string& uri,
-                                                   const ofJson& json)
+std::unique_ptr<BufferedResponse<JSONRequest>> HTTPClient::post(const std::string& uri,
+                                                                const ofJson& json)
 {
-    JSONRequest request(uri, json, Poco::Net::HTTPMessage::HTTP_1_1);
-    return execute<BufferedResponse>(request);
+    return executeBuffered<JSONRequest, BufferedResponse<JSONRequest>>(std::make_unique<JSONRequest>(uri, json));
 }
 
 
-std::unique_ptr<BufferedResponse> HTTPClient::form(const std::string& uri,
-                                                   const std::multimap<std::string, std::string> formFields,
-                                                   const std::vector<FormPart>& formParts)
+std::unique_ptr<BufferedResponse<PostRequest>> HTTPClient::form(const std::string& uri,
+                                                                const std::multimap<std::string, std::string> formFields,
+                                                                const std::vector<FormPart>& formParts)
 {
-    PostRequest request(uri, Poco::Net::HTTPMessage::HTTP_1_1);
-    request.addFormFields(formFields);
-    request.addFormParts(formParts);
-    return execute<BufferedResponse>(request);
-}
-
-
-std::unique_ptr<BufferedResponse> HTTPClient::request(BaseRequest& request)
-{
-    return execute<BufferedResponse>(request);
+    auto request = std::make_unique<PostRequest>(uri);
+    request->addFormFields(formFields);
+    request->addFormParts(formParts);
+    return executeBuffered<PostRequest, BufferedResponse<PostRequest>>(std::move(request));
 }
 
 

@@ -107,6 +107,21 @@ public:
     /// \returns the current proxy settings.
     const ProxySettings& getProxySettings() const;
 
+    /// \brief Set the number of bytes per progress update.
+    ///
+    /// This is the default number of bytes to wait between progress update
+    /// events events. If this number is very low, then too many events may be
+    /// sent. If this number is too high, the progress updates may not come
+    /// frequently enough to be useful.
+    ///
+    /// A value of 0 will disable the progress updates.
+    ///
+    /// \bytesPerProgressUpdate The number of bytes to set.
+    void setBytesPerProgressUpdate(std::streamsize bytesPerProgressUpdate);
+
+    /// \returns The number of bytes per progress update.
+    std::streamsize getBytesPerProgressUpdate() const;
+
     /// \brief The default user agent sent with the client.
     static const std::string DEFAULT_USER_AGENT;
 
@@ -118,6 +133,9 @@ public:
 
     /// \brief The default client timeout.
     static const Poco::Timespan DEFAULT_TIMEOUT;
+
+    /// \brief The default number of bytes to wait between progress update events.
+    static const std::streamsize DEFAULT_BYTES_PER_PROGRESS_UPDATE;
 
 private:
 //    std::string _virtualHost;
@@ -140,6 +158,11 @@ private:
 
     /// \brief The proxy settings for the client session.
     ProxySettings _proxy;
+
+    /// \brief The number of bytes to wait between progress update events.
+    ///
+    /// A value of 0 will disable the progress updates.
+    std::streamsize _bytesPerProgressUpdate;
 
     /// \brief The a collection of default headers to include with each request.
     Poco::Net::NameValueCollection _defaultHeaders;

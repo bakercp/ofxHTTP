@@ -91,9 +91,11 @@ void DefaultProxyProcessor::responseFilter(BaseRequest& request,
             Poco::URI proxyRedirectURI;
             proxyRedirectURI.resolve(response.get("Location"));
             context.setProxyRedirectURI(proxyRedirectURI);
-            context.getClientSession().reset(); // delete session
 
-            // Set the context to resubmit.
+            // Delete session because we are submitting to a new location.
+            context.destroyClientSession();
+
+            // Set the context to resubmit based on the proxy-redirect URI.
             context.setResubmit(true);
         }
         else

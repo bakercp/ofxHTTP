@@ -34,6 +34,7 @@ const std::string ClientSessionSettings::DEFAULT_USER_AGENT = "Mozilla/5.0 (comp
 const std::size_t ClientSessionSettings::DEFAULT_MAX_REDIRECTS = 20;
 const Poco::Timespan ClientSessionSettings::DEFAULT_KEEPALIVE_TIMEOUT = Poco::Timespan::SECONDS * 8;
 const Poco::Timespan ClientSessionSettings::DEFAULT_TIMEOUT = Poco::Timespan::SECONDS * 60;
+const std::streamsize ClientSessionSettings::DEFAULT_BYTES_PER_PROGRESS_UPDATE = 1024;
 
 
 ClientSessionSettings::ClientSessionSettings():
@@ -43,7 +44,8 @@ ClientSessionSettings::ClientSessionSettings():
     _maxRedirects(DEFAULT_MAX_REDIRECTS),
     _keepAlive(true),
     _keepAliveTimeout(DEFAULT_KEEPALIVE_TIMEOUT),
-    _timeout(DEFAULT_TIMEOUT)
+    _timeout(DEFAULT_TIMEOUT),
+    _bytesPerProgressUpdate(DEFAULT_BYTES_PER_PROGRESS_UPDATE)
 {
 }
 
@@ -158,6 +160,18 @@ void ClientSessionSettings::setProxy(const ProxySettings& proxy)
 const ProxySettings& ClientSessionSettings::getProxySettings() const
 {
     return _proxy;
+}
+
+
+void ClientSessionSettings::setBytesPerProgressUpdate(std::streamsize bytesPerProgressUpdate)
+{
+    _bytesPerProgressUpdate = bytesPerProgressUpdate;
+}
+
+
+std::streamsize ClientSessionSettings::getBytesPerProgressUpdate() const
+{
+    return _bytesPerProgressUpdate;
 }
 
 
