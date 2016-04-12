@@ -371,7 +371,6 @@ void DefaultCredentialStore::clear()
 
 
 /*
-//------------------------------------------------------------------------------
 void ofxHTTPCredentialStore::dump() {
     ofScopedLock lock(mutex);
 
