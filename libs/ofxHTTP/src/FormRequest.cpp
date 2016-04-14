@@ -38,6 +38,15 @@ FormRequest::~FormRequest()
 }
 
 
+void FormRequest::addFormFields(const Poco::Net::NameValueCollection& formFields)
+{
+    for (auto& entry : formFields)
+    {
+        _form.add(entry.first, entry.second);
+    }
+}
+
+
 void FormRequest::addFormFields(const std::multimap<std::string, std::string>& formFields)
 {
     for (auto& entry : formFields)

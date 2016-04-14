@@ -28,6 +28,7 @@
 
 #include "ofx/HTTP/BaseRequest.h"
 #include "Poco/Net/HTMLForm.h"
+#include "Poco/Net/NameValueCollection.h"
 
 
 namespace ofx {
@@ -64,6 +65,15 @@ public:
     /// \param value The field value.
     void setFormField(const std::string& name,
                       const std::string& value);
+
+    /// \brief Add additional form fields.
+    ///
+    /// When form fields are added to anything other then POST and PUT requests,
+    /// the form fields will be converted to query parameters and appended to
+    /// the URI before request submission.
+    ///
+    /// \param formFields The form fields to add.
+    void addFormFields(const Poco::Net::NameValueCollection& formFields);
 
     /// \brief Add additional form fields.
     ///

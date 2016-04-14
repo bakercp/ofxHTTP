@@ -30,7 +30,7 @@ namespace ofx {
 namespace HTTP {
 
 
-Credentials::Credentials() : _username(""), _password("")
+Credentials::Credentials()
 {
 }
 
@@ -90,4 +90,5 @@ std::string Credentials::toString() const
     return _username + ":" + _password;
 }
 
+    
 } } // namespace ofx::HTTP
