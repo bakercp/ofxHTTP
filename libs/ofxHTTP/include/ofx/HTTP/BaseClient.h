@@ -88,10 +88,13 @@ public:
 
         try
         {
-            // The response now owns the request and context, so we use it from there.
-            response->bufferStream(execute(response->request(),
-                                           *response,
-                                           response->context()));
+            // The buffer to fill.
+            ofBuffer buffer(execute(response->request(),
+                                    *response,
+                                    response->context()));
+
+            // Set the buffer.
+            response->setBuffer(buffer);
         }
         catch (const Poco::Exception& exc)
         {

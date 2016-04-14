@@ -187,98 +187,47 @@ private:
 };
 
 
-/// \brief The base class for a buffered response.
-///
-/// A buffered response buffers and packages all response data.
-template<typename RequestType>
-class BaseBufferedResponse: public PackagedResponse<RequestType>
-{
-public:
-    using PackagedResponse<RequestType>::PackagedResponse;
-
-    /// \brief Destroy the BaseBufferedResponse.
-    virtual ~BaseBufferedResponse()
-    {
-    }
-
-protected:
-    /// \brief Buffers the input stream.
-    ///
-    /// This section is allowed to throw exceptions that should be caught by the
-    /// calling party. Those exceptions should be handled or set or added to the
-    /// response by calling setException().
-    ///
-    /// \param istr The input stream to buffer.
-    /// \throws Any number of exceptions.
-    virtual void bufferStream(std::istream& responseStream) = 0;
-
-private:
-    friend class BaseClient;
-
-};
-
 
 /// \brief A BufferedResponse reads the bytes into a raw byte buffer.
 template<typename RequestType>
-class BufferedResponse: public BaseBufferedResponse<RequestType>
+class BufferedResponse: public PackagedResponse<RequestType>
 {
 public:
-    using BaseBufferedResponse<RequestType>::BaseBufferedResponse;
+    using PackagedResponse<RequestType>::PackagedResponse;
 
     /// \brief Destroy a BufferedResponse.
     virtual ~BufferedResponse()
     {
     }
 
-    /// \returns the buffered input stream in a byte buffer.
-    const ofBuffer& data() const
+    /// \brief Set the buffered data.
+    ///
+    /// Upon setting the buffered data, parseBuffer() will be called so that
+    /// sub-classes can extract structured data.
+    ///
+    /// \param buffer The buffered data.
+    void setBuffer(const ofBuffer& buffer)
+    {
+        _buffer = buffer;
+        parseBuffer();
+    }
+
+
+    /// \returns the raw buffered data.
+    const ofBuffer& getBuffer() const
     {
         return _buffer;
     }
 
-    /// \brief Attempt to load the data as ofPixels.
-    /// \returns filled ofPixels or an empty pixels if not possible.
-    ofPixels pixels() const
-    {
-        ofPixels _pixels;
-
-        if (!ofLoadImage(_pixels, _buffer))
-        {
-            ofLogError("BufferedResponse::pixels") << "Unable to interpret data as ofPixels.";
-        }
-        
-        return _pixels;
-    }
-
-    /// \brief Attempt to load the data as parsed JSON data.
-    /// \returns parsed JSON data or a null element if not possible.
-    ofJson json() const
-    {
-        ofJson _json;
-
-        try
-        {
-            _json = ofJson::parse(_buffer);
-        }
-        catch (const std::exception& exc)
-        {
-            ofLogError("BufferedResponse::json") << "Unable to interpret data as json: " << exc.what();
-        }
-        
-        return _json;
-    }
-    
 protected:
-    virtual void bufferStream(std::istream& responseStream) override
+    /// \brief Sub-classes can implement parse buffer to extract structured data.
+    virtual void parseBuffer()
     {
-        responseStream >> _buffer;
     }
 
 private:
     /// \brief The buffered input stream data.
     ofBuffer _buffer;
-
-    friend class BaseClient;
 
 };
 
