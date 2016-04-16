@@ -235,8 +235,7 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
                             ofLogWarning("WebSocketConnection::handleRequest") << "WebSocket numBytesSent == 0";
                             // error = WS_ERROR_ZERO_BYTE_FRAME_SENT;
                         }
-                        // TODO ofBuffer::size() returns long ... sendFrame returns int ... :/
-                        else if(numBytesSent < frame.size())
+                        else if(numBytesSent < static_cast<int>(frame.size()))
                         {
                             ofLogWarning("WebSocketConnection::handleRequest") << "WebSocket numBytesSent < frame.size()";
                             // error = WS_ERROR_INCOMPLETE_FRAME_SENT;
