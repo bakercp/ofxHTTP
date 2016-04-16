@@ -81,7 +81,7 @@ private:
 
     int _inflateWindowBits = 15;
 
-    bool _noContextTakeover = false;
+    //bool _noContextTakeover = false;
 
     z_stream _deflateState;
     z_stream _inflateState;
