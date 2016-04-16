@@ -56,7 +56,7 @@ DefaultClientTask::~DefaultClientTask()
 
 void DefaultClientTask::runTask()
 {
-#if defined(TARGET_LINUX)
+#if OF_VERSION_MINOR < 10 
     ofAddListener(events.onHTTPClientErrorEvent, this, &DefaultClientTask::onHTTPClientErrorEvent);
     ofAddListener(events.onHTTPClientResponseEvent, this, &DefaultClientTask::onHTTPClientResponseEvent);
     ofAddListener(events.onHTTPClientRequestProgress, this, &DefaultClientTask::onHTTPClientRequestProgress);
@@ -75,7 +75,7 @@ void DefaultClientTask::runTask()
 
     submit(*_request, *_response, *_context);
 
-#if defined(TARGET_LINUX)
+#if OF_VERSION_MINOR < 10 
     ofRemoveListener(events.onHTTPClientErrorEvent, this, &DefaultClientTask::onHTTPClientErrorEvent);
     ofRemoveListener(events.onHTTPClientResponseEvent, this, &DefaultClientTask::onHTTPClientResponseEvent);
     ofRemoveListener(events.onHTTPClientRequestProgress, this, &DefaultClientTask::onHTTPClientRequestProgress);
