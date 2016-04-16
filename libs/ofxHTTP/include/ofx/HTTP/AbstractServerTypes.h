@@ -137,13 +137,6 @@ public:
     {
     }
 
-    /// \brief Handle an HTTPServerRequest with an HTTPServerResponse.
-    /// \param request The HTTPServerRequest to handle.
-    /// \param response The HTTPServerResponse to return.
-    /// \note Redeclared here for documentation puposes.
-    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
-                               Poco::Net::HTTPServerResponse& response) = 0;
-
 };
 
 
