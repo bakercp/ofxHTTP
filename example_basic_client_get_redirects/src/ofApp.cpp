@@ -47,7 +47,7 @@ void ofApp::setup()
         }
 
         std::cout << std::endl << "Data:" << std::endl << std::endl;
-        std::cout << response->data() << std::endl;
+        std::cout << response->getBuffer() << std::endl;
 
     }
     else

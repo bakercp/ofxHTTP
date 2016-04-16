@@ -50,7 +50,7 @@ void ofApp::setup()
 
     if (response->isSuccess())
     {
-        std::cout << response->data() << std::endl;
+        std::cout << response->getBuffer() << std::endl;
     }
     else
     {
