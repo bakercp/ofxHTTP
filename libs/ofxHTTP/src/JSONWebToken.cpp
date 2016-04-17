@@ -26,6 +26,7 @@
 #include "ofx/HTTP/JSONWebToken.h"
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/Crypto/RSADigestEngine.h"
+#include "ofx/HTTP/HTTPUtils.h"
 #include "ofx/IO/Base64Encoding.h"
 #include "ofx/IO/ByteBuffer.h"
 #include "ofLog.h"
@@ -174,21 +175,7 @@ void JSONWebTokenPayload::setAudience(const std::vector<std::string>& audience)
     std::vector<std::string> _audience = audience;
     auto it = std::unique(_audience.begin(), _audience.end());
     _audience.resize(std::distance(_audience.begin(), it));
-
-    // Join with white spaces.
-    std::stringstream ss;
-
-    for(size_t i = 0; i < _audience.size(); ++i)
-    {
-        if(i != 0)
-        {
-            ss << " ";
-        }
-        
-        ss << _audience[i];
-    }
-    
-    setAudience(ss.str());
+    setAudience(HTTPUtils::explode(_audience, " "));
 }
 
 
