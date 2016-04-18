@@ -119,7 +119,7 @@ public:
 
             if (addTrailingDelimiter || i < values.size() - 1)
             {
-                ss << " ";
+                ss << delimiter;
             }
         }
 
