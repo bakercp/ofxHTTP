@@ -102,14 +102,14 @@ public:
     /// \returns the number of bytes consumed.
     static std::streamsize consume(std::istream& stream);
 
-    /// \brief Explode a list of values into a single delimited string.
+    /// \brief Join a list of values into a single delimited string.
     /// \param values The list of values to explode.
     /// \param delimiter The delimiter to use when exploding.
     /// \returns an exploded delimited list of strings.
     template <typename Type>
-    static std::string explode(const std::vector<Type>& values,
-                               const std::string& delimiter,
-                               bool addTrailingDelimiter = false)
+    static std::string join(const std::vector<Type>& values,
+                            const std::string& delimiter = " ",
+                            bool addTrailingDelimiter = false)
     {
         std::stringstream ss;
 

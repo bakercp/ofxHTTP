@@ -175,7 +175,7 @@ void JSONWebTokenPayload::setAudience(const std::vector<std::string>& audience)
     std::vector<std::string> _audience = audience;
     auto it = std::unique(_audience.begin(), _audience.end());
     _audience.resize(std::distance(_audience.begin(), it));
-    setAudience(HTTPUtils::explode(_audience, " "));
+    setAudience(HTTPUtils::join(_audience, " "));
 }
 
 
