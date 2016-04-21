@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2009-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,33 +26,43 @@
 #pragma once
 
 
-#include "Poco/Net/HTMLForm.h"
-#include "Poco/Net/OAuth20Credentials.h"
-#include "ofx/HTTP/AbstractClientTypes.h"
+#include "ofx/HTTP/HTTPClient.h"
+#include "ofx/HTTP/OAuth10Credentials.h"
+#include "ofx/HTTP/OAuth10RequestFilter.h"
+#include "Poco/Net/OAuth10Credentials.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class OAuth20RequestFilter: public AbstractRequestFilter
+/// \brief An OAuth 1.0 compatible base client.
+class OAuth10HTTPClient: public HTTPClient
 {
 public:
-    OAuth20RequestFilter();
+    /// \brief Create a default client.
+    OAuth10HTTPClient();
 
-    OAuth20RequestFilter(const std::string& bearerToken,
-                         const std::string& scheme = Poco::Net::OAuth20Credentials::SCHEME);
+    /// \brief Create a client with the provided credentials.
+    /// \param credentials OAuth 1.0 credentials.
+    OAuth10HTTPClient(const OAuth10Credentials& credentials);
 
-    virtual ~OAuth20RequestFilter();
+    /// \breif Destroy the client.
+    virtual ~OAuth10HTTPClient();
 
-    void requestFilter(BaseRequest& request, Context& context) override;
+    /// \brief Set the OAuth 1.0 credentials.
+    /// \param credentials OAuth 1.0 credentials.
+    void setCredentials(const OAuth10Credentials& credentials);
 
-    Poco::Net::OAuth20Credentials& credentials();
-
-    const Poco::Net::OAuth20Credentials& credentials() const;
+    /// \returns the OAuth 1.0 credentials.
+    OAuth10Credentials getCredentials() const;
 
 private:
-    Poco::Net::OAuth20Credentials _credentials;
+    /// \brief OAuth 1.0 Credentials.
+    OAuth10Credentials _credentials;
+
+    /// \brief The request filter.
+    OAuth10RequestFilter _oAuth10RequestFilter;
 
 };
 

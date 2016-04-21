@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2009-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,38 +23,44 @@
 // =============================================================================
 
 
-#pragma once
-
-
-#include "Poco/Net/HTMLForm.h"
-#include "Poco/Net/OAuth20Credentials.h"
-#include "ofx/HTTP/AbstractClientTypes.h"
+#include "ofx/HTTP/OAuth10HTTPClient.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class OAuth20RequestFilter: public AbstractRequestFilter
+OAuth10HTTPClient::OAuth10HTTPClient(): OAuth10HTTPClient(OAuth10Credentials())
 {
-public:
-    OAuth20RequestFilter();
+}
 
-    OAuth20RequestFilter(const std::string& bearerToken,
-                         const std::string& scheme = Poco::Net::OAuth20Credentials::SCHEME);
 
-    virtual ~OAuth20RequestFilter();
+OAuth10HTTPClient::OAuth10HTTPClient(const OAuth10Credentials& credentials)
+{
+    setCredentials(credentials);
+    addRequestFilter(&_oAuth10RequestFilter);
+}
 
-    void requestFilter(BaseRequest& request, Context& context) override;
 
-    Poco::Net::OAuth20Credentials& credentials();
+OAuth10HTTPClient::~OAuth10HTTPClient()
+{
+}
 
-    const Poco::Net::OAuth20Credentials& credentials() const;
 
-private:
-    Poco::Net::OAuth20Credentials _credentials;
+void OAuth10HTTPClient::setCredentials(const OAuth10Credentials& credentials)
+{
+    _credentials = credentials;
+    _oAuth10RequestFilter.credentials().setConsumerKey(credentials.consumerKey());
+    _oAuth10RequestFilter.credentials().setConsumerSecret(credentials.consumerSecret());
+    _oAuth10RequestFilter.credentials().setToken(credentials.accessToken());
+    _oAuth10RequestFilter.credentials().setTokenSecret(credentials.accessTokenSecret());
+}
 
-};
+
+OAuth10Credentials OAuth10HTTPClient::getCredentials() const
+{
+    return _credentials;
+}
 
 
 } } // namespace ofx::HTTP
