@@ -275,17 +275,17 @@ void DefaultCredentialStore::responseFilter(BaseRequest& request,
             }
             catch (const Poco::Net::NotAuthenticatedException& exc)
             {
-                ofLogError("CredentialStore::authenticate") << "HTTP response has no authentication header.";
+                ofLogError("CredentialStore::authenticate") << "HTTP response has no authentication header." << " : " << exc.displayText();
                 return;
             }
             catch (const Poco::InvalidArgumentException& exc)
             {
-                ofLogError("CredentialStore::authenticate") << "Incompatible or unknown WWW-Authenticate header.  Basic and digest supported: " << iter->second;
+                ofLogError("CredentialStore::authenticate") << "Incompatible or unknown WWW-Authenticate header.  Basic and digest supported: " << iter->second << " : " << exc.displayText();
                 return;
             }
             catch (const Poco::SyntaxException& exc)
             {
-                ofLogError("CredentialStore::authenticate") << "Error parsing WWW-Authenticate header: "  << iter->second;
+				ofLogError("CredentialStore::authenticate") << "Error parsing WWW-Authenticate header: " << iter->second << " : " << exc.displayText();
                 return;
             }
 
