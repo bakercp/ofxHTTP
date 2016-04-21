@@ -1,5 +1,0 @@
-ofxHTTP
-ofxIO
-ofxMediaType
-ofxNetworkUtils
-ofxSSLManager
