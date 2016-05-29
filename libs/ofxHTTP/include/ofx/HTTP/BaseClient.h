@@ -26,7 +26,6 @@
 #pragma once
 
 
-#include "Poco/TeeStream.h"
 #include "ofx/HTTP/AbstractClientTypes.h"
 #include "ofx/HTTP/ClientEvents.h"
 #include "ofx/HTTP/ClientProgressStream.h"
