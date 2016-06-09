@@ -60,7 +60,7 @@ public:
 
     /// \brief Execute a request and get the raw input stream.
     ///
-    /// This is the workhorse function for all client/server interactions. All
+    /// This is the workhorse function for all client / server interactions. All
     /// functions eventually call this function for exectution.
     ///
     /// \param request The request to execute.
@@ -71,14 +71,21 @@ public:
                           BaseResponse& response,
                           Context& context);
 
-
+    /// \brief Execute a request and return the buffered data.
+    /// \param request A pointer to the Request to execute.
+    /// \returns a BufferedResponse.
+    /// \tparam RequestType The request type to execute and return.
     template <typename RequestType>
     std::unique_ptr<BufferedResponse<RequestType>> executeBuffered(std::unique_ptr<RequestType> request)
     {
         return executeBuffered<RequestType, BufferedResponse<RequestType>>(std::move(request));
     }
 
-    
+    /// \brief Execute a request and return the buffered data.
+    /// \param request A pointer to the Request to execute.
+    /// \returns a ResponseType.
+    /// \tparam RequestType The request type to execute.
+    /// \tparam ResponseType The response type to return.
     template <typename RequestType, typename ResponseType>
     std::unique_ptr<ResponseType> executeBuffered(std::unique_ptr<RequestType> request)
     {
