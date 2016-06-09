@@ -69,7 +69,7 @@ void BaseRequest::write(std::ostream& ostr) const
     }
     catch (const Poco::SyntaxException& exc)
     {
-        ofLogWarning("ofx::HTTP::BaseRequest") << "Unable to parse URI, using: " << getURI();
+        ofLogWarning("ofx::HTTP::BaseRequest") << "Unable to parse URI, using: " << getURI() << " : " << exc.displayText();
         Poco::Net::HTTPRequest::write(ostr);
     }
 }

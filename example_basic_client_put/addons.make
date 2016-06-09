@@ -3,4 +3,3 @@ ofxIO
 ofxMediaType
 ofxNetworkUtils
 ofxSSLManager
-ofxTaskQueue

@@ -38,7 +38,7 @@ void ofApp::setup()
 
     if (response->isSuccess())
     {
-        texture.loadData(response->pixels());
+        ofLoadImage(texture, response->getBuffer());
     }
     else
     {

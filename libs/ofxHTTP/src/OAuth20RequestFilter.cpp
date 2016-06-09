@@ -48,13 +48,13 @@ OAuth20RequestFilter::~OAuth20RequestFilter()
 }
 
 
-OAuth20Credentials& OAuth20RequestFilter::credentials()
+Poco::Net::OAuth20Credentials& OAuth20RequestFilter::credentials()
 {
     return _credentials;
 }
 
 
-const OAuth20Credentials& OAuth20RequestFilter::credentials() const
+const Poco::Net::OAuth20Credentials& OAuth20RequestFilter::credentials() const
 {
     return _credentials;
 }

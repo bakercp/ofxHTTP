@@ -27,7 +27,7 @@
 
 
 #include "Poco/Net/HTMLForm.h"
-#include "ofx/HTTP/OAuth10Credentials.h"
+#include "Poco/Net/OAuth10Credentials.h"
 #include "ofx/HTTP/AbstractClientTypes.h"
 
 
@@ -49,12 +49,12 @@ public:
 
     void requestFilter(BaseRequest& request, Context& context) override;
 
-    OAuth10Credentials& credentials();
+    Poco::Net::OAuth10Credentials& credentials();
 
-    const OAuth10Credentials& credentials() const;
+    const Poco::Net::OAuth10Credentials& credentials() const;
 
 private:
-    OAuth10Credentials _credentials;
+    Poco::Net::OAuth10Credentials _credentials;
 
 };
 

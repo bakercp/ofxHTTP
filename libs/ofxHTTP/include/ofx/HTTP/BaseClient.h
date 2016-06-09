@@ -26,7 +26,6 @@
 #pragma once
 
 
-#include "Poco/TeeStream.h"
 #include "ofx/HTTP/AbstractClientTypes.h"
 #include "ofx/HTTP/ClientEvents.h"
 #include "ofx/HTTP/ClientProgressStream.h"
@@ -131,7 +130,7 @@ public:
 
     /// \brief Submit a request and get the results via callback.
     ///
-    /// Listeners are should subscribe to the events in the ClientEvents member.
+    /// Listeners should subscribe to the events in the ClientEvents member.
     /// Exceptions will be passed as errors to the event listeners. Filter
     /// events, response events and progress events will also be broadcast to
     /// event listeners. See ClientEvents for more.

@@ -27,7 +27,7 @@
 
 
 #include "Poco/Net/HTMLForm.h"
-#include "ofx/HTTP/OAuth20Credentials.h"
+#include "Poco/Net/OAuth20Credentials.h"
 #include "ofx/HTTP/AbstractClientTypes.h"
 
 
@@ -41,18 +41,18 @@ public:
     OAuth20RequestFilter();
 
     OAuth20RequestFilter(const std::string& bearerToken,
-                         const std::string& scheme = OAuth20Credentials::SCHEME);
+                         const std::string& scheme = Poco::Net::OAuth20Credentials::SCHEME);
 
     virtual ~OAuth20RequestFilter();
 
     void requestFilter(BaseRequest& request, Context& context) override;
 
-    OAuth20Credentials& credentials();
+    Poco::Net::OAuth20Credentials& credentials();
 
-    const OAuth20Credentials& credentials() const;
+    const Poco::Net::OAuth20Credentials& credentials() const;
 
 private:
-    OAuth20Credentials _credentials;
+    Poco::Net::OAuth20Credentials _credentials;
 
 };
 

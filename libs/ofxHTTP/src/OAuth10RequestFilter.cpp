@@ -50,13 +50,13 @@ OAuth10RequestFilter::~OAuth10RequestFilter()
 }
 
 
-OAuth10Credentials& OAuth10RequestFilter::credentials()
+Poco::Net::OAuth10Credentials& OAuth10RequestFilter::credentials()
 {
     return _credentials;
 }
 
 
-const OAuth10Credentials& OAuth10RequestFilter::credentials() const
+const Poco::Net::OAuth10Credentials& OAuth10RequestFilter::credentials() const
 {
     return _credentials;
 }
@@ -67,7 +67,7 @@ void OAuth10RequestFilter::requestFilter(BaseRequest& request, Context& context)
     _credentials.authenticate(request,
                               Poco::URI(request.getURI()),
                               request.form(),
-                              OAuth10Credentials::SIGN_HMAC_SHA1);
+                              Poco::Net::OAuth10Credentials::SIGN_HMAC_SHA1);
 }
 
 
