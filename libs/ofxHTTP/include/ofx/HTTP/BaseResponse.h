@@ -27,6 +27,7 @@
 
 
 #include <istream>
+#include "ofConstants.h"
 #include "json.hpp"
 #include "Poco/Exception.h"
 #include "Poco/NullStream.h"

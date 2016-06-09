@@ -26,6 +26,7 @@
 #pragma once
 
 
+#include "ofConstants.h"
 #include "json.hpp"
 #include "ofx/HTTP/BaseRequest.h"
 

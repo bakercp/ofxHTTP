@@ -27,8 +27,8 @@
 
 
 #include <string>
-#include "json.hpp"
 #include "ofConstants.h"
+#include "json.hpp"
 
 
 namespace ofx {
