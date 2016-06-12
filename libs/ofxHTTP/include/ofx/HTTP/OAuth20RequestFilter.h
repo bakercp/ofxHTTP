@@ -26,33 +26,36 @@
 #pragma once
 
 
-#include "Poco/Net/HTMLForm.h"
-#include "Poco/Net/OAuth20Credentials.h"
 #include "ofx/HTTP/AbstractClientTypes.h"
+#include "ofx/HTTP/OAuth20Credentials.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
+/// \brief An OAuth 2.0 request filter.
 class OAuth20RequestFilter: public AbstractRequestFilter
 {
 public:
+    /// \brief Create a default OAuth 2.0 request filter.
     OAuth20RequestFilter();
 
-    OAuth20RequestFilter(const std::string& bearerToken,
-                         const std::string& scheme = Poco::Net::OAuth20Credentials::SCHEME);
-
+    /// \brief Destroy the request filter.
     virtual ~OAuth20RequestFilter();
 
+    /// \brief Set the 0Auth 2.0 credentials.
+    /// \param credentials The OAuth 2.0 credentials.
+    void setCredentials(const OAuth20Credentials& credentials);
+
+    /// \returns The OAuth 2.0 credentials.
+    OAuth20Credentials getCredentials() const;
+    
     void requestFilter(BaseRequest& request, Context& context) override;
 
-    Poco::Net::OAuth20Credentials& credentials();
-
-    const Poco::Net::OAuth20Credentials& credentials() const;
-
 private:
-    Poco::Net::OAuth20Credentials _credentials;
+    /// \brief The OAuth 2.0 credentials used for authentication.
+    OAuth20Credentials _credentials;
 
 };
 

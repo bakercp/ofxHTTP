@@ -49,17 +49,13 @@ OAuth10HTTPClient::~OAuth10HTTPClient()
 
 void OAuth10HTTPClient::setCredentials(const OAuth10Credentials& credentials)
 {
-    _credentials = credentials;
-    _oAuth10RequestFilter.credentials().setConsumerKey(credentials.consumerKey());
-    _oAuth10RequestFilter.credentials().setConsumerSecret(credentials.consumerSecret());
-    _oAuth10RequestFilter.credentials().setToken(credentials.accessToken());
-    _oAuth10RequestFilter.credentials().setTokenSecret(credentials.accessTokenSecret());
+    _oAuth10RequestFilter.setCredentials(credentials);
 }
 
 
 OAuth10Credentials OAuth10HTTPClient::getCredentials() const
 {
-    return _credentials;
+    return _oAuth10RequestFilter.getCredentials();
 }
 
 

@@ -24,8 +24,10 @@
 
 
 #include "ofx/HTTP/OAuth10RequestFilter.h"
+#include "Poco/Net/OAuth10Credentials.h"
 #include "ofx/HTTP/BaseRequest.h"
 #include "ofx/HTTP/HTTPUtils.h"
+
 
 namespace ofx {
 namespace HTTP {
@@ -36,27 +38,18 @@ OAuth10RequestFilter::OAuth10RequestFilter()
 }
 
 
-OAuth10RequestFilter::OAuth10RequestFilter(const std::string& consumerKey,
-                                           const std::string& consumerSecret,
-                                           const std::string& token,
-                                           const std::string& tokenSecret):
-    _credentials(consumerKey, consumerSecret, token, tokenSecret)
-{
-}
-
-    
 OAuth10RequestFilter::~OAuth10RequestFilter()
 {
 }
 
 
-Poco::Net::OAuth10Credentials& OAuth10RequestFilter::credentials()
+void OAuth10RequestFilter::setCredentials(const OAuth10Credentials& credentials)
 {
-    return _credentials;
+    _credentials = credentials;
 }
 
 
-const Poco::Net::OAuth10Credentials& OAuth10RequestFilter::credentials() const
+OAuth10Credentials OAuth10RequestFilter::getCredentials() const
 {
     return _credentials;
 }
@@ -64,10 +57,15 @@ const Poco::Net::OAuth10Credentials& OAuth10RequestFilter::credentials() const
 
 void OAuth10RequestFilter::requestFilter(BaseRequest& request, Context& context)
 {
-    _credentials.authenticate(request,
-                              Poco::URI(request.getURI()),
-                              request.form(),
-                              Poco::Net::OAuth10Credentials::SIGN_HMAC_SHA1);
+    Poco::Net::OAuth10Credentials credentials(_credentials.consumerKey(),
+                                              _credentials.consumerSecret(),
+                                              _credentials.accessToken(),
+                                              _credentials.accessTokenSecret());
+
+    credentials.authenticate(request,
+                             Poco::URI(request.getURI()),
+                             request.form(),
+                             Poco::Net::OAuth10Credentials::SIGN_HMAC_SHA1);
 }
 
 

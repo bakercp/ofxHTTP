@@ -29,7 +29,6 @@
 #include "ofx/HTTP/HTTPClient.h"
 #include "ofx/HTTP/OAuth10Credentials.h"
 #include "ofx/HTTP/OAuth10RequestFilter.h"
-#include "Poco/Net/OAuth10Credentials.h"
 
 
 namespace ofx {
@@ -58,9 +57,6 @@ public:
     OAuth10Credentials getCredentials() const;
 
 private:
-    /// \brief OAuth 1.0 Credentials.
-    OAuth10Credentials _credentials;
-
     /// \brief The request filter.
     OAuth10RequestFilter _oAuth10RequestFilter;
 
