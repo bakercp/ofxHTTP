@@ -30,9 +30,7 @@
 #include "Poco/UUID.h"
 #include "Poco/Net/MediaType.h"
 #include "Poco/Net/PartHandler.h"
-
 #include "ofLog.h"
-
 #include "ofx/HTTP/BaseRoute.h"
 #include "ofx/HTTP/PostRouteEvents.h"
 
