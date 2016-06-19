@@ -144,7 +144,7 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
                         if (n > 2)
                         {
                             // Skip the first two bytes of the code.
-                            reason = frame.getText().substr(2);
+                            reason = frame.toString().substr(2);
                         }
                         else
                         {

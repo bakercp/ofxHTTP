@@ -213,7 +213,7 @@ std::string WebSocketFrame::toString() const
     ss << ", RSV2="   << (isRSV2()         ? "Y" : "N");
     ss << ", RSV3="   << (isRSV3()         ? "Y" : "N");
     ss << ", nBytes=" << size();
-    ss << ", bytes="  << getText();
+    ss << ", bytes="  << toString();
     
     return ss.str();
 }
