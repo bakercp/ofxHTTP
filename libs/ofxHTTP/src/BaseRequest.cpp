@@ -121,4 +121,19 @@ void BaseRequest::writeRequestBody(std::ostream& requestStream)
 }
 
 
+int64_t BaseRequest::estimatedContentLength() const
+{
+    int64_t contentLength = getContentLength64();
+
+    // If needed, try to calculate it based on the form data.
+    if (contentLength == UNKNOWN_CONTENT_LENGTH)
+    {
+        // TODO: This long thing is a work-around for bug https://github.com/pocoproject/poco/issues/1337
+        contentLength = (_form.getEncoding() == Poco::Net::HTMLForm::ENCODING_URL) ? 0 : _form.calculateContentLength();
+    }
+
+    return contentLength;
+}
+
+
 } } // namespace ofx::HTTP

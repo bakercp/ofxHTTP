@@ -38,6 +38,12 @@ OAuth20RequestFilter::OAuth20RequestFilter()
 }
 
 
+OAuth20RequestFilter::OAuth20RequestFilter(const OAuth20Credentials& credentials):
+    _credentials(credentials)
+{
+}
+
+
 void OAuth20RequestFilter::setCredentials(const OAuth20Credentials& credentials)
 {
     _credentials = credentials;
@@ -50,7 +56,8 @@ OAuth20Credentials OAuth20RequestFilter::getCredentials() const
 }
 
 
-void OAuth20RequestFilter::requestFilter(BaseRequest& request, Context& context)
+void OAuth20RequestFilter::requestFilter(Context& context,
+                                         BaseRequest& request) const
 {
     Poco::Net::OAuth20Credentials credentials(_credentials.getBearerToken(),
                                               _credentials.getScheme());

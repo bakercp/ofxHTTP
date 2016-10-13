@@ -41,6 +41,7 @@ namespace HTTP {
 //const std::string Context::KEY_USE_ABSOLUTE_REQUEST_PATH = "USE_ABSOLUTE_REQUEST_PATH";
 
 
+
 Context::Context()
 {
 }
@@ -60,6 +61,8 @@ Context::~Context()
 void Context::setClientSessionSettings(const ClientSessionSettings& sessionSettings)
 {
     _sessionSettings = sessionSettings;
+//    _requestStream = nullptr;
+//    _responseStream = nullptr;
 }
 
 
@@ -69,48 +72,29 @@ const ClientSessionSettings& Context::getClientSessionSettings() const
 }
 
 
-//void Context::setCookieStore(CookieStore::SharedPtr cookieStore)
-//{
-//    _cookieStore = cookieStore;
-//}
-//
-//
-//CookieStore::WeakPtr Context::getCookieStore()
-//{
-//    return _cookieStore;
-//}
-
-
-void Context::setClientSession(std::shared_ptr<Poco::Net::HTTPClientSession> clientSession)
+void Context::setClientSession(std::unique_ptr<Poco::Net::HTTPClientSession> clientSession)
 {
-    _clientSession = clientSession;
+    _clientSession = std::move(clientSession);
 }
 
 
-std::shared_ptr<Poco::Net::HTTPClientSession> Context::getClientSession()
+Poco::Net::HTTPClientSession* Context::clientSession()
 {
-    return _clientSession;
+    return _clientSession.get();
 }
 
 
-void Context::destroyClientSession()
+const Poco::Net::HTTPClientSession* Context::clientSession() const
 {
-    // We don't call .reset() because Poco::Net::HTTPClientSession also has a
-    // reset method that can be confusing.
-    _clientSession = nullptr;
+    return _clientSession.get();
 }
 
 
-//void Context::setResolvedURI(const Poco::URI& uri)
-//{
-//    _resolvedURI = uri;
-//}
-//
-//
-//const Poco::URI& Context::getResolvedURI() const
-//{
-//    return _resolvedURI;
-//}
+std::unique_ptr<Poco::Net::HTTPClientSession> Context::releaseClientSession()
+{
+    // Moving sets _clientSession to nullptr ¤20.8.1/4.
+    return std::move(_clientSession);
+}
 
 
 void Context::addRedirect(const Poco::URI& uri)
@@ -147,5 +131,21 @@ bool Context::getResubmit() const
 {
     return _resubmit;
 }
+
+
+ClientState Context::getState() const
+{
+    return _state;
+}
+
+
+void Context::setState(ClientState state)
+{
+    ofLogVerbose("Context::setState") << "Setting state: " << to_string(_state);
+    _state = state;
+    ClientStateChangeEventArgs args(*this);
+    ofNotifyEvent(events.onHTTPClientStateChange, args, this);
+}
+
 
 } } // namespace ofx::HTTP

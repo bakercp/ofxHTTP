@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2014-2016 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,47 +23,59 @@
 // =============================================================================
 
 
-#pragma once
-
-
-#include "ofx/HTTP/AbstractClientTypes.h"
-#include "ofx/HTTP/BaseRequest.h"
-#include "ofx/HTTP/BaseResponse.h"
-#include "ofx/HTTP/Context.h"
+#include "ofx/HTTP/HTTPHost.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class DefaultResponseStreamFilter: public AbstractResponseStreamFilter
+HTTPHost::HTTPHost(const std::string& scheme,
+                   const std::string& host,
+                   uint16_t port):
+    _scheme(scheme),
+    _host(host),
+    _port(port)
 {
-public:
-    DefaultResponseStreamFilter();
-    virtual ~DefaultResponseStreamFilter();
-    
-    void requestFilter(BaseRequest& request, Context& context) override;
 
-    void responseFilter(BaseRequest& request,
-                        BaseResponse& response,
-                        Context& context) override;
+}
 
-    bool canFilterResponse(BaseRequest& request,
-                           BaseResponse& response,
-                           Context& context) const;
+HTTPHost::~HTTPHost()
+{
+}
 
-    std::istream& responseStreamFilter(std::istream& responseStream,
-                                       const BaseRequest& request,
-                                       const BaseResponse& response,
-                                       Context& context) override;
 
-    static const std::string ACCEPT_ENCODING_HEADER;
-    static const std::string CONTENT_ENCODING_HEADER;
+std::string HTTPHost::scheme() const
+{
+    return _scheme;
+}
 
-private:
-    std::unique_ptr<std::istream> _pResponseStream;
-    
-};
+
+std::string HTTPHost::host() const
+{
+    return _host;
+}
+
+
+uint16_t HTTPHost::port() const
+{
+    return _port;
+}
+
+
+bool HTTPHost::secure() const
+{
+    return _scheme == "https" || _scheme == "wss";
+}
+
+
+std::string HTTPHost::toString() const
+{
+    return "[" + _scheme + "," + _host + "," + std::to_string(_port) + "]";
+    //    std::stringstream ss;
+//    ss << "[" << _scheme << "," << _host << "," << _port << "]";
+//    return ss.str();
+}
 
 
 } } // namespace ofx::HTTP

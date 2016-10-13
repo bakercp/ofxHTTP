@@ -47,7 +47,7 @@ void DefaultCredentialStore::setCredentials(const AuthScope& scope,
 {
     if (!credentials.hasCredentials())
     {
-        ofLogWarning("CredentialStore::setCredentials") << "Credentials are empty.  Ignoring.";
+        ofLogWarning("DefaultCredentialStore::setCredentials") << "Credentials are empty.  Ignoring.";
         return;
     }
 
@@ -85,15 +85,15 @@ void DefaultCredentialStore::setCredentialsFromURI(const Poco::URI& uri)
 
 
 void DefaultCredentialStore::setCredentials(const Poco::URI& uri,
-                                     const Credentials& credentials)
+                                            const Credentials& credentials)
 {
     setCredentials(AuthScope(uri), credentials);
 }
 
 
 void DefaultCredentialStore::setCredentials(const Poco::URI& uri,
-                                     const string& username,
-                                     const string& password)
+                                            const string& username,
+                                            const string& password)
 {
     setCredentials(AuthScope(uri), Credentials(username, password));
 }
@@ -108,8 +108,8 @@ bool DefaultCredentialStore::hasCredentials(const AuthScope& targetScope) const
 
 
 bool DefaultCredentialStore::getCredentials(const AuthScope& targetScope,
-                                     AuthScope& matchingScope,
-                                     Credentials& matchingCredentials) const
+                                            AuthScope& matchingScope,
+                                            Credentials& matchingCredentials) const
 {
     std::unique_lock<std::mutex> lock(_mutex);
     return getCredentialsWithExistingLock(targetScope, matchingScope, matchingCredentials);
@@ -117,17 +117,15 @@ bool DefaultCredentialStore::getCredentials(const AuthScope& targetScope,
 
 
 bool DefaultCredentialStore::getCredentialsWithExistingLock(const AuthScope& targetScope,
-                                                     AuthScope& matchingScope,
-                                                     Credentials& matchingCredentials) const
+                                                            AuthScope& matchingScope,
+                                                            Credentials& matchingCredentials) const
 {
     // calls to this function are expected to be locked!
-    HTTPCredentialMapIter iter = credentialMap.find(targetScope);
+    auto iter = credentialMap.find(targetScope);
 
     // TODO
 //    cout << "TARGET Scope = " << targetScope.toString() << endl;
 //    cout << "TARGET CREDZ = " << targetScope.toString() << endl;
-
-
 
     if (iter != credentialMap.end())
     {
@@ -138,7 +136,7 @@ bool DefaultCredentialStore::getCredentialsWithExistingLock(const AuthScope& tar
     else
     {
         int bestMatchFactor  = -1;
-        HTTPCredentialMapIter bestMatch = credentialMap.end();
+        auto bestMatch = credentialMap.end();
         iter = credentialMap.begin();
         while (iter != credentialMap.end())
         {
@@ -181,19 +179,18 @@ void DefaultCredentialStore::clearCredentials(const Poco::URI& uri)
 }
 
 
-void DefaultCredentialStore::requestFilter(BaseRequest& request,
-                                           Context&)
+void DefaultCredentialStore::requestFilter(Context&,
+                                           BaseRequest& request) const
 {
     // first check and see if the request has any authentication headers
     // these could be added via default session headers
     if (request.has(Poco::Net::HTTPRequest::AUTHORIZATION))
     {
-        ofLogVerbose("CredentialStore::authenticate") << "HTTP Authorization headers already set.  Skipping authentication.";
+        ofLogVerbose("DefaultCredentialStore::authenticate") << "HTTP Authorization headers already set.  Skipping authentication.";
         return;
     }
 
     Poco::URI uri(request.getURI());
-
 
     AuthScope    targetScope(uri.getHost(), uri.getPort());
     Credentials  matchingCredentials;
@@ -205,40 +202,40 @@ void DefaultCredentialStore::requestFilter(BaseRequest& request,
     if (getCredentialsWithExistingLock(targetScope, matchingScope, matchingCredentials))
     {
         // first search our digest credentials to see if we have a matching scope (preferred)
-        HTTPDigestCredentialCacheMapIter iterDigest = digestCredentialCacheMap.find(matchingScope);
+        auto iterDigest = digestCredentialCacheMap.find(matchingScope);
 
         if (iterDigest != digestCredentialCacheMap.end())
         {
             (*iterDigest).second->updateAuthInfo(request); // successfully updated auth info for matching scope
-            ofLogVerbose("CredentialStore::updateAuthentication") << "Found and updated digest credentials.";
+            ofLogVerbose("DefaultCredentialStore::updateAuthentication") << "Found and updated digest credentials.";
             return;
         }
 
         // if there are no digest credentials, search for basic credentials
 
-        HTTPBasicCredentialCacheMapIter iterBasic = basicCredentialCacheMap.find(matchingScope);
+        auto iterBasic = basicCredentialCacheMap.find(matchingScope);
 
         if (iterBasic != basicCredentialCacheMap.end())
         {
             (*iterBasic).second->authenticate(request); // successfully updated auth info for matching scope
-            ofLogVerbose("CredentialStore::updateAuthentication") << "Found and updated basic credentials.";
+            ofLogVerbose("DefaultCredentialStore::updateAuthentication") << "Found and updated basic credentials.";
             return;
         }
 
-        ofLogVerbose("CredentialStore::updateAuthentication") << "Had no matching cached credentials for preemptive authentication.";
+        ofLogVerbose("DefaultCredentialStore::updateAuthentication") << "Had no matching cached credentials for preemptive authentication.";
         return;
     }
     else
     {
-        ofLogVerbose("CredentialStore::authenticate") << "Had no matching credentials for preemptive authentication.";
+        ofLogVerbose("DefaultCredentialStore::authenticate") << "Had no matching credentials for preemptive authentication.";
         return;
     }
 }
 
 
-void DefaultCredentialStore::responseFilter(BaseRequest& request,
-                                            BaseResponse& response,
-                                            Context&)
+void DefaultCredentialStore::responseFilter(Context&,
+                                            BaseRequest& request,
+                                            BaseResponse& response) const
 {
 
     if (response.getStatus() == Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED)
@@ -261,7 +258,7 @@ void DefaultCredentialStore::responseFilter(BaseRequest& request,
             }
             else
             {
-                ofLogError("CredentialStore::authenticate") << "Incompatible or unknown WWW-Authenticate header.  Basic and digest supported: " << iter->second;
+                ofLogError("DefaultCredentialStore::authenticate") << "Incompatible or unknown WWW-Authenticate header.  Basic and digest supported: " << iter->second;
                 return;
             }
 
@@ -275,17 +272,17 @@ void DefaultCredentialStore::responseFilter(BaseRequest& request,
             }
             catch (const Poco::Net::NotAuthenticatedException& exc)
             {
-                ofLogError("CredentialStore::authenticate") << "HTTP response has no authentication header." << " : " << exc.displayText();
+                ofLogError("DefaultCredentialStore::authenticate") << "HTTP response has no authentication header." << " : " << exc.displayText();
                 return;
             }
             catch (const Poco::InvalidArgumentException& exc)
             {
-                ofLogError("CredentialStore::authenticate") << "Incompatible or unknown WWW-Authenticate header.  Basic and digest supported: " << iter->second << " : " << exc.displayText();
+                ofLogError("DefaultCredentialStore::authenticate") << "Incompatible or unknown WWW-Authenticate header.  Basic and digest supported: " << iter->second << " : " << exc.displayText();
                 return;
             }
             catch (const Poco::SyntaxException& exc)
             {
-				ofLogError("CredentialStore::authenticate") << "Error parsing WWW-Authenticate header: " << iter->second << " : " << exc.displayText();
+				ofLogError("DefaultCredentialStore::authenticate") << "Error parsing WWW-Authenticate header: " << iter->second << " : " << exc.displayText();
                 return;
             }
 
@@ -308,48 +305,48 @@ void DefaultCredentialStore::responseFilter(BaseRequest& request,
                 if (BASIC == requestedAuthType)
                 {
                     // replace any old ones (probably means they failed and were updated somewhere)
-                    basicCredentialCacheMap[matchingScope] = HTTPBasicCredentialsSharedPtr(new Poco::Net::HTTPBasicCredentials(matchingCredentials.getUsername(), matchingCredentials.getPassword()));
+                    basicCredentialCacheMap[matchingScope] = std::make_shared<Poco::Net::HTTPBasicCredentials>(matchingCredentials.getUsername(), matchingCredentials.getPassword());
                     basicCredentialCacheMap[matchingScope].get()->authenticate(request);
                     return;
                 }
                 else if (DIGEST == requestedAuthType)
                 {
-                    digestCredentialCacheMap[matchingScope] = HTTPDigestCredentialsSharedPtr(new Poco::Net::HTTPDigestCredentials(matchingCredentials.getUsername(),matchingCredentials.getPassword()));
+                    digestCredentialCacheMap[matchingScope] = std::make_shared<Poco::Net::HTTPDigestCredentials>(matchingCredentials.getUsername(),matchingCredentials.getPassword());
                     digestCredentialCacheMap[matchingScope].get()->authenticate(request, response);
                     return;
                 }
                 else
                 {
-                    ofLogError("CredentialStore::authenticate") << "Unknown requestedAuthType: " << requestedAuthType;
+                    ofLogError("DefaultCredentialStore::authenticate") << "Unknown requestedAuthType: " << requestedAuthType;
                     return;
                 }
             }
             else
             {
-                ofLogVerbose("CredentialStore::authenticate") << "Had no matching credentials for authentication.";
+                ofLogVerbose("DefaultCredentialStore::authenticate") << "Had no matching credentials for authentication.";
                 return;
             }
         }
 
-        ofLogVerbose("CredentialStore::authenticate") << "Response was unauthorized, but could not find WWW-Authenticate header.";
+        ofLogVerbose("DefaultCredentialStore::authenticate") << "Response was unauthorized, but could not find WWW-Authenticate header.";
         return;
     }
     else
     {
-        ofLogVerbose("CredentialStore::authenticate") << "Response was not unauthorized.  Nothing to be done.";
+        ofLogVerbose("DefaultCredentialStore::authenticate") << "Response was not unauthorized.  Nothing to be done.";
         return;
     }
 
 }
 
 
-bool DefaultCredentialStore::canFilterResponse(BaseRequest&,
-                                               BaseResponse&,
-                                               Context&) const
-{
-    // TODO
-    return true;
-}
+//bool DefaultCredentialStore::canFilterResponse(BaseRequest&,
+//                                               BaseResponse&,
+//                                               Context&) const
+//{
+//    // TODO
+//    return true;
+//}
 
 
 

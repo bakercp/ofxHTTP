@@ -39,76 +39,40 @@ namespace ofx {
 namespace HTTP {
 
 
-class AbstractRequestStreamListener
-{
-public:
-    virtual ~AbstractRequestStreamListener()
-    {
-    }
-
-    virtual void progress(const BaseRequest& request,
-                          Context& context,
-                          std::streamsize totalBytesTransferred) = 0;
-
-};
-
-
-class AbstractResponseStreamListener
-{
-public:
-    virtual ~AbstractResponseStreamListener()
-    {
-    }
-
-    virtual void progress(const BaseRequest& request,
-                          const BaseResponse& response,
-                          Context& context,
-                          std::streamsize totalBytesTransferred) = 0;
-    
-};
-
-
 class ClientProgressStreamBuf: public Poco::UnbufferedStreamBuf
 {
 public:
-//    ClientProgressStreamBuf();
+    ClientProgressStreamBuf(Context& context,
+                            BaseRequest& request,
+                            std::ostream& ostr);
 
-    ClientProgressStreamBuf(std::ostream& ostr,
-                            const BaseRequest& request,
-                            Context& context,
-                            AbstractRequestStreamListener& listener,
-                            std::streamsize bytesPerProgressUpdate);
-
-    ClientProgressStreamBuf(std::istream& istr,
-                            const BaseRequest& request,
-                            const BaseResponse& response,
-                            Context& context,
-                            AbstractResponseStreamListener& listener,
-                            std::streamsize bytesPerProgressUpdate);
+    ClientProgressStreamBuf(Context& context,
+                            BaseRequest& request,
+                            BaseResponse& response,
+                            std::istream& istr);
 
     ~ClientProgressStreamBuf();
 
-    void reset();
-
 protected:
-    int readFromDevice();
-    int writeToDevice(char c);
+    int writeToDevice(char c) override;
+    int readFromDevice() override;
 
 private:
-    const BaseRequest* _pRequest = nullptr;;
-    const BaseResponse* _pResponse = nullptr;;
-    Context* _pContext = nullptr;;
+    Context* _pContext = nullptr;
+    BaseRequest* _pRequest = nullptr;
+    BaseResponse* _pResponse = nullptr;
 
     std::ostream* _pRequestStream = nullptr;
-    std::istream* _pResponseStream = nullptr;;
+    std::istream* _pResponseStream = nullptr;
 
-    AbstractRequestStreamListener*  _pRequestStreamListener = nullptr;;
-    AbstractResponseStreamListener* _pResponseStreamListener = nullptr;;
+    std::streamsize _requestStreamBytesTransferred = 0;
+    std::streamsize _responseStreamBytesTransferred = 0;
 
-    std::streamsize _requestStreamBytes = 0;
-    std::streamsize _responseStreamBytes = 0;
+    Progress _requestStreamProgress;
+    Progress _responseStreamProgress;
 
-    std::streamsize _bytesPerProgressUpdate = 0;
+    int64_t _bytesPerUpdate = 0;
+    int64_t _maxUpdateInterval = 0;
 
 };
 
@@ -116,18 +80,14 @@ private:
 class ClientProgressIOS: public virtual std::ios
 {
 public:
-    ClientProgressIOS(std::ostream& ostr,
-                      const BaseRequest& request,
-                      Context& context,
-                      AbstractRequestStreamListener& listener,
-                      std::streamsize bytesPerProgressUpdate);
+    ClientProgressIOS(Context& context,
+                      BaseRequest& request,
+                      std::ostream& ostr);
 
-    ClientProgressIOS(std::istream& istr,
-                      const BaseRequest& request,
-                      const BaseResponse& response,
-                      Context& context,
-                      AbstractResponseStreamListener& listener,
-                      std::streamsize bytesPerProgressUpdate);
+    ClientProgressIOS(Context& context,
+                      BaseRequest& request,
+                      BaseResponse& response,
+                      std::istream& istr);
 
     ~ClientProgressIOS();
 
@@ -147,15 +107,13 @@ class ClientProgressRequestStream:
 {
 public:
     /// \brief Creates the CountingOutputStream and connects it to the given input stream.
-    ClientProgressRequestStream(std::ostream& ostr,
-                                const BaseRequest& request,
-                                Context& context,
-                                AbstractRequestStreamListener& listener,
-                                std::streamsize bytesPerProgressUpdate);
+    ClientProgressRequestStream(Context& context,
+                                BaseRequest& request,
+                                std::ostream& ostr);
 
     /// \brief Destroys the ProgressOutputStream.
     ~ClientProgressRequestStream();
-    
+
 };
 
 
@@ -165,15 +123,53 @@ class ClientProgressResponseStream:
 {
 public:
     /// \brief Creates the CountingInputStream and connects it to the given input stream.
-    ClientProgressResponseStream(std::istream& istr,
-                                 const BaseRequest& request,
-                                 const BaseResponse& response,
-                                 Context& context,
-                                 AbstractResponseStreamListener& listener,
-                                 std::streamsize bytesPerProgressUpdate);
+    ClientProgressResponseStream(Context& context,
+                                 BaseRequest& request,
+                                 BaseResponse& response,
+                                 std::istream& istr);
 
     /// \brief Destroys the stream.
     ~ClientProgressResponseStream();
+
+};
+
+
+class ClientProgressRequestStreamFilter: public IO::AbstractOutputStreamFilter
+{
+public:
+    ClientProgressRequestStreamFilter(Context& context,
+                                      BaseRequest& request);
+
+    virtual ~ClientProgressRequestStreamFilter();
+
+    std::ostream& filter(std::ostream& stream) override;
+
+private:
+    Context& _context;
+    BaseRequest& _request;
+
+    std::unique_ptr<ClientProgressRequestStream> _stream;
+    
+};
+
+
+class ClientProgressResponseStreamFilter: public IO::AbstractInputStreamFilter
+{
+public:
+    ClientProgressResponseStreamFilter(Context& context,
+                                       BaseRequest& request,
+                                       BaseResponse& response);
+
+    virtual ~ClientProgressResponseStreamFilter();
+
+    std::istream& filter(std::istream& stream) override;
+
+private:
+    Context& _context;
+    BaseRequest& _request;
+    BaseResponse& _response;
+
+    std::unique_ptr<ClientProgressResponseStream> _stream;
 
 };
 

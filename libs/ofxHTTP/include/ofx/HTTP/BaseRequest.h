@@ -61,6 +61,9 @@ public:
     /// PUT requests will be submitted as requests POST and PUT (e.g. GET) will
     /// be URL-encoded and appended to the request URI before submission.
     ///
+    /// If the endpoint URI does not include a host name, the URI will be
+    /// resolved using the given HTTPSessionClient.
+    ///
     /// \param method The HTTP method (e.g. GET, POST, PUT, etc).
     /// \param uri The endpoint URI.
     /// \param httpVersion Either HTTP/1.0 or HTTP/1.1.
@@ -100,6 +103,18 @@ public:
     /// \returns a const reference to the raw form data.
     const Poco::Net::HTMLForm& form() const;
 
+    /// \brief Get the estimated content length for progress estimtion purposes.
+    ///
+    /// Internally this will read from the Content-Length header. If that header
+    /// is not available due to transfer-chunking being true, etc, then it will
+    /// query the form to calculate the length. Typically, it is not advised to
+    /// call this function until after any form preparation has been done.  If
+    /// it is not possible to calculate the content length,
+    /// UNKNOWN_CONTENT_LENGTH will be returned.
+    ///
+    /// \returns the estimated content length or UNKNOWN_CONTENT_LENGTH if unknown.
+    int64_t estimatedContentLength() const;
+
 protected:
     /// \brief Prepare the current request.
     virtual void prepareRequest();
@@ -119,9 +134,13 @@ protected:
     std::string _requestId;
 
     /// \brief A form with all query terms / form parameters.
-    Poco::Net::HTMLForm _form;
+    ///
+    /// This function is not const because the underlying form content length
+    /// calculator is not const.
+    mutable Poco::Net::HTMLForm _form;
 
     friend class BaseClient;
+    friend class Client;
 
 };
 

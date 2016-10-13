@@ -38,6 +38,12 @@ OAuth10RequestFilter::OAuth10RequestFilter()
 }
 
 
+OAuth10RequestFilter::OAuth10RequestFilter(const OAuth10Credentials& credentials):
+    _credentials(credentials)
+{
+}
+
+
 OAuth10RequestFilter::~OAuth10RequestFilter()
 {
 }
@@ -55,7 +61,8 @@ OAuth10Credentials OAuth10RequestFilter::getCredentials() const
 }
 
 
-void OAuth10RequestFilter::requestFilter(BaseRequest& request, Context& context)
+void OAuth10RequestFilter::requestFilter(Context& context,
+                                         BaseRequest& request) const
 {
     Poco::Net::OAuth10Credentials credentials(_credentials.consumerKey(),
                                               _credentials.consumerSecret(),

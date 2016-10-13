@@ -23,54 +23,40 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/DefaultClientSessionProvider.h"
-#include "ofx/HTTP/BaseRequest.h"
-#include "ofx/HTTP/BaseResponse.h"
-#include "ofx/HTTP/Context.h"
+#include "ofx/HTTP/ClientCache.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-DefaultClientSessionProvider::DefaultClientSessionProvider()
+
+SQLiteClientCacheStorage::~SQLiteClientCacheStorage()
 {
 }
 
 
-DefaultClientSessionProvider::~DefaultClientSessionProvider()
+void SQLiteClientCacheStorage::put(const std::string& key, ClientCacheEntry value)
 {
+ // noop
 }
 
 
-void DefaultClientSessionProvider::requestFilter(BaseRequest& request,
-                                                 Context& context)
+ClientCacheEntry SQLiteClientCacheStorage::get(const std::string& key)
 {
-    std::shared_ptr<Poco::Net::HTTPClientSession> clientSession = context.getClientSession();
+    return ClientCacheEntry();
+}
 
-    if (clientSession == nullptr)
-    {
-        const ClientSessionSettings& settings = context.getClientSessionSettings();
 
-        Poco::URI uri(request.getURI());
+void SQLiteClientCacheStorage::remove(const std::string& key)
+{
+    // noop
+}
 
-        if (0 == uri.getScheme().compare("https"))
-        {
-            ofSSLManager::initializeClient(); // Initialize SSL context if needed.
 
-            clientSession = std::make_shared<Poco::Net::HTTPSClientSession>(uri.getHost(), uri.getPort());
-        }
-        else
-        {
-            clientSession = std::make_shared<Poco::Net::HTTPClientSession>(uri.getHost(), uri.getPort());
-        }
-
-        clientSession->setKeepAlive(settings.getKeepAlive());
-        clientSession->setKeepAliveTimeout(settings.getKeepAliveTimeout());
-        clientSession->setTimeout(settings.getTimeout());
-
-        context.setClientSession(clientSession);
-    }
+void SQLiteClientCacheStorage::update(const std::string& key)
+{
+    // noop
 }
 
 

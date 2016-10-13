@@ -26,56 +26,51 @@
 #pragma once
 
 
-#include "ofx/HTTP/BaseResponse"
+#include <string>
+#include <iostream>
 
 
 namespace ofx {
 namespace HTTP {
 
 
+class HTTPHost
+{
+public:
+    HTTPHost(const std::string& scheme,
+             const std::string& host,
+             uint16_t port);
 
-///// \brief An HTTP POST Request with a JSON request body.
-//class JSONResponse: public BaseResponse
-//{
-//public:
-//    /// \brief Construct a JSONResponse
-//    JSONResponse();
-//
-//    /// \brief Construct a JSONResponse
-//    /// \param json The JSON content.
-//    JSONResponse(const ofJson& json);
-//
-//    /// \brief Destroy the JSONRequest.
-//    virtual ~JSONRequest();
-//
-//    /// \brief Set the JSON content.
-//    /// \param json The JSON content.
-//    virtual void setJSON(const ofJson& json);
-//
-//    /// \returns a const reference to the request JSON.
-//    virtual const ofJson& getJSON() const;
-//
-//    /// \brief The JSON media type.
-//    static const std::string JSON_MEDIA_TYPE;
-//
-//protected:
-//    /// \brief Custom prepareRequest() to set the content length;
-//    virtual void prepareRequest() override;
-//
-//    /// \brief Writes from the form buffer.
-//    /// \param requestStream The stream to write the request body.
-//    void writeRequestBody(std::ostream& requestStream) override;
-//    
-//    /// \brief The JSON data to send.
-//    mutable ofJson _json;
-//
-//private:
-//    /// \brief An output buffer.
-//    std::stringstream _outBuffer;
-//    
-//};
+    ~HTTPHost();
+
+    std::string scheme() const;
+    std::string host() const;
+    uint16_t port() const;
+
+    /// \returns true of this host is secure.
+    bool secure() const;
+
+    std::string toString() const;
+
+    /// \brief Stream output.
+    /// \param os the std::ostream.
+    /// \param host The HTTPHost to output.
+    /// \returns the updated std::ostream reference.
+    friend std::ostream& operator << (std::ostream& os, const HTTPHost& host);
+
+private:
+    std::string _scheme;
+    std::string _host;
+    uint16_t _port;
+
+};
 
 
+inline std::ostream& operator<<(std::ostream& os, const HTTPHost& host)
+{
+    os << host.toString();
+    return os;
+}
 
 
 } } // namespace ofx::HTTP

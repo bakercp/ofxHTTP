@@ -51,16 +51,12 @@ public:
     
     virtual ~DefaultRedirectProcessor();
 
-    virtual void requestFilter(BaseRequest& request,
-                               Context& context) override;
+    virtual void requestFilter(Context& context,
+                               BaseRequest& request) const override;
 
-    virtual void responseFilter(BaseRequest& request,
-                                BaseResponse& response,
-                                Context& context) override;
-
-    virtual bool canFilterResponse(BaseRequest& request,
-                                   BaseResponse& response,
-                                   Context& context) const;
+    virtual void responseFilter(Context& context,
+                                BaseRequest& request,
+                                BaseResponse& response) const override;
 
 };
 

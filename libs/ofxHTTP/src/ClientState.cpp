@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2014-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,48 +23,49 @@
 // =============================================================================
 
 
-#pragma once
-
-
-#include <ios>
-#include "Poco/Mutex.h"
+#include "ofx/HTTP/ClientState.h"
+#include <map>
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class ProgressMonitor
-{
-public:
-    ProgressMonitor();
-    virtual ~ProgressMonitor();
-    
-    void update(std::streamsize totalBytesTransferred,
-                std::streamsize totalBytes,
-                std::size_t transferBufferSize,
-                uint64_t lastUpdate);
-
-    std::streamsize totalBytesTranferred() const;
-    std::streamsize totalBytes() const;
-    
-    float percentageTransferred() const;
-    
-    std::size_t transferBufferSize() const;
-
-    void reset();
-    
-private:
-    std::streamsize _totalBytesTransferred;
-    std::streamsize _totalBytes;
-    std::size_t _transferBufferSize;
-
-    uint64_t _lastUpdateTime;
-    float _bytesPerSecond;
-
-    mutable Poco::FastMutex _mutex;
-
+const std::map<ClientState, std::string> CLIENT_STATE_STRINGS = {
+    { ClientState::NONE, "NONE" },
+    { ClientState::DETECTING_PROXY, "DETECTING_PROXY" },
+    { ClientState::RESOLVING_NAME, "RESOLVING_NAME" },
+    { ClientState::CONNECTING_TO_SERVER, "CONNECTING_TO_SERVER" },
+    { ClientState::NEGOTIATING_SSL, "NEGOTIATING_SSL" },
+    { ClientState::SENDING_HEADERS, "SENDING_HEADERS" },
+    { ClientState::SENDING_CONTENTS, "SENDING_CONTENTS" },
+    { ClientState::WAITING_FOR_RESPONSE, "WAITING_FOR_RESPONSE" },
+    { ClientState::RECEIVING_HEADERS, "RECEIVING_HEADERS" },
+    { ClientState::RECEIVING_CONTENTS, "RECEIVING_CONTENTS" },
+    { ClientState::REDIRECTING, "REDIRECTING" }
 };
+
+
+std::string to_string(ClientState state)
+{
+    return CLIENT_STATE_STRINGS.at(state);
+}
+
+
+bool from_string(const std::string text, ClientState& state)
+{
+    for (const auto& entry: CLIENT_STATE_STRINGS)
+    {
+        if (text == entry.second)
+        {
+            state = entry.first;
+            return true;
+        }
+    }
+    
+    state = ClientState::NONE;
+    return false;
+}
 
 
 } } // namespace ofx::HTTP

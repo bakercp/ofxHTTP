@@ -50,13 +50,6 @@ public:
     /// \brief Destroy the ClientSessionSettings.
     virtual ~ClientSessionSettings();
 
-//    /// \brief Set the virtual host.
-//    void setVirtualHost(const std::string& virtualHost);
-//    std::string getVirtualHost() const;
-//
-//    void setDefaultHost(const std::string& defaultHost);
-//    std::string getDefaultHost() const;
-
     /// \brief Set the user-agent for this client session.
     /// \param userAgent The user agent string.
     void setUserAgent(const std::string& userAgent);
@@ -107,7 +100,7 @@ public:
     /// \returns the current proxy settings.
     const ProxySettings& getProxySettings() const;
 
-    /// \brief Set the number of bytes per progress update.
+    /// \brief Set the minimum number of bytes per progress update.
     ///
     /// This is the default number of bytes to wait between progress update
     /// events events. If this number is very low, then too many events may be
@@ -116,11 +109,24 @@ public:
     ///
     /// A value of 0 will disable the progress updates.
     ///
-    /// \bytesPerProgressUpdate The number of bytes to set.
-    void setBytesPerProgressUpdate(std::streamsize bytesPerProgressUpdate);
+    /// \param bytesPerProgressUpdate The number of bytes to set.
+    void setMinimumBytesPerProgressUpdate(int64_t minimumBytesPerProgressUpdate);
 
-    /// \returns The number of bytes per progress update.
-    std::streamsize getBytesPerProgressUpdate() const;
+    /// \returns The minimum number of bytes per progress update.
+    int64_t getMinimumBytesPerProgressUpdate() const;
+
+    /// \brief Set the maximum interval between progress updates.
+    ///
+    /// This is useful for slow connections to keep the update data rate
+    /// up-to-date.
+    ///
+    /// A value of 0 will effectively disable the maximum interval.
+    ///
+    /// \param interval The interval to set.
+    void setMaximumProgressUpdateInterval(Poco::Timespan interval);
+
+    /// \returns the maximum interval between progress updates.
+    Poco::Timespan getMaximumProgressUpdateInterval() const;
 
     /// \brief The default user agent sent with the client.
     static const std::string DEFAULT_USER_AGENT;
@@ -135,12 +141,12 @@ public:
     static const Poco::Timespan DEFAULT_TIMEOUT;
 
     /// \brief The default number of bytes to wait between progress update events.
-    static const std::streamsize DEFAULT_BYTES_PER_PROGRESS_UPDATE;
+    static const int64_t DEFAULT_MINIMUM_BYTES_PER_PROGRESS_UPDATE;
+
+    /// \brief The default maximum interval between progress updates.
+    static const Poco::Timespan DEFAULT_MAXIMUM_PROGRESS_UPDATE_INTERVAL;
 
 private:
-//    std::string _virtualHost;
-//    std::string _defaultHost;
-
     /// \brief The user-agent string.
     std::string _userAgent;
 
@@ -162,7 +168,10 @@ private:
     /// \brief The number of bytes to wait between progress update events.
     ///
     /// A value of 0 will disable the progress updates.
-    std::streamsize _bytesPerProgressUpdate;
+    int64_t _minimumBytesPerProgressUpdate;
+
+    /// \brief The maximum interval between progress updates.
+    Poco::Timespan _maximumProgressUpdateInterval;
 
     /// \brief The a collection of default headers to include with each request.
     Poco::Net::NameValueCollection _defaultHeaders;

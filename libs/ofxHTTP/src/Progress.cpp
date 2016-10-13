@@ -23,44 +23,92 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/DefaultClientHeaders.h"
-#include "ofx/HTTP/BaseRequest.h"
-#include "ofx/HTTP/Context.h"
+#include "ofx/HTTP/Progress.h"
+#include "Poco/Net/HTTPMessage.h"
+#include "Poco/Timestamp.h"
 
 
 namespace ofx {
 namespace HTTP {
 
+    
+const int64_t Progress::UNKNOWN_CONTENT_LENGTH = Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH;
 
-DefaultClientHeaders::DefaultClientHeaders()
+
+Progress::Progress(int64_t totalBytes): _totalBytes(totalBytes)
 {
 }
 
 
-DefaultClientHeaders::~DefaultClientHeaders()
+Progress::Progress()
 {
 }
 
 
-void DefaultClientHeaders::requestFilter(Context& context,
-                                         BaseRequest& request) const
+Progress::~Progress()
 {
-    const ClientSessionSettings& settings = context.getClientSessionSettings();
+}
 
-    if (!settings.getUserAgent().empty())
+
+int64_t Progress::getTotalBytesTranferred() const
+{
+    return _totalBytesTransferred;
+}
+
+
+void Progress::setTotalBytesTransferred(int64_t totalBytesTransferred)
+{
+    _lastUpdateTime.update();
+    _totalBytesTransferred = totalBytesTransferred;
+}
+
+
+
+int64_t Progress::getTotalBytes() const
+{
+    return _totalBytes;
+}
+
+
+void Progress::setTotalBytes(int64_t totalBytes)
+{
+    _startTime.update();
+    _totalBytes = totalBytes;
+}
+
+
+float Progress::progress() const
+{
+    if (_totalBytes == 0)
     {
-        request.set("User-Agent", settings.getUserAgent());
+        return 1.0;
     }
-
-//    request.set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-//    request.set("Accept-Language", "en-US,en;q=0.8");
-
-    for (const auto& entry: settings.getDefaultHeaders())
+    else if (_totalBytes > 0)
     {
-        request.set(entry.first, entry.second);
+        double totalBytesTransferred = static_cast<double>(_totalBytesTransferred);
+        double totalBytes = static_cast<double>(_totalBytes);
+        return static_cast<float>(totalBytesTransferred / totalBytes);
     }
+    else return UNKNOWN_CONTENT_LENGTH;
 }
 
+
+float Progress::bytesPerSecond() const
+{
+    return _totalBytesTransferred / (_startTime.elapsed() / 1000000.0);
+}
+
+
+Poco::Timestamp Progress::lastUpdateTime() const
+{
+    return _lastUpdateTime;
+}
+
+
+Poco::Timestamp Progress::startTime() const
+{
+    return _startTime;
+}
 
 
 } } // namespace ofx::HTTP

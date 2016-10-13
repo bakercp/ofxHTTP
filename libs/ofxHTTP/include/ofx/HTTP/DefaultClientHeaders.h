@@ -40,7 +40,7 @@ public:
 
     virtual ~DefaultClientHeaders();
 
-    virtual void requestFilter(BaseRequest& request, Context& context);
+    virtual void requestFilter(Context& context, BaseRequest& request) const override;
 
 };
 

@@ -49,7 +49,7 @@ PostRequest::~PostRequest()
 
 void PostRequest::setFormEncoding(FormEncoding formEncoding)
 {
-    if (FORM_ENCODING_URL == formEncoding)
+    if (formEncoding == FORM_ENCODING_URL)
     {
         _form.setEncoding(Poco::Net::HTMLForm::ENCODING_URL);
     }
@@ -62,7 +62,7 @@ void PostRequest::setFormEncoding(FormEncoding formEncoding)
 
 PostRequest::FormEncoding PostRequest::getFormEncoding() const
 {
-    if (0 == Poco::UTF8::icompare(_form.getEncoding(), Poco::Net::HTMLForm::ENCODING_URL))
+    if (_form.getEncoding() == Poco::Net::HTMLForm::ENCODING_URL)
     {
         return FORM_ENCODING_URL;
     }
@@ -151,32 +151,19 @@ void PostRequest::prepareRequest()
 {
     _form.prepareSubmit(*this);
 
-    if (FORM_ENCODING_MULTIPART == getFormEncoding() &&
-        Poco::Net::HTTPMessage::HTTP_1_0 == getVersion())
+    // \TODO Fix for Poco Bug
+    // https://github.com/pocoproject/poco/issues/1331
+    if (!getChunkedTransferEncoding())
     {
-        // If we are using 1.0 with file uploads, we must get a content
-        // length before sending the data.
-        _outBuffer.clear();
-        Poco::CountingOutputStream cos(_outBuffer);
-        _form.write(cos);
-        set("Content-Length", ofToString(cos.chars()));
-        setKeepAlive(false);
-        setChunkedTransferEncoding(false);
+        // TODO: This long thing is a work-around for bug https://github.com/pocoproject/poco/issues/1337
+        setContentLength(_form.getEncoding() == Poco::Net::HTMLForm::ENCODING_URL ? 0 : _form.calculateContentLength());
     }
 }
 
 
 void PostRequest::writeRequestBody(std::ostream& requestStream)
 {
-    if (FORM_ENCODING_MULTIPART == getFormEncoding() &&
-        Poco::Net::HTTPMessage::HTTP_1_0 == getVersion())
-    {
-        Poco::StreamCopier::copyStream(_outBuffer, requestStream);
-    }
-    else
-    {
-        _form.write(requestStream);
-    }
+    _form.write(requestStream);
 }
 
 

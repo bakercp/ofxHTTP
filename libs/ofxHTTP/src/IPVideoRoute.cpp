@@ -282,9 +282,9 @@ void IPVideoRoute::send(const ofPixels& pix) const
         IPVideoFrameSettings frameSettings = _settings.getFrameSettings();
 
         if (frameSettings.getWidth() != IPVideoFrameSettings::NO_RESIZE
-        ||  frameSettings.getHeight() != IPVideoFrameSettings::NO_RESIZE
-        ||  frameSettings.getFlipHorizontal()
-        ||  frameSettings.getFlipVertical())
+            ||  frameSettings.getHeight() != IPVideoFrameSettings::NO_RESIZE
+            ||  frameSettings.getFlipHorizontal()
+            ||  frameSettings.getFlipVertical())
         {
             int newWidth = frameSettings.getWidth() != IPVideoFrameSettings::NO_RESIZE ? frameSettings.getWidth() : pix.getWidth();
             int newHeight = frameSettings.getHeight() != IPVideoFrameSettings::NO_RESIZE ? frameSettings.getHeight() : pix.getHeight();
@@ -307,8 +307,8 @@ void IPVideoRoute::send(const ofPixels& pix) const
         else
         {
             ofPixels pixels = pix;
-	    ofSaveImage(pixels, compressedPixels, OF_IMAGE_FORMAT_JPEG, frameSettings.getQuality());
-        } 
+            ofSaveImage(pixels, compressedPixels, OF_IMAGE_FORMAT_JPEG, frameSettings.getQuality());
+        }
 
         std::unique_lock<std::mutex> lock(_mutex);
 
@@ -392,7 +392,7 @@ void IPVideoConnection::handleRequest(ServerEventArgs& evt)
        route().numConnections() >= route().settings().getMaxClientConnections())
     {
         evt.response().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE,
-                                          "Maximum client connections exceeded.  Please try again later.");
+                                          "Maximum client connections exceeded. Please try again later.");
 
         route().handleRequest(evt);
         return;
@@ -406,38 +406,43 @@ void IPVideoConnection::handleRequest(ServerEventArgs& evt)
     }
     catch (const Poco::SyntaxException& exc)
     {
-        ofLogError("IPVideoRoute::createRequestHandler") << exc.what();
+        evt.response().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR,
+                                          "Request URI Invalid.");
+
+        route().handleRequest(evt);
+        return;
     }
 
     std::string query = uri.getQuery();
+
 
     Poco::Net::NameValueCollection queryMap = HTTPUtils::getQueryMap(uri);
 
     if (queryMap.has("vflip"))
     {
         std::string vflip = queryMap.get("vflip");
-        _frameSettings.setFlipVertical(Poco::icompare(vflip,"1")    == 0 ||
-                                       Poco::icompare(vflip,"true") == 0 ||
-                                       Poco::icompare(vflip,"t")    == 0 ||
-                                       Poco::icompare(vflip,"y")    == 0 ||
-                                       Poco::icompare(vflip,"yes")  == 0);
+        _frameSettings.setFlipVertical(Poco::icompare(vflip, "1")    == 0 ||
+                                       Poco::icompare(vflip, "true") == 0 ||
+                                       Poco::icompare(vflip, "t")    == 0 ||
+                                       Poco::icompare(vflip, "y")    == 0 ||
+                                       Poco::icompare(vflip, "yes")  == 0);
     }
 
     if (queryMap.has("hflip"))
     {
         std::string hflip = queryMap.get("hflip");
-        _frameSettings.setFlipHorizontal(Poco::icompare(hflip,"1")    == 0 ||
-                                         Poco::icompare(hflip,"true") == 0 ||
-                                         Poco::icompare(hflip,"t")    == 0 ||
-                                         Poco::icompare(hflip,"y")    == 0 ||
-                                         Poco::icompare(hflip,"yes")  == 0);
+        _frameSettings.setFlipHorizontal(Poco::icompare(hflip, "1")    == 0 ||
+                                         Poco::icompare(hflip, "true") == 0 ||
+                                         Poco::icompare(hflip, "t")    == 0 ||
+                                         Poco::icompare(hflip, "y")    == 0 ||
+                                         Poco::icompare(hflip, "yes")  == 0);
     }
 
     if (queryMap.has("size"))
     {
         std::string size = queryMap.get("size");
         Poco::toLowerInPlace(size);
-        std::vector<std::string> tokens = ofSplitString(size,"x");
+        std::vector<std::string>  tokens = ofSplitString(size, "x");
 
         if (tokens.size() == 2)
         {
@@ -488,9 +493,9 @@ void IPVideoConnection::handleRequest(ServerEventArgs& evt)
             // no change
         }
     }
-
+    
     route().addConnection(this);
-
+    
     try
     {
         Poco::Net::MediaType mediaType = route().settings().getMediaType();
@@ -501,11 +506,11 @@ void IPVideoConnection::handleRequest(ServerEventArgs& evt)
         evt.response().setContentType(mediaType);
         evt.response().set("Expires", Poco::DateTimeFormatter::format(Poco::Timestamp(0),
                                                                       Poco::DateTimeFormat::HTTP_FORMAT));
-
+        
         std::ostream& outputStream = evt.response().send();
-
+        
         Poco::CountingOutputStream ostr(outputStream);
-
+        
         while (_isRunning)
         {
             if (outputStream.good() && !outputStream.fail() && !outputStream.bad())
@@ -513,10 +518,14 @@ void IPVideoConnection::handleRequest(ServerEventArgs& evt)
                 if (!empty())
                 {
                     std::shared_ptr<IPVideoFrame> frame = pop();
-
+                    
                     if (frame != nullptr)
                     {
                         const ofBuffer& buffer = frame->buffer();
+
+                        std::cout << "resize image here " << std::endl;
+
+
 
                         ostr << route().settings().getBoundaryMarker();
                         ostr << "\r\n";
@@ -526,7 +535,7 @@ void IPVideoConnection::handleRequest(ServerEventArgs& evt)
                         ostr << "\r\n";
                         ostr << "\r\n";
                         ostr << buffer;
-
+                        
                         uint64_t now = ofGetElapsedTimeMillis();
                         _lastFrameDuration = now - _lastFrameSent;
                         _lastFrameSent = now;
@@ -548,7 +557,7 @@ void IPVideoConnection::handleRequest(ServerEventArgs& evt)
             {
                 throw Poco::Exception("Response stream failed or went bad -- it was probably interrupted.");
             }
-
+            
             Poco::Thread::sleep(30);  // TODO: smarter ways of doing for rate / fps limiting
         }
     }
@@ -556,7 +565,7 @@ void IPVideoConnection::handleRequest(ServerEventArgs& evt)
     {
         ofLogError("IPVideoRouteHandler::handleRequest") << "Exception: " << e.displayText();
     }
-
+    
     route().removeConnection(this);
 }
 

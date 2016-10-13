@@ -23,73 +23,22 @@
 // =============================================================================
 
 
-#include "ofx/HTTP/ProgressMonitor.h"
+#include "ofx/HTTP/SimpleClient.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-ProgressMonitor::ProgressMonitor() :
-    _totalBytesTransferred(-1),
-    _totalBytes(-1),
-    _transferBufferSize(0),
-    _lastUpdateTime(0),
-    _bytesPerSecond(0)
+SimpleClient::~SimpleClient()
 {
 }
 
 
-ProgressMonitor::~ProgressMonitor()
-{
-}
-
-
-void ProgressMonitor::update(std::streamsize,
-                             std::streamsize,
-                             std::size_t,
-                             uint64_t)
-{
-//    _totalBytesTransferred  = totalBytesTransferred;
-//    _totalBytes             = totalBytes;
-//    _transferBufferSize     = transferBufferSize;
-//    _lastUpdateTime         = lastUpdateTime;
-//    _bytesPerSecond         = bytesPerSecond;
-}
-
-
-std::streamsize ProgressMonitor::totalBytesTranferred() const
-{
-    return 0;
-}
-
-
-std::streamsize ProgressMonitor::totalBytes() const
-{
-    return 0;
-}
-
-
-float ProgressMonitor::percentageTransferred() const
-{
-    return 0;
-}
-
-
-std::size_t ProgressMonitor::transferBufferSize() const
-{
-    return 0;
-}
-
-
-void ProgressMonitor::reset()
-{
-    _totalBytesTransferred = -1;
-    _totalBytes            = -1;
-    _transferBufferSize    = 0;
-    _lastUpdateTime        = 0;
-    _bytesPerSecond        = 0;
-}
+//std::unique_ptr<BufferedResponse<GetRequest>> SimpleClient::get(const std::string& uri)
+//{
+//    return executeBuffered<GetRequest, BufferedResponse<GetRequest>>(std::make_unique<GetRequest>(uri));
+//}
 
 
 } } // namespace ofx::HTTP

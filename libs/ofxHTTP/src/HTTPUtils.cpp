@@ -32,7 +32,6 @@ namespace HTTP {
 
 Poco::Net::NameValueCollection HTTPUtils::splitTextPlainPost(const std::string& textPlain)
 {
-    // Here we handle
     Poco::Net::NameValueCollection nvc;
     std::string result;
     std::stringstream ss;
@@ -62,13 +61,11 @@ Poco::Net::NameValueCollection HTTPUtils::splitAndURLDecode(const std::string& e
 
     Poco::Net::NameValueCollection nvc;
 
-    std::vector<std::string> arguments = ofSplitString(encoded, "&", true);
+    auto arguments = ofSplitString(encoded, "&", true);
 
-    std::vector<std::string>::const_iterator iter = arguments.begin();
-
-    while (iter != arguments.end())
+    for (const auto& argument: arguments)
     {
-        std::vector<std::string> tokens = ofSplitString(*iter, "=", true);
+        std::vector<std::string> tokens = ofSplitString(argument, "=", true);
 
         if (tokens.size() > 0)
         {
@@ -84,7 +81,6 @@ Poco::Net::NameValueCollection HTTPUtils::splitAndURLDecode(const std::string& e
 
             nvc.add(key, value);
         }
-        ++iter;
     }
 
     return nvc;
@@ -118,7 +114,9 @@ std::string HTTPUtils::makeQueryString(const Poco::Net::NameValueCollection& que
 
     while (it != query.end())
     {
-    if (it != query.begin()) ostr << "&";
+        if (it != query.begin())
+            ostr << "&";
+
         std::string name;
         Poco::URI::encode(it->first, "=&+;", name);
         std::string value;
@@ -135,8 +133,8 @@ void HTTPUtils::dumpHeaders(const Poco::Net::HTTPRequest& request,
                             const Poco::Net::HTTPResponse& response,
                             ofLogLevel logLevel)
 {
-    dumpNameValueCollection(request,logLevel);
-    dumpNameValueCollection(response,logLevel);
+    dumpNameValueCollection(request, logLevel);
+    dumpNameValueCollection(response, logLevel);
 }
 
 
@@ -159,14 +157,10 @@ void HTTPUtils::dumpNameValueCollection(const Poco::Net::NameValueCollection& nv
 {
     if (logLevel >= ofGetLogLevel())
     {
-        Poco::Net::NameValueCollection::ConstIterator iter = nvc.begin();
-        ofLog(logLevel) << "Begin NameValueCollection =================";
-        while (iter != nvc.end())
+        for (const auto& entry: nvc)
         {
-            ofLog(logLevel) << (*iter).first << ">" << (*iter).second << "<";
-            ++iter;
+            ofLog(logLevel) << entry.first << ": " << entry.second;
         }
-        ofLog(logLevel) << "End NameValueCollection =================";
     }
 }
 

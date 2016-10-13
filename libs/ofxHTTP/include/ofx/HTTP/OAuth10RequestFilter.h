@@ -41,6 +41,10 @@ public:
     /// \brief Create a default OAuth 1.0 request filter.
     OAuth10RequestFilter();
 
+    /// \brief Create a default OAuth 1.0 request filter.
+    /// \param credentials The OAuth 1.0 credentials.
+    OAuth10RequestFilter(const OAuth10Credentials& credentials);
+
     /// \brief Destroy the request filter.
     virtual ~OAuth10RequestFilter();
 
@@ -51,7 +55,8 @@ public:
     /// \returns The OAuth 1.0 credentials.
     OAuth10Credentials getCredentials() const;
     
-    void requestFilter(BaseRequest& request, Context& context) override;
+    virtual void requestFilter(Context& context,
+                               BaseRequest& request) const override;
 
 private:
     /// \brief The OAuth 1.0 credentials used for authentication.

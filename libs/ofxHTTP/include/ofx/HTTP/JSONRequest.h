@@ -27,7 +27,7 @@
 
 
 #include "ofConstants.h"
-#include "json.hpp"
+#include "ofJson.h"
 #include "ofx/HTTP/BaseRequest.h"
 
 
@@ -40,7 +40,7 @@ class JSONRequest: public BaseRequest
 {
 public:
     /// \brief Construct a JSONRequest with a given uri and http version.
-    /// \param uri the Post endpoint uri.
+    /// \param uri the POST endpoint uri.
     /// \param httpVersion Either HTTP/1.0 or HTTP/1.1.
     JSONRequest(const std::string& uri,
                 const std::string& httpVersion);
@@ -75,7 +75,7 @@ protected:
     void writeRequestBody(std::ostream& requestStream) override;
     
     /// \brief The JSON data to send.
-    mutable ofJson _json;
+    ofJson _json;
 
 private:
     /// \brief An output buffer.

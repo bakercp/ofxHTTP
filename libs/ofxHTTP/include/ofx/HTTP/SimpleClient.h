@@ -26,25 +26,27 @@
 #pragma once
 
 
-#include "ofSSLManager.h"
-#include "Poco/Net/HTTPClientSession.h"
-#include "Poco/Net/HTTPSClientSession.h"
-#include "ofx/HTTP/AbstractClientTypes.h"
+#include "ofJson.h"
+#include "ofx/HTTP/Client.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-/// \brief Set up a client session based on the reques URI scheme.
-class DefaultClientSessionProvider: public AbstractRequestFilter
+/// \brief A Simple HTTP cient.
+class SimpleClient: public Client
 {
 public:
-    DefaultClientSessionProvider();
+    using Client::Client;
 
-    virtual ~DefaultClientSessionProvider();
+    /// \brief Destroy the SimpleClient.
+    virtual ~SimpleClient();
 
-    virtual void requestFilter(BaseRequest& request, Context& context);
+    /// \brief GET data from the given URI.
+    /// \param uri The endpoint URI.
+    /// \returns a buffered response.
+//    std::unique_ptr<BufferedResponse<GetRequest>> get(const std::string& uri);
 
 };
 

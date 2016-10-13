@@ -46,4 +46,3 @@ enum AuthenticationStatus
 
 
 } } // namespace ofx::HTTP
-

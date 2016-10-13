@@ -24,11 +24,7 @@
 
 
 #include "ofx/HTTP/JSONRequest.h"
-#include "Poco/CountingStream.h"
 #include "Poco/StreamCopier.h"
-#include "Poco/Net/FilePartSource.h"
-#include "Poco/Net/PartSource.h"
-#include "Poco/Net/StringPartSource.h"
 
 
 namespace ofx {
@@ -36,7 +32,6 @@ namespace HTTP {
 
 
 const std::string JSONRequest::JSON_MEDIA_TYPE = "application/json";
-
 
 
 JSONRequest::JSONRequest(const std::string& uri,
@@ -77,8 +72,7 @@ void JSONRequest::prepareRequest()
 {
     _outBuffer.clear();
     _outBuffer << getJSON(); // Call a subclass if needed.
-
-    set("Content-Length", std::to_string(_outBuffer.str().length()));
+    setContentLength(_outBuffer.str().length());
 }
 
 

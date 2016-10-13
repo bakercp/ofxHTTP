@@ -34,18 +34,18 @@ const std::string ClientSessionSettings::DEFAULT_USER_AGENT = "Mozilla/5.0 (comp
 const std::size_t ClientSessionSettings::DEFAULT_MAX_REDIRECTS = 20;
 const Poco::Timespan ClientSessionSettings::DEFAULT_KEEPALIVE_TIMEOUT = Poco::Timespan::SECONDS * 8;
 const Poco::Timespan ClientSessionSettings::DEFAULT_TIMEOUT = Poco::Timespan::SECONDS * 60;
-const std::streamsize ClientSessionSettings::DEFAULT_BYTES_PER_PROGRESS_UPDATE = 1024;
+const int64_t ClientSessionSettings::DEFAULT_MINIMUM_BYTES_PER_PROGRESS_UPDATE = 1024;
+const Poco::Timespan ClientSessionSettings::DEFAULT_MAXIMUM_PROGRESS_UPDATE_INTERVAL = Poco::Timespan::SECONDS * 1;
 
 
 ClientSessionSettings::ClientSessionSettings():
-//    _virtualHost(""),
-//    _defaultHost(""),
     _userAgent(DEFAULT_USER_AGENT),
     _maxRedirects(DEFAULT_MAX_REDIRECTS),
     _keepAlive(true),
     _keepAliveTimeout(DEFAULT_KEEPALIVE_TIMEOUT),
     _timeout(DEFAULT_TIMEOUT),
-    _bytesPerProgressUpdate(DEFAULT_BYTES_PER_PROGRESS_UPDATE)
+    _minimumBytesPerProgressUpdate(DEFAULT_MINIMUM_BYTES_PER_PROGRESS_UPDATE),
+    _maximumProgressUpdateInterval(DEFAULT_MAXIMUM_PROGRESS_UPDATE_INTERVAL)
 {
 }
 
@@ -53,30 +53,6 @@ ClientSessionSettings::ClientSessionSettings():
 ClientSessionSettings::~ClientSessionSettings()
 {
 }
-
-
-//void ClientSessionSettings::setVirtualHost(const std::string& virtualHost)
-//{
-//    _virtualHost = virtualHost;
-//}
-//
-//
-//std::string ClientSessionSettings::getVirtualHost() const
-//{
-//    return _virtualHost;
-//}
-//
-//
-//void ClientSessionSettings::setDefaultHost(const std::string& defaultHost)
-//{
-//    _defaultHost = defaultHost;
-//}
-//
-//
-//std::string ClientSessionSettings::getDefaultHost() const
-//{
-//    return _defaultHost;
-//}
 
 
 void ClientSessionSettings::setUserAgent(const std::string& userAgent)
@@ -163,15 +139,27 @@ const ProxySettings& ClientSessionSettings::getProxySettings() const
 }
 
 
-void ClientSessionSettings::setBytesPerProgressUpdate(std::streamsize bytesPerProgressUpdate)
+void ClientSessionSettings::setMinimumBytesPerProgressUpdate(int64_t minimumBytesPerProgressUpdate)
 {
-    _bytesPerProgressUpdate = bytesPerProgressUpdate;
+    _minimumBytesPerProgressUpdate = minimumBytesPerProgressUpdate;
 }
 
 
-std::streamsize ClientSessionSettings::getBytesPerProgressUpdate() const
+int64_t ClientSessionSettings::getMinimumBytesPerProgressUpdate() const
 {
-    return _bytesPerProgressUpdate;
+    return _minimumBytesPerProgressUpdate;
+}
+
+
+void ClientSessionSettings::setMaximumProgressUpdateInterval(Poco::Timespan interval)
+{
+    _maximumProgressUpdateInterval = interval;
+}
+
+
+Poco::Timespan ClientSessionSettings::getMaximumProgressUpdateInterval() const
+{
+    return _maximumProgressUpdateInterval;
 }
 
 

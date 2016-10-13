@@ -81,16 +81,16 @@ public:
 
     void clearCredentials(const Poco::URI& uri);
 
-    void requestFilter(BaseRequest& request,
-                       Context& context);
+    void requestFilter(Context& context,
+                       BaseRequest& request) const override;
 
-    void responseFilter(BaseRequest& request,
-                        BaseResponse& response,
-                        Context& context);
+    void responseFilter(Context& context,
+                        BaseRequest& request,
+                        BaseResponse& response) const override;
 
-    bool canFilterResponse(BaseRequest& request,
-                           BaseResponse& response,
-                           Context& context) const;
+//    bool canFilterResponse(BaseRequest& request,
+//                           BaseResponse& response,
+//                           Context& context) const;
 
     void clear();
 
@@ -107,21 +107,17 @@ private:
     DefaultCredentialStore(const DefaultCredentialStore&);
     DefaultCredentialStore& operator = (const DefaultCredentialStore&);
 
-    typedef std::shared_ptr<Poco::Net::HTTPBasicCredentials> HTTPBasicCredentialsSharedPtr;
-    typedef std::shared_ptr<Poco::Net::HTTPDigestCredentials> HTTPDigestCredentialsSharedPtr;
-
     typedef std::map<AuthScope, Credentials> CredentialMap;
-    typedef std::map<AuthScope, HTTPBasicCredentialsSharedPtr> BasicCredentialCacheMap;
-    typedef std::map<AuthScope, HTTPDigestCredentialsSharedPtr> DigestCredentialCacheMap;
+    typedef std::map<AuthScope, std::shared_ptr<Poco::Net::HTTPBasicCredentials>> BasicCredentialCacheMap;
+    typedef std::map<AuthScope, std::shared_ptr<Poco::Net::HTTPDigestCredentials>> DigestCredentialCacheMap;
 
-
-    typedef CredentialMap::const_iterator HTTPCredentialMapIter;
-    typedef BasicCredentialCacheMap::iterator HTTPBasicCredentialCacheMapIter;
-    typedef DigestCredentialCacheMap::iterator HTTPDigestCredentialCacheMapIter;
+//    typedef CredentialMap::const_iterator HTTPCredentialMapIter;
+//    typedef BasicCredentialCacheMap::iterator HTTPBasicCredentialCacheMapIter;
+//    typedef DigestCredentialCacheMap::iterator HTTPDigestCredentialCacheMapIter;
 
     CredentialMap credentialMap;
-    BasicCredentialCacheMap basicCredentialCacheMap;
-    DigestCredentialCacheMap digestCredentialCacheMap;
+    mutable BasicCredentialCacheMap basicCredentialCacheMap;
+    mutable DigestCredentialCacheMap digestCredentialCacheMap;
 
     mutable std::mutex _mutex;
 

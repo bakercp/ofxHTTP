@@ -196,10 +196,6 @@ protected:
     /// \param requestStream The stream to write the request body.
     void writeRequestBody(std::ostream& requestStream);
 
-private:
-    /// \brief A utility output buffer used for HTTP 1.0 connections.
-    std::stringstream _outBuffer;
-
 };
 
 
