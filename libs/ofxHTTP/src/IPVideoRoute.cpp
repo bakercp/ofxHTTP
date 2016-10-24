@@ -523,10 +523,6 @@ void IPVideoConnection::handleRequest(ServerEventArgs& evt)
                     {
                         const ofBuffer& buffer = frame->buffer();
 
-                        std::cout << "resize image here " << std::endl;
-
-
-
                         ostr << route().settings().getBoundaryMarker();
                         ostr << "\r\n";
                         ostr << "Content-Type: image/jpeg";
