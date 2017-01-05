@@ -1,7 +1,7 @@
 # This file allows testing your addon using travis CI servers to use it you'll need to
-# create an account in travis.org and enable your addon there. 
+# create an account in travis.org and enable your addon there.
 #
-# By default it will test linux 64bit and osx against the master and stable OF branches. 
+# By default it will test linux 64bit and osx against the master and stable OF branches.
 # Other platforms can be enabled by uncommenting the corresponding sections.
 #
 # If any extra install is needed to use the addon it can be included in the corresponding
@@ -59,11 +59,11 @@ matrix:
 #    compiler: clang
 #    env: TARGET="osx" OF_BRANCH="stable"
 
-# Linux ARM6, OF master: Uncomment following lines to enable 
-#  - os: linux
-#    sudo: required
-#    dist: trusty
-#    env: TARGET="linuxarmv6l" OF_BRANCH="master"
+# Linux ARM6, OF master
+  - os: linux
+    sudo: required
+    dist: trusty
+    env: TARGET="linuxarmv6l" OF_BRANCH="master"
 
 
 # Linux ARM6, OF stable:  Not supported yet
@@ -72,15 +72,15 @@ matrix:
 #    dist: trusty
 #    env: TARGET="linuxarmv6l" OF_BRANCH="stable"
 
-# Linux ARM7, OF master: Uncomment following lines to enable 
-#  - os: linux
-#    sudo: false
-#    env: TARGET="linuxarmv7l" OF_BRANCH="master"
-#    cache:
-#      directories:
-#        - ~/rpi2_toolchain
-#        - ~/firmware-master
-#        - ~/archlinux
+# Linux ARM7, OF master
+  - os: linux
+    sudo: false
+    env: TARGET="linuxarmv7l" OF_BRANCH="master"
+    cache:
+      directories:
+        - ~/rpi2_toolchain
+        - ~/firmware-master
+        - ~/archlinux
 
 # Linux ARM7, OF stable:  Not supported yet
 #  - os: linux
@@ -93,16 +93,16 @@ matrix:
 #        - ~/archlinux
 
 
-# Emscripten, OF master: Uncomment following lines to enable 
-#  - os: linux
-#    sudo: false
-#    env: TARGET="emscripten" OF_BRANCH="master"
-#    addons:
-#      apt:
-#        sources:
-#          - ubuntu-toolchain-r-test
-#        packages:
-#          - libstdc++6
+#Emscripten, OF master
+  - os: linux
+    sudo: false
+    env: TARGET="emscripten" OF_BRANCH="master"
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+        packages:
+          - libstdc++6
 
 
 # Emscripten, OF stable: Not supported yet
@@ -145,13 +145,13 @@ matrix:
 #    env: TARGET="tvos" OF_BRANCH="stable"
 
 
-# Android armv7, OF master: Uncomment following lines to enable 
-#  - os: linux
-#    sudo: false
-#    env: TARGET="android" OPT="armv7" OF_BRANCH="master"
-#    cache:
-#      directories:
-#        - ~/android-ndk-r12b
+# Android armv7, OF master
+  - os: linux
+    sudo: false
+    env: TARGET="android" OPT="armv7" OF_BRANCH="master"
+    cache:
+      directories:
+        - ~/android-ndk-r12b
 
 
 # Android armv7, OF stable: Not supported yet
@@ -163,13 +163,13 @@ matrix:
 #        - ~/android-ndk-r12b
 
 
-# Android x86, OF master: Uncomment following lines to enable 
-#  - os: linux
-#    sudo: false
-#    env: TARGET="android" OPT="x86" OF_BRANCH="master"
-#    cache:
-#      directories:
-#        - ~/android-ndk-r12b
+# Android x86, OF master
+  - os: linux
+    sudo: false
+    env: TARGET="android" OPT="x86" OF_BRANCH="master"
+    cache:
+      directories:
+        - ~/android-ndk-r12b
 
 
 # Android x86, OF stable: Not supported yet
