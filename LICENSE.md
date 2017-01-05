@@ -19,12 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-# Included libraries
-- `alphanum` [LGPL-3.0](https://opensource.org/licenses/LGPL-3.0)
-- `brotli` [MIT](https://opensource.org/licenses/MIT)
-- `lz4` [BSD-2-Clause](https://opensource.org/licenses/BSD-2-Clause)
-- `snappy` [BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause)
-- `POCO` [BSL-1.0](https://opensource.org/licenses/BSL-1.0)

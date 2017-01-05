@@ -3,7 +3,7 @@ ofxHTTP
 
 ## Description
 
-A suite of HTTP clients and servers.
+An openFrameworks addon for custom HTTP clients and servers.
 
 ## Features
 
