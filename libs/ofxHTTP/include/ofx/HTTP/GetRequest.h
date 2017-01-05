@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,21 +26,18 @@
 #pragma once
 
 
-#include <string>
-#include "Poco/Net/HTTPMessage.h"
-#include "ofx/HTTP/HTTPUtils.h"
-#include "ofx/HTTP/BaseRequest.h"
+#include "ofx/HTTP/FormRequest.h"
 
 
 namespace ofx {
 namespace HTTP {
 
     
-class GetRequest: public BaseRequest
+class GetRequest: public FormRequest
 {
 public:
     GetRequest(const std::string& uri,
-               const std::string& httpVersion);
+               const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1);
 
     virtual ~GetRequest();
 

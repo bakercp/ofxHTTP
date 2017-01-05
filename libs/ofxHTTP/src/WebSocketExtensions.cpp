@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,7 @@ std::unique_ptr<AbstractWebSocketFilter> WebSocketPerMessageCompressionFactory::
 {
     try
     {
-        const std::string& extensionValues = evt.getRequest().get("Sec-WebSocket-Extensions");
+        const std::string& extensionValues = evt.request().get("Sec-WebSocket-Extensions");
 
         std::vector<std::string> elements;
 
@@ -77,7 +77,7 @@ std::unique_ptr<AbstractWebSocketFilter> WebSocketPerMessageCompressionFactory::
                 for (const auto& parameter : parameters)
                 {
                     const std::string& key = parameter.first;
-                    const std::string& value = parameter.second;
+                    // const std::string& value = parameter.second;
 
                     if (0 == Poco::icompare(key, "server_no_context_takeover"))
                     {
@@ -135,7 +135,7 @@ std::unique_ptr<AbstractWebSocketFilter> WebSocketPerMessageCompressionFactory::
                     }
                 }
 
-                evt.getResponse().set("Sec-WebSocket-Extensions", ss.str());
+                evt.response().set("Sec-WebSocket-Extensions", ss.str());
 
                 return std::make_unique<WebSocketPerMessageCompressionFilter>();
             }
@@ -155,11 +155,7 @@ uint8_t DEFLATE_BYTE_BLOCK[] = { 0x00, 0x00, 0xff, 0xff };
 std::size_t DEFLATE_BYTE_BLOCK_SIZE = sizeof(DEFLATE_BYTE_BLOCK);
 
 
-WebSocketPerMessageCompressionFilter::WebSocketPerMessageCompressionFilter():
-    _deflateWindowBits(15),
-    _deflateMemLevel(8),
-    _inflateWindowBits(15),
-    _noContextTakeover(false)
+WebSocketPerMessageCompressionFilter::WebSocketPerMessageCompressionFilter()
 {
     _deflateState.zalloc    = Z_NULL;
     _deflateState.zfree     = Z_NULL;

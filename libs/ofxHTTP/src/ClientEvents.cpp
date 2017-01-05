@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2014-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2014-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,178 +24,159 @@
 
 
 #include "ofx/HTTP/ClientEvents.h"
+#include "ofx/HTTP/BaseRequest.h"
+#include "ofx/HTTP/BaseResponse.h"
+#include "ofx/HTTP/Context.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-MutableClientRequestArgs::MutableClientRequestArgs(BaseRequest& request,
-                                                   Context& context):
-    _request(request),
+ClientContextEventArgs::ClientContextEventArgs(Context& context):
     _context(context)
 {
 }
 
 
-MutableClientRequestArgs::~MutableClientRequestArgs()
+ClientContextEventArgs::~ClientContextEventArgs()
 {
 }
 
 
-BaseRequest& MutableClientRequestArgs::getRequest() const
-{
-    return _request;
-}
-
-
-Context& MutableClientRequestArgs::getContext()
+const Context& ClientContextEventArgs::context() const
 {
     return _context;
 }
 
 
-MutableClientResponseArgs::MutableClientResponseArgs(BaseRequest& request,
-                                                     BaseResponse& response,
-                                                     Context& context):
-    MutableClientRequestArgs(request, context),
-    _response(response)
+ClientStateChangeEventArgs::~ClientStateChangeEventArgs()
 {
 }
 
 
-MutableClientResponseArgs::~MutableClientResponseArgs()
+ClientState ClientStateChangeEventArgs::state() const
+{
+    return _context.getState();
+}
+
+
+ClientRequestEventArgs::ClientRequestEventArgs(Context& context,
+                                               BaseRequest& request):
+    ClientContextEventArgs(context),
+    _request(request)
 {
 }
 
 
-BaseResponse& MutableClientResponseArgs::getResponse()
-{
-    return _response;
-}
-
-
-BaseClientRequestArgs::BaseClientRequestArgs(const BaseRequest& request,
-                                             Context& context):
-    _request(request),
-    _context(context)
+ClientRequestEventArgs::~ClientRequestEventArgs()
 {
 }
 
 
-BaseClientRequestArgs::~BaseClientRequestArgs()
-{
-}
-
-
-const BaseRequest& BaseClientRequestArgs::getRequest() const
+const BaseRequest& ClientRequestEventArgs::request() const
 {
     return _request;
 }
 
 
-Context& BaseClientRequestArgs::getContext()
-{
-    return _context;
-}
-
-
-const std::string BaseClientRequestArgs::getRequestId() const
-{
-    return _request.getRequestId();
-}
-
-
-BaseProgressArgs::BaseProgressArgs(std::streamsize totalBytesTransferred):
-    _totalBytesTransferred(totalBytesTransferred)
-{
-}
-
-
-BaseProgressArgs::~BaseProgressArgs()
-{
-}
-
-
-std::streamsize BaseProgressArgs::getTotalBytesTransferred() const
-{
-    return _totalBytesTransferred;
-}
-
-
-float BaseProgressArgs::getProgress() const
-{
-    std::streamsize contentLength = getContentLength();
-
-    if (Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH == contentLength)
-    {
-        return Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH;
-    }
-    else
-    {
-        return _totalBytesTransferred / (float)contentLength;
-    }
-}
-
-
-ClientRequestProgressArgs::ClientRequestProgressArgs(const BaseRequest& request,
-                                                     Context& context,
-                                                     std::streamsize totalBytesTransferred):
-    BaseClientRequestArgs(request, context),
-    BaseProgressArgs(totalBytesTransferred)
-{
-}
-
-
-ClientRequestProgressArgs::~ClientRequestProgressArgs()
-{
-}
-
-
-std::streamsize ClientRequestProgressArgs::getContentLength() const
-{
-    return _request.getContentLength();
-}
-
-
-BaseClientResponseArgs::BaseClientResponseArgs(const BaseRequest& request,
-                                               const BaseResponse& response,
-                                               Context& context):
-    BaseClientRequestArgs(request, context),
+ClientResponseEventArgs::ClientResponseEventArgs(Context& context,
+                                                 BaseRequest& request,
+                                                 BaseResponse& response):
+    ClientRequestEventArgs(context, request),
     _response(response)
 {
 }
 
 
-BaseClientResponseArgs::~BaseClientResponseArgs()
+ClientResponseEventArgs::~ClientResponseEventArgs()
 {
 }
 
 
-const BaseResponse& BaseClientResponseArgs::getResponse() const
+const BaseResponse& ClientResponseEventArgs::response() const
 {
     return _response;
 }
 
 
-ClientResponseProgressArgs::ClientResponseProgressArgs(const BaseRequest& request,
-                                                       const BaseResponse& response,
-                                                       Context& context,
-                                                       std::streamsize bytesTransferred):
-    BaseClientResponseArgs(request, response, context),
-    BaseProgressArgs(bytesTransferred)
+ClientRequestProgressEventArgs::ClientRequestProgressEventArgs(Context& context,
+                                                               BaseRequest& request,
+                                                               Progress& progress):
+    ClientRequestEventArgs(context, request),
+    _progress(progress)
 {
 }
 
 
-ClientResponseProgressArgs::~ClientResponseProgressArgs()
+ClientRequestProgressEventArgs::~ClientRequestProgressEventArgs()
 {
 }
 
 
-std::streamsize ClientResponseProgressArgs::getContentLength() const
+const Progress& ClientRequestProgressEventArgs::progress() const
 {
-    return _response.getContentLength();
+    return _progress;
+}
+
+
+ClientResponseProgressEventArgs::ClientResponseProgressEventArgs(Context& context,
+                                                                 BaseRequest& request,
+                                                                 BaseResponse& response,
+                                                                 Progress& progress):
+    ClientResponseEventArgs(context, request, response),
+    _progress(progress)
+{
+}
+
+
+ClientResponseProgressEventArgs::~ClientResponseProgressEventArgs()
+{
+}
+
+
+const Progress& ClientResponseProgressEventArgs::progress() const
+{
+    return _progress;
+}
+
+
+ClientResponseStreamEventArgs::~ClientResponseStreamEventArgs()
+{
+}
+
+
+std::istream& ClientResponseStreamEventArgs::stream()
+{
+    return _response.stream();
+}
+
+
+ClientErrorEventArgs::ClientErrorEventArgs(Context& context,
+                                           BaseRequest& request,
+                                           BaseResponse* response,
+                                           const Poco::Exception& exception):
+    ClientRequestEventArgs(context, request),
+    _response(response),
+    _exception(exception)
+{
+}
+
+        
+ClientErrorEventArgs::~ClientErrorEventArgs()
+{
+}
+
+
+const BaseResponse* ClientErrorEventArgs::response() const
+{
+    return _response;
+}
+
+        
+const Poco::Exception& ClientErrorEventArgs::exception() const
+{
+    return _exception;
 }
 
 

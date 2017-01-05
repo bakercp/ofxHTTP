@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,18 +30,25 @@ namespace ofx {
 namespace HTTP {
 
 
-const std::string Context::KEY_PREFIX_RESERVED    = "HTTP_";
-const std::string Context::KEY_SESSION_SETTINGS   = "HTTP_SESSION_SETTINGS";
-const std::string Context::KEY_COOKIE_STORE       = "HTTP_COOKIE_STORE";
-const std::string Context::KEY_CREDENTIAL_STORE   = "HTTP_CREDENTIAL_STORE";
-const std::string Context::KEY_RESOLVED_URI       = "HTTP_RESOLVED_URI";
-const std::string Context::KEY_PROXY_REDIRECT_URI = "HTTP_PROXY_REDIRECT_URI";
-const std::string Context::KEY_REDIRECTS          = "HTTP_REDIRECTS";
-const std::string Context::KEY_SESSION            = "HTTP_SESSION";
-const std::string Context::KEY_USE_ABSOLUTE_REQUEST_PATH = "USE_ABSOLUTE_REQUEST_PATH";
+//const std::string Context::KEY_PREFIX_RESERVED    = "HTTP_";
+//const std::string Context::KEY_SESSION_SETTINGS   = "HTTP_SESSION_SETTINGS";
+//const std::string Context::KEY_COOKIE_STORE       = "HTTP_COOKIE_STORE";
+//const std::string Context::KEY_CREDENTIAL_STORE   = "HTTP_CREDENTIAL_STORE";
+//const std::string Context::KEY_RESOLVED_URI       = "HTTP_RESOLVED_URI";
+//const std::string Context::KEY_PROXY_REDIRECT_URI = "HTTP_PROXY_REDIRECT_URI";
+//const std::string Context::KEY_REDIRECTS          = "HTTP_REDIRECTS";
+//const std::string Context::KEY_SESSION            = "HTTP_SESSION";
+//const std::string Context::KEY_USE_ABSOLUTE_REQUEST_PATH = "USE_ABSOLUTE_REQUEST_PATH";
 
 
-Context::Context(): _resubmit(false)
+
+Context::Context()
+{
+}
+
+
+Context::Context(const ClientSessionSettings& sessionSettings):
+    _sessionSettings(sessionSettings)
 {
 }
 
@@ -51,51 +58,43 @@ Context::~Context()
 }
 
 
-void Context::setClientSessionSettings(const ClientSessionSettings& clientSessionSettings)
+void Context::setClientSessionSettings(const ClientSessionSettings& sessionSettings)
 {
-    _clientSessionSettings = clientSessionSettings;
+    _sessionSettings = sessionSettings;
+//    _requestStream = nullptr;
+//    _responseStream = nullptr;
 }
 
 
 const ClientSessionSettings& Context::getClientSessionSettings() const
 {
-    return _clientSessionSettings;
+    return _sessionSettings;
 }
 
 
-//void Context::setCookieStore(CookieStore::SharedPtr cookieStore)
-//{
-//    _cookieStore = cookieStore;
-//}
-//
-//
-//CookieStore::WeakPtr Context::getCookieStore()
-//{
-//    return _cookieStore;
-//}
-
-
-void Context::setClientSession(ClientSession clientSession)
+void Context::setClientSession(std::unique_ptr<Poco::Net::HTTPClientSession> clientSession)
 {
-    _clientSession = clientSession;
+    _clientSession = std::move(clientSession);
 }
 
 
-Context::ClientSession& Context::getClientSession()
+Poco::Net::HTTPClientSession* Context::clientSession()
 {
-    return _clientSession;
+    return _clientSession.get();
 }
 
-//void Context::setResolvedURI(const Poco::URI& uri)
-//{
-//    _resolvedURI = uri;
-//}
-//
-//
-//const Poco::URI& Context::getResolvedURI() const
-//{
-//    return _resolvedURI;
-//}
+
+const Poco::Net::HTTPClientSession* Context::clientSession() const
+{
+    return _clientSession.get();
+}
+
+
+std::unique_ptr<Poco::Net::HTTPClientSession> Context::releaseClientSession()
+{
+    // Moving sets _clientSession to nullptr ¤20.8.1/4.
+    return std::move(_clientSession);
+}
 
 
 void Context::addRedirect(const Poco::URI& uri)
@@ -122,14 +121,30 @@ const Poco::URI& Context::getProxyRedirectURI() const
 }
 
 
+void Context::setResubmit(bool resubmit)
+{
+    _resubmit = resubmit;
+}
+
+
 bool Context::getResubmit() const
 {
     return _resubmit;
 }
 
-void Context::setResubmit(bool resubmit)
+
+ClientState Context::getState() const
 {
-    _resubmit = resubmit;
+    return _state;
+}
+
+
+void Context::setState(ClientState state)
+{
+    ofLogVerbose("Context::setState") << "Setting state: " << to_string(_state);
+    _state = state;
+    ClientStateChangeEventArgs args(*this);
+    ofNotifyEvent(events.onHTTPClientStateChange, args, this);
 }
 
 

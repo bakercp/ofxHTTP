@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,11 +51,11 @@ public:
     /// \brief Destroy the RequestHandlerAdapter.
     virtual ~RequestHandlerAdapter();
 
-    void handleRequest(Poco::Net::HTTPServerRequest& request,
-                       Poco::Net::HTTPServerResponse& response);
+    virtual void handleRequest(Poco::Net::HTTPServerRequest& request,
+                               Poco::Net::HTTPServerResponse& response) override;
 
 protected:
-    /// \breif The the handler to adapt.
+    /// \brief The the handler to adapt.
     Poco::Net::HTTPRequestHandler& _handler;
 
 };

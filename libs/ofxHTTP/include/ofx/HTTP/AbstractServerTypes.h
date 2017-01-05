@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2012-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2012-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -103,8 +103,8 @@ public:
 
     virtual void onHTTPServerEvent(const void* pSender, ServerEventArgs& evt) = 0;
 
-    /// \brief Return a reference to the session cache.
-    virtual AbstractSessionStore& getSessionStore() = 0;
+    /// \returns a reference to the session store.
+    virtual AbstractSessionStore& sessionStore() = 0;
 
 };
 
@@ -286,7 +286,7 @@ public:
     /// requests to be routed to different routes based on their requested URI.
     ///
     /// \returns the regex path pattern.
-    virtual std::string getRoutePathPattern() const = 0;
+    virtual std::string routePathPattern() const = 0;
 
     /// \brief Determine if this route can handle the given request.
     /// \param request The incoming Poco::Net::HTTPServerRequest to be tested.

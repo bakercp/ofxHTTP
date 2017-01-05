@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,55 +43,52 @@ DefaultRedirectProcessor::~DefaultRedirectProcessor()
 }
 
 
-void DefaultRedirectProcessor::requestFilter(BaseRequest&,
-                                             Context&)
+void DefaultRedirectProcessor::requestFilter(Context& context, BaseRequest&) const
 {
+    // We set resubmit false because we are executing a new request.
+    context.setResubmit(false);
 }
 
-void DefaultRedirectProcessor::responseFilter(BaseRequest& request,
-                                              BaseResponse& response,
-                                              Context& context)
+
+void DefaultRedirectProcessor::responseFilter(Context& context,
+                                              BaseRequest& request,
+                                              BaseResponse& response) const
 {
-    if (canFilterResponse(request, response, context))
+    if (Poco::Net::HTTPResponse::HTTP_MOVED_PERMANENTLY   == response.getStatus() || // 301
+        Poco::Net::HTTPResponse::HTTP_FOUND               == response.getStatus() || // 302
+        Poco::Net::HTTPResponse::HTTP_SEE_OTHER           == response.getStatus() || // 303
+        Poco::Net::HTTPResponse::HTTP_TEMPORARY_REDIRECT  == response.getStatus())   // 307
     {
         if (context.getRedirects().size() < context.getClientSessionSettings().getMaxRedirects())
         {
-            Poco::URI currentURI(request.getURI());
+            Poco::URI lastURI(request.getURI());
 
-            Poco::URI redirectedURI(currentURI);
+            Poco::URI targetURI(lastURI);
 
             if (response.has("Location"))
             {
-                redirectedURI.resolve(response.get("Location"));
+                targetURI.resolve(response.get("Location"));
             }
             else
             {
-                throw Poco::Net::HTTPException("No Location Header Specified in Redirect.");
+                throw Poco::Net::HTTPException("No location header specified in redirect.");
             }
+
+            ofLogVerbose("DefaultRedirectProcessor::requestFilter") << "Processing " << response.getStatus() << " to " << response.get("Location");
+            ofLogVerbose("DefaultRedirectProcessor::requestFilter") << "Last URI: " << lastURI.toString();
+            ofLogVerbose("DefaultRedirectProcessor::requestFilter") << "Target URI: " << targetURI.toString();
 
             // Set referrer header.
-            request.set("Referrer", currentURI.toString());
+            request.set("Referrer", lastURI.toString());
 
             // Save the information to the context.
-            context.addRedirect(redirectedURI);
+            context.addRedirect(targetURI);
 
-            // Reset the session if the scheme (e.g. http:// vs. https:// )
-            // or authority (e.g. userInfo, host and port) differ.
-            if (0 != currentURI.getScheme().compare(redirectedURI.getScheme()) ||
-                0 != currentURI.getAuthority().compare(redirectedURI.getAuthority()))
-            {
-                // Delete the session since this is a
-                // redirect to a different authority.
-                // NOTE: ->reset() and .reset() are not
-                // the same thing.
-                context.getClientSession().reset();
-
-                // Strip out any host header files that were set.
-                request.erase(Poco::Net::HTTPRequest::HOST);
-            }
+            // Erase the request host that may have been set by the client session.
+            request.erase(Poco::Net::HTTPRequest::HOST);
 
             // Set the new URI according to the redirection.
-            request.setURI(redirectedURI.toString());
+            request.setURI(targetURI.toString());
 
             // Clear the form fields for all redirects. Query parameters will
             // be kept in the URI after a redirect and are no longer available
@@ -105,8 +102,9 @@ void DefaultRedirectProcessor::responseFilter(BaseRequest& request,
             // Additionally, by clearing the form fields, we allows the client
             // to respect server query re-writes such as those re-written by
             // permalinks on blogs.
+            ///
             // TODO: not sure about this ...
-            // request.getFormRef().clear();
+            // request.getForm().clear();
 
             // If the method is entity containing method (e.g. POST or PUT), we
             // will not redirect with the entity or parameters (which might
@@ -124,34 +122,13 @@ void DefaultRedirectProcessor::responseFilter(BaseRequest& request,
 
             // Set the context to resubmit.
             context.setResubmit(true);
-
-            return;
         }
         else
         {
             throw Poco::Net::HTTPException("Maximum redirects exceeded.");
         }
     }
-    else
-    {
-        return;
-    }
 }
-
-
-bool DefaultRedirectProcessor::canFilterResponse(BaseRequest&,
-                                                 BaseResponse& response,
-                                                 Context&) const
-{
-    Poco::Net::HTTPResponse::HTTPStatus status = response.getStatus();
-
-    return Poco::Net::HTTPResponse::HTTP_MOVED_PERMANENTLY   == status || // 301
-           Poco::Net::HTTPResponse::HTTP_FOUND               == status || // 302
-           Poco::Net::HTTPResponse::HTTP_SEE_OTHER           == status || // 303
-           Poco::Net::HTTPResponse::HTTP_TEMPORARY_REDIRECT  == status;   // 307
-}
-    
-
 
 
 } } // namespace ofx::HTTP

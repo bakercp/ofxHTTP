@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,8 +42,8 @@ DefaultClientHeaders::~DefaultClientHeaders()
 }
 
 
-void DefaultClientHeaders::requestFilter(BaseRequest& request,
-                                         Context& context)
+void DefaultClientHeaders::requestFilter(Context& context,
+                                         BaseRequest& request) const
 {
     const ClientSessionSettings& settings = context.getClientSessionSettings();
 
@@ -55,14 +55,9 @@ void DefaultClientHeaders::requestFilter(BaseRequest& request,
 //    request.set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
 //    request.set("Accept-Language", "en-US,en;q=0.8");
 
-    const Poco::Net::NameValueCollection& defaultHeaders = settings.getDefaultHeaders();
-
-    Poco::Net::NameValueCollection::ConstIterator iter = defaultHeaders.begin();
-
-    while (iter != defaultHeaders.end())
+    for (const auto& entry: settings.getDefaultHeaders())
     {
-        request.set((*iter).first, (*iter).second);
-        ++iter;
+        request.set(entry.first, entry.second);
     }
 }
 

@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,41 +26,76 @@
 #pragma once
 
 
+#include "Poco/Exception.h"
 #include "ofEvents.h"
 #include "ofFileUtils.h"
-#include "ofx/HTTP/BaseRequest.h"
-#include "ofx/HTTP/BaseResponse.h"
-#include "ofx/HTTP/Context.h"
-#include "ofx/IO/ByteBuffer.h"
+#include "ofx/HTTP/ClientState.h"
+#include "ofx/HTTP/Progress.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class MutableClientRequestArgs: public ofEventArgs
+class BaseRequest;
+class BaseResponse;
+class Context;
+
+
+class ClientContextEventArgs
 {
 public:
-    MutableClientRequestArgs(BaseRequest& request, Context& context);
-    virtual ~MutableClientRequestArgs();
-    BaseRequest& getRequest() const;
-    Context& getContext();
+    ClientContextEventArgs(Context& context);
+
+    virtual ~ClientContextEventArgs();
+
+    const Context& context() const;
 
 protected:
-    BaseRequest& _request;
     Context& _context;
     
 };
 
 
-class MutableClientResponseArgs: public MutableClientRequestArgs
+
+class ClientStateChangeEventArgs: public ClientContextEventArgs
 {
 public:
-    MutableClientResponseArgs(BaseRequest& request,
-                              BaseResponse& response,
-                              Context& context);
-    virtual ~MutableClientResponseArgs();
-    BaseResponse& getResponse();
+    using ClientContextEventArgs::ClientContextEventArgs;
+
+    virtual ~ClientStateChangeEventArgs();
+
+    ClientState state() const;
+
+};
+
+
+class ClientRequestEventArgs: public ClientContextEventArgs
+{
+public:
+    ClientRequestEventArgs(Context& context,
+                           BaseRequest& request);
+
+    virtual ~ClientRequestEventArgs();
+
+    const BaseRequest& request() const;
+
+protected:
+    BaseRequest& _request;
+
+};
+
+
+class ClientResponseEventArgs: public ClientRequestEventArgs
+{
+public:
+    ClientResponseEventArgs(Context& context,
+                            BaseRequest& request,
+                            BaseResponse& response);
+
+    virtual ~ClientResponseEventArgs();
+
+    const BaseResponse& response() const;
 
 protected:
     BaseResponse& _response;
@@ -68,201 +103,74 @@ protected:
 };
 
 
-
-class BaseClientRequestArgs: public ofEventArgs
+/// \brief A class for progress event data.
+class ClientRequestProgressEventArgs: public ClientRequestEventArgs
 {
 public:
-    BaseClientRequestArgs(const BaseRequest& request, Context& context);
-    virtual ~BaseClientRequestArgs();
-    const BaseRequest& getRequest() const;
-    Context& getContext();
-    const std::string getRequestId() const;
+    ClientRequestProgressEventArgs(Context& context,
+                                   BaseRequest& request,
+                                   Progress& progress);
 
-protected:
-    const BaseRequest& _request;
-    Context& _context;
+    /// \brief Destroy the ClientRequestProgressEventArgs.
+    virtual ~ClientRequestProgressEventArgs();
+
+    const Progress& progress() const;
+
+private:
+    Progress& _progress;
+
+};
+
+
+/// \brief A class for progress event data.
+class ClientResponseProgressEventArgs: public ClientResponseEventArgs
+{
+public:
+    ClientResponseProgressEventArgs(Context& context,
+                                    BaseRequest& request,
+                                    BaseResponse& response,
+                                    Progress& progress);
+
+    /// \brief Destroy the ClientResponseProgressEventArgs.
+    virtual ~ClientResponseProgressEventArgs();
     
+    const Progress& progress() const;
+
+private:
+    Progress& _progress;
+
 };
 
 
-class BaseProgressArgs
+class ClientResponseStreamEventArgs: public ClientResponseEventArgs
 {
 public:
-    BaseProgressArgs(std::streamsize totalBytesTransferred);
-    virtual ~BaseProgressArgs();
-    virtual std::streamsize getContentLength() const = 0;
+    using ClientResponseEventArgs::ClientResponseEventArgs;
 
-    /// \brief Get the total number of bytes transferred during this request.
-    /// \returns the total number of bytes transferred.
-    std::streamsize getTotalBytesTransferred() const;
+    virtual ~ClientResponseStreamEventArgs();
 
-    /// \brief Get the progress of the request upload or download.
-    ///
-    /// If the total content length is unknown (e.g. during chunked-transfer)
-    /// progress of Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH will be
-    /// returned.
-    ///
-    /// \returns a value 0.0 - 1.0 iff the content length is known.  Otherwise
-    /// returns Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH.
-    float getProgress() const;
+    std::istream& stream();
+
+};
+
+
+class ClientErrorEventArgs: public ClientRequestEventArgs
+{
+public:
+    ClientErrorEventArgs(Context& context,
+                         BaseRequest& request,
+                         BaseResponse* response,
+                         const Poco::Exception& exception);
+
+    virtual ~ClientErrorEventArgs();
+
+    const BaseResponse* response() const;
+
+    const Poco::Exception& exception() const;
 
 protected:
-    std::streamsize _totalBytesTransferred;
+    BaseResponse* _response = nullptr;
 
-};
-
-
-class ClientRequestProgressArgs:
-    public BaseClientRequestArgs,
-    public BaseProgressArgs
-{
-public:
-    ClientRequestProgressArgs(const BaseRequest& request,
-                              Context& context,
-                              std::streamsize totalBytesTransferred);
-
-    virtual ~ClientRequestProgressArgs();
-
-    /// \brief Get the total content length associated with this request.
-    ///
-    /// If the total content length is unknown (e.g. during chunked-transfer)
-    /// Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH is returned.
-    ///
-    /// \returns the total length of the content in bytes iff the content length
-    /// is known.  Otherwise returns
-    /// Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH.
-    std::streamsize getContentLength() const;
-
-};
-
-
-class BaseClientResponseArgs: public BaseClientRequestArgs
-{
-public:
-    BaseClientResponseArgs(const BaseRequest& request,
-                           const BaseResponse& response,
-                           Context& context);
-
-    virtual ~BaseClientResponseArgs();
-
-
-    const BaseResponse& getResponse() const;
-
-protected:
-    const BaseResponse& _response;
-
-};
-
-
-class ClientResponseProgressArgs:
-    public BaseClientResponseArgs,
-    public BaseProgressArgs
-{
-public:
-    ClientResponseProgressArgs(const BaseRequest& request,
-                               const BaseResponse& response,
-                               Context& context,
-                               std::streamsize bytesTransferred);
-
-    virtual ~ClientResponseProgressArgs();
-
-    /// \brief Get the total content length associated with this request.
-    ///
-    /// If the total content length is unknown (e.g. during chunked-transfer)
-    /// Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH is returned.
-    ///
-    /// \returns the total length of the content in bytes iff the content length
-    /// is known.  Otherwise returns
-    /// Poco::Net::HTTPMessage::UNKNOWN_CONTENT_LENGTH.
-    std::streamsize getContentLength() const;
-
-};
-
-
-
-class ClientResponseEventArgs: public BaseClientResponseArgs
-{
-public:
-    ClientResponseEventArgs(std::istream& responseStream,
-                            const BaseRequest& request,
-                            const BaseResponse& response,
-                            Context& context):
-        BaseClientResponseArgs(request, response, context),
-        _responseStream(responseStream)
-    {
-    }
-
-
-    virtual ~ClientResponseEventArgs()
-    {
-    }
-
-
-    std::istream& getResponseStream() const
-    {
-        return _responseStream;
-    }
-
-protected:
-    std::istream& _responseStream;
-    
-};
-
-
-class ClientResponseBufferEventArgs: public BaseClientResponseArgs
-{
-public:
-    ClientResponseBufferEventArgs(const IO::ByteBuffer& byteBuffer,
-                                  const BaseRequest& request,
-                                  const BaseResponse& response,
-                                  Context& context):
-        BaseClientResponseArgs(request, response, context),
-            _byteBuffer(byteBuffer)
-    {
-    }
-
-
-    virtual ~ClientResponseBufferEventArgs()
-    {
-    }
-    
-
-    const IO::ByteBuffer& getByteBuffer() const
-    {
-        return _byteBuffer;
-    }
-
-
-protected:
-    const IO::ByteBuffer _byteBuffer;
-    
-};
-
-
-class ClientErrorEventArgs: public BaseClientResponseArgs
-{
-public:
-    ClientErrorEventArgs(const BaseRequest& request,
-                         const BaseResponse& response,
-                         Context& context,
-                         const Poco::Exception& exception):
-        BaseClientResponseArgs(request, response, context),
-        _exception(exception)
-    {
-    }
-
-
-    virtual ~ClientErrorEventArgs()
-    {
-    }
-
-
-    const Poco::Exception& getException() const
-    {
-        return _exception;
-    }
-
-protected:
     const Poco::Exception& _exception;
 
 };
@@ -271,14 +179,11 @@ protected:
 class ClientEvents
 {
 public:
-    ofEvent<MutableClientRequestArgs>   onHTTPClientRequestFilterEvent;
-    ofEvent<MutableClientResponseArgs>  onHTTPClientResponseFilterEvent;
-
-    ofEvent<ClientErrorEventArgs>    onHTTPClientErrorEvent;
-    ofEvent<ClientResponseEventArgs> onHTTPClientResponseEvent;
-
-    ofEvent<ClientRequestProgressArgs> onHTTPClientRequestProgress;
-    ofEvent<ClientResponseProgressArgs> onHTTPClientResponseProgress;
+    ofEvent<ClientStateChangeEventArgs> onHTTPClientStateChange;
+    ofEvent<ClientRequestProgressEventArgs> onHTTPClientRequestProgress;
+    ofEvent<ClientResponseProgressEventArgs> onHTTPClientResponseProgress;
+    ofEvent<ClientResponseStreamEventArgs> onHTTPClientResponseStream;
+    ofEvent<ClientErrorEventArgs> onHTTPClientError;
 
 };
 

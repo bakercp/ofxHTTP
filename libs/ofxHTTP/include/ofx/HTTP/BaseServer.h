@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -60,19 +60,11 @@ namespace HTTP {
 class BaseServerHandle: public Poco::Net::HTTPRequestHandlerFactory
 {
 public:
-    BaseServerHandle(Poco::Net::HTTPRequestHandlerFactory& factory):
-        _factory(factory)
-    {
-    }
+    BaseServerHandle(Poco::Net::HTTPRequestHandlerFactory& factory);
 
-    virtual ~BaseServerHandle()
-    {
-    }
+    virtual ~BaseServerHandle();
 
-    Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request)
-    {
-        return _factory.createRequestHandler(request);
-    }
+    Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
 
 private:
     Poco::Net::HTTPRequestHandlerFactory& _factory;
@@ -159,26 +151,25 @@ public:
     void setUseSessions(bool useSession);
     bool useSessions() const;
 
-    Poco::URI getURI() const;
-
+    Poco::URI uri() const;
 
     const Net::IPAddressRange::List& getWhitelist() const;
     void setWhitelist(const Net::IPAddressRange::List& whitelist);
 
     const Net::IPAddressRange::List& getBlacklist() const;
     void setBlacklist(const Net::IPAddressRange::List& blacklist);
-    
-    const static std::string DEFAULT_HOST;
-    const static uint16_t DEFAULT_PORT;
-    const static bool DEFAULT_USE_SSL;
-    const static bool DEFAULT_USE_SESSIONS;
-    
+
+    static const std::string DEFAULT_HOST;
+    static const uint16_t DEFAULT_PORT;
+    static const bool DEFAULT_USE_SSL;
+    static const bool DEFAULT_USE_SESSIONS;
+
 private:
     std::string _host;
     uint16_t _port;
     bool _useSSL;
     bool _useSessions;
-    
+
     Net::IPAddressRange::List _whitelist;
     Net::IPAddressRange::List _blacklist;
 
@@ -212,7 +203,7 @@ public:
         Poco::Net::uninitializeSSL();
         Poco::ErrorHandler::set(pOldEH);
     }
-        
+
     void start()
     {
         if (isRunning())
@@ -300,16 +291,16 @@ public:
         ofLogVerbose("BaseServer_::stop") << "getThreadPool().used() = " << getThreadPool().used();
         ofLogVerbose("BaseServer_::stop") << "getThreadPool().allocated() = " << getThreadPool().allocated();
         ofLogVerbose("BaseServer_::stop") << "getThreadPool().available() = " << getThreadPool().available();
-        
+
         // Wait for all threads in the thread pool.
         // Particularly troubling if we are sharing
         // this pool with other non-server-based-processes.
         // getThreadPool().joinAll();
-        
+
         getThreadPool().stopAll();
-        
+
         _server.reset();
-        
+
         _isSecurePort = false;
     }
 
@@ -321,7 +312,7 @@ public:
 
     bool isRunning() const
     {
-        return 0 != _server;
+        return  _server != nullptr;
     }
 
     virtual void setup(const SettingsType& settings)
@@ -334,14 +325,14 @@ public:
         }
     }
 
-    const SettingsType& getSettings() const
+    const SettingsType& settings() const
     {
         return _settings;
     }
 
-    std::string getURL() const
+    std::string url() const
     {
-        return _settings.getURI().toString();
+        return _settings.uri().toString();
     }
 
     void addRoute(AbstractRoute* pRoute)
@@ -353,7 +344,7 @@ public:
     void removeRoute(AbstractRoute* pRoute)
     {
         _routes.erase(std::remove(_routes.begin(), _routes.end(), pRoute), _routes.end());
-        pRoute->setServer(0);
+        pRoute->setServer(nullptr);
     }
 
 
@@ -370,7 +361,7 @@ public:
             // We start with the last factory that was added.
             // Thus, factories with overlapping routes should be
             // carefully ordered.
-            Routes::const_reverse_iterator iter = _routes.rbegin();
+            auto iter = _routes.rbegin();
 
             while (iter != _routes.rend())
             {
@@ -392,11 +383,12 @@ public:
         ofRemoveListener(ofEvents().exit, this, &BaseServer_::exit);
     }
 
-    SessionStoreType& getSessionStore()
+    SessionStoreType& sessionStore()
     {
         return _sessionStore;
     }
 
+    /// \brief A collection of server events.
     ServerEvents events;
 
 protected:
@@ -412,7 +404,7 @@ protected:
 
 private:
     BaseServer_(const BaseServer_&);
-	BaseServer_& operator = (const BaseServer_&);
+    BaseServer_& operator = (const BaseServer_&);
 
     typedef std::vector<AbstractRoute*> Routes;
 
@@ -517,7 +509,7 @@ private:
         serverParams->setThreadIdleTime(params.getThreadIdleTime());
         serverParams->setThreadPriority(params.getThreadPriority());
         serverParams->setSoftwareVersion(params.getSoftwareVersion());
-        
+
         return serverParams;
     }
 };

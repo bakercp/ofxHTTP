@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,9 +33,13 @@
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPClientSession.h"
+#include "ofEvents.h"
+#include "ofx/HTTP/ClientEvents.h"
+#include "ofx/HTTP/ClientSessionSettings.h"
+#include "ofx/HTTP/ClientState.h"
 #include "ofx/HTTP/CookieStore.h"
 #include "ofx/HTTP/CredentialStore.h"
-#include "ofx/HTTP/ClientSessionSettings.h"
+#include "ofx/HTTP/Progress.h"
 
 // a thread-safe shared context
 // -- in theory all members are thread safe
@@ -48,83 +52,121 @@ namespace ofx {
 namespace HTTP {
 
 
+class ClientEvents;
+
+
+/// \brief A Context is a collection of data that supports a client session.
+///
+/// This Context stores various attributes including session settings, redirects
+/// cookie stores, etc.
 class Context
 {
 public:
-    typedef std::shared_ptr<Poco::Net::HTTPClientSession> ClientSession;
-
+    /// \brief Create a default Context.
     Context();
+
+    /// \brief Create a Context with the given settings.
+    /// \param settings The ClientSessionSettings to use.
+    Context(const ClientSessionSettings& sessionSettings);
+
+    /// \brief Destroy the Context.
     virtual ~Context();
-   
-    void setClientSessionSettings(const ClientSessionSettings& settings);
+
+    /// \brief Set the ClientSessionSettings.
+    /// \param settings The ClientSessionSettings to set.
+    void setClientSessionSettings(const ClientSessionSettings& sessionSettings);
+
+    /// \returns the ClientSessionSettings.
     const ClientSessionSettings& getClientSessionSettings() const;
 
-//    void setCookieStore(CookieStore::SharedPtr cookieStore);
-//    CookieStore::WeakPtr getCookieStore();
+    /// \brief Set the client session to use.
+    ///
+    /// This is typically provided by the DefaultClientSessionProvider. The
+    /// Context will take ownership of the HTTPClientSession.
+    ///
+    /// \param clientSession The client session to take ownership of.
+    void setClientSession(std::unique_ptr<Poco::Net::HTTPClientSession> clientSession);
 
-    void setClientSession(ClientSession clientSession);
-    ClientSession& getClientSession();
+    /// \brief Release the client session.
+    ///
+    /// This is typically recalled by the client session provider to (possibly)
+    /// be reused.
+    ///
+    /// \returns ownership of the client session via a unique_ptr.
+    std::unique_ptr<Poco::Net::HTTPClientSession> releaseClientSession();
 
+    /// \brief Get a pointer to the current HTTP session for this context.
+    ///
+    /// The context will retain ownership of the HTTP session.
+    ///
+    /// \returns a pointer to the current client session or nullptr if none set.
+    Poco::Net::HTTPClientSession* clientSession();
+
+    /// \brief Get a const pointer to the current HTTP session for this context.
+    ///
+    /// The context will retain ownership of the HTTP session.
+    ///
+    /// \returns a const pointer to the current client session or nullptr if none set.
+    const Poco::Net::HTTPClientSession* clientSession() const;
+
+    /// \brief Add to the history of redirects.
+    /// \param uri The URI to add.
     void addRedirect(const Poco::URI& uri);
+
+    /// \returns A list of all redurects followed by this client session.
     const std::vector<Poco::URI>& getRedirects() const;
 
-//    void setResolvedURI(const Poco::URI& uri);
-//    const Poco::URI& getResolvedURI() const;
-
+    /// \brief Set the URI that should be used if a proxy is required.
+    /// \param uri The proxy redirect URI.
+    /// \sa DefaultProxyProcessor::responseFilter.
     void setProxyRedirectURI(const Poco::URI& uri);
+
+    /// \returns the proxy redirect URI.
+    /// \sa DefaultProxyProcessor::requestFilter
     const Poco::URI& getProxyRedirectURI() const;
 
-    bool getResubmit() const;
+    /// \brief Set whether the current session should be resubmitted.
+    ///
+    /// Resubmits can be set if request filters require it (e.g. Proxy filters).
+    ///
+    /// \param resubmit true if the associated request should be resubmitted.
     void setResubmit(bool resubmit);
 
-    const static std::string KEY_PREFIX_RESERVED;
-    const static std::string KEY_SESSION_SETTINGS;
-    const static std::string KEY_COOKIE_STORE;
-    const static std::string KEY_CREDENTIAL_STORE;
-    const static std::string KEY_RESOLVED_URI;
-    const static std::string KEY_PROXY_REDIRECT_URI;
-    const static std::string KEY_REDIRECTS;
-    const static std::string KEY_SESSION;
-    const static std::string KEY_USE_ABSOLUTE_REQUEST_PATH;
+    /// \returns true if the current transaction needs to be resubmitted.
+    bool getResubmit() const;
 
-    template <typename TypeName>
-    bool getValue(const std::string& key, TypeName& value) const
-    {
-        std::map<std::string, Poco::Any>::const_iterator iter = _map.find(key);
+    /// \returns the current state of the
+    ClientState getState() const;
 
-        if (iter != _map.end())
-        {
-            try
-            {
-                value = Poco::AnyCast<TypeName>(iter->second);
-                return true;
-            }
-            catch (Poco::BadCastException& exc)
-            {
-                ofLogError("Context::getValue") << "Unable to cast value for key : " << key;
-                return false;
-            }
-        }
-        else
-        {
-            return false;
-        }
-    }
+    void setState(ClientState state);
+
+    /// \brief Client events.
+    ClientEvents events;
 
 private:
-    std::map<std::string, Poco::Any> _map;
+    /// \brief A copy of the client's session settings.
+    ClientSessionSettings _sessionSettings;
 
-    ClientSessionSettings _clientSessionSettings;
-//    CookieStore::WeakPtr _cookieStore;
+    /// \brief The current client state.
+    ClientState _state = ClientState::NONE;
 
+    /// \brief A list of all redirects followed by this session.
     std::vector<Poco::URI> _redirects;
 
-//    Poco::URI _resolvedURI;
+    /// \brief The URI that should be used if a proxy is required.
+    /// \sa DefaultProxyProcessor::responseFilter.
     Poco::URI _proxyRedirectURI;
 
-    ClientSession _clientSession;
+    /// \brief True if the current redirect should be pursued.
+    bool _resubmit = false;
 
-    bool _resubmit;
+    /// \brief The client session that may be reused.
+    std::unique_ptr<Poco::Net::HTTPClientSession> _clientSession = nullptr;
+
+    std::unique_ptr<IO::FilteredInputStream> _responseStream = nullptr;
+
+    friend class Client;
+    friend class ClientSessionProvider;
 
 };
 

@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,9 @@ public:
 
     virtual ~Cookie();
 
-    Poco::Timestamp getCreatedAt() const;
+    /// \returns The Cooke's created-at timestamp.
+    Poco::Timestamp createdAt() const;
+
 //    bool isExpired(Poco::Timestamp expiredAt = Poco::Timestamp()) const;
 //    bool isSession() const;
 //    
@@ -61,6 +63,7 @@ public:
 //    std::string toString() const;
 
 protected:
+    /// \brief The Cookie's created-at timestamp.
     Poco::Timestamp _createdAt;
       
 };

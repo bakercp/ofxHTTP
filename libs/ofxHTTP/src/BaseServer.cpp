@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,23 @@
 
 namespace ofx {
 namespace HTTP {
+
+
+BaseServerHandle::BaseServerHandle(Poco::Net::HTTPRequestHandlerFactory& factory):
+    _factory(factory)
+{
+}
+
+
+BaseServerHandle::~BaseServerHandle()
+{
+}
+
+
+Poco::Net::HTTPRequestHandler* BaseServerHandle::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+{
+    return _factory.createRequestHandler(request);
+}
 
 
 TCPServerParams::TCPServerParams():
@@ -182,9 +199,9 @@ int HTTPServerParams::getMaxKeepAliveRequests() const
 }
 
 
-const std::string BaseServerSettings::DEFAULT_HOST    = "127.0.0.1";
+const std::string BaseServerSettings::DEFAULT_HOST = "127.0.0.1";
 const uint16_t BaseServerSettings::DEFAULT_PORT = 8998;
-const bool BaseServerSettings::DEFAULT_USE_SSL        = false;
+const bool BaseServerSettings::DEFAULT_USE_SSL = false;
 const bool BaseServerSettings::DEFAULT_USE_SESSIONS = true;
 
 
@@ -253,7 +270,7 @@ bool BaseServerSettings::useSessions() const
 }
 
 
-Poco::URI BaseServerSettings::getURI() const
+Poco::URI BaseServerSettings::uri() const
 {
     Poco::URI uri;
     
@@ -263,7 +280,6 @@ Poco::URI BaseServerSettings::getURI() const
     
     return uri;
 }    
-
 
 
 const Net::IPAddressRange::List& BaseServerSettings::getWhitelist() const
@@ -288,7 +304,6 @@ void BaseServerSettings::setBlacklist(const Net::IPAddressRange::List& blacklist
 {
     _blacklist = blacklist;
 }
-
 
 
 } } // namespace ofx::HTTP

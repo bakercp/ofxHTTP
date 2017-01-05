@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2012-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2012-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,12 +30,7 @@ namespace ofx {
 namespace HTTP {
 
 
-IPVideoFrameSettings::IPVideoFrameSettings():
-    _width(DEFAULT_WIDTH),
-    _height(DEFAULT_HEIGHT),
-    _flipHorizontal(false),
-    _flipVertical(false),
-    _quality(OF_IMAGE_QUALITY_MEDIUM)
+IPVideoFrameSettings::IPVideoFrameSettings()
 {
 }
 
@@ -45,25 +40,25 @@ IPVideoFrameSettings::~IPVideoFrameSettings()
 }
 
 
-void IPVideoFrameSettings::setWidth(std::size_t width)
+void IPVideoFrameSettings::setWidth(int width)
 {
     _width = width;
 }
 
 
-std::size_t IPVideoFrameSettings::getWidth() const
+int IPVideoFrameSettings::getWidth() const
 {
     return _width;
 }
 
 
-void IPVideoFrameSettings::setHeight(std::size_t height)
+void IPVideoFrameSettings::setHeight(int height)
 {
     _height = height;
 }
 
 
-std::size_t IPVideoFrameSettings::getHeight() const
+int IPVideoFrameSettings::getHeight() const
 {
     return _height;
 }
@@ -120,19 +115,19 @@ IPVideoFrame::~IPVideoFrame()
 }
 
 
-IPVideoFrameSettings IPVideoFrame::getSettings() const
+const IPVideoFrameSettings& IPVideoFrame::settings() const
 {
     return _settings;
 }
 
 
-uint64_t IPVideoFrame::getTimestamp() const
+uint64_t IPVideoFrame::timestamp() const
 {
     return _timestamp;
 }
 
 
-ofBuffer& IPVideoFrame::getBuffer()
+ofBuffer& IPVideoFrame::buffer()
 {
     return _buffer;
 }

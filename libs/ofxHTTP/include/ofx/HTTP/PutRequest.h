@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,21 +26,21 @@
 #pragma once
 
 #include "ofFileUtils.h"
-#include "ofx/HTTP/BaseRequest.h"
+#include "ofx/HTTP/FormRequest.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-class PutRequest: public BaseRequest
+class PutRequest: public FormRequest
 {
 public:
     /// \brief Construct a PutRequest with a given uri and http version.
     /// \param uri the Put endpoint uri.
     /// \param httpVersion Either HTTP/1.0 or HTTP/1.1.
     PutRequest(const std::string& uri,
-               const std::string& httpVersion);
+               const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1);
 
     virtual ~PutRequest();
 
@@ -74,9 +74,6 @@ public:
     ///
     /// \contentType The content type of the PUT request.
     void setContentType(const std::string& contentType);
-
-    /// \brief The default MIME type used for file parts.
-    static const std::string DEFAULT_MEDIA_TYPE;
 
     virtual void prepareRequest() override;
     virtual void writeRequestBody(std::ostream& requestStream) override;

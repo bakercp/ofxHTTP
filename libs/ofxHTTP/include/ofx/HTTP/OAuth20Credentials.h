@@ -1,27 +1,34 @@
+// =============================================================================
 //
-// OAuth20Credentials.h
+// Copyright (c) 2009-2016 Christopher Baker <http://christopherbaker.net>
 //
-// $Id$
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
-// Library: Net
-// Package: OAuth
-// Module:	OAuth20Credentials
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
-// Definition of the OAuth20Credentials class.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 //
-// Copyright (c) 2014, Applied Informatics Software Engineering GmbH.
-// and Contributors.
-//
-// SPDX-License-Identifier:	BSL-1.0
-//
+// =============================================================================
 
 
-#ifndef Net_OAuth20Credentials_INCLUDED
-#define Net_OAuth20Credentials_INCLUDED
+#pragma once
 
 
-#include "Poco/Net/Net.h"
-#include "Poco/Net/HTTPRequest.h"
+#include <string>
+#include "ofConstants.h"
+#include "json.hpp"
 
 
 namespace ofx {
@@ -29,104 +36,45 @@ namespace HTTP {
 
 
 class OAuth20Credentials
-	/// This class implements OAuth 2.0 authentication for HTTP requests,
-	/// via Bearer tokens in the Authorization header, 
-	/// according to RFC 6749 and RFC 6750.
-	///
-	/// To add an Authorization header containing a bearer token
-	/// to a HTTPRequest object, create an OAuth20Credentials object
-	/// with the bearer token and call authenticate().
-	///
-	/// The bearer token can also be extracted from a HTTPRequest
-	/// by creating the OAuth20Credentials object with a HTTPRequest
-	/// object containing a "Bearer" Authorization header and
-	/// calling getBearerToken().
-	///
-	/// The authorization header scheme can be changed from 
-	/// "Bearer" to a custom value. For example, GitHub uses
-	/// the "token" scheme.
 {
 public:
 	OAuth20Credentials();
-		/// Creates an empty OAuth20Credentials object.
 
-	explicit OAuth20Credentials(const std::string& bearerToken);
-		/// Creates an OAuth20Credentials object with the given bearer token.
+	OAuth20Credentials(const std::string& bearerToken);
 
-	OAuth20Credentials(const std::string& bearerToken, const std::string& scheme);
-		/// Creates an OAuth20Credentials object with the given bearer token
-		/// and authorization scheme, which overrides the default scheme ("Bearer").
-		///
-		/// This is useful for services like GitHub, which use "token" as scheme.
+	OAuth20Credentials(const std::string& bearerToken,
+                       const std::string& scheme);
 
-    explicit OAuth20Credentials(const Poco::Net::HTTPRequest& request);
-		/// Creates an OAuth20Credentials object from a HTTPRequest object.
-		///
-		/// Extracts bearer token from the Authorization header, which
-		/// must use the "Bearer" authorization scheme.
-		///
-		/// Throws a NotAuthenticatedException if the request does
-		/// not contain a bearer token in the Authorization header.
-
-	OAuth20Credentials(const Poco::Net::HTTPRequest& request, const std::string& scheme);
-		/// Creates an OAuth20Credentials object from a HTTPRequest object.
-		///
-		/// Extracts bearer token from the Authorization header, which must
-		/// use the given authorization scheme.
-		///
-		/// Throws a NotAuthenticatedException if the request does
-		/// not contain a bearer token in the Authorization header.
-
-	~OAuth20Credentials();
-		/// Destroys the HTTPCredentials.
+	virtual ~OAuth20Credentials();
 
 	void setBearerToken(const std::string& bearerToken);
-		/// Sets the bearer token.
-		
+
 	const std::string& getBearerToken() const;
-		/// Returns the bearer token.
 
 	void setScheme(const std::string& scheme);
-		/// Sets the Authorization header scheme.
-		
+
 	const std::string& getScheme() const;
-		/// Returns the Authorization header scheme.
-		
-	void authenticate(Poco::Net::HTTPRequest& request);
-		/// Adds an Authorization header containing the bearer token to
-		/// the HTTPRequest.
 
 	static const std::string SCHEME;
 
-protected:
-	void extractBearerToken(const Poco::Net::HTTPRequest& request);
-		/// Extracts the bearer token from the HTTPRequest.
-		
+//    static OAuth20Credentials fromJSON(const ofJson& value);
+//
+//    static ofJson toJSON(const OAuth20Credentials& credentials);
+//
+//    static OAuth20Credentials fromFile(const std::string& credentialsFile);
+//
+//    static bool toFile(const OAuth20Credentials& credentials,
+//                       const std::string& credentialsFile);
+
+
 private:
-	OAuth20Credentials(const OAuth20Credentials&);
-	OAuth20Credentials& operator = (const OAuth20Credentials&);
-	
+    /// \brief The OAuth 2.0 bearer token.
 	std::string _bearerToken;
+
+    /// \brief The OAuth 1.0 scheme.
 	std::string _scheme;
 };
 
 
-//
-// inlines
-//
-inline const std::string& OAuth20Credentials::getBearerToken() const
-{
-	return _bearerToken;
-}
+} } // namespace ofx::HTTP
 
-
-inline const std::string& OAuth20Credentials::getScheme() const
-{
-	return _scheme;
-}
-
-
-} } // namespace Poco::Net
-
-
-#endif // Net_OAuth20Credentials_INCLUDED

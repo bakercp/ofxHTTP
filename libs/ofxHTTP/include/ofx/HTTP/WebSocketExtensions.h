@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -76,12 +76,12 @@ private:
         MAX_WINDOW_BITS = 15
     };
 
-    int _deflateWindowBits;
-    int _deflateMemLevel;
+    int _deflateWindowBits = 15;
+    int _deflateMemLevel = 8;
 
-    int _inflateWindowBits;
+    int _inflateWindowBits = 15;
 
-    bool _noContextTakeover;
+    //bool _noContextTakeover = false;
 
     z_stream _deflateState;
     z_stream _inflateState;

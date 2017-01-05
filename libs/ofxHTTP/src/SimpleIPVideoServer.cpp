@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2012-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2012-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -59,31 +59,31 @@ void SimpleIPVideoServer::setup(const Settings& settings)
 }
 
 
-void SimpleIPVideoServer::send(ofPixels& pix)
+void SimpleIPVideoServer::send(const ofPixels& pix)
 {
     _ipVideoRoute.send(pix);
 }
 
 
-std::size_t SimpleIPVideoServer::getNumConnections() const
+std::size_t SimpleIPVideoServer::numConnections() const
 {
-    return _ipVideoRoute.getNumConnections();
+    return _ipVideoRoute.numConnections();
 }
 
 
-FileSystemRoute& SimpleIPVideoServer::getFileSystemRoute()
+FileSystemRoute& SimpleIPVideoServer::fileSystemRoute()
 {
     return _fileSystemRoute;
 }
 
 
-PostRoute& SimpleIPVideoServer::getPostRoute()
+PostRoute& SimpleIPVideoServer::postRoute()
 {
     return _postRoute;
 }
 
 
-IPVideoRoute& SimpleIPVideoServer::getIPVideoRoute()
+IPVideoRoute& SimpleIPVideoServer::ipVideoRoute()
 {
     return _ipVideoRoute;
 }

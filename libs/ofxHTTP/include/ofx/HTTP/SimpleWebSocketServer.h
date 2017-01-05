@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,8 +39,12 @@ namespace HTTP {
 class SimpleWebSocketServerSettings: public BaseServerSettings
 {
 public:
+    /// \brief File system route settings.
     FileSystemRouteSettings fileSystemRouteSettings;
-    WebSocketRouteSettings webSocketServerSettings;
+
+    /// \brief Web Socket route settings.
+    WebSocketRouteSettings webSocketRouteSettings;
+
 };
 
 
@@ -58,12 +62,13 @@ public:
     /// \brief Destroy the SimpleWebSocketServer.
     virtual ~SimpleWebSocketServer();
 
-    virtual void setup(const Settings& settings);
+    virtual void setup(const Settings& settings) override;
 
-    FileSystemRoute& getFileSystemRoute();
+    /// \return A reference to the file system route.
+    FileSystemRoute& fileSystemRoute();
 
     /// \returns the WebSocketRoute attached to this server.
-    WebSocketRoute& getWebSocketRoute();
+    WebSocketRoute& webSocketRoute();
 
 private:
     /// \brief The FileSystemRoute attached to this server.

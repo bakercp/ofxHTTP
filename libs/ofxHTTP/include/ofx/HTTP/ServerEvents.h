@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -63,21 +63,21 @@ public:
 
     /// \brief Get the Poco::Net::HTTPServerRequest.
     /// \return the Poco::Net::HTTPServerRequest.
-    Poco::Net::HTTPServerRequest& getRequest()
+    Poco::Net::HTTPServerRequest& request()
     {
         return _request;
     }
 
     /// \brief Get the Poco::Net::HTTPServerResponse.
     /// \return the Poco::Net::HTTPServerResponse.
-    Poco::Net::HTTPServerResponse& getResponse()
+    Poco::Net::HTTPServerResponse& response()
     {
         return _response;
     }
 
     /// \brief Get the session associated with this event.
     /// \returns the session associated with this event.
-    AbstractSession& getSession()
+    AbstractSession& session()
     {
         return _session;
     }

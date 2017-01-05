@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -80,7 +80,7 @@ WebSocketFrame::~WebSocketFrame()
 }
 
 
-int WebSocketFrame::getFlags() const
+int WebSocketFrame::flags() const
 {
     return _flags;
 }
@@ -213,7 +213,7 @@ std::string WebSocketFrame::toString() const
     ss << ", RSV2="   << (isRSV2()         ? "Y" : "N");
     ss << ", RSV3="   << (isRSV3()         ? "Y" : "N");
     ss << ", nBytes=" << size();
-    ss << ", bytes="  << getText();
+    ss << ", bytes="  << toString();
     
     return ss.str();
 }

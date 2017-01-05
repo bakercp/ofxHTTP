@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,8 @@
 
 
 #include <string>
+#include "ofConstants.h"
+#include "json.hpp"
 #include "ofTypes.h"
 #include "ofLog.h"
 #include "ofUtils.h"
@@ -50,12 +52,17 @@ public:
     /// \brief Construct an HTTPRequest
     ///
     /// This simple constructor passes the raw URI as is with the HTTPRequest.
-    /// query and fragment parameters included in the URI will not be available
-    /// for additional processing (e.g. for use in OAuth signatures).  Any
-    /// query parameters / form fields added later using the addField() method
-    /// will be processed separately according to the provided HTTP method (e.g.
-    /// form fields added to a GET requests will be URL-encoded and added to the
-    /// request URI before submission).
+    /// Query and fragment parameters included in the URI _will not_ be
+    /// automatically available for additional processing (e.g. for use in OAuth
+    /// 1.0 signatures, which require validation of the query/form parameters).
+    /// Any query parameters added later using the `FormRequest::addFormField()`
+    /// methods will be treated as either form fields or URI query parameters
+    /// depending on the request's HTTP method.  Form fields added to POST and
+    /// PUT requests will be submitted as requests POST and PUT (e.g. GET) will
+    /// be URL-encoded and appended to the request URI before submission.
+    ///
+    /// If the endpoint URI does not include a host name, the URI will be
+    /// resolved using the given HTTPSessionClient.
     ///
     /// \param method The HTTP method (e.g. GET, POST, PUT, etc).
     /// \param uri The endpoint URI.
@@ -76,22 +83,6 @@ public:
     /// URI paths.
     virtual void write(std::ostream& ostr) const;
 
-    /// \brief Add a name value pair to upload with this request.
-    /// \param name The field name.
-    /// \param value The field value.
-    void addFormField(const std::string& name,
-                      const std::string& value);
-
-    /// \brief Set a name value pair to upload with this request.
-    /// \param name The field name.
-    /// \param value The field value.
-    void setFormField(const std::string& name,
-                      const std::string& value);
-
-    /// \brief Add additional form fields.
-    /// \param formFields The form fields to add.
-    void addFormFields(const Poco::Net::NameValueCollection& formFields);
-
     /// \brief Set the id of the request.
     /// \param requestId the id of the request.
     void setRequestId(const std::string& requestId);
@@ -100,20 +91,29 @@ public:
     /// \returns the id of the request.
     const std::string& getRequestId() const;
 
-    /// \brief Get a const reference to the raw form data.
-    /// \returns a const reference to the raw form data.
-    const Poco::Net::HTMLForm& getForm() const;
-
-    /// \brief Get a reference to the raw form data.
-    /// \returns a reference to the raw form data.
-    Poco::Net::HTMLForm& getForm();
-
     /// \brief Generate a UUID string.
     /// \returns a UUID string.
     static std::string generateId();
 
-    /// \brief The default MIME type.
-    static const std::string DEFAULT_MEDIA_TYPE;
+    /// \brief Get a const reference to the raw form data.
+    ///
+    /// This allows read-only access to the raw form data, which prevents
+    /// inappropriately adding form parts to non POST / PUT requests.
+    ///
+    /// \returns a const reference to the raw form data.
+    const Poco::Net::HTMLForm& form() const;
+
+    /// \brief Get the estimated content length for progress estimtion purposes.
+    ///
+    /// Internally this will read from the Content-Length header. If that header
+    /// is not available due to transfer-chunking being true, etc, then it will
+    /// query the form to calculate the length. Typically, it is not advised to
+    /// call this function until after any form preparation has been done.  If
+    /// it is not possible to calculate the content length,
+    /// UNKNOWN_CONTENT_LENGTH will be returned.
+    ///
+    /// \returns the estimated content length or UNKNOWN_CONTENT_LENGTH if unknown.
+    int64_t estimatedContentLength() const;
 
 protected:
     /// \brief Prepare the current request.
@@ -134,9 +134,13 @@ protected:
     std::string _requestId;
 
     /// \brief A form with all query terms / form parameters.
-    Poco::Net::HTMLForm _form;
+    ///
+    /// This function is not const because the underlying form content length
+    /// calculator is not const.
+    mutable Poco::Net::HTMLForm _form;
 
     friend class BaseClient;
+    friend class Client;
 
 };
 

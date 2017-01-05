@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -40,15 +40,11 @@ public:
 
     virtual ~DefaultProxyProcessor();
 
-    virtual void requestFilter(BaseRequest& request, Context& context) override;
+    virtual void requestFilter(Context& context, BaseRequest& request) const override;
 
-    virtual void responseFilter(BaseRequest& request,
-                                BaseResponse& response,
-                                Context& context) override;
-
-    virtual bool canFilterResponse(BaseRequest& request,
-                                   BaseResponse& response,
-                                   Context& context) const;
+    virtual void responseFilter(Context& context,
+                                BaseRequest& request,
+                                BaseResponse& response) const override;
 
 };
 

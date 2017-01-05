@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ namespace ofx {
 namespace HTTP {
 
 
-Credentials::Credentials() : _username(""), _password("")
+Credentials::Credentials()
 {
 }
 
@@ -90,4 +90,5 @@ std::string Credentials::toString() const
     return _username + ":" + _password;
 }
 
+    
 } } // namespace ofx::HTTP

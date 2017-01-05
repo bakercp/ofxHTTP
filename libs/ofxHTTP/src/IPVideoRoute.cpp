@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2012-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2012-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@
 #include "Poco/CountingStream.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTimeFormatter.h"
+#include "ofImage.h"
 
 
 #undef min // for windows
@@ -36,7 +37,7 @@
 namespace ofx {
 namespace HTTP {
 
-    
+
 IPVideoFrameQueue::IPVideoFrameQueue(std::size_t maxSize):
     _maxSize(maxSize)
 {
@@ -91,6 +92,7 @@ void IPVideoFrameQueue::setMaxSize(std::size_t maxSize)
 {
     std::unique_lock<std::mutex> lock(_mutex);
     _maxSize = maxSize;
+
     while (_frames.size() > _maxSize)
     {
         _frames.pop_front();
@@ -141,6 +143,18 @@ IPVideoRouteSettings::IPVideoRouteSettings(const std::string& routePathPattern,
 
 IPVideoRouteSettings::~IPVideoRouteSettings()
 {
+}
+
+
+void IPVideoRouteSettings::setFrameSettings(const IPVideoFrameSettings& frameSettings)
+{
+    _frameSettings = frameSettings;
+}
+
+
+IPVideoFrameSettings IPVideoRouteSettings::getFrameSettings() const
+{
+    return _frameSettings;
 }
 
 
@@ -253,11 +267,11 @@ IPVideoRoute::~IPVideoRoute()
 
 Poco::Net::HTTPRequestHandler* IPVideoRoute::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
 {
-    return new IPVideoRouteHandler(*this);
+    return new IPVideoConnection(*this);
 }
 
 
-void IPVideoRoute::send(ofPixels& pix) const
+void IPVideoRoute::send(const ofPixels& pix) const
 {
     if (pix.isAllocated())
     {
@@ -265,22 +279,46 @@ void IPVideoRoute::send(ofPixels& pix) const
 
         ofBuffer compressedPixels;
 
-        // TODO: turbo jpeg an option here?
-        ofSaveImage(pix, compressedPixels, OF_IMAGE_FORMAT_JPEG, OF_IMAGE_QUALITY_MEDIUM);
+        IPVideoFrameSettings frameSettings = _settings.getFrameSettings();
+
+        if (frameSettings.getWidth() != IPVideoFrameSettings::NO_RESIZE
+            ||  frameSettings.getHeight() != IPVideoFrameSettings::NO_RESIZE
+            ||  frameSettings.getFlipHorizontal()
+            ||  frameSettings.getFlipVertical())
+        {
+            int newWidth = frameSettings.getWidth() != IPVideoFrameSettings::NO_RESIZE ? frameSettings.getWidth() : pix.getWidth();
+            int newHeight = frameSettings.getHeight() != IPVideoFrameSettings::NO_RESIZE ? frameSettings.getHeight() : pix.getHeight();
+
+            ofPixels pixels = pix;
+
+            if (newWidth != pix.getWidth() || newHeight != pix.getHeight())
+            {
+                pixels.resize(newWidth, newHeight);
+            }
+
+            if (frameSettings.getFlipVertical() || frameSettings.getFlipHorizontal())
+            {
+                pixels.mirror(frameSettings.getFlipVertical(),
+                              frameSettings.getFlipHorizontal());
+            }
+
+            ofSaveImage(pixels, compressedPixels, OF_IMAGE_FORMAT_JPEG, frameSettings.getQuality());
+        }
+        else
+        {
+            ofPixels pixels = pix;
+            ofSaveImage(pixels, compressedPixels, OF_IMAGE_FORMAT_JPEG, frameSettings.getQuality());
+        }
 
         std::unique_lock<std::mutex> lock(_mutex);
 
         Connections::const_iterator iter = _connections.begin();
 
-        IPVideoFrameSettings settings;
-//
-//        settings.quality = settings.quality;
-
-        std::shared_ptr<IPVideoFrame> frame = std::make_shared<IPVideoFrame>(settings, timestamp, compressedPixels);
+        std::shared_ptr<IPVideoFrame> frame = std::make_shared<IPVideoFrame>(frameSettings, timestamp, compressedPixels);
 
         while (iter != _connections.end())
         {
-            if(*iter)
+            if (*iter != nullptr)
             {
                 (*iter)->push(frame);
             }
@@ -288,9 +326,9 @@ void IPVideoRoute::send(ofPixels& pix) const
             {
                 ofLogError("IPVideoRoute::send") << "Found a NULL IPVideoRouteHandler*.  This should not happen.";
             }
+
             ++iter;
         }
-            
     }
     else
     {
@@ -299,21 +337,7 @@ void IPVideoRoute::send(ofPixels& pix) const
 }
 
 
-void IPVideoRoute::addConnection(IPVideoRouteHandler* handler)
-{
-    std::unique_lock<std::mutex> lock(_mutex);
-    _connections.push_back(handler);
-}
-
-
-void IPVideoRoute::removeConnection(IPVideoRouteHandler* handler)
-{
-    std::unique_lock<std::mutex> lock(_mutex);
-    _connections.erase(std::remove(_connections.begin(), _connections.end(), handler), _connections.end());
-}
-
-
-std::size_t IPVideoRoute::getNumConnections() const
+std::size_t IPVideoRoute::numConnections() const
 {
     std::unique_lock<std::mutex> lock(_mutex);
     return _connections.size();
@@ -322,52 +346,55 @@ std::size_t IPVideoRoute::getNumConnections() const
 
 void IPVideoRoute::stop()
 {
-    if (!_connections.empty())
+    Connections::reverse_iterator iter = _connections.rbegin();
+
+    while (iter != _connections.rend())
     {
-        Connections::reverse_iterator iter = _connections.rbegin();
-
-        while (iter != _connections.rend())
+        if (*iter != nullptr)
         {
-            if (*iter)
-            {
-                (*iter)->stop();
-            }
-
-            ++iter;
+            (*iter)->stop();
         }
+
+        ++iter;
     }
 }
 
 
-IPVideoRouteHandler::IPVideoRouteHandler(IPVideoRoute& route):
+void IPVideoRoute::addConnection(IPVideoConnection* handler)
+{
+    std::unique_lock<std::mutex> lock(_mutex);
+    _connections.push_back(handler);
+}
+
+
+void IPVideoRoute::removeConnection(IPVideoConnection* handler)
+{
+    std::unique_lock<std::mutex> lock(_mutex);
+    _connections.erase(std::remove(_connections.begin(), _connections.end(), handler), _connections.end());
+}
+
+
+IPVideoConnection::IPVideoConnection(IPVideoRoute& route):
     BaseRouteHandler_<IPVideoRoute>(route),
-    IPVideoFrameQueue(route.getSettings().getMaxClientQueueSize()),
-    _isRunning(true),
-    _startTime(0),
-    _bytesSent(0),
-    _framesSent(0),
-    _lastFrameSent(0),
-    _lastFrameDuration(0),
-    _targetFrameDuration(0),
-    _nextScheduledFrame(0)
+    IPVideoFrameQueue(route.settings().getMaxClientQueueSize())
 {
 }
 
 
-IPVideoRouteHandler::~IPVideoRouteHandler()
+IPVideoConnection::~IPVideoConnection()
 {
 }
 
 
-void IPVideoRouteHandler::handleRequest(ServerEventArgs& evt)
+void IPVideoConnection::handleRequest(ServerEventArgs& evt)
 {
-    if(getRoute().getSettings().getMaxClientConnections() != 0 && // 0 == no limit
-       getRoute().getNumConnections() >= getRoute().getSettings().getMaxClientConnections())
+    if(route().settings().getMaxClientConnections() != 0 && // 0 == no limit
+       route().numConnections() >= route().settings().getMaxClientConnections())
     {
-        evt.getResponse().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE,
-                                             "Maximum client connections exceeded.  Please try again later.");
+        evt.response().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE,
+                                          "Maximum client connections exceeded. Please try again later.");
 
-        getRoute().handleRequest(evt);
+        route().handleRequest(evt);
         return;
     }
 
@@ -375,42 +402,47 @@ void IPVideoRouteHandler::handleRequest(ServerEventArgs& evt)
 
     try
     {
-        uri = Poco::URI(evt.getRequest().getURI());
+        uri = Poco::URI(evt.request().getURI());
     }
     catch (const Poco::SyntaxException& exc)
     {
-        ofLogError("IPVideoRoute::createRequestHandler") << exc.what();
+        evt.response().setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR,
+                                          "Request URI Invalid.");
+
+        route().handleRequest(evt);
+        return;
     }
 
     std::string query = uri.getQuery();
+
 
     Poco::Net::NameValueCollection queryMap = HTTPUtils::getQueryMap(uri);
 
     if (queryMap.has("vflip"))
     {
         std::string vflip = queryMap.get("vflip");
-        _frameSettings.setFlipVertical(Poco::icompare(vflip,"1")    == 0 ||
-                                       Poco::icompare(vflip,"true") == 0 ||
-                                       Poco::icompare(vflip,"t")    == 0 ||
-                                       Poco::icompare(vflip,"y")    == 0 ||
-                                       Poco::icompare(vflip,"yes")  == 0);
+        _frameSettings.setFlipVertical(Poco::icompare(vflip, "1")    == 0 ||
+                                       Poco::icompare(vflip, "true") == 0 ||
+                                       Poco::icompare(vflip, "t")    == 0 ||
+                                       Poco::icompare(vflip, "y")    == 0 ||
+                                       Poco::icompare(vflip, "yes")  == 0);
     }
 
     if (queryMap.has("hflip"))
     {
         std::string hflip = queryMap.get("hflip");
-        _frameSettings.setFlipHorizontal(Poco::icompare(hflip,"1")    == 0 ||
-                                         Poco::icompare(hflip,"true") == 0 ||
-                                         Poco::icompare(hflip,"t")    == 0 ||
-                                         Poco::icompare(hflip,"y")    == 0 ||
-                                         Poco::icompare(hflip,"yes")  == 0);
+        _frameSettings.setFlipHorizontal(Poco::icompare(hflip, "1")    == 0 ||
+                                         Poco::icompare(hflip, "true") == 0 ||
+                                         Poco::icompare(hflip, "t")    == 0 ||
+                                         Poco::icompare(hflip, "y")    == 0 ||
+                                         Poco::icompare(hflip, "yes")  == 0);
     }
 
     if (queryMap.has("size"))
     {
         std::string size = queryMap.get("size");
         Poco::toLowerInPlace(size);
-        std::vector<std::string> tokens = ofSplitString(size,"x");
+        std::vector<std::string>  tokens = ofSplitString(size, "x");
 
         if (tokens.size() == 2)
         {
@@ -424,8 +456,8 @@ void IPVideoRouteHandler::handleRequest(ServerEventArgs& evt)
 
             if (width > 0 && height > 0)
             {
-                width = std::min(width, getRoute().getSettings().getMaxStreamWidth());
-                height = std::min(height, getRoute().getSettings().getMaxStreamHeight());
+                width = std::min(width, route().settings().getMaxStreamWidth());
+                height = std::min(height, route().settings().getMaxStreamHeight());
                 _frameSettings.setWidth(width);
                 _frameSettings.setHeight(height);
             }
@@ -435,6 +467,7 @@ void IPVideoRouteHandler::handleRequest(ServerEventArgs& evt)
     if (queryMap.has("quality"))
     {
         std::string quality = queryMap.get("quality");
+
         if (Poco::icompare(quality,"best"))
         {
             _frameSettings.setQuality(OF_IMAGE_QUALITY_BEST);
@@ -460,24 +493,24 @@ void IPVideoRouteHandler::handleRequest(ServerEventArgs& evt)
             // no change
         }
     }
-
-    getRoute().addConnection(this);
-
+    
+    route().addConnection(this);
+    
     try
     {
-        Poco::Net::MediaType mediaType = getRoute().getSettings().getMediaType();
-        mediaType.setParameter("boundary", getRoute().getSettings().getBoundaryMarker());
-        evt.getResponse().set("Cache-control", "no-cache, no-store, must-revalidate");
-        evt.getResponse().set("Pragma", "no-cache");
-        evt.getResponse().set("Server", "ofx::HTTP::IPVideoServer");
-        evt.getResponse().setContentType(mediaType);
-        evt.getResponse().set("Expires", Poco::DateTimeFormatter::format(Poco::Timestamp(0),
-                                                                         Poco::DateTimeFormat::HTTP_FORMAT));
-
-        std::ostream& outputStream = evt.getResponse().send();
-
+        Poco::Net::MediaType mediaType = route().settings().getMediaType();
+        mediaType.setParameter("boundary", route().settings().getBoundaryMarker());
+        evt.response().set("Cache-control", "no-cache, no-store, must-revalidate");
+        evt.response().set("Pragma", "no-cache");
+        evt.response().set("Server", "ofx::HTTP::IPVideoServer");
+        evt.response().setContentType(mediaType);
+        evt.response().set("Expires", Poco::DateTimeFormatter::format(Poco::Timestamp(0),
+                                                                      Poco::DateTimeFormat::HTTP_FORMAT));
+        
+        std::ostream& outputStream = evt.response().send();
+        
         Poco::CountingOutputStream ostr(outputStream);
-
+        
         while (_isRunning)
         {
             if (outputStream.good() && !outputStream.fail() && !outputStream.bad())
@@ -485,12 +518,12 @@ void IPVideoRouteHandler::handleRequest(ServerEventArgs& evt)
                 if (!empty())
                 {
                     std::shared_ptr<IPVideoFrame> frame = pop();
-
-                    if (0 != frame)
+                    
+                    if (frame != nullptr)
                     {
-                        const ofBuffer& buffer = frame->getBuffer();
+                        const ofBuffer& buffer = frame->buffer();
 
-                        ostr << getRoute().getSettings().getBoundaryMarker();
+                        ostr << route().settings().getBoundaryMarker();
                         ostr << "\r\n";
                         ostr << "Content-Type: image/jpeg";
                         ostr << "\r\n";
@@ -498,12 +531,13 @@ void IPVideoRouteHandler::handleRequest(ServerEventArgs& evt)
                         ostr << "\r\n";
                         ostr << "\r\n";
                         ostr << buffer;
-
+                        
                         uint64_t now = ofGetElapsedTimeMillis();
                         _lastFrameDuration = now - _lastFrameSent;
                         _lastFrameSent = now;
                         _bytesSent += static_cast<uint64_t>(ostr.chars()); // add the counts
                         ostr.reset();               // reset the counts
+                        ostr.flush();
                     }
                     else
                     {
@@ -528,34 +562,34 @@ void IPVideoRouteHandler::handleRequest(ServerEventArgs& evt)
         ofLogError("IPVideoRouteHandler::handleRequest") << "Exception: " << e.displayText();
     }
     
-    getRoute().removeConnection(this);
+    route().removeConnection(this);
 }
 
 
-void IPVideoRouteHandler::stop()
+void IPVideoConnection::stop()
 {
     std::unique_lock<std::mutex> lock(_mutex);
     _isRunning = false;
 }
 
 
-IPVideoFrameSettings IPVideoRouteHandler::getFrameSettings() const
+IPVideoFrameSettings IPVideoConnection::frameSettings() const
 {
     return _frameSettings;
 }
 
 
-float IPVideoRouteHandler::getCurrentBitRate() const
+float IPVideoConnection::currentBitRate() const
 {
     std::unique_lock<std::mutex> lock(_mutex);
-    return (float)_bytesSent * 8.0f / (ofGetElapsedTimeMillis() - _startTime);
+    return static_cast<float>(_bytesSent) * 8.0f / (ofGetElapsedTimeMillis() - _startTime);
 }
 
 
-float IPVideoRouteHandler::getCurrentFrameRate() const
+float IPVideoConnection::currentFrameRate() const
 {
     std::unique_lock<std::mutex> lock(_mutex);
-    return (float)_framesSent / (ofGetElapsedTimeMillis() - _startTime);
+    return static_cast<float>(_framesSent) / (ofGetElapsedTimeMillis() - _startTime);
 }
 
 

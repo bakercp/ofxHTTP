@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +38,7 @@ namespace HTTP {
 class SimpleFileServerSettings: public BaseServerSettings
 {
 public:
+    /// \brief File system route settings.
     FileSystemRouteSettings fileSystemRouteSettings;
 };
 
@@ -56,9 +57,10 @@ public:
     /// \brief Destroy the BasicServer.
     virtual ~SimpleFileServer();
 
-    virtual void setup(const Settings& settings);
+    virtual void setup(const Settings& settings) override;
 
-    FileSystemRoute& getFileSystemRoute();
+    /// \return A reference to the file system route.
+    FileSystemRoute& fileSystemRoute();
 
 protected:
     /// \brief The FileSystemRoute attached to this server.

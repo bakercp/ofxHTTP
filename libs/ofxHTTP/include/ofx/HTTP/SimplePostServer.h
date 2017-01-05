@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,17 +35,21 @@ namespace ofx {
 namespace HTTP {
 
 
-/// \brief Settings for a SimplePostServerSettings.
+/// \brief Settings for a SimplePostServer.
 class SimplePostServerSettings: public BaseServerSettings
 {
 public:
+    /// \brief File system route settings.
     FileSystemRouteSettings fileSystemRouteSettings;
+
+    /// \brief Post route settings.
     PostRouteSettings postRouteSettings;
 
 };
 
 
-class SimplePostServer: public BaseServer_<SimplePostServerSettings, SimpleSessionStore>
+class SimplePostServer:
+    public BaseServer_<SimplePostServerSettings, SimpleSessionStore>
 {
 public:
     typedef SimplePostServerSettings Settings;
@@ -54,13 +58,17 @@ public:
 
     virtual ~SimplePostServer();
 
-    virtual void setup(const Settings& settings);
+    virtual void setup(const Settings& settings) override;
 
-    FileSystemRoute& getFileSystemRoute();
-    PostRoute& getPostRoute();
+    /// \return A reference to the file system route.
+    FileSystemRoute& fileSystemRoute();
+
+    PostRoute& postRoute();
 
 protected:
+    /// \brief The FileSystemRoute attached to this server.
     FileSystemRoute _fileSystemRoute;
+
     PostRoute _postRoute;
     
 };

@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,70 +24,106 @@
 
 
 #include "ofx/HTTP/BaseResponse.h"
-//#include "Poco/CountingStream.h"
-//#include "Poco/TeeStream.h"
 
 
 namespace ofx {
 namespace HTTP {
 
 
-BaseResponse::BaseResponse():
-    Poco::Net::HTTPResponse()//,
-//    _pResponseStream(0),
-//    _pException(0)
-{
-}
+const std::string BaseResponse::CONTENT_RANGE = "Content-Range";
+const std::string BaseResponse::BYTES_UNIT = "bytes";
 
 
 BaseResponse::~BaseResponse()
 {
-//    // deleting a null pointer is a noop
-//    delete _pResponseStream; // cleans up the stream and the backing session
-//    _pResponseStream = 0;
-//
-//    delete _pException;
-//    _pException = 0;
 }
 
 
-//bool BaseResponse::hasResponseStream() const
-//{
-//    return 0 != _pResponseStream;
-//}
-//
-//std::istream& BaseResponse::getResponseStream()
-//{
-//    poco_assert(_pResponseStream);
-//    
-//    return *_pResponseStream;
-//}
-//
-//
-//void BaseResponse::setResponseStream(std::istream* pResponseStream)
-//{
-//    delete _pResponseStream;
-//    _pResponseStream = pResponseStream;
-//}
-//
-//
-//bool BaseResponse::hasException() const
-//{
-//    return 0 != _pException;
-//}
-//
-//
-//const Poco::Exception* BaseResponse::getException() const
-//{
-//    return _pException;
-//}
-//
-//
-//void BaseResponse::setException(Poco::Exception* pException)
-//{
-//    delete _pException;
-//    _pException = pException;
-//}
+bool BaseResponse::hasResponseStream() const
+{
+    return _responseStream != nullptr;
+}
+
+
+std::istream& BaseResponse::stream()
+{
+    return _responseStream->stream();
+}
+
+
+int64_t BaseResponse::estimatedContentLength() const
+{
+    int64_t contentLength = getContentLength64();
+
+    // If needed, try to calculate it based on the form data.
+    if (contentLength == UNKNOWN_CONTENT_LENGTH)
+    {
+        // We only support a very specific content range in the form:
+        // Content-Range: bytes 0-4068/4069
+        // This could be expanded using regex, e.g.
+        // https://code.google.com/p/googleappengine/source/browse/trunk/java/src/main/com/google/appengine/api/blobstore/ByteRange.java
+        auto tokens = ofSplitString(get(CONTENT_RANGE, ""), " ", true, true);
+
+        if (tokens.size() == 2 && tokens[0] == BYTES_UNIT)
+        {
+            auto _entryTokens = ofSplitString(tokens[1], "/", true, true);
+
+            if (_entryTokens.size() == 2)
+            {
+                auto _rangeTokens = ofSplitString(tokens[1], "-", true, true);
+
+                if (_rangeTokens.size() == 2)
+                {
+                    int rangeStart = ofToInt(_rangeTokens[0]);
+                    int rangeEnd = ofToInt(_rangeTokens[1]);
+
+                    if (rangeEnd > rangeStart)
+                    {
+                        contentLength = rangeEnd - rangeStart + 1;
+                    }
+                }
+            }
+        }
+    }
+    
+    return contentLength;
+}
+
+
+BufferedResponse::~BufferedResponse()
+{
+
+}
+
+
+std::istream& BufferedResponse::stream()
+{
+    _bufferResponse();
+    return *_bbis;
+}
+
+
+ofBuffer BufferedResponse::buffer() 
+{
+    _bufferResponse();
+    return ofBuffer(_buffer.getCharPtr(), _buffer.size());
+}
+
+
+bool BufferedResponse::isBuffered() const
+{
+    return _bbis != nullptr;
+}
+
+
+void BufferedResponse::_bufferResponse()
+{
+    if (_bbis == nullptr)
+    {
+        _buffer.writeBytes(BaseResponse::stream());
+        _bbis = std::make_unique<IO::ByteBufferInputStream>(_buffer);
+    }
+}
 
 
 } } // namespace ofx::HTTP

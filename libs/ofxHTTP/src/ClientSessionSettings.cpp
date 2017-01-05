@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,48 +30,28 @@ namespace ofx {
 namespace HTTP {
 
 
-const std::string    ClientSessionSettings::DEFAULT_USER_AGENT        = "Mozilla/5.0 (compatible; Client/1.0 +https://github.com/bakercp/ofxHTTP)";
-const int            ClientSessionSettings::DEFAULT_MAX_REDIRECTS     = 20;
+const std::string ClientSessionSettings::DEFAULT_USER_AGENT = "Mozilla/5.0 (compatible; Client/1.0 +https://github.com/bakercp/ofxHTTP)";
+const std::size_t ClientSessionSettings::DEFAULT_MAX_REDIRECTS = 20;
 const Poco::Timespan ClientSessionSettings::DEFAULT_KEEPALIVE_TIMEOUT = Poco::Timespan::SECONDS * 8;
+const Poco::Timespan ClientSessionSettings::DEFAULT_TIMEOUT = Poco::Timespan::SECONDS * 60;
+const int64_t ClientSessionSettings::DEFAULT_MINIMUM_BYTES_PER_PROGRESS_UPDATE = 1024;
+const Poco::Timespan ClientSessionSettings::DEFAULT_MAXIMUM_PROGRESS_UPDATE_INTERVAL = Poco::Timespan::SECONDS * 1;
 
 
 ClientSessionSettings::ClientSessionSettings():
-    _virtualHost(""),
-    _defaultHost(""),
     _userAgent(DEFAULT_USER_AGENT),
     _maxRedirects(DEFAULT_MAX_REDIRECTS),
     _keepAlive(true),
-    _keepAliveTimeout(DEFAULT_KEEPALIVE_TIMEOUT)
+    _keepAliveTimeout(DEFAULT_KEEPALIVE_TIMEOUT),
+    _timeout(DEFAULT_TIMEOUT),
+    _minimumBytesPerProgressUpdate(DEFAULT_MINIMUM_BYTES_PER_PROGRESS_UPDATE),
+    _maximumProgressUpdateInterval(DEFAULT_MAXIMUM_PROGRESS_UPDATE_INTERVAL)
 {
 }
 
 
 ClientSessionSettings::~ClientSessionSettings()
 {
-}
-
-
-void ClientSessionSettings::setVirtualHost(const std::string& virtualHost)
-{
-    _virtualHost = virtualHost;
-}
-
-
-std::string ClientSessionSettings::getVirtualHost() const
-{
-    return _virtualHost;
-}
-
-
-void ClientSessionSettings::setDefaultHost(const std::string& defaultHost)
-{
-    _defaultHost = defaultHost;
-}
-
-
-std::string ClientSessionSettings::getDefaultHost() const
-{
-    return _defaultHost;
 }
 
 
@@ -135,6 +115,18 @@ Poco::Timespan ClientSessionSettings::getKeepAliveTimeout() const
 }
 
 
+void ClientSessionSettings::setTimeout(Poco::Timespan timeout)
+{
+    _timeout = timeout;
+}
+
+
+Poco::Timespan ClientSessionSettings::getTimeout() const
+{
+    return _timeout;
+}
+
+
 void ClientSessionSettings::setProxy(const ProxySettings& proxy)
 {
     _proxy = proxy;
@@ -144,6 +136,30 @@ void ClientSessionSettings::setProxy(const ProxySettings& proxy)
 const ProxySettings& ClientSessionSettings::getProxySettings() const
 {
     return _proxy;
+}
+
+
+void ClientSessionSettings::setMinimumBytesPerProgressUpdate(int64_t minimumBytesPerProgressUpdate)
+{
+    _minimumBytesPerProgressUpdate = minimumBytesPerProgressUpdate;
+}
+
+
+int64_t ClientSessionSettings::getMinimumBytesPerProgressUpdate() const
+{
+    return _minimumBytesPerProgressUpdate;
+}
+
+
+void ClientSessionSettings::setMaximumProgressUpdateInterval(Poco::Timespan interval)
+{
+    _maximumProgressUpdateInterval = interval;
+}
+
+
+Poco::Timespan ClientSessionSettings::getMaximumProgressUpdateInterval() const
+{
+    return _maximumProgressUpdateInterval;
 }
 
 

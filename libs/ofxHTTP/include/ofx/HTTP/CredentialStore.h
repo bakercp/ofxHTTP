@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -53,7 +53,7 @@ class BaseRequest;
 class BaseResponse;
 class Context;
 
-    
+
 /// \brief Default credential store.
 class DefaultCredentialStore: public AbstractRequestResponseFilter
 {
@@ -62,13 +62,13 @@ public:
     virtual ~DefaultCredentialStore();
 
     bool hasCredentials(const AuthScope& targetScope) const;
-    
+
     bool getCredentials(const AuthScope& targetScope,
                         AuthScope& matchingScope,
                         Credentials& matchingCredentials) const;
 
     void setCredentials(const AuthScope& scope, const Credentials& credentials);
-    
+
     void setCredentialsFromURI(const Poco::URI& uri);
 
     void setCredentials(const Poco::URI& uri, const Credentials& credentials);
@@ -76,21 +76,21 @@ public:
     void setCredentials(const Poco::URI& uri,
                         const string& username,
                         const string& password);
-    
+
     void clearCredentials(const AuthScope& scope);
 
     void clearCredentials(const Poco::URI& uri);
 
-    void requestFilter(BaseRequest& request,
-                       Context& context);
+    void requestFilter(Context& context,
+                       BaseRequest& request) const override;
 
-    void responseFilter(BaseRequest& request,
-                        BaseResponse& response,
-                        Context& context);
+    void responseFilter(Context& context,
+                        BaseRequest& request,
+                        BaseResponse& response) const override;
 
-    bool canFilterResponse(BaseRequest& request,
-                           BaseResponse& response,
-                           Context& context) const;
+//    bool canFilterResponse(BaseRequest& request,
+//                           BaseResponse& response,
+//                           Context& context) const;
 
     void clear();
 
@@ -102,29 +102,25 @@ protected:
     bool getCredentialsWithExistingLock(const AuthScope& targetScope,
                                         AuthScope& matchingScope,
                                         Credentials& matchingCredentials) const;
-    
+
 private:
-	DefaultCredentialStore(const DefaultCredentialStore&);
-	DefaultCredentialStore& operator = (const DefaultCredentialStore&);
+    DefaultCredentialStore(const DefaultCredentialStore&);
+    DefaultCredentialStore& operator = (const DefaultCredentialStore&);
 
-    typedef std::shared_ptr<Poco::Net::HTTPBasicCredentials>  HTTPBasicCredentialsSharedPtr;
-    typedef std::shared_ptr<Poco::Net::HTTPDigestCredentials> HTTPDigestCredentialsSharedPtr;
+    typedef std::map<AuthScope, Credentials> CredentialMap;
+    typedef std::map<AuthScope, std::shared_ptr<Poco::Net::HTTPBasicCredentials>> BasicCredentialCacheMap;
+    typedef std::map<AuthScope, std::shared_ptr<Poco::Net::HTTPDigestCredentials>> DigestCredentialCacheMap;
 
-    typedef std::map<AuthScope, Credentials>                    CredentialMap;
-    typedef std::map<AuthScope, HTTPBasicCredentialsSharedPtr>  BasicCredentialCacheMap;
-    typedef std::map<AuthScope, HTTPDigestCredentialsSharedPtr> DigestCredentialCacheMap;
+//    typedef CredentialMap::const_iterator HTTPCredentialMapIter;
+//    typedef BasicCredentialCacheMap::iterator HTTPBasicCredentialCacheMapIter;
+//    typedef DigestCredentialCacheMap::iterator HTTPDigestCredentialCacheMapIter;
 
-
-    typedef CredentialMap::const_iterator      HTTPCredentialMapIter;
-    typedef BasicCredentialCacheMap::iterator  HTTPBasicCredentialCacheMapIter;
-    typedef DigestCredentialCacheMap::iterator HTTPDigestCredentialCacheMapIter;
-
-    CredentialMap            credentialMap;
-    BasicCredentialCacheMap  basicCredentialCacheMap;
-    DigestCredentialCacheMap digestCredentialCacheMap;
+    CredentialMap credentialMap;
+    mutable BasicCredentialCacheMap basicCredentialCacheMap;
+    mutable DigestCredentialCacheMap digestCredentialCacheMap;
 
     mutable std::mutex _mutex;
-    
+
 };
 
 

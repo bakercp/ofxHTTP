@@ -1,6 +1,6 @@
 //// =============================================================================
 ////
-//// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+//// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 ////
 //// Permission is hereby granted, free of charge, to any person obtaining a copy
 //// of this software and associated documentation files (the "Software"), to deal
@@ -53,7 +53,7 @@
 //
 //    virtual bool shouldAccept(const Poco::URI& uri,
 //                              const Poco::Net::HTTPCookie& cookie) const = 0;
-//    
+//
 //};
 //
 //
@@ -85,7 +85,7 @@
 //    {
 //        return false;
 //    }
-//    
+//
 //};
 //
 //
@@ -138,7 +138,7 @@
 //    typedef std::map<std::string, Cookies> CookieIndex;
 //
 //    CookieStore(const CookieStore&);
-//	CookieStore& operator = (const CookieStore&);
+//    CookieStore& operator = (const CookieStore&);
 //
 //    const AbstractCookiePolicy& _policy;
 //
@@ -154,5 +154,5 @@
 //
 //};
 //
-//    
+//
 //} } // namespace ofx::HTTP

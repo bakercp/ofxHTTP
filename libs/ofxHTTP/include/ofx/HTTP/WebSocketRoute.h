@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -206,18 +206,18 @@ public:
     void unregisterWebSocketEvents(ListenerClass* listener,
                                    int priority = OF_EVENT_ORDER_AFTER_APP);
 
-    /// \returns The number of active WebSocketConnections.
-    std::size_t getNumWebSocketConnections() const;
+    /// \returns The number of active connections.
+    std::size_t numConnections() const;
 
     /// \returns a reference to the filter factories.
-    const std::vector<std::unique_ptr<AbstractWebSocketFilterFactory>>& getFilterFactories() const;
+    const std::vector<std::unique_ptr<AbstractWebSocketFilterFactory>>& filterFactories() const;
 
     /// \brief WebSocketEvents for WebSocket callbacks.
     WebSocketEvents events;
 
 protected:
-    void registerWebSocketConnection(WebSocketConnection* connection);
-    void unregisterWebSocketConnection(WebSocketConnection* connection);
+    void registerConnection(WebSocketConnection* connection);
+    void unregisterConnection(WebSocketConnection* connection);
 
     friend class WebSocketConnection;
     

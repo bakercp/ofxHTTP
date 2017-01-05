@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ namespace HTTP {
     
 PostRequest::PostRequest(const std::string& uri,
                          const std::string& httpVersion):
-    BaseRequest(Poco::Net::HTTPRequest::HTTP_POST, uri, httpVersion)
+    FormRequest(Poco::Net::HTTPRequest::HTTP_POST, uri, httpVersion)
 {
 }
 
@@ -49,7 +49,7 @@ PostRequest::~PostRequest()
 
 void PostRequest::setFormEncoding(FormEncoding formEncoding)
 {
-    if (FORM_ENCODING_URL == formEncoding)
+    if (formEncoding == FORM_ENCODING_URL)
     {
         _form.setEncoding(Poco::Net::HTMLForm::ENCODING_URL);
     }
@@ -62,7 +62,7 @@ void PostRequest::setFormEncoding(FormEncoding formEncoding)
 
 PostRequest::FormEncoding PostRequest::getFormEncoding() const
 {
-    if (0 == Poco::UTF8::icompare(_form.getEncoding(), Poco::Net::HTMLForm::ENCODING_URL))
+    if (_form.getEncoding() == Poco::Net::HTMLForm::ENCODING_URL)
     {
         return FORM_ENCODING_URL;
     }
@@ -73,24 +73,55 @@ PostRequest::FormEncoding PostRequest::getFormEncoding() const
 }
 
 
+Poco::Net::HTMLForm& PostRequest::form()
+{
+    return _form;
+}
+
+
 void PostRequest::addFormPart(const FormPart& part)
 {
-    _form.addPart(part.name, part.pSource);
+    switch (part.type())
+    {
+        case FormPart::Type::STRING:
+        {
+            // _form takes ownership of StringPartSource.
+            _form.addPart(part.name(), new Poco::Net::StringPartSource(part.value(),
+                                                                       part.mediaType()));
+            break;
+        }
+        case FormPart::Type::FILE:
+        {
+            try
+            {
+                // _form takes ownership of FilePartSource.
+                _form.addPart(part.name(), new Poco::Net::FilePartSource(ofToDataPath(part.value(), true),
+                                                                         part.mediaType()));
+            }
+            catch (const Poco::FileNotFoundException& exc)
+            {
+                ofLogError("PostRequest::addFile") << exc.displayText();
+            }
+            catch (const Poco::OpenFileException& exc)
+            {
+                ofLogError("PostRequest::addFile") << exc.displayText();
+            }
+
+            break;
+        }
+    }
+
+    // We must set encoding to multipart.
     _form.setEncoding(Poco::Net::HTMLForm::ENCODING_MULTIPART);
 }
 
 
-void PostRequest::addFormParts(const FormParts& parts)
+void PostRequest::addFormParts(const std::vector<FormPart>& parts)
 {
-    FormParts::const_iterator iter = parts.begin();
-
-    while (iter != parts.end())
+    for (auto& part: parts)
     {
-        _form.addPart((*iter).name, (*iter).pSource);
-        ++iter;
+        addFormPart(part);
     }
-
-    _form.setEncoding(Poco::Net::HTMLForm::ENCODING_MULTIPART);
 }
 
 
@@ -98,33 +129,21 @@ void PostRequest::addFormFile(const std::string& name,
                               const std::string& path,
                               const std::string& mediaType)
 {
-
-    std::string absPath = ofToDataPath(path, true);
-
-    try
-    {
-        _form.addPart(name, new Poco::Net::FilePartSource(absPath, mediaType));
-        _form.setEncoding(Poco::Net::HTMLForm::ENCODING_MULTIPART);
-    }
-    catch (Poco::FileNotFoundException& exc)
-    {
-        ofLogError("PostRequest::addFile") << exc.displayText();
-    }
-    catch (Poco::OpenFileException& exc)
-    {
-        ofLogError("PostRequest::addFile") << exc.displayText();
-    }
+    addFormPart(FormPart(FormPart::Type::FILE,
+                         name,
+                         path,
+                         mediaType));
 }
 
 
-void PostRequest::addFormBuffer(const std::string& name,
-                                const ofBuffer& buffer,
+void PostRequest::addFormString(const std::string& name,
+                                const std::string& buffer,
                                 const std::string& mediaType)
 {
-    _form.addPart(name, new Poco::Net::StringPartSource(buffer.getText(),
-                                                        mediaType));
-
-    _form.setEncoding(Poco::Net::HTMLForm::ENCODING_MULTIPART);
+    addFormPart(FormPart(FormPart::Type::STRING,
+                         name,
+                         buffer,
+                         mediaType));
 }
 
 
@@ -132,32 +151,19 @@ void PostRequest::prepareRequest()
 {
     _form.prepareSubmit(*this);
 
-    if (FORM_ENCODING_MULTIPART == getFormEncoding() &&
-        Poco::Net::HTTPMessage::HTTP_1_0 == getVersion())
+    // \TODO Fix for Poco Bug
+    // https://github.com/pocoproject/poco/issues/1331
+    if (!getChunkedTransferEncoding())
     {
-        // If we are using 1.0 with file uploads, we must get a content
-        // length before sending the data.
-        _outBuffer.clear();
-        Poco::CountingOutputStream cos(_outBuffer);
-        _form.write(cos);
-        set("Content-Length", ofToString(cos.chars()));
-        setKeepAlive(false);
-        setChunkedTransferEncoding(false);
+        // TODO: This long thing is a work-around for bug https://github.com/pocoproject/poco/issues/1337
+        setContentLength(_form.getEncoding() == Poco::Net::HTMLForm::ENCODING_URL ? 0 : _form.calculateContentLength());
     }
 }
 
 
 void PostRequest::writeRequestBody(std::ostream& requestStream)
 {
-    if (FORM_ENCODING_MULTIPART == getFormEncoding() &&
-        Poco::Net::HTTPMessage::HTTP_1_0 == getVersion())
-    {
-        Poco::StreamCopier::copyStream(_outBuffer, requestStream);
-    }
-    else
-    {
-        _form.write(requestStream);
-    }
+    _form.write(requestStream);
 }
 
 

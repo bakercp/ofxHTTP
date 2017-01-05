@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2014-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2014-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -83,10 +83,10 @@ protected:
     SimpleSessionStore(const SimpleSessionStore&);
     SimpleSessionStore& operator = (const SimpleSessionStore&);
 
-    bool hasSession(const std::string& sessionId) const;
-    AbstractSession& getSession(const std::string& sessionId);
-    AbstractSession& createSession();
-    void destroySession(const std::string& sessionId);
+    bool hasSession(const std::string& sessionId) const override;
+    AbstractSession& getSession(const std::string& sessionId) override;
+    AbstractSession& createSession() override;
+    void destroySession(const std::string& sessionId) override;
 
     typedef std::map<std::string, std::shared_ptr<AbstractSession>> SessionMap;
 

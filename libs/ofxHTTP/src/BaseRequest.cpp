@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// Copyright (c) 2013-2015 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2013-2016 Christopher Baker <http://christopherbaker.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,9 +29,6 @@
 
 namespace ofx {
 namespace HTTP {
-
-
-const std::string BaseRequest::DEFAULT_MEDIA_TYPE = "application/octet-stream";
 
 
 BaseRequest::BaseRequest(const std::string& method,
@@ -72,35 +69,9 @@ void BaseRequest::write(std::ostream& ostr) const
     }
     catch (const Poco::SyntaxException& exc)
     {
-        ofLogWarning("ofx::HTTP::BaseRequest") << "Unable to parse URI, using: " << getURI();
+        ofLogWarning("ofx::HTTP::BaseRequest") << "Unable to parse URI, using: " << getURI() << " : " << exc.displayText();
         Poco::Net::HTTPRequest::write(ostr);
     }
-}
-
-
-void BaseRequest::addFormFields(const Poco::Net::NameValueCollection& formFields)
-{
-    Poco::Net::NameValueCollection::ConstIterator iter = formFields.begin();
-
-    while (iter != formFields.end())
-    {
-        _form.add(iter->first, iter->second);
-        ++iter;
-    }
-}
-
-
-void BaseRequest::addFormField(const std::string& name,
-                               const std::string& value)
-{
-    _form.add(name, value);
-}
-
-
-void BaseRequest::setFormField(const std::string& name,
-                               const std::string& value)
-{
-    _form.set(name, value);
 }
 
 
@@ -116,21 +87,15 @@ const std::string& BaseRequest::getRequestId() const
 }
 
 
-const Poco::Net::HTMLForm& BaseRequest::getForm() const
-{
-    return _form;
-}
-
-
-Poco::Net::HTMLForm& BaseRequest::getForm()
-{
-    return _form;
-}
-
-
 std::string BaseRequest::generateId()
 {
     return Poco::UUIDGenerator::defaultGenerator().createOne().toString();
+}
+
+
+const Poco::Net::HTMLForm& BaseRequest::form() const
+{
+    return _form;
 }
 
 
@@ -153,6 +118,21 @@ void BaseRequest::prepareRequest()
 void BaseRequest::writeRequestBody(std::ostream& requestStream)
 {
     _form.write(requestStream);
+}
+
+
+int64_t BaseRequest::estimatedContentLength() const
+{
+    int64_t contentLength = getContentLength64();
+
+    // If needed, try to calculate it based on the form data.
+    if (contentLength == UNKNOWN_CONTENT_LENGTH)
+    {
+        // TODO: This long thing is a work-around for bug https://github.com/pocoproject/poco/issues/1337
+        contentLength = (_form.getEncoding() == Poco::Net::HTMLForm::ENCODING_URL) ? 0 : _form.calculateContentLength();
+    }
+
+    return contentLength;
 }
 
 
