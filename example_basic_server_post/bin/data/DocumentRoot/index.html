@@ -32,11 +32,11 @@
         <br>
         <h3>Example Form Using <code>text/plain</code> Form Encoding</h3>
         <blockquote>
-                The following form is defined by <code>&lt;form role="form" action="/post" method="post" enctype="text/plain"&gt;</code>.
+                The following form is defined by <code>&lt;form role="form" action="/" method="post" enctype="text/plain"&gt;</code>.
                 This for will send an event to the <code>bool onHTTPPostEvent(ofx::HTTP::PostEventArgs& evt);</code> callback.
                 In this case, the content cannot be reliably parsed so it is up to the user to extract name / value pairs.
         </blockquote>
-        <form role="form" action="/post" method="post" enctype="text/plain">
+        <form role="form" action="/" method="post" enctype="text/plain">
             <div class="form-group">
                 <label for="text_0">Text Box 0</label>
                 <textarea name="text_0" class="form-control" rows="3"></textarea>
@@ -55,10 +55,10 @@
         <br>
         <h3>Example Form Using <code>application/x-www-form-urlencoded</code> Form Encoding</h3>
         <blockquote>
-            The following form is defined by <code>&lt;class="form-inline" role="form" action="/post" method="post" enctype="application/x-www-form-urlencoded"&gt;</code>.  This will send en event to the <code>bool onHTTPFormEvent(ofx::HTTP::PostFormEventArgs& evt);</code> callback.  
+            The following form is defined by <code>&lt;class="form-inline" role="form" action="/" method="post" enctype="application/x-www-form-urlencoded"&gt;</code>.  This will send en event to the <code>bool onHTTPFormEvent(ofx::HTTP::PostFormEventArgs& evt);</code> callback.
             In this case, the content will be parsed and returns as a set of name / value pairs.
         </blockquote>
-        <form class="form-inline" role="form" action="/post" method="post" enctype="application/x-www-form-urlencoded">
+        <form class="form-inline" role="form" action="/" method="post" enctype="application/x-www-form-urlencoded">
             <div class="form-group">
                 <label class="sr-only" for="email">Email address</label>
                 <input type="email" name="email" id="email" class="form-control" placeholder="Enter email">
@@ -77,10 +77,10 @@
         <br>
         <h3>Example Form Using <code>multipart/form-data</code> Form Encoding</h3>
         <blockquote>
-            The following form is defined by <code>&lt;role="form" action="/post" method="post" enctype="multipart/form-data"&gt;</code>.
-            This will send events to three callbacks.  If files are attached, each file will be processed in sequence and 
-            will send events at the beginning of the upload, during progress (as determined by the size of the upload buffer) 
-            and one upon completion.  The callbacks are as follows: 
+            The following form is defined by <code>&lt;role="form" action="/" method="post" enctype="multipart/form-data"&gt;</code>.
+            This will send events to three callbacks.  If files are attached, each file will be processed in sequence and
+            will send events at the beginning of the upload, during progress (as determined by the size of the upload buffer)
+            and one upon completion.  The callbacks are as follows:
             <ul>
                 <li>
                     <code>bool onHTTPPostEvent(ofx::HTTP::PostEventArgs& evt);</code>
@@ -94,7 +94,7 @@
             </ul>
         </pre>
         </blockquote>
-        <form role="form" action="/post" method="post" enctype="multipart/form-data">
+        <form role="form" action="/" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="email">Email address</label>
                 <input type="email" name="email" id="email" class="form-control" placeholder="Enter email">
@@ -124,5 +124,5 @@
     </div>
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
-</body> 
+</body>
 </html>

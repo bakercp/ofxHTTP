@@ -37,6 +37,9 @@ void ofApp::setup()
     // Many other settings are available.
     settings.setPort(7890);
 
+    // Set an alternate route path pattern (defaut is /post).
+     settings.postRouteSettings.setRoutePathPattern("/");
+
     // Apply the settings.
     server.setup(settings);
 
