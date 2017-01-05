@@ -3,3 +3,4 @@ ofxIO
 ofxMediaType
 ofxNetworkUtils
 ofxSSLManager
+ofxPoco
