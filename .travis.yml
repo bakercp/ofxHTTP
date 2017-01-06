@@ -93,16 +93,16 @@ matrix:
 #        - ~/archlinux
 
 
-#Emscripten, OF master
-  - os: linux
-    sudo: false
-    env: TARGET="emscripten" OF_BRANCH="master"
-    addons:
-      apt:
-        sources:
-          - ubuntu-toolchain-r-test
-        packages:
-          - libstdc++6
+# #Emscripten, OF master
+#   - os: linux
+#     sudo: false
+#     env: TARGET="emscripten" OF_BRANCH="master"
+#     addons:
+#       apt:
+#         sources:
+#           - ubuntu-toolchain-r-test
+#         packages:
+#           - libstdc++6
 
 
 # Emscripten, OF stable: Not supported yet
@@ -145,13 +145,13 @@ matrix:
 #    env: TARGET="tvos" OF_BRANCH="stable"
 
 
-# Android armv7, OF master
-  - os: linux
-    sudo: false
-    env: TARGET="android" OPT="armv7" OF_BRANCH="master"
-    cache:
-      directories:
-        - ~/android-ndk-r12b
+# # Android armv7, OF master
+#   - os: linux
+#     sudo: false
+#     env: TARGET="android" OPT="armv7" OF_BRANCH="master"
+#     cache:
+#       directories:
+#         - ~/android-ndk-r12b
 
 
 # Android armv7, OF stable: Not supported yet
@@ -163,13 +163,13 @@ matrix:
 #        - ~/android-ndk-r12b
 
 
-# Android x86, OF master
-  - os: linux
-    sudo: false
-    env: TARGET="android" OPT="x86" OF_BRANCH="master"
-    cache:
-      directories:
-        - ~/android-ndk-r12b
+# # Android x86, OF master
+#   - os: linux
+#     sudo: false
+#     env: TARGET="android" OPT="x86" OF_BRANCH="master"
+#     cache:
+#       directories:
+#         - ~/android-ndk-r12b
 
 
 # Android x86, OF stable: Not supported yet
