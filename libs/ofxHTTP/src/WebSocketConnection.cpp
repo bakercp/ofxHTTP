@@ -203,8 +203,8 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
                         const char* pData = frame.getCharPtr();
 
                         std::size_t numBytesSent = ws.sendFrame(pData,
-                                                    frame.size(),
-                                                    frame.flags());
+                                                                frame.size(),
+                                                                frame.flags());
 
                         _totalBytesSent += numBytesSent;
 
