@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2009 Christopher Baker <http://christopherbaker.net>
+// Copyright (c) 2009 Christopher Baker <https://christopherbaker.net>
 //
 // SPDX-License-Identifier:	MIT
 //
