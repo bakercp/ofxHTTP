@@ -20,7 +20,7 @@ args = parser.parse_args()
 # These paths assume that this file is located in
 #   OF_ROOT/addons/ADDON_NAME/ci/common/install_dependencies.py
 
-ADDON_PATH = Path('../../..')
+ADDON_PATH = Path(__file__).parent / '../../..'
 ADDON_NAME = ADDON_PATH.resolve().name
 
 if args.of_root:
@@ -36,10 +36,10 @@ GH_USERNAME = args.username if args.username else 'bakercp'
 GH_BRANCH = args.branch if args.branch else 'master'
 GH_DEPTH = args.depth if args.depth else 1
 
-print(ADDON_PATH)
+print(ADDON_PATH.resolve())
 print(ADDON_NAME)
 print(OF_ROOT)
-print(OF_ADDONS.resolve())
+print(OF_ADDONS)
 
 # print(ADDON_PATH)
 # print(ADDON_NAME)
@@ -57,6 +57,10 @@ if ADDON_CONFIG_MK.exists():
             addons = line[line.index('=') + 1:].strip().split()
             for addon in addons:
                 REQUIRED_ADDONS.add(addon)
+else:
+    print("Could not find {}".format(ADDON_CONFIG_MK))
+
+print(REQUIRED_ADDONS)
 
 # Collect any required dependencies from the example*/addons.make files.
 for addon_mk in ADDON_PATH.glob("example*/addons.make"):
@@ -66,7 +70,10 @@ for addon_mk in ADDON_PATH.glob("example*/addons.make"):
 print(REQUIRED_ADDONS)
 
 # Remove this addon from the list.
-REQUIRED_ADDONS.remove(ADDON_NAME)
+try:
+    REQUIRED_ADDONS.remove(ADDON_NAME)
+except KeyError as err:
+    print("Error removing {}".format(err))
 
 for required_addon in REQUIRED_ADDONS:
     required_addon_path = OF_ADDONS.resolve() / addon
