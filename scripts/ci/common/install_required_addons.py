@@ -76,11 +76,10 @@ except KeyError as err:
     print("Error removing {}".format(err))
 
 for required_addon in REQUIRED_ADDONS:
-    required_addon_path = OF_ADDONS.resolve() / addon
+    required_addon_path = OF_ADDONS.resolve() / required_addon
+    print("Checking " + str(required_addon_path))
     if not required_addon_path.exists():
-        repository = "https://github.com/" + GH_USERNAME + "/" + addon + ".git"
+        repository = "https://github.com/" + GH_USERNAME + "/" + required_addon + ".git"
         print("cloning " + repository + " into " + str(required_addon_path))
         subprocess.call(["git", "clone", repository, str(required_addon_path)])
         print("done")
-else:
-    print("No addons to install.")
