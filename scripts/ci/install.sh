@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-python3 common/install_required_addons.py
+echo `pwd`
+
+python3 scripts/ci/common/install_required_addons.py
