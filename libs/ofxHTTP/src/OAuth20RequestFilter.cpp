@@ -15,9 +15,9 @@ namespace ofx {
 namespace HTTP {
 
 
-OAuth20RequestFilter::OAuth20RequestFilter()
-{
-}
+//OAuth20RequestFilter::OAuth20RequestFilter()
+//{
+//}
 
 
 OAuth20RequestFilter::OAuth20RequestFilter(const OAuth20Credentials& credentials):
