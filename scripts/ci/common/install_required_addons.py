@@ -5,16 +5,16 @@ import os
 import subprocess
 from pathlib import Path
 
-parser = argparse.ArgumentParser()
+PARSER = argparse.ArgumentParser()
 
 # parser.add_argument("--addon_path", help="The path of the addon.")
-parser.add_argument("--of_root", help="The OF_ROOT directory.")
+PARSER.add_argument("--of_root", help="The OF_ROOT directory.")
 # parser.add_argument("--of_addons", help="The OF_ADDONS directory.")
-parser.add_argument("--username", help="The default github username.")
-parser.add_argument("--branch", help="The default github branch.")
-parser.add_argument("--depth", help="The default github clone depth.")
+PARSER.add_argument("--username", help="The default github username.")
+PARSER.add_argument("--branch", help="The default github branch.")
+PARSER.add_argument("--depth", help="The default github clone depth.")
 
-args = parser.parse_args()
+ARGS = PARSER.parse_args()
 
 
 # These paths assume that this file is located in
@@ -23,8 +23,8 @@ args = parser.parse_args()
 ADDON_PATH = Path(__file__).parent / '../../..'
 ADDON_NAME = ADDON_PATH.resolve().name
 
-if args.of_root:
-    OF_ROOT = Path(args.of_root).expanduser()
+if ARGS.of_root:
+    OF_ROOT = Path(ARGS.of_root).expanduser()
 elif os.getenv('OF_ROOT'):
     OF_ROOT = Path(os.getenv('OF_ROOT')).expanduser()
 else:
@@ -32,9 +32,9 @@ else:
 
 OF_ADDONS = OF_ROOT / 'addons'
 
-GH_USERNAME = args.username if args.username else 'bakercp'
-GH_BRANCH = args.branch if args.branch else 'master'
-GH_DEPTH = args.depth if args.depth else 1
+GH_USERNAME = ARGS.username if ARGS.username else 'bakercp'
+GH_BRANCH = ARGS.branch if ARGS.branch else 'master'
+GH_DEPTH = ARGS.depth if ARGS.depth else 1
 
 print(ADDON_PATH.resolve())
 print(ADDON_NAME)
