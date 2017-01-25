@@ -20,8 +20,8 @@ namespace HTTP {
 class OAuth20RequestFilter: public AbstractRequestFilter
 {
 public:
-//    /// \brief Create a default OAuth 2.0 request filter.
-//    OAuth20RequestFilter();
+    /// \brief Create a default OAuth 2.0 request filter.
+    OAuth20RequestFilter();
 
     /// \brief Create a default OAuth 2.0 request filter with credentials.
     /// \param credentials The OAuth 2.0 credentials.
