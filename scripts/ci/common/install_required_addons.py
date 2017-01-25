@@ -79,5 +79,8 @@ for required_addon in REQUIRED_ADDONS:
     required_addon_path = OF_ADDONS.resolve() / addon
     if not required_addon_path.exists():
         repository = "https://github.com/" + GH_USERNAME + "/" + addon + ".git"
+        print("cloning " + repository + " into " + str(required_addon_path))
         subprocess.call(["git", "clone", repository, str(required_addon_path)])
-
+        print("done")
+else:
+    print("No addons to install.")
