@@ -257,7 +257,7 @@ std::string JSONWebToken::generateToken(const std::string& privateKey,
     ofx::IO::Base64Encoding encoder(true);
     encoder.encode(signatureBuffer, encodedSignatureBuffer);
 
-    return encodedHeaderAndClaims + "." + encodedSignatureBuffer.getText();
+    return encodedHeaderAndClaims + "." + encodedSignatureBuffer.toString();
 }
 
 
