@@ -13,6 +13,13 @@ exampl*/Project.xcconfig
 exampl*/*.xcodeproj
 exampl*/*.plist
 
+tests/**/.compiler*
+tests/**/config.make
+tests/**/Makefile
+tests/**/Project.xcconfig
+tests/**/*.xcodeproj
+tests/**/*.plist
+
 *.sln
 *.vcxproj
 *.vcxproj.filters
