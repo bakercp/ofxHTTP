@@ -67,7 +67,6 @@ private:
     int64_t _totalBytes = UNKNOWN_CONTENT_LENGTH;
     Poco::Timestamp _lastUpdateTime;
     Poco::Timestamp _startTime;
-    float _bytesPerSecond = 0.0;
 
 };
 
