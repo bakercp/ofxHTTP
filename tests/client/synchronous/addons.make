@@ -1,0 +1,8 @@
+ofxHTTP
+ofxIO
+ofxMediaType
+ofxNetworkUtils
+ofxPoco
+ofxSSLManager
+ofxTaskQueue
+ofxUnitTests
