@@ -21,19 +21,19 @@ configuration: Debug
 shallow_clone: true
 clone_depth: 10
 init:
-- set MSYS2_PATH=c:\msys64
-- set CHERE_INVOKING=1
-- if "%BUILDER%_%PLATFORM%"=="MSYS2_x86" set MSYSTEM=MINGW32
-- if "%BUILDER%_%PLATFORM%"=="MSYS2_x64" set MSYSTEM=MINGW64
-- if "%BUILDER%"=="VS" set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
-
+  - set MAKEFLAGS=-s
+  - set MSYS2_PATH=c:\msys64
+  - set CHERE_INVOKING=1
+  - if "%BUILDER%_%PLATFORM%"=="MSYS2_x86" set MSYSTEM=MINGW32
+  - if "%BUILDER%_%PLATFORM%"=="MSYS2_x64" set MSYSTEM=MINGW64
+  - if "%BUILDER%"=="VS" set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
+  - cd %APPVEYOR_BUILD_FOLDER%\..\
+  - set OF_ROOT=%CD%\openFrameworks
+  - set OF_ADDON_NAME=%APPVEYOR_PROJECT_NAME%
 install:
-- cd ..
-- git clone --depth=1 --branch=CI-TESTS https://github.com/bakercp/openFrameworks
-- call openFrameworks\scripts\ci\addons\install.cmd
-
+  - git clone --depth=1 --branch=CI-TESTS https://github.com/bakercp/openFrameworks %OF_ROOT%
+  - cd %OF_ROOT%
+  - call scripts\ci\addons\install.cmd
 build_script:
-- cd %OF_PATH%
-- scripts\ci\addons\build.cmd
-
-
+  - cd %OF_ROOT%
+  - call scripts\ci\addons\build.cmd

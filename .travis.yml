@@ -48,10 +48,10 @@ matrix:
 #          - gdb
 
 # OSX, OF master
-# - os: osx
-#   osx_image: xcode8
-#   compiler: clang
-#   env: TARGET="osx" OF_BRANCH="master"
+  - os: osx
+    osx_image: xcode8
+    compiler: clang
+    env: TARGET="osx" OF_BRANCH="master"
 
 # OSX, OF stable:  Not supported yet
 #  - os: osx
@@ -59,11 +59,11 @@ matrix:
 #    compiler: clang
 #    env: TARGET="osx" OF_BRANCH="stable"
 
-# # Linux ARM6, OF master
-#   - os: linux
-#     sudo: required
-#     dist: trusty
-#     env: TARGET="linuxarmv6l" OF_BRANCH="master"
+# Linux ARM6, OF master
+  - os: linux
+    sudo: required
+    dist: trusty
+    env: TARGET="linuxarmv6l" OF_BRANCH="master"
 
 
 # Linux ARM6, OF stable:  Not supported yet
@@ -72,15 +72,15 @@ matrix:
 #    dist: trusty
 #    env: TARGET="linuxarmv6l" OF_BRANCH="stable"
 
-# # Linux ARM7, OF master
-#   - os: linux
-#     sudo: false
-#     env: TARGET="linuxarmv7l" OF_BRANCH="master"
-#     cache:
-#       directories:
-#         - ~/rpi2_toolchain
-#         - ~/firmware-master
-#         - ~/archlinux
+# Linux ARM7, OF master
+  - os: linux
+    sudo: false
+    env: TARGET="linuxarmv7l" OF_BRANCH="master"
+    cache:
+      directories:
+        - ~/rpi2_toolchain
+        - ~/firmware-master
+        - ~/archlinux
 
 # Linux ARM7, OF stable:  Not supported yet
 #  - os: linux
@@ -185,15 +185,18 @@ matrix:
   # see https://github.com/travis-ci/travis-ci/issues/1228
   exclude:
     - compiler: gcc
-
-install:
-  - cd ~
-  - git clone --depth=1 --branch=CI-TESTS https://github.com/bakercp/openFrameworks
-  - cd openFrameworks
-  - scripts/ci/addons/install.sh
-
-script:
-  - scripts/ci/addons/build.sh
-
 git:
   depth: 10
+
+before_install:
+  - export MAKEFLAGS=-s
+  - cd $TRAVIS_BUILD_DIR/../
+  - export OF_ROOT=$PWD/openFrameworks
+  - export OF_ADDON_NAME=$(basename $TRAVIS_BUILD_DIR)
+install:
+  - git clone --depth=1 --branch=CI-TESTS https://github.com/bakercp/openFrameworks $OF_ROOT
+  - cd $OF_ROOT
+  - scripts/ci/addons/install.sh
+script:
+  - cd $OF_ROOT
+  - scripts/ci/addons/build.sh
