@@ -15,7 +15,7 @@
 class ofApp: public ofBaseApp
 {
 public:
-    void setup();
+    void setup() override;
 
     // We do not have an draw() method since this is a headless display.
 

@@ -15,10 +15,10 @@
 class ofApp: public ofBaseApp
 {
 public:
-    void setup();
-    void draw();
+    void setup() override;
+    void draw() override;
 
-    void keyPressed(int key);
+    void keyPressed(int key) override;
 
     void onSSEOpenEvent(ofxHTTP::SSEOpenEventArgs& evt);
     void onSSECloseEvent(ofxHTTP::SSECloseEventArgs& evt);
