@@ -202,26 +202,27 @@ void WebSocketConnection::handleRequest(ServerEventArgs& evt)
 
                         const char* pData = frame.getCharPtr();
 
-                        std::size_t numBytesSent = ws.sendFrame(pData,
-                                                                frame.size(),
-                                                                frame.flags());
-
-                        _totalBytesSent += numBytesSent;
+                        int numBytesSent = ws.sendFrame(pData,
+                                                        frame.size(),
+                                                        frame.flags());
 
                         // WebSocketError error = WS_ERR_NONE;
 
-                        if (0 >= numBytesSent)
+                        if (numBytesSent < 0)
                         {
-                            ofLogWarning("WebSocketConnection::handleRequest") << "WebSocket numBytesSent <= 0";
+                            ofLogWarning("WebSocketConnection::handleRequest") << "WebSocket numBytesSent < 0";
                             // error = WS_ERROR_ZERO_BYTE_FRAME_SENT;
                         }
-                        else if(numBytesSent < static_cast<int>(frame.size()))
+                        else
                         {
-                            ofLogWarning("WebSocketConnection::handleRequest") << "WebSocket numBytesSent < frame.size()";
-                            // error = WS_ERROR_INCOMPLETE_FRAME_SENT;
-                        }
+                            if (numBytesSent < static_cast<int>(frame.size()))
+                            {
+                                ofLogWarning("WebSocketConnection::handleRequest") << "WebSocket numBytesSent < frame.size()";
+                                // error = WS_ERROR_INCOMPLETE_FRAME_SENT;
+                            }
 
-                        _totalBytesSent += numBytesSent;
+                            _totalBytesSent += numBytesSent;
+                        }
 
                         WebSocketFrameEventArgs eventArgs(evt, *this, frame);
                         
