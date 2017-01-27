@@ -28,7 +28,7 @@ API documentation can be found here.
 
 ## Build Status
 
-Linux, macOS [![Build Status](https://travis-ci.org/bakercp/ofxHTTP.svg?branch=stable)](https://travis-ci.org/bakercp/ofxHTTP)
+Linux, macOS [![Build Status](https://travis-ci.org/bakercp/ofxHTTP.svg?branch=master)](https://travis-ci.org/bakercp/ofxHTTP)
 
 Visual Studio, MSYS [![Build status](https://ci.appveyor.com/api/projects/status/ltsg7y588u4gw9o7/branch/master?svg=true)](https://ci.appveyor.com/project/bakercp/ofxhttp/branch/master)
 
