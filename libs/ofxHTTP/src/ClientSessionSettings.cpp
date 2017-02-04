@@ -73,6 +73,12 @@ void ClientSessionSettings::setDefaultHeaders(const Poco::Net::NameValueCollecti
 }
 
 
+void ClientSessionSettings::addDefaultHeader(const std::string& name, const std::string& value)
+{
+    _defaultHeaders.add(name, value);
+}
+
+
 void ClientSessionSettings::setkeepAlive(bool keepAlive)
 {
     _keepAlive = keepAlive;

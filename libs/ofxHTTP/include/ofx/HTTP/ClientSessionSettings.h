@@ -54,6 +54,11 @@ public:
     /// \params headers The default headers to included with each request.
     void setDefaultHeaders(const Poco::Net::NameValueCollection& headers);
 
+    /// \brief Add a default headers to included with each request.
+    /// \params name The header name.
+    /// \params value The header value.
+    void addDefaultHeader(const std::string& name, const std::string& value);
+
     /// \brief Enable or disable the session keep-alive.
     /// \param keepAlive True if keep-alive should be enabled.
     void setkeepAlive(bool keepAlive);
