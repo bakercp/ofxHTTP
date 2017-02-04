@@ -222,9 +222,13 @@ std::string Response::statusAndReason() const
 
 void Response::_bufferResponse()
 {
-    if (_bbis == nullptr && isBufferable())
+    if (isBufferable())
     {
-        _buffer.writeBytes(_responseStream->stream());
+        if (!isBuffered())
+        {
+            _buffer.writeBytes(_responseStream->stream());
+        }
+        
         _bbis = std::make_unique<IO::ByteBufferInputStream>(_buffer);
     }
 }
