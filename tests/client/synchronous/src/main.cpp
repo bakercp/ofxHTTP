@@ -26,17 +26,24 @@ class ofApp: public ofxUnitTestsApp
         defaultHeaders.add("Upgrade-Insecure-Requests","1");
         ofxHTTP::ClientSessionSettings settings;
         settings.setDefaultHeaders(defaultHeaders);
-        ofxHTTP::Context context(settings);
+        client.context().setClientSessionSettings(settings);
         ofxHTTP::GetRequest request("https://httpbin.org/headers");
-        auto response = client.execute(context, request);
+        auto response = client.execute(request);
 
-        ofJson json;
-        json << response->stream();
+        test_eq(response->isBuffered(), false, "Test buffered state before buffering.");
+        test_eq(response->isBufferable(), true, "Test bufferability.");
+        test_eq(response->isJson(), true, "Test json parse response.");
+        test_eq(response->isXml(), false, "Test xml parse response.");
+        test_eq(response->isPixels(), false, "Test pixels parse response.");
+
+        ofJson json = response->json();
 
         for (auto& entry: defaultHeaders)
         {
             test_eq(json["headers"][entry.first], entry.second, "Test headers fields.");
         }
+
+        test_eq(response->isBuffered(), true, "Test buffered state after buffering.");
 
     }
 
@@ -69,6 +76,83 @@ class ofApp: public ofxUnitTestsApp
 
     void testMethodGet()
     {
+        std::multimap<std::string, std::string> formFields =
+        {
+            { "test", "123" },
+            { "123", "test" }
+        };
+
+        {
+            std::string user = "user";
+            std::string password = "password";
+
+//            client.context().
+
+            ofxHTTP::GetRequest request("https://httpbin.org/basic-auth/" + user + "/" + password);
+            auto response = client.execute(request);
+            test_eq(response->isSuccess(), true, "Test basic authentication.");
+        }
+
+
+        {
+            ofxHTTP::GetRequest request("https://httpbin.org/xml");
+            auto response = client.execute(request);
+            test_eq(response->isXml(), true, "Test xml parse response.");
+            ofXml xml = response->xml();
+        }
+
+        {
+            ofxHTTP::GetRequest request("https://httpbin.org/image");
+            auto response = client.execute(request);
+            test_eq(response->isPixels(), true, "Test pixels parse response.");
+            ofPixels pixels = response->pixels();
+        }
+
+        {
+            ofxHTTP::GetRequest request("https://httpbin.org/get",
+                                         Poco::Net::HTTPMessage::HTTP_1_0);
+
+            request.addFormFields(formFields);
+
+            ofJson json = client.execute(request)->json();
+
+            for (auto& entry: formFields)
+            {
+                test_eq(json["args"][entry.first], entry.second, "Test form fields.");
+            }
+        }
+        {
+            ofxHTTP::GetRequest request("https://httpbin.org/get?hello=world&world=hello",
+                                        Poco::Net::HTTPMessage::HTTP_1_0);
+
+            ofJson json = client.execute(request)->json();
+
+            test_eq(json["args"]["hello"], "world", "Test form fields.");
+            test_eq(json["args"]["world"], "hello", "Test form fields.");
+        }
+        {
+            ofxHTTP::GetRequest request("https://httpbin.org/get",
+                                        Poco::Net::HTTPMessage::HTTP_1_1);
+
+            request.addFormFields(formFields);
+
+            ofJson json = client.execute(request)->json();
+
+            for (auto& entry: formFields)
+            {
+                test_eq(json["args"][entry.first], entry.second, "Test form fields.");
+            }
+        }
+        {
+            ofxHTTP::GetRequest request("https://httpbin.org/get?hello=world&world=hello",
+                                        Poco::Net::HTTPMessage::HTTP_1_1);
+
+            ofJson json = client.execute(request)->json();
+
+            test_eq(json["args"]["hello"], "world", "Test form fields.");
+            test_eq(json["args"]["world"], "hello", "Test form fields.");
+        }
+
 
     }
 
@@ -85,8 +169,6 @@ class ofApp: public ofxUnitTestsApp
                               "one pixel",
                               "pixel.gif")
         };
-        
-        ofxHTTP::Context context;
 
         {
             ofxHTTP::PostRequest request("https://httpbin.org/post",
@@ -94,10 +176,20 @@ class ofApp: public ofxUnitTestsApp
             request.addFormFields(formFields);
             request.addFormParts(formFiles);
 
-            auto response = client.execute(context, request);
+            ofJson json = client.execute(request)->json();
 
-            ofJson json;
-            json << response->stream();
+            for (auto& entry: formFields)
+            {
+                test_eq(json["form"][entry.first], entry.second, "Test form fields.");
+            }
+        }
+        {
+            ofxHTTP::PostRequest request("https://httpbin.org/post",
+                                         Poco::Net::HTTPMessage::HTTP_1_1);
+            request.addFormFields(formFields);
+            request.addFormParts(formFiles);
+
+            ofJson json = client.execute(request)->json();
 
             for (auto& entry: formFields)
             {
@@ -108,18 +200,27 @@ class ofApp: public ofxUnitTestsApp
             ofxHTTP::PostRequest request("https://httpbin.org/post",
                                          Poco::Net::HTTPMessage::HTTP_1_0);
             request.addFormFields(formFields);
-            request.addFormParts(formFiles);
 
-            auto response = client.execute(context, request);
-
-            ofJson json;
-            json << response->stream();
+            ofJson json = client.execute(request)->json();
 
             for (auto& entry: formFields)
             {
                 test_eq(json["form"][entry.first], entry.second, "Test form fields.");
             }
         }
+        {
+            ofxHTTP::PostRequest request("https://httpbin.org/post",
+                                         Poco::Net::HTTPMessage::HTTP_1_1);
+            request.addFormFields(formFields);
+
+            ofJson json = client.execute(request)->json();
+
+            for (auto& entry: formFields)
+            {
+                test_eq(json["form"][entry.first], entry.second, "Test form fields.");
+            }
+        }
+
     }
 
 
@@ -246,6 +347,7 @@ class ofApp: public ofxUnitTestsApp
 
 int main()
 {
+//    ofSetLogLevel(OF_LOG_VERBOSE);
 	ofInit();
 	auto window = std::make_shared<ofAppNoWindow>();
 	auto app = std::make_shared<ofApp>();
