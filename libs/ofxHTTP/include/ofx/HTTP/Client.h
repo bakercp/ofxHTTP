@@ -62,7 +62,7 @@ public:
 };
 
 /// \brief A base HTTP cient for executing HTTP client requests.
-class Client
+class Client: public AbstractRequestResponseFilter
 {
 public:
     /// \brief Create a Client.
@@ -91,7 +91,6 @@ public:
     /// \returns a unique pointer with the response.
     /// \throws Various exceptions.
     std::unique_ptr<Response> execute(Context& context, Request& request);
-
 
     /// \brief Execute an HTTP Request with the default client context.
     ///
@@ -155,10 +154,16 @@ public:
 
 
 protected:
-    void _doRequest(Context& context, Request& request);
+    virtual void requestFilter(Context& context,
+                               Request& request) const override;
 
+    virtual void responseFilter(Context& context,
+                                Request& request,
+                                Response& response) const override;
 
 private:
+    void _doRequest(Context& context, Request& request);
+
     std::unique_ptr<Context> _context = nullptr;
 
     std::unique_ptr<AbstractClientSessionProvider> _sessionProvider = nullptr;
@@ -167,16 +172,6 @@ private:
     std::unique_ptr<AbstractRequestResponseFilter> _proxyHandler = nullptr;
     std::unique_ptr<AbstractResponseStreamFilter> _responseEncodingFilter = nullptr;
     std::unique_ptr<AbstractResponseStreamFilter> _cacheProvider = nullptr;
-
-    /// \brief A list of request filters.
-    ///
-    /// These filters are automatically applied to the outgoing request headers.
-    std::vector<std::unique_ptr<AbstractRequestFilter>> _requestFilters;
-
-    /// \brief A list of response filters.
-    ///
-    /// These filters are automatically applied to the incoming response headers.
-    std::vector<std::unique_ptr<AbstractResponseFilter>> _responseFilters;
 
     /// \brief A list of request stream filters.
     std::vector<std::unique_ptr<AbstractRequestStreamFilter>> _requestStreamFilters;

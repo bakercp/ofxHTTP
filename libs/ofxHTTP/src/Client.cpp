@@ -128,7 +128,7 @@ std::unique_ptr<Response> Client::execute(Request& request)
 // during transfer, etc?
 // Is it just a matter of closing the socket?
 std::unique_ptr<Response> Client::execute(Context& context,
-                                              Request& request)
+                                          Request& request)
 {
     ofLogVerbose("Client::execute") << "==== Begin Client Execution ====";
 
@@ -151,9 +151,8 @@ std::unique_ptr<Response> Client::execute(Context& context,
     // Do proxy handling.
     _proxyHandler->responseFilter(context, request, *response);
 
-    // Apply response filters.
-    for (auto& filter: _responseFilters)
-        filter->responseFilter(context, request, *response);
+    // Call any subclass response filters.
+    responseFilter(context, request, *response);
 
     // Make any updates to headers.
     _responseEncodingFilter->responseFilter(context, request, *response);
@@ -252,6 +251,18 @@ void Client::submit(Context& context, Request& request)
 }
 
 
+void Client::requestFilter(Context& context, Request& request) const
+{
+}
+
+
+void Client::responseFilter(Context& context,
+                            Request& request,
+                            Response& response) const
+{
+}
+
+
 void Client::_doRequest(Context& context, Request& request)
 {
     // Apply the request headers.
@@ -260,8 +271,8 @@ void Client::_doRequest(Context& context, Request& request)
     // Apply accept-headers.
     _responseEncodingFilter->requestFilter(context, request);
 
-    // Apply request filters.
-    for (auto& filter: _requestFilters) filter->requestFilter(context, request);
+    // Call any sub-class request filters.
+    requestFilter(context, request);
 
     // Prepare the request. Depending on the request type, this may involve
     // signing a requests, counting Content-Bytes, etc.
