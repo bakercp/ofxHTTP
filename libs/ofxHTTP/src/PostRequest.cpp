@@ -129,24 +129,4 @@ void PostRequest::addFormString(const std::string& name,
 }
 
 
-void PostRequest::prepareRequest()
-{
-    _form.prepareSubmit(*this);
-
-    // \TODO Fix for Poco Bug
-    // https://github.com/pocoproject/poco/issues/1331
-    if (!getChunkedTransferEncoding())
-    {
-        // TODO: This long thing is a work-around for bug https://github.com/pocoproject/poco/issues/1337
-        setContentLength(_form.getEncoding() == Poco::Net::HTMLForm::ENCODING_URL ? 0 : _form.calculateContentLength());
-    }
-}
-
-
-void PostRequest::writeRequestBody(std::ostream& requestStream)
-{
-    _form.write(requestStream);
-}
-
-
 } } // namespace ofx::HTTP

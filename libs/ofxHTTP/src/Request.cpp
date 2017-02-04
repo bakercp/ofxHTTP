@@ -7,6 +7,7 @@
 
 #include "ofx/HTTP/Request.h"
 #include "ofx/HTTP/HTTPUtils.h"
+#include "Poco/Net/NetException.h"
 
 
 namespace ofx {
@@ -94,8 +95,27 @@ void Request::prepareRequest()
     {
         setURI(uri.substr(0, uri.size() - 1));
     }
-}
 
+    // \TODO Fix for Poco Bug
+    // https://github.com/pocoproject/poco/issues/1331
+    //
+    // Chunked Transfer Encoding uses the `Transfer-Encoding` HTTP header in
+    // place of the Content-Length header.
+
+    if (getChunkedTransferEncoding() == false && getContentLength64() == UNKNOWN_CONTENT_LENGTH)
+    {
+        try
+        {
+            setContentLength(_form.calculateContentLength());
+        }
+        catch (const Poco::Net::HTMLFormException& exc)
+        {
+            // This exception is called for some GET requests that are
+            // attempting url-encoded submissions.
+            setContentLength(0);
+        }
+    }
+}
 
 void Request::writeRequestBody(std::ostream& requestStream)
 {
@@ -110,8 +130,15 @@ int64_t Request::estimatedContentLength() const
     // If needed, try to calculate it based on the form data.
     if (contentLength == UNKNOWN_CONTENT_LENGTH)
     {
-        // TODO: This long thing is a work-around for bug https://github.com/pocoproject/poco/issues/1337
-        contentLength = (_form.getEncoding() == Poco::Net::HTMLForm::ENCODING_URL) ? 0 : _form.calculateContentLength();
+        try
+        {
+            contentLength = _form.calculateContentLength();
+        }
+        catch (const Poco::Net::HTMLFormException& exc)
+        {
+            // If we end up in here, we can't determine the content length.
+            contentLength == UNKNOWN_CONTENT_LENGTH;
+        }
     }
 
     return contentLength;

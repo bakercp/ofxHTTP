@@ -85,7 +85,7 @@ public:
     /// \returns a const reference to the raw form data.
     const Poco::Net::HTMLForm& form() const;
 
-    /// \brief Get the estimated content length for progress estimtion purposes.
+    /// \brief Get the estimated content length for progress estimation purposes.
     ///
     /// Internally this will read from the Content-Length header. If that header
     /// is not available due to transfer-chunking being true, etc, then it will

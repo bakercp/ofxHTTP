@@ -170,14 +170,6 @@ public:
     /// \returns a reference to the raw form data.
     Poco::Net::HTMLForm& form();
 
-protected:
-    /// \brief Custom prepareRequest() to set the content length;
-    void prepareRequest();
-
-    /// \brief Writes from the form buffer.
-    /// \param requestStream The stream to write the request body.
-    void writeRequestBody(std::ostream& requestStream);
-
 };
 
 
