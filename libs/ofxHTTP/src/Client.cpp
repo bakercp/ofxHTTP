@@ -14,6 +14,7 @@
 #include "ofx/HTTP/DefaultEncodingResponseStreamFilter.h"
 
 
+
 namespace ofx {
 namespace HTTP {
 
@@ -28,20 +29,26 @@ PixelResponseHandler::~PixelResponseHandler()
 }
 
 
-ofPixels PixelResponseHandler::handleResponse(BaseResponse& response)
+ofPixels PixelResponseHandler::handleResponse(Response& response)
 {
-    ofPixels pixels;
-    ofBuffer buffer(response.stream());
-    if (ofLoadImage(pixels, buffer))
+    if (response.isSuccess())
     {
-        return pixels;
+        ofPixels pixels;
+        ofBuffer buffer(response.stream());
+        if (ofLoadImage(pixels, buffer))
+        {
+            return pixels;
+        }
+        else
+        {
+            throw Poco::IOException("Unable to parse pixels from buffer.");
+        }
     }
     else
     {
-        throw Poco::IOException("Unable to parse pixels from buffer.");
+        throw Poco::Net::HTTPException("Invalid HTTPResponse Code", response.getStatus());
     }
 }
-
 
 
 JSONResponseHandler::JSONResponseHandler()
@@ -54,11 +61,34 @@ JSONResponseHandler::~JSONResponseHandler()
 }
 
 
-ofJson JSONResponseHandler::handleResponse(BaseResponse& response)
+ofJson JSONResponseHandler::handleResponse(Response& response)
 {
-    ofJson json;
-    json << response.stream();
-    return json;
+    if (response.isSuccess())
+    {
+        ofJson json;
+        json << response.stream();
+        return json;
+    }
+    else
+    {
+        throw Poco::Net::HTTPException("Invalid HTTPResponse Code", response.getStatus());
+    }
+}
+
+
+BufferResponseHandler::BufferResponseHandler()
+{
+}
+
+
+BufferResponseHandler::~BufferResponseHandler()
+{
+}
+
+
+ofBuffer BufferResponseHandler::handleResponse(Response& response)
+{
+    return ofBuffer(response.stream());
 }
 
 
@@ -76,11 +106,29 @@ Client::~Client()
 {
 }
 
+
+Context& Client::context()
+{
+    if (_context == nullptr)
+    {
+        _context = std::make_unique<Context>();
+    }
+
+    return *_context;
+}
+
+
+std::unique_ptr<Response> Client::execute(Request& request)
+{
+    return execute(context(), request);
+}
+
+
 // TODO CANCEL TOKEN ... how do we cancel this at various stages?
 // during transfer, etc?
 // Is it just a matter of closing the socket?
-std::unique_ptr<BaseResponse> Client::execute(Context& context,
-                                              BaseRequest& request)
+std::unique_ptr<Response> Client::execute(Context& context,
+                                              Request& request)
 {
     ofLogVerbose("Client::execute") << "==== Begin Client Execution ====";
 
@@ -149,7 +197,13 @@ std::unique_ptr<BaseResponse> Client::execute(Context& context,
 }
 
 
-void Client::submit(Context& context, BaseRequest& request)
+void Client::submit(Request& request)
+{
+    submit(context(), request);
+}
+
+
+void Client::submit(Context& context, Request& request)
 {
     auto response = nullptr;
 
@@ -198,7 +252,7 @@ void Client::submit(Context& context, BaseRequest& request)
 }
 
 
-void Client::_doRequest(Context& context, BaseRequest& request)
+void Client::_doRequest(Context& context, Request& request)
 {
     // Apply the request headers.
     _defaultRequestHeaders->requestFilter(context, request);

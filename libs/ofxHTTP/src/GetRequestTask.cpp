@@ -83,6 +83,7 @@ bool GetRequestTask::onHTTPClientResponseProgress(ClientResponseProgressEventArg
 
 bool GetRequestTask::onHTTPClientResponseStream(ClientResponseStreamEventArgs& args)
 {
+    // Buffer the stream.
     ofBuffer buffer(args.stream());
 
     if (!_cachePath.empty())
@@ -90,24 +91,44 @@ bool GetRequestTask::onHTTPClientResponseStream(ClientResponseStreamEventArgs& a
         ofBufferToFile(_cachePath, buffer);
     }
 
+    // We catch parsing errors and exceptions, in order to return the raw buffer.
+
     Poco::Net::MediaType mediaType(args.response().getContentType());
 
     if (mediaType.matches("image"))
     {
         ofPixels pixels;
-        ofLoadImage(pixels, buffer);
-        postNotification(new Poco::TaskCustomNotification<ofPixels>(this, pixels));
+
+        if (ofLoadImage(pixels, buffer))
+        {
+            postNotification(new Poco::TaskCustomNotification<ofPixels>(this, pixels));
+            return;
+        }
+        else
+        {
+            ofLogError("GetRequestTask::onHTTPClientResponseStream") << "Failed to load image from buffer.";
+        }
     }
     else if (mediaType.matches("application", "json"))
     {
-        ofJson json = ofJson::parse(buffer);
-        postNotification(new Poco::TaskCustomNotification<ofJson>(this, json));
+        try
+        {
+            ofJson json = ofJson::parse(buffer);
+            postNotification(new Poco::TaskCustomNotification<ofJson>(this, json));
+            return;
+        }
+        catch (const std::exception& exc)
+        {
+            ofLogError("GetRequestTask::onHTTPClientResponseStream") << "Failed to parse JSON: " << exc.what();
+        }
+        catch (...)
+        {
+            ofLogError("GetRequestTask::onHTTPClientResponseStream") << "Failed to parse JSON: unknown exception.";
+        }
     }
-    else
-    {
-        std::cout << "Unknown type " << mediaType.toString() << " posting buffer.";
-        postNotification(new Poco::TaskCustomNotification<ofBuffer>(this, buffer));
-    }
+
+    // The default case.
+    postNotification(new Poco::TaskCustomNotification<ofBuffer>(this, buffer));
 
     return true;
 }
