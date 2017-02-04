@@ -8,7 +8,7 @@
 #pragma once
 
 
-#include "ofx/HTTP/BaseResponse"
+#include "ofx/HTTP/Response"
 
 
 namespace ofx {
@@ -17,7 +17,7 @@ namespace HTTP {
 
 
 ///// \brief An HTTP POST Request with a JSON request body.
-//class JSONResponse: public BaseResponse
+//class JSONResponse: public Response
 //{
 //public:
 //    /// \brief Construct a JSONResponse

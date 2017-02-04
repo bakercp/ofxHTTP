@@ -22,11 +22,11 @@ public:
 
     virtual ~DefaultProxyProcessor();
 
-    virtual void requestFilter(Context& context, BaseRequest& request) const override;
+    virtual void requestFilter(Context& context, Request& request) const override;
 
     virtual void responseFilter(Context& context,
-                                BaseRequest& request,
-                                BaseResponse& response) const override;
+                                Request& request,
+                                Response& response) const override;
 
 };
 

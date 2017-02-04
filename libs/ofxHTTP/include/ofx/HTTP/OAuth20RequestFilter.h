@@ -38,7 +38,7 @@ public:
     OAuth20Credentials getCredentials() const;
     
     virtual void requestFilter(Context& context,
-                               BaseRequest& request) const override;
+                               Request& request) const override;
 
 private:
     /// \brief The OAuth 2.0 credentials used for authentication.

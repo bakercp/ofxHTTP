@@ -6,8 +6,8 @@
 
 
 #include "ofx/HTTP/CredentialStore.h"
-#include "ofx/HTTP/BaseRequest.h"
-#include "ofx/HTTP/BaseResponse.h"
+#include "ofx/HTTP/Request.h"
+#include "ofx/HTTP/Response.h"
 
 
 namespace ofx {
@@ -162,7 +162,7 @@ void DefaultCredentialStore::clearCredentials(const Poco::URI& uri)
 
 
 void DefaultCredentialStore::requestFilter(Context&,
-                                           BaseRequest& request) const
+                                           Request& request) const
 {
     // first check and see if the request has any authentication headers
     // these could be added via default session headers
@@ -216,8 +216,8 @@ void DefaultCredentialStore::requestFilter(Context&,
 
 
 void DefaultCredentialStore::responseFilter(Context&,
-                                            BaseRequest& request,
-                                            BaseResponse& response) const
+                                            Request& request,
+                                            Response& response) const
 {
 
     if (response.getStatus() == Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED)
@@ -322,8 +322,8 @@ void DefaultCredentialStore::responseFilter(Context&,
 }
 
 
-//bool DefaultCredentialStore::canFilterResponse(BaseRequest&,
-//                                               BaseResponse&,
+//bool DefaultCredentialStore::canFilterResponse(Request&,
+//                                               Response&,
 //                                               Context&) const
 //{
 //    // TODO

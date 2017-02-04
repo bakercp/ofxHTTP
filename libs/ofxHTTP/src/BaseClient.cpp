@@ -32,8 +32,8 @@
 //
 //
 //void BaseClient::execute(Context& context,
-//                         BaseRequest& request,
-//                         BaseResponse& response)
+//                         Request& request,
+//                         Response& response)
 //{
 //    try
 //    {

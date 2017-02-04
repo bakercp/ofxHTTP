@@ -41,14 +41,14 @@ public:
     virtual ~ClientSessionProvider();
 
     virtual void requestFilter(Context& context,
-                               BaseRequest& request) const override;
+                               Request& request) const override;
 
     virtual void returnClientSession(std::unique_ptr<Poco::Net::HTTPClientSession> session) const override;
 
 private:
     /// \brief Attempt to determine the host information from a request or context.
     static HTTPHost _extractHost(const Context& context,
-                                 const BaseRequest& request);
+                                 const Request& request);
 
     static HTTPHost _extractHost(const Poco::Net::HTTPClientSession& session);
 

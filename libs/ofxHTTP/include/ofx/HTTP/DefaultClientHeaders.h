@@ -22,7 +22,7 @@ public:
 
     virtual ~DefaultClientHeaders();
 
-    virtual void requestFilter(Context& context, BaseRequest& request) const override;
+    virtual void requestFilter(Context& context, Request& request) const override;
 
 };
 

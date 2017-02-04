@@ -9,8 +9,8 @@
 
 
 #include "ofx/HTTP/AbstractClientTypes.h"
-#include "ofx/HTTP/BaseRequest.h"
-#include "ofx/HTTP/BaseResponse.h"
+#include "ofx/HTTP/Request.h"
+#include "ofx/HTTP/Response.h"
 #include "ofx/HTTP/Context.h"
 
 
@@ -24,15 +24,15 @@ public:
     DefaultEncodingResponseStreamFilter();
     virtual ~DefaultEncodingResponseStreamFilter();
     
-    void requestFilter(Context& context, BaseRequest& request) const override;
+    void requestFilter(Context& context, Request& request) const override;
 
     void responseFilter(Context& context,
-                        BaseRequest& request,
-                        BaseResponse& response) const override;
+                        Request& request,
+                        Response& response) const override;
 
     void responseStreamFilter(Context& context,
-                              const BaseRequest& request,
-                              const BaseResponse& response,
+                              const Request& request,
+                              const Response& response,
                               IO::FilteredInputStream& responseStream) const override;
 
     /// \brief The "Accept-Encoding" header key.

@@ -57,8 +57,8 @@
 //    //    /// \param context The context data used during the submission.
 //
 //    void execute(Context& context,
-//                 BaseRequest& request,
-//                 BaseResponse& response);
+//                 Request& request,
+//                 Response& response);
 //
 ////    /// \brief Execute a request and return the buffered data.
 ////    /// \param request A pointer to the Request to execute.
@@ -113,7 +113,7 @@
 ////
 //    /// \brief Add a request header filter.
 //    ///
-//    /// Request filters are applied to the BaseRequest in the order they are
+//    /// Request filters are applied to the Request in the order they are
 //    /// are added. Request filters are often used to introduce additional header
 //    /// or other client information such as authentication credentials.
 //    ///
@@ -130,7 +130,7 @@
 //
 //    /// \brief Add a response header filter.
 //    ///
-//    /// Response filters are applied to the BaseResponse in the order they are
+//    /// Response filters are applied to the Response in the order they are
 //    /// are added. Response filters are often used to introduce additional
 //    /// header data or analyze the response information to extract client
 //    /// information such as cookies or credentials.
@@ -206,29 +206,29 @@
 ////    /// \brief An internal function that applies the request filters.
 ////    /// \param request The request to filter.
 ////    /// \param context The context of the request.
-////    void _filterRequest(BaseRequest& request, Context& context);
+////    void _filterRequest(Request& request, Context& context);
 ////
 ////    /// \brief An internal function that applies the response filters.
 ////    /// \param request The request.
 ////    /// \param response The response to filter.
 ////    /// \param context The context of the request.
-////    void _filterResponse(BaseRequest& request,
-////                         BaseResponse& response,
+////    void _filterResponse(Request& request,
+////                         Response& response,
 ////                         Context& context);
 ////
 ////    /// \brief An internal function that establishes a connection.
 ////    /// \param request The filtered request.
 ////    /// \param context The context of the request.
 ////    /// \returns a unique pointer to an output stream to write to.
-////    std::unique_ptr<std::ostream> _send(BaseRequest& request, Context& context);
+////    std::unique_ptr<std::ostream> _send(Request& request, Context& context);
 ////
 ////    /// \brief An internal function that receives a response.
 ////    /// \param request The submitted request.
 ////    /// \param response The response headers generated.
 ////    /// \param context The context of the request.
 ////    /// \returns a unique pointer to an input stream to be read.
-////    std::unique_ptr<std::istream> _receive(BaseRequest& request,
-////                                           BaseResponse& response,
+////    std::unique_ptr<std::istream> _receive(Request& request,
+////                                           Response& response,
 //
 //
 //    

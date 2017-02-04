@@ -6,7 +6,7 @@
 
 
 #include "ofx/HTTP/DefaultClientHeaders.h"
-#include "ofx/HTTP/BaseRequest.h"
+#include "ofx/HTTP/Request.h"
 #include "ofx/HTTP/Context.h"
 
 
@@ -25,7 +25,7 @@ DefaultClientHeaders::~DefaultClientHeaders()
 
 
 void DefaultClientHeaders::requestFilter(Context& context,
-                                         BaseRequest& request) const
+                                         Request& request) const
 {
     const ClientSessionSettings& settings = context.getClientSessionSettings();
 

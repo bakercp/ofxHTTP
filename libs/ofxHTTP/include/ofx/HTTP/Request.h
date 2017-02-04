@@ -28,12 +28,12 @@ namespace HTTP {
 
 
 /// \brief A Custom Base HTTP Request.
-class BaseRequest: public Poco::Net::HTTPRequest
+class Request: public Poco::Net::HTTPRequest
 {
 public:
-    /// \brief Construct an HTTPRequest
+    /// \brief Construct an Request
     ///
-    /// This simple constructor passes the raw URI as is with the HTTPRequest.
+    /// This simple constructor passes the raw URI as is with the Request.
     /// Query and fragment parameters included in the URI _will not_ be
     /// automatically available for additional processing (e.g. for use in OAuth
     /// 1.0 signatures, which require validation of the query/form parameters).
@@ -50,12 +50,12 @@ public:
     /// \param uri The endpoint URI.
     /// \param httpVersion Either HTTP/1.0 or HTTP/1.1.
     /// \throws Poco::SyntaxException if the uri is not valid.
-    BaseRequest(const std::string& method,
-                const std::string& uri,
-                const std::string& httpVersion);
+    Request(const std::string& method,
+            const std::string& uri,
+            const std::string& httpVersion);
 
-    /// \brief Destroy this BaseReuqest.
-    virtual ~BaseRequest();
+    /// \brief Destroy this Request.
+    virtual ~Request();
 
     /// \brief Write the HTTPRequest to an output stream.
     ///

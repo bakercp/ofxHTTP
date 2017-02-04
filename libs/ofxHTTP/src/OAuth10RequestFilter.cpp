@@ -7,7 +7,7 @@
 
 #include "ofx/HTTP/OAuth10RequestFilter.h"
 #include "Poco/Net/OAuth10Credentials.h"
-#include "ofx/HTTP/BaseRequest.h"
+#include "ofx/HTTP/Request.h"
 #include "ofx/HTTP/HTTPUtils.h"
 
 
@@ -44,7 +44,7 @@ OAuth10Credentials OAuth10RequestFilter::getCredentials() const
 
 
 void OAuth10RequestFilter::requestFilter(Context& context,
-                                         BaseRequest& request) const
+                                         Request& request) const
 {
     Poco::Net::OAuth10Credentials credentials(_credentials.consumerKey(),
                                               _credentials.consumerSecret(),

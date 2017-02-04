@@ -38,7 +38,7 @@ public:
     OAuth10Credentials getCredentials() const;
     
     virtual void requestFilter(Context& context,
-                               BaseRequest& request) const override;
+                               Request& request) const override;
 
 private:
     /// \brief The OAuth 1.0 credentials used for authentication.

@@ -12,8 +12,8 @@
 #include <istream>
 #include <cctype>
 #include "Poco/UnbufferedStreamBuf.h"
-#include "ofx/HTTP/BaseRequest.h"
-#include "ofx/HTTP/BaseResponse.h"
+#include "ofx/HTTP/Request.h"
+#include "ofx/HTTP/Response.h"
 #include "ofx/HTTP/Context.h"
 
 
@@ -25,12 +25,12 @@ class ClientProgressStreamBuf: public Poco::UnbufferedStreamBuf
 {
 public:
     ClientProgressStreamBuf(Context& context,
-                            BaseRequest& request,
+                            Request& request,
                             std::ostream& ostr);
 
     ClientProgressStreamBuf(Context& context,
-                            BaseRequest& request,
-                            BaseResponse& response,
+                            Request& request,
+                            Response& response,
                             std::istream& istr);
 
     ~ClientProgressStreamBuf();
@@ -41,8 +41,8 @@ protected:
 
 private:
     Context* _pContext = nullptr;
-    BaseRequest* _pRequest = nullptr;
-    BaseResponse* _pResponse = nullptr;
+    Request* _pRequest = nullptr;
+    Response* _pResponse = nullptr;
 
     std::ostream* _pRequestStream = nullptr;
     std::istream* _pResponseStream = nullptr;
@@ -63,12 +63,12 @@ class ClientProgressIOS: public virtual std::ios
 {
 public:
     ClientProgressIOS(Context& context,
-                      BaseRequest& request,
+                      Request& request,
                       std::ostream& ostr);
 
     ClientProgressIOS(Context& context,
-                      BaseRequest& request,
-                      BaseResponse& response,
+                      Request& request,
+                      Response& response,
                       std::istream& istr);
 
     ~ClientProgressIOS();
@@ -90,7 +90,7 @@ class ClientProgressRequestStream:
 public:
     /// \brief Creates the CountingOutputStream and connects it to the given input stream.
     ClientProgressRequestStream(Context& context,
-                                BaseRequest& request,
+                                Request& request,
                                 std::ostream& ostr);
 
     /// \brief Destroys the ProgressOutputStream.
@@ -106,8 +106,8 @@ class ClientProgressResponseStream:
 public:
     /// \brief Creates the CountingInputStream and connects it to the given input stream.
     ClientProgressResponseStream(Context& context,
-                                 BaseRequest& request,
-                                 BaseResponse& response,
+                                 Request& request,
+                                 Response& response,
                                  std::istream& istr);
 
     /// \brief Destroys the stream.
@@ -120,7 +120,7 @@ class ClientProgressRequestStreamFilter: public IO::AbstractOutputStreamFilter
 {
 public:
     ClientProgressRequestStreamFilter(Context& context,
-                                      BaseRequest& request);
+                                      Request& request);
 
     virtual ~ClientProgressRequestStreamFilter();
 
@@ -128,7 +128,7 @@ public:
 
 private:
     Context& _context;
-    BaseRequest& _request;
+    Request& _request;
 
     std::unique_ptr<ClientProgressRequestStream> _stream;
     
@@ -139,8 +139,8 @@ class ClientProgressResponseStreamFilter: public IO::AbstractInputStreamFilter
 {
 public:
     ClientProgressResponseStreamFilter(Context& context,
-                                       BaseRequest& request,
-                                       BaseResponse& response);
+                                       Request& request,
+                                       Response& response);
 
     virtual ~ClientProgressResponseStreamFilter();
 
@@ -148,8 +148,8 @@ public:
 
 private:
     Context& _context;
-    BaseRequest& _request;
-    BaseResponse& _response;
+    Request& _request;
+    Response& _response;
 
     std::unique_ptr<ClientProgressResponseStream> _stream;
 

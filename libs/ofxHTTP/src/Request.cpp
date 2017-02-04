@@ -5,7 +5,7 @@
 //
 
 
-#include "ofx/HTTP/BaseRequest.h"
+#include "ofx/HTTP/Request.h"
 #include "ofx/HTTP/HTTPUtils.h"
 
 
@@ -13,7 +13,7 @@ namespace ofx {
 namespace HTTP {
 
 
-BaseRequest::BaseRequest(const std::string& method,
+Request::Request(const std::string& method,
                          const std::string& uri,
                          const std::string& httpVersion):
     Poco::Net::HTTPRequest(method, uri, httpVersion),
@@ -22,12 +22,12 @@ BaseRequest::BaseRequest(const std::string& method,
 }
 
 
-BaseRequest::~BaseRequest()
+Request::~Request()
 {
 }
 
 
-void BaseRequest::write(std::ostream& ostr) const
+void Request::write(std::ostream& ostr) const
 {
     try
     {
@@ -51,37 +51,37 @@ void BaseRequest::write(std::ostream& ostr) const
     }
     catch (const Poco::SyntaxException& exc)
     {
-        ofLogWarning("ofx::HTTP::BaseRequest") << "Unable to parse URI, using: " << getURI() << " : " << exc.displayText();
+        ofLogWarning("ofx::HTTP::Request") << "Unable to parse URI, using: " << getURI() << " : " << exc.displayText();
         Poco::Net::HTTPRequest::write(ostr);
     }
 }
 
 
-void BaseRequest::setRequestId(const std::string& requestId)
+void Request::setRequestId(const std::string& requestId)
 {
     _requestId = requestId;
 }
 
 
-const std::string& BaseRequest::getRequestId() const
+const std::string& Request::getRequestId() const
 {
     return _requestId;
 }
 
 
-std::string BaseRequest::generateId()
+std::string Request::generateId()
 {
     return Poco::UUIDGenerator::defaultGenerator().createOne().toString();
 }
 
 
-const Poco::Net::HTMLForm& BaseRequest::form() const
+const Poco::Net::HTMLForm& Request::form() const
 {
     return _form;
 }
 
 
-void BaseRequest::prepareRequest()
+void Request::prepareRequest()
 {
     _form.prepareSubmit(*this);
 
@@ -97,13 +97,13 @@ void BaseRequest::prepareRequest()
 }
 
 
-void BaseRequest::writeRequestBody(std::ostream& requestStream)
+void Request::writeRequestBody(std::ostream& requestStream)
 {
     _form.write(requestStream);
 }
 
 
-int64_t BaseRequest::estimatedContentLength() const
+int64_t Request::estimatedContentLength() const
 {
     int64_t contentLength = getContentLength64();
 

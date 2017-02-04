@@ -17,7 +17,7 @@
 //#include "ofx/HTTP/DefaultProxyProcessor.h"
 //#include "ofx/HTTP/DefaultRedirectProcessor.h"
 //#include "ofx/HTTP/DefaultEncodingResponseStreamFilter.h"
-//#include "ofx/HTTP/BaseResponse.h"
+//#include "ofx/HTTP/Response.h"
 //#include "ofx/HTTP/GetRequest.h"
 //#include "ofx/HTTP/JSONRequest.h"
 //#include "ofx/HTTP/PostRequest.h"

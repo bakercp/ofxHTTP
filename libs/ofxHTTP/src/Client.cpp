@@ -91,7 +91,7 @@ std::unique_ptr<BaseResponse> Client::execute(Context& context,
     HTTPUtils::dumpHeaders(request, OF_LOG_VERBOSE);
     ofLogVerbose("Client::execute") << "===== End Request Headers =====";
 
-    auto response = std::make_unique<BaseResponse>();
+    auto response = std::make_unique<Response>();
 
     context.setState(ClientState::RECEIVING_HEADERS);
 

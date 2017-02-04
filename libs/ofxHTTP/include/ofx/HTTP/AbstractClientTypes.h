@@ -21,8 +21,8 @@ namespace ofx {
 namespace HTTP {
 
 
-class BaseRequest;
-class BaseResponse;
+class Request;
+class Response;
 class Context;
 
 
@@ -38,7 +38,7 @@ public:
     }
 
     virtual void requestFilter(Context& context,
-                               BaseRequest& request) const = 0;
+                               Request& request) const = 0;
 
 };
 
@@ -53,8 +53,8 @@ public:
     }
     
     virtual void responseFilter(Context& context,
-                                BaseRequest& request,
-                                BaseResponse& response) const = 0;
+                                Request& request,
+                                Response& response) const = 0;
 
 };
 
@@ -79,7 +79,7 @@ public:
     }
 
     virtual void requestStreamFilter(Context& context,
-                                     const BaseRequest& request,
+                                     const Request& request,
                                      IO::FilteredOutputStream& requestStream) const = 0;
     
 };
@@ -93,8 +93,8 @@ public:
     }
 
     virtual void responseStreamFilter(Context& context,
-                                      const BaseRequest& request,
-                                      const BaseResponse& response,
+                                      const Request& request,
+                                      const Response& response,
                                       IO::FilteredInputStream& responseStream) const = 0;
 
 };

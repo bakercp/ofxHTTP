@@ -6,8 +6,8 @@
 
 
 #include "ofx/HTTP/ClientSessionProvider.h"
-#include "ofx/HTTP/BaseRequest.h"
-#include "ofx/HTTP/BaseResponse.h"
+#include "ofx/HTTP/Request.h"
+#include "ofx/HTTP/Response.h"
 #include "ofx/HTTP/Context.h"
 #include "ofSSLManager.h"
 #include "Poco/Net/HTTPClientSession.h"
@@ -47,7 +47,7 @@ ClientSessionProvider::~ClientSessionProvider()
 
 
 void ClientSessionProvider::requestFilter(Context& context,
-                                          BaseRequest& request) const
+                                          Request& request) const
 {
     ofLogVerbose("ClientSessionProvider::requestFilter") << "Session needed for " << request.getURI();
 
@@ -101,7 +101,7 @@ void ClientSessionProvider::returnClientSession(std::unique_ptr<Poco::Net::HTTPC
 
 
 HTTPHost ClientSessionProvider::_extractHost(const Context& context,
-                                             const BaseRequest& request)
+                                             const Request& request)
 {
     // Determine the scheme, host and port required for this request.
     Poco::URI uri = Poco::URI(request.getURI());

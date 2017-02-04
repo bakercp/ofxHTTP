@@ -13,7 +13,7 @@ namespace HTTP {
 
 
 ClientProgressStreamBuf::ClientProgressStreamBuf(Context& context,
-                                                 BaseRequest& request,
+                                                 Request& request,
                                                  std::ostream& ostr):
     _pContext(&context),
     _pRequest(&request),
@@ -28,8 +28,8 @@ ClientProgressStreamBuf::ClientProgressStreamBuf(Context& context,
 
 
 ClientProgressStreamBuf::ClientProgressStreamBuf(Context& context,
-                                                 BaseRequest& request,
-                                                 BaseResponse& response,
+                                                 Request& request,
+                                                 Response& response,
                                                  std::istream& istr):
     _pContext(&context),
     _pRequest(&request),
@@ -120,7 +120,7 @@ int ClientProgressStreamBuf::readFromDevice()
 
 
 ClientProgressIOS::ClientProgressIOS(Context& context,
-                                     BaseRequest& request,
+                                     Request& request,
                                      std::ostream& ostr):
     _buf(context, request, ostr)
 {
@@ -129,8 +129,8 @@ ClientProgressIOS::ClientProgressIOS(Context& context,
 
 
 ClientProgressIOS::ClientProgressIOS(Context& context,
-                                     BaseRequest& request,
-                                     BaseResponse& response,
+                                     Request& request,
+                                     Response& response,
                                      std::istream& istr):
     _buf(context, request, response, istr)
 {
@@ -150,7 +150,7 @@ ClientProgressStreamBuf* ClientProgressIOS::rdbuf()
 
 
 ClientProgressRequestStream::ClientProgressRequestStream(Context& context,
-                                                         BaseRequest& request,
+                                                         Request& request,
                                                          std::ostream& ostr):
     ClientProgressIOS(context, request, ostr),
     std::ostream(&_buf)
@@ -164,8 +164,8 @@ ClientProgressRequestStream::~ClientProgressRequestStream()
 
 
 ClientProgressResponseStream::ClientProgressResponseStream(Context& context,
-                                                           BaseRequest& request,
-                                                           BaseResponse& response,
+                                                           Request& request,
+                                                           Response& response,
                                                            std::istream& istr):
     ClientProgressIOS(context, request, response, istr),
     std::istream(&_buf)
@@ -179,7 +179,7 @@ ClientProgressResponseStream::~ClientProgressResponseStream()
 
 
 ClientProgressRequestStreamFilter::ClientProgressRequestStreamFilter(Context& context,
-                                                                     BaseRequest& request):
+                                                                     Request& request):
     _context(context),
     _request(request)
 {
@@ -201,8 +201,8 @@ std::ostream& ClientProgressRequestStreamFilter::filter(std::ostream& stream)
 
 
 ClientProgressResponseStreamFilter::ClientProgressResponseStreamFilter(Context& context,
-                                                                       BaseRequest& request,
-                                                                       BaseResponse& response):
+                                                                       Request& request,
+                                                                       Response& response):
     _context(context),
     _request(request),
     _response(response)

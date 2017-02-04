@@ -10,7 +10,7 @@
 
 #include "ofConstants.h"
 #include "ofJson.h"
-#include "ofx/HTTP/BaseRequest.h"
+#include "ofx/HTTP/Request.h"
 
 
 namespace ofx {
@@ -18,7 +18,7 @@ namespace HTTP {
 
 
 /// \brief An HTTP POST Request with a JSON request body.
-class JSONRequest: public BaseRequest
+class JSONRequest: public Request
 {
 public:
     /// \brief Construct a JSONRequest with a given uri and http version.

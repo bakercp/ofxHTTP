@@ -6,8 +6,8 @@
 
 
 #include "ofx/HTTP/ClientEvents.h"
-#include "ofx/HTTP/BaseRequest.h"
-#include "ofx/HTTP/BaseResponse.h"
+#include "ofx/HTTP/Request.h"
+#include "ofx/HTTP/Response.h"
 #include "ofx/HTTP/Context.h"
 
 
@@ -44,7 +44,7 @@ ClientState ClientStateChangeEventArgs::state() const
 
 
 ClientRequestEventArgs::ClientRequestEventArgs(Context& context,
-                                               BaseRequest& request):
+                                               Request& request):
     ClientContextEventArgs(context),
     _request(request)
 {
@@ -56,15 +56,15 @@ ClientRequestEventArgs::~ClientRequestEventArgs()
 }
 
 
-const BaseRequest& ClientRequestEventArgs::request() const
+const Request& ClientRequestEventArgs::request() const
 {
     return _request;
 }
 
 
 ClientResponseEventArgs::ClientResponseEventArgs(Context& context,
-                                                 BaseRequest& request,
-                                                 BaseResponse& response):
+                                                 Request& request,
+                                                 Response& response):
     ClientRequestEventArgs(context, request),
     _response(response)
 {
@@ -76,14 +76,14 @@ ClientResponseEventArgs::~ClientResponseEventArgs()
 }
 
 
-const BaseResponse& ClientResponseEventArgs::response() const
+const Response& ClientResponseEventArgs::response() const
 {
     return _response;
 }
 
 
 ClientRequestProgressEventArgs::ClientRequestProgressEventArgs(Context& context,
-                                                               BaseRequest& request,
+                                                               Request& request,
                                                                Progress& progress):
     ClientRequestEventArgs(context, request),
     _progress(progress)
@@ -103,8 +103,8 @@ const Progress& ClientRequestProgressEventArgs::progress() const
 
 
 ClientResponseProgressEventArgs::ClientResponseProgressEventArgs(Context& context,
-                                                                 BaseRequest& request,
-                                                                 BaseResponse& response,
+                                                                 Request& request,
+                                                                 Response& response,
                                                                  Progress& progress):
     ClientResponseEventArgs(context, request, response),
     _progress(progress)
@@ -135,8 +135,8 @@ std::istream& ClientResponseStreamEventArgs::stream()
 
 
 ClientErrorEventArgs::ClientErrorEventArgs(Context& context,
-                                           BaseRequest& request,
-                                           BaseResponse* response,
+                                           Request& request,
+                                           Response* response,
                                            const Poco::Exception& exception):
     ClientRequestEventArgs(context, request),
     _response(response),
@@ -150,7 +150,7 @@ ClientErrorEventArgs::~ClientErrorEventArgs()
 }
 
 
-const BaseResponse* ClientErrorEventArgs::response() const
+const Response* ClientErrorEventArgs::response() const
 {
     return _response;
 }

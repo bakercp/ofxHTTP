@@ -19,8 +19,8 @@ namespace ofx {
 namespace HTTP {
 
 
-class BaseRequest;
-class BaseResponse;
+class Request;
+class Response;
 class Context;
 
 
@@ -56,14 +56,14 @@ class ClientRequestEventArgs: public ClientContextEventArgs
 {
 public:
     ClientRequestEventArgs(Context& context,
-                           BaseRequest& request);
+                           Request& request);
 
     virtual ~ClientRequestEventArgs();
 
-    const BaseRequest& request() const;
+    const Request& request() const;
 
 protected:
-    BaseRequest& _request;
+    Request& _request;
 
 };
 
@@ -72,15 +72,15 @@ class ClientResponseEventArgs: public ClientRequestEventArgs
 {
 public:
     ClientResponseEventArgs(Context& context,
-                            BaseRequest& request,
-                            BaseResponse& response);
+                            Request& request,
+                            Response& response);
 
     virtual ~ClientResponseEventArgs();
 
-    const BaseResponse& response() const;
+    const Response& response() const;
 
 protected:
-    BaseResponse& _response;
+    Response& _response;
     
 };
 
@@ -90,7 +90,7 @@ class ClientRequestProgressEventArgs: public ClientRequestEventArgs
 {
 public:
     ClientRequestProgressEventArgs(Context& context,
-                                   BaseRequest& request,
+                                   Request& request,
                                    Progress& progress);
 
     /// \brief Destroy the ClientRequestProgressEventArgs.
@@ -109,8 +109,8 @@ class ClientResponseProgressEventArgs: public ClientResponseEventArgs
 {
 public:
     ClientResponseProgressEventArgs(Context& context,
-                                    BaseRequest& request,
-                                    BaseResponse& response,
+                                    Request& request,
+                                    Response& response,
                                     Progress& progress);
 
     /// \brief Destroy the ClientResponseProgressEventArgs.
@@ -140,18 +140,18 @@ class ClientErrorEventArgs: public ClientRequestEventArgs
 {
 public:
     ClientErrorEventArgs(Context& context,
-                         BaseRequest& request,
-                         BaseResponse* response,
+                         Request& request,
+                         Response* response,
                          const Poco::Exception& exception);
 
     virtual ~ClientErrorEventArgs();
 
-    const BaseResponse* response() const;
+    const Response* response() const;
 
     const Poco::Exception& exception() const;
 
 protected:
-    BaseResponse* _response = nullptr;
+    Response* _response = nullptr;
 
     const Poco::Exception& _exception;
 

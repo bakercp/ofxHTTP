@@ -6,8 +6,8 @@
 
 
 #include "ofx/HTTP/DefaultRedirectProcessor.h"
-#include "ofx/HTTP/BaseRequest.h"
-#include "ofx/HTTP/BaseResponse.h"
+#include "ofx/HTTP/Request.h"
+#include "ofx/HTTP/Response.h"
 #include "ofx/HTTP/Context.h"
 
 
@@ -25,7 +25,7 @@ DefaultRedirectProcessor::~DefaultRedirectProcessor()
 }
 
 
-void DefaultRedirectProcessor::requestFilter(Context& context, BaseRequest&) const
+void DefaultRedirectProcessor::requestFilter(Context& context, Request&) const
 {
     // We set resubmit false because we are executing a new request.
     context.setResubmit(false);
@@ -33,8 +33,8 @@ void DefaultRedirectProcessor::requestFilter(Context& context, BaseRequest&) con
 
 
 void DefaultRedirectProcessor::responseFilter(Context& context,
-                                              BaseRequest& request,
-                                              BaseResponse& response) const
+                                              Request& request,
+                                              Response& response) const
 {
     if (Poco::Net::HTTPResponse::HTTP_MOVED_PERMANENTLY   == response.getStatus() || // 301
         Poco::Net::HTTPResponse::HTTP_FOUND               == response.getStatus() || // 302
@@ -79,7 +79,7 @@ void DefaultRedirectProcessor::responseFilter(Context& context,
             // forward query parameters as the request would require a new
             // signature to be computed for the redirected domain / path.
             // This is to avoid security holes.  For cusom redirect handling,
-            // create a custom implementation of BaseRequestResponseProcessor.
+            // create a custom implementation of RequestResponseProcessor.
             //
             // Additionally, by clearing the form fields, we allows the client
             // to respect server query re-writes such as those re-written by
@@ -93,7 +93,7 @@ void DefaultRedirectProcessor::responseFilter(Context& context,
             // contain sensitive information), but rather convert it to a GET
             // request.  Some browsers redirect POST / PUT, while others do not.
             // Users desiring special behaviour should create a custom
-            // implementation of BaseRequestResponseProcessor.
+            // implementation of RequestResponseProcessor.
             const std::string& method = request.getMethod();
 
             if (method == Poco::Net::HTTPRequest::HTTP_POST ||

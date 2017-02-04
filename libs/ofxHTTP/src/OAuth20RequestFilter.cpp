@@ -7,7 +7,7 @@
 
 #include "ofx/HTTP/OAuth20RequestFilter.h"
 #include "Poco/Net/OAuth20Credentials.h"
-#include "ofx/HTTP/BaseRequest.h"
+#include "ofx/HTTP/Request.h"
 #include "ofx/HTTP/HTTPUtils.h"
 
 
@@ -44,7 +44,7 @@ OAuth20Credentials OAuth20RequestFilter::getCredentials() const
 
 
 void OAuth20RequestFilter::requestFilter(Context& context,
-                                         BaseRequest& request) const
+                                         Request& request) const
 {
     Poco::Net::OAuth20Credentials credentials(_credentials.getBearerToken(),
                                               _credentials.getScheme());

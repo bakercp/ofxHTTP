@@ -6,8 +6,8 @@
 
 
 #include "ofx/HTTP/DefaultProxyProcessor.h"
-#include "ofx/HTTP/BaseRequest.h"
-#include "ofx/HTTP/BaseResponse.h"
+#include "ofx/HTTP/Request.h"
+#include "ofx/HTTP/Response.h"
 #include "ofx/HTTP/Context.h"
 
 
@@ -25,7 +25,7 @@ DefaultProxyProcessor::~DefaultProxyProcessor()
 }
 
 
-void DefaultProxyProcessor::requestFilter(Context& context, BaseRequest&) const
+void DefaultProxyProcessor::requestFilter(Context& context, Request&) const
 {
     context.setState(ClientState::DETECTING_PROXY);
 
@@ -58,8 +58,8 @@ void DefaultProxyProcessor::requestFilter(Context& context, BaseRequest&) const
 
 
 void DefaultProxyProcessor::responseFilter(Context& context,
-                                           BaseRequest& request,
-                                           BaseResponse& response) const
+                                           Request& request,
+                                           Response& response) const
 {
     // The requested resource MUST be accessed through the proxy
     // given by the Location field. The Location field gives the

@@ -6,8 +6,8 @@
 
 
 #include "ofx/HTTP/DefaultEncodingResponseStreamFilter.h"
-#include "ofx/HTTP/BaseRequest.h"
-#include "ofx/HTTP/BaseResponse.h"
+#include "ofx/HTTP/Request.h"
+#include "ofx/HTTP/Response.h"
 #include "ofx/HTTP/Context.h"
 #include "ofx/IO/StreamFilters.h"
 
@@ -31,7 +31,7 @@ DefaultEncodingResponseStreamFilter::~DefaultEncodingResponseStreamFilter()
 
 
 void DefaultEncodingResponseStreamFilter::requestFilter(Context&,
-                                                        BaseRequest& request) const
+                                                        Request& request) const
 {
     // Set the headers indicating the encodings we can decode.
     request.set(ACCEPT_ENCODING_HEADER, "gzip, deflate");
@@ -39,15 +39,15 @@ void DefaultEncodingResponseStreamFilter::requestFilter(Context&,
 
 
 void DefaultEncodingResponseStreamFilter::responseFilter(Context&,
-                                                         BaseRequest&,
-                                                         BaseResponse&) const
+                                                         Request&,
+                                                         Response&) const
 {
 }
 
 
 void DefaultEncodingResponseStreamFilter::responseStreamFilter(Context& context,
-                                                               const BaseRequest& request,
-                                                               const BaseResponse& response,
+                                                               const Request& request,
+                                                               const Response& response,
                                                                IO::FilteredInputStream& responseStream) const
 {
     if (response.has(CONTENT_ENCODING_HEADER))

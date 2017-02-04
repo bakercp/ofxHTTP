@@ -8,7 +8,7 @@
 #pragma once
 
 
-#include "ofx/HTTP/BaseRequest.h"
+#include "ofx/HTTP/Request.h"
 #include "Poco/Net/HTMLForm.h"
 #include "Poco/Net/NameValueCollection.h"
 
@@ -18,10 +18,10 @@ namespace HTTP {
 
 
 /// \brief A Custom Base HTTP Request.
-class FormRequest: public BaseRequest
+class FormRequest: public Request
 {
 public:
-    using BaseRequest::BaseRequest;
+    using Request::Request;
 
     /// \brief Destroy this BaseReuqest.
     virtual ~FormRequest();

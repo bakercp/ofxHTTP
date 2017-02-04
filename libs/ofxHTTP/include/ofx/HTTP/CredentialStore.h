@@ -31,8 +31,8 @@ namespace ofx {
 namespace HTTP {
 
 
-class BaseRequest;
-class BaseResponse;
+class Request;
+class Response;
 class Context;
 
 
@@ -64,14 +64,14 @@ public:
     void clearCredentials(const Poco::URI& uri);
 
     void requestFilter(Context& context,
-                       BaseRequest& request) const override;
+                       Request& request) const override;
 
     void responseFilter(Context& context,
-                        BaseRequest& request,
-                        BaseResponse& response) const override;
+                        Request& request,
+                        Response& response) const override;
 
-//    bool canFilterResponse(BaseRequest& request,
-//                           BaseResponse& response,
+//    bool canFilterResponse(Request& request,
+//                           Response& response,
 //                           Context& context) const;
 
     void clear();
