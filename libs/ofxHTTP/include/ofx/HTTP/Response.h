@@ -111,6 +111,14 @@ public:
     /// \returns empty xml if the response can't be buffered or xml can't be parsed.
     ofXml xml();
 
+    /// \brief Save the buffer contents to a file.
+    ///
+    /// Internally calls buffer() and saves the contents to the path.
+    ///
+    /// \param file The path to save the buffer.
+    /// \returns true if the file save operation was successful.
+    bool toFile(const std::filesystem::path& path);
+
     /// \brief Determine if this response is informational.
     /// \sa https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
     /// \returns true if the HTTP response code is >= 100 and < 200.

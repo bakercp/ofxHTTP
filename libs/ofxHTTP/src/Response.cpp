@@ -180,6 +180,12 @@ ofXml Response::xml()
 }
 
 
+bool Response::toFile(const std::filesystem::path& path)
+{
+    return ofBufferToFile(path, buffer());
+}
+
+
 bool Response::isInformational() const
 {
     return getStatus() >= 100
