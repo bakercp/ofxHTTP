@@ -137,7 +137,7 @@ int64_t Request::estimatedContentLength() const
         catch (const Poco::Net::HTMLFormException& exc)
         {
             // If we end up in here, we can't determine the content length.
-            contentLength == UNKNOWN_CONTENT_LENGTH;
+            contentLength = UNKNOWN_CONTENT_LENGTH;
         }
     }
 
