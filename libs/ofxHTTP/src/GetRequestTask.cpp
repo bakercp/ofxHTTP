@@ -102,7 +102,7 @@ bool GetRequestTask::onHTTPClientResponseStream(ClientResponseStreamEventArgs& a
         if (ofLoadImage(pixels, buffer))
         {
             postNotification(new Poco::TaskCustomNotification<ofPixels>(this, pixels));
-            return;
+            return true;
         }
         else
         {
@@ -115,7 +115,7 @@ bool GetRequestTask::onHTTPClientResponseStream(ClientResponseStreamEventArgs& a
         {
             ofJson json = ofJson::parse(buffer);
             postNotification(new Poco::TaskCustomNotification<ofJson>(this, json));
-            return;
+            return true;
         }
         catch (const std::exception& exc)
         {
@@ -129,7 +129,6 @@ bool GetRequestTask::onHTTPClientResponseStream(ClientResponseStreamEventArgs& a
 
     // The default case.
     postNotification(new Poco::TaskCustomNotification<ofBuffer>(this, buffer));
-
     return true;
 }
 
