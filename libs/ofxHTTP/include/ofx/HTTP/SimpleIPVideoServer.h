@@ -37,7 +37,7 @@ public:
 class SimpleIPVideoServer: public BaseServer_<SimpleIPVideoServerSettings, SimpleSessionStore>
 {
 public:
-    /// \breif A typedef for the SimpleIPVideoServerSettings.
+    /// \brief A typedef for the SimpleIPVideoServerSettings.
     typedef SimpleIPVideoServerSettings Settings;
 
     /// \brief Create a SimpleIPVideoServer with the given settings.

@@ -23,7 +23,7 @@ public:
     /// \brief Create a default OAuth 1.0 request filter.
     OAuth10RequestFilter();
 
-    /// \brief Create a default OAuth 1.0 request filter.
+    /// \brief Create a default OAuth 1.0 request filter with credentials.
     /// \param credentials The OAuth 1.0 credentials.
     OAuth10RequestFilter(const OAuth10Credentials& credentials);
 

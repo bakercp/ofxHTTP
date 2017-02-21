@@ -28,7 +28,7 @@ public:
     /// \param credentials OAuth 1.0 credentials.
     OAuth10HTTPClient(const OAuth10Credentials& credentials);
 
-    /// \breif Destroy the client.
+    /// \brief Destroy the client.
     virtual ~OAuth10HTTPClient();
 
     /// \brief Set the OAuth 1.0 credentials.

@@ -126,7 +126,7 @@ std::unique_ptr<Response> Client::execute(Request& request)
 
 // TODO CANCEL TOKEN ... how do we cancel this at various stages?
 // during transfer, etc?
-// Is it just a matter of closing the socket?
+// Is it just a matter of calling abort() on the socket the socket?
 std::unique_ptr<Response> Client::execute(Context& context,
                                           Request& request)
 {

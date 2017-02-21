@@ -89,6 +89,8 @@ public:
     /// \returns the receive timeout.
     Poco::Timespan getReceiveTimeout() const;
 
+    /// \brief Set the send timeout.
+    /// \param sendTimeout the send timeout to set.
     void setSendTimeout(const Poco::Timespan& sendTimeout);
 
     /// \returns the send timeout.
