@@ -20,7 +20,6 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/SecureServerSocket.h"
 #include "Poco/Net/ServerSocket.h"
-#include "Poco/RWLock.h"
 #include "Poco/Thread.h"
 #include "Poco/ThreadPool.h"
 #include "Poco/Timespan.h"

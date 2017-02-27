@@ -139,9 +139,6 @@ void SSEConnection::handleRequest(ServerEventArgs& evt)
 
             responseStream << "data: " << ofGetTimestampString() << SSE_EVENT_BOUNDARY;
             responseStream.flush();
-
-            cout << "out ... " << responseStream.good() << " " << responseStream.fail() << " " << responseStream.bad() << endl;
-
             std::unique_lock<std::mutex> lock(_mutex);
             _condition.wait_for(lock, std::chrono::milliseconds(1000));
         }
