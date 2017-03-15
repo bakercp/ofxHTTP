@@ -9,6 +9,7 @@
 
 
 #include <string>
+#include "ofFileUtils.h"
 #include "ofConstants.h"
 #include "ofJson.h"
 
@@ -45,10 +46,10 @@ public:
 
     static ofJson toJSON(const OAuth10Credentials& credentials);
 
-    static OAuth10Credentials fromFile(const std::string& credentialsFile);
+    static OAuth10Credentials fromFile(const std::filesystem::path& credentialsFile);
 
     static bool toFile(const OAuth10Credentials& credentials,
-                       const std::string& credentialsFile);
+                       const std::filesystem::path& credentialsFile);
 
 private:
     /// \brief The OAuth 1.0 consumer key.

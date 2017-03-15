@@ -43,7 +43,7 @@ public:
 //
 //    static ofJson toJSON(const OAuth20Credentials& credentials);
 //
-//    static OAuth20Credentials fromFile(const std::string& credentialsFile);
+//    static OAuth20Credentials fromFile(const std::filesystem::path& credentialsFile);
 //
 //    static bool toFile(const OAuth20Credentials& credentials,
 //                       const std::string& credentialsFile);

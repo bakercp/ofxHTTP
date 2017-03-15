@@ -107,7 +107,7 @@ ofJson OAuth10Credentials::toJSON(const OAuth10Credentials& credentials)
 }
 
 
-OAuth10Credentials OAuth10Credentials::fromFile(const std::string& credentialsFile)
+OAuth10Credentials OAuth10Credentials::fromFile(const std::filesystem::path& credentialsFile)
 {
     OAuth10Credentials credentials;
 
@@ -125,32 +125,9 @@ OAuth10Credentials OAuth10Credentials::fromFile(const std::string& credentialsFi
 
 
 bool OAuth10Credentials::toFile(const OAuth10Credentials& credentials,
-                                const std::string& credentialsFile)
+                                const std::filesystem::path& credentialsFile)
 {
-    ofJson json = toJSON(credentials);
-
-    try
-    {
-        Poco::FileOutputStream fos(ofToDataPath(credentialsFile, true));
-
-        if (fos.good())
-        {
-            fos << json;
-            fos.close();
-            return true;
-        }
-        else
-        {
-            throw Poco::IOException("Bad file output stream.");
-        }
-    }
-    catch (const Poco::Exception& exception)
-    {
-        ofLogError("Credentials::toFile") << exception.displayText();
-        return false;
-    }
-
-    return true;
+    return ofSaveJson(credentialsFile.string(), toJSON(credentials));
 }
 
 
