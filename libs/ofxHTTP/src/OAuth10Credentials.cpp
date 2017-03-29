@@ -72,6 +72,18 @@ std::string OAuth10Credentials::accessTokenSecret() const
 }
 
 
+std::string OAuth10Credentials::owner() const
+{
+    return _owner;
+}
+
+
+std::string OAuth10Credentials::ownerId() const
+{
+    return _ownerId;
+}
+
+
 OAuth10Credentials OAuth10Credentials::fromJSON(const ofJson& json)
 {
     OAuth10Credentials credentials;
@@ -83,9 +95,11 @@ OAuth10Credentials OAuth10Credentials::fromJSON(const ofJson& json)
         const auto& value = iter.value();
 
         if (key == "consumerKey") credentials._consumerKey = value;
-        else if (key == "consumerSecret") credentials._consumerSecret = value;
-        else if (key == "accessToken") credentials._accessToken = value;
-        else if (key == "accessTokenSecret") credentials._accessTokenSecret = value;
+        else if (key == "consumerSecret" || key == "consumer_secret") credentials._consumerSecret = value;
+        else if (key == "accessToken" || key == "access_token") credentials._accessToken = value;
+        else if (key == "accessTokenSecret" || key == "access_token_secret") credentials._accessTokenSecret = value;
+        else if (key == "owner") credentials._owner = value;
+        else if (key == "ownerId" || key == "owner_id" ) credentials._ownerId = value;
         else ofLogWarning("Credentials::fromJSON") << "Unknown key: " << key << std::endl << value.dump(4);
         ++iter;
     }
@@ -98,10 +112,12 @@ ofJson OAuth10Credentials::toJSON(const OAuth10Credentials& credentials)
 {
     ofJson json;
 
-    json["consumerKey"] = credentials._consumerKey;
-    json["consumerSecret"] = credentials._consumerSecret;
-    json["accessToken"] = credentials._accessToken;
-    json["accessTokenSecret"] = credentials._accessTokenSecret;
+    json["consumer_key"] = credentials._consumerKey;
+    json["consumer_secret"] = credentials._consumerSecret;
+    json["access_token"] = credentials._accessToken;
+    json["access_token_secret"] = credentials._accessTokenSecret;
+    json["owner"] = credentials._owner;
+    json["owner_id"] = credentials._ownerId;
 
     return json;
 }

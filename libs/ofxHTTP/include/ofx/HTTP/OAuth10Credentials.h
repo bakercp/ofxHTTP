@@ -42,6 +42,10 @@ public:
 
     std::string accessTokenSecret() const;
 
+    std::string owner() const;
+
+    std::string ownerId() const;
+
     static OAuth10Credentials fromJSON(const ofJson& value);
 
     static ofJson toJSON(const OAuth10Credentials& credentials);
@@ -64,6 +68,11 @@ private:
     /// \brief The OAuth 1.0 access token secret.
     std::string _accessTokenSecret;
 
+    /// \brief Optional owner information.
+    std::string _owner;
+
+    /// \brief Optional owner id information.
+    std::string _ownerId;
 };
 
 
