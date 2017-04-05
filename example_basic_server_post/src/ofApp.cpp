@@ -19,8 +19,10 @@ void ofApp::setup()
     // Many other settings are available.
     settings.setPort(7890);
 
-    // Set an alternate route path pattern (defaut is /post).
-     settings.postRouteSettings.setRoutePathPattern("/");
+    // If you want to set an alternate route path pattern (defaut is /post),
+    // you can change the POST endpoint here. Just be sure to also update it in
+    // any HTML forms in the bin/data/DocumentRoot.
+    // settings.postRouteSettings.setRoutePathPattern("/");
 
     // Apply the settings.
     server.setup(settings);
