@@ -143,7 +143,8 @@ OAuth10Credentials OAuth10Credentials::fromFile(const std::filesystem::path& cre
 bool OAuth10Credentials::toFile(const OAuth10Credentials& credentials,
                                 const std::filesystem::path& credentialsFile)
 {
-    return ofSaveJson(credentialsFile.string(), toJSON(credentials));
+    ofJson json = toJSON(credentials);
+    return ofSaveJson(credentialsFile.string(), json);
 }
 
 
