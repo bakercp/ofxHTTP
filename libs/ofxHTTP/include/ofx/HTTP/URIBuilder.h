@@ -48,20 +48,30 @@ public:
     ///     otherwise will set the value as a "true" or "false".
     void add(const std::string& key, bool value, bool numerical = true);
 
+    /// \brief Set an key / value pair in the name value collection.
+    ///
+    /// This method converts the value to a string if possible.
+    ///
+    /// \param key The key.
+    /// \param value The value.
+    /// \tparam T The type to set.
+    template <typename T>
+    void set(const std::string& key, const T& value)
+    {
+        Poco::Net::NameValueCollection::set(key, ofToString(value));
+    }
 
     /// \brief Set an key / value pair in the name value collection.
     ///
     /// This method converts the value to a string if possible.
     ///
     /// \param key The key.
-    /// \param value The boolean value.
-    ///     otherwise will set the value as a "true" or "false".
+    /// \param value The value.
+    /// \tparam T The type to set.
     template <typename T>
-    void set(const std::string& key, const T& value)
+    void set(const std::string& key, const T& value, int preceision)
     {
-        std::ostringstream ss;
-        ss << value;
-        Poco::Net::NameValueCollection::set(key, ss.str());
+        Poco::Net::NameValueCollection::set(key, ofToString(value, preceision));
     }
 
     /// \brief Add an key / value pair in the name value collection.
@@ -71,12 +81,18 @@ public:
     /// \param key The key.
     /// \param value The boolean value.
     ///     otherwise will set the value as a "true" or "false".
+    /// \tparam T The type to set.
     template <typename T>
     void add(const std::string& key, const T& value)
     {
-        std::ostringstream ss;
-        ss << value;
-        Poco::Net::NameValueCollection::add(key, ss.str());
+        Poco::Net::NameValueCollection::set(key, ofToString(value));
+    }
+
+    /// \tparam T The type to set.
+    template <typename T>
+    void add(const std::string& key, const T& value, int preceision)
+    {
+        Poco::Net::NameValueCollection::set(key, ofToString(value, preceision));
     }
 
     /// \brief Get the built URI as a Poco::URI object.
