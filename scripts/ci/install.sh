@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -e
 
-THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+THIS_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 if ! [ -z ${OF_ROOT} ]; then
-  OF_ROOT=$( cd "$(dirname "$0")/../../../.." ; pwd -P )
+  OF_ROOT=$( cd "$( dirname "${BASH_SOURCE[0]}")/../../../.." ; pwd -P )
 fi
 
 if ! [ -z ${ADDON_NAME} ]; then
-  ADDON_NAME=$(basename $( cd "$(dirname "$0")/../../.." ; pwd -P ))
+  ADDON_NAME=$(basename $( cd "$( dirname "${BASH_SOURCE[0]}")/../.." ; pwd -P ))
 fi
 
 # Default addon github info.
@@ -22,11 +22,12 @@ REQUIRED_ADDONS=()
 # Extract ADDON_DEPENDENCIES from addon_config.mk file.
 ADDON_CONFIG_MK=$OF_ROOT/addons/$ADDON_NAME/addon_config.mk
 
+echo ""
 echo "Running ${THIS_DIR}/install.sh"
 echo "---------------------------------"
 echo "        OF_ROOT: ${OF_ROOT}"
 echo "     ADDON_NAME: ${ADDON_NAME}"
-echo "ADDON_CONFIG_MK: ${ADDON_NAME}"
+echo "ADDON_CONFIG_MK: ${ADDON_CONFIG_MK}"
 echo ""
 
 echo "Examining ${ADDON_CONFIG_MK} ..."
