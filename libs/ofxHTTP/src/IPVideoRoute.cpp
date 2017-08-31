@@ -400,7 +400,7 @@ void IPVideoConnection::handleRequest(ServerEventArgs& evt)
 
 
     Poco::Net::NameValueCollection queryMap = HTTPUtils::getQueryMap(uri);
- 
+
     if (queryMap.has("vflip"))
     {
         std::string vflip = queryMap.get("vflip");
@@ -518,9 +518,6 @@ void IPVideoConnection::handleRequest(ServerEventArgs& evt)
                         ostr << "\r\n";
                         ostr << buffer;
                         
-//                        uint64_t now = ofGetElapsedTimeMillis();
-//                        _lastFrameDuration = now - _lastFrameSent;
-//                        _lastFrameSent = now;
                         _bytesSent += static_cast<uint64_t>(ostr.chars()); // add the counts
                         _framesSent ++;
                         ostr.reset();               // reset the counts
