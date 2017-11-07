@@ -56,8 +56,8 @@ public:
     void setCredentials(const Poco::URI& uri, const Credentials& credentials);
 
     void setCredentials(const Poco::URI& uri,
-                        const string& username,
-                        const string& password);
+                        const std::string& username,
+                        const std::string& password);
 
     void clearCredentials(const AuthScope& scope);
 

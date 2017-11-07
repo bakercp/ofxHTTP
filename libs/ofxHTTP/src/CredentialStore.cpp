@@ -49,7 +49,7 @@ void DefaultCredentialStore::setCredentialsFromURI(const Poco::URI& uri)
 
     const std::string::size_type p = userInfo.find(':');
 
-    if (p != string::npos)
+    if (p != std::string::npos)
     {
         username.assign(userInfo, 0, p);
         password.assign(userInfo, p + 1, std::string::npos);
@@ -74,8 +74,8 @@ void DefaultCredentialStore::setCredentials(const Poco::URI& uri,
 
 
 void DefaultCredentialStore::setCredentials(const Poco::URI& uri,
-                                            const string& username,
-                                            const string& password)
+                                            const std::string& username,
+                                            const std::string& password)
 {
     setCredentials(AuthScope(uri), Credentials(username, password));
 }

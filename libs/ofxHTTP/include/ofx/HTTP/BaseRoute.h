@@ -592,7 +592,7 @@ BaseConnection_<RouteType, FrameType>::BaseConnection_(RouteType& _route):
 template <typename RouteType, typename FrameType>
 BaseConnection_<RouteType, FrameType>::~BaseConnection_()
 {
-    cout << "closing the connection " << std::endl;
+    std::cout << "closing the connection " << std::endl;
 
 //    BaseRouteHandler_<RouteType>::route().unregisterConnection(this);
 
