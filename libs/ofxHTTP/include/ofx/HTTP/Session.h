@@ -8,6 +8,7 @@
 #pragma once
 
 
+#include <map>
 #include <string>
 #include "ofx/HTTP/AbstractServerTypes.h"
 #include "Poco/Mutex.h"
