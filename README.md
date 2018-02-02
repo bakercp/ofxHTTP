@@ -24,7 +24,7 @@ To get started, generate the example project files using the openFrameworks [Pro
 
 ## Documentation
 
-API documentation can be found here.
+API documentation can be found [here](https://bakercp.github.io/ofxHTTP/).
 
 ## Build Status
 
