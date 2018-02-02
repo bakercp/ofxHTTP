@@ -1,0 +1,19 @@
+var searchData=
+[
+  ['default_5fapache_5fmime_5ftypes_5fpath',['DEFAULT_APACHE_MIME_TYPES_PATH',['classofx_1_1_media_type_map.html#a449be714ec4d14b3bfcfeaab66b41563',1,'ofx::MediaTypeMap']]],
+  ['default_5ffile_5fextension',['DEFAULT_FILE_EXTENSION',['classofx_1_1_media_type_map.html#a5743e8d588039bd43fec5f703d856f6f',1,'ofx::MediaTypeMap']]],
+  ['default_5fget_5fhttp_5fmethods',['DEFAULT_GET_HTTP_METHODS',['../classofx_1_1_h_t_t_p_1_1_file_system_route_settings.html#ad5ee429bb11038e66831ddd5ec8db1f6',1,'ofx::HTTP::FileSystemRouteSettings']]],
+  ['default_5fget_5fhttp_5fmethods_5farray',['DEFAULT_GET_HTTP_METHODS_ARRAY',['../classofx_1_1_h_t_t_p_1_1_file_system_route_settings.html#a4a058378aec001213777898c5ba00ce5',1,'ofx::HTTP::FileSystemRouteSettings']]],
+  ['default_5fkeepalive_5ftimeout',['DEFAULT_KEEPALIVE_TIMEOUT',['../classofx_1_1_h_t_t_p_1_1_client_session_settings.html#a09503207c17419f9d58f8af9b338d329',1,'ofx::HTTP::ClientSessionSettings']]],
+  ['default_5fmax_5fredirects',['DEFAULT_MAX_REDIRECTS',['../classofx_1_1_h_t_t_p_1_1_client_session_settings.html#ac57432f076ae383f521f0288de68a24d',1,'ofx::HTTP::ClientSessionSettings']]],
+  ['default_5fmaximum_5fprogress_5fupdate_5finterval',['DEFAULT_MAXIMUM_PROGRESS_UPDATE_INTERVAL',['../classofx_1_1_h_t_t_p_1_1_client_session_settings.html#a1163c4a879978653096edf43247176e6',1,'ofx::HTTP::ClientSessionSettings']]],
+  ['default_5fmedia_5ftype',['DEFAULT_MEDIA_TYPE',['classofx_1_1_media_type_map.html#a028f7af92cb30df5681bad1ce3681b93',1,'ofx::MediaTypeMap::DEFAULT_MEDIA_TYPE()'],['../classofx_1_1_h_t_t_p_1_1_form_request.html#a44861a99120c0ae4de38837d4f6ef4d7',1,'ofx::HTTP::FormRequest::DEFAULT_MEDIA_TYPE()']]],
+  ['default_5fminimum_5fbytes_5fper_5fprogress_5fupdate',['DEFAULT_MINIMUM_BYTES_PER_PROGRESS_UPDATE',['../classofx_1_1_h_t_t_p_1_1_client_session_settings.html#a229095da6a8644dc3585e47b4bf4eac2',1,'ofx::HTTP::ClientSessionSettings']]],
+  ['default_5fpost_5fhttp_5fmethods',['DEFAULT_POST_HTTP_METHODS',['../classofx_1_1_h_t_t_p_1_1_post_route_settings.html#a933615805046a3adf4dbf582d0aceb95',1,'ofx::HTTP::PostRouteSettings']]],
+  ['default_5fpost_5fhttp_5fmethods_5farray',['DEFAULT_POST_HTTP_METHODS_ARRAY',['../classofx_1_1_h_t_t_p_1_1_post_route_settings.html#a86fc73cc3ee3d315e98a3e6d89f8f8ee',1,'ofx::HTTP::PostRouteSettings']]],
+  ['default_5froute_5fpath_5fpattern',['DEFAULT_ROUTE_PATH_PATTERN',['../classofx_1_1_h_t_t_p_1_1_base_route_settings.html#adfe2b0c947da12d15497a3f2e7c8a635',1,'ofx::HTTP::BaseRouteSettings']]],
+  ['default_5fsse_5froute_5fpath_5fpattern',['DEFAULT_SSE_ROUTE_PATH_PATTERN',['../classofx_1_1_h_t_t_p_1_1_s_s_e_route_settings.html#a384ec430c4540736d15d6d4ef99d7bde',1,'ofx::HTTP::SSERouteSettings']]],
+  ['default_5ftimeout',['DEFAULT_TIMEOUT',['../classofx_1_1_h_t_t_p_1_1_client_session_settings.html#a918f0dece23972d9e692d41f0805b77a',1,'ofx::HTTP::ClientSessionSettings']]],
+  ['default_5fuser_5fagent',['DEFAULT_USER_AGENT',['../classofx_1_1_h_t_t_p_1_1_client_session_settings.html#a92a88ebccb269f5bddbffff84cf2199b',1,'ofx::HTTP::ClientSessionSettings']]],
+  ['default_5fwebsocket_5froute_5fpath_5fpattern',['DEFAULT_WEBSOCKET_ROUTE_PATH_PATTERN',['../classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#a98194f59077cac67df88c7a8c232e62f',1,'ofx::HTTP::WebSocketRouteSettings']]]
+];

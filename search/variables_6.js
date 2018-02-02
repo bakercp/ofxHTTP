@@ -1,0 +1,4 @@
+var searchData=
+[
+  ['filesystemroutesettings',['fileSystemRouteSettings',['../classofx_1_1_h_t_t_p_1_1_simple_file_server_settings.html#a5d5a959a5fb8131809c25df48991c483',1,'ofx::HTTP::SimpleFileServerSettings::fileSystemRouteSettings()'],['../classofx_1_1_h_t_t_p_1_1_simple_i_p_video_server_settings.html#ad53c73386bca8638defd0f758eff06fa',1,'ofx::HTTP::SimpleIPVideoServerSettings::fileSystemRouteSettings()'],['../classofx_1_1_h_t_t_p_1_1_simple_post_server_settings.html#a9622e8309727f3ed3cada7555aa5936e',1,'ofx::HTTP::SimplePostServerSettings::fileSystemRouteSettings()'],['../classofx_1_1_h_t_t_p_1_1_simple_s_s_e_server_settings.html#ab7bfab267a297809562b9e682e4b39fd',1,'ofx::HTTP::SimpleSSEServerSettings::fileSystemRouteSettings()'],['../classofx_1_1_h_t_t_p_1_1_simple_web_socket_server_settings.html#ac0858b116610cd67ca5a2ff6e55af2b3',1,'ofx::HTTP::SimpleWebSocketServerSettings::fileSystemRouteSettings()']]]
+];

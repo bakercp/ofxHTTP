@@ -1,0 +1,28 @@
+var classofx_1_1_h_t_t_p_1_1_web_socket_route_settings =
+[
+    [ "OriginSet", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#abf35e196becb8cf8ba7b207ddb35345a", null ],
+    [ "SubprotocolSet", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#a6b18bfab4161f7141bfb3ab32de1365a", null ],
+    [ "DEFAULT_BUFFER_SIZE", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#aa21404caafc9ef555dd6e7b7654f09aca1443ff32e6fb66b647b23451769d0c69", null ],
+    [ "WebSocketRouteSettings", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#ae2bbf5a136edc7e731acbacafdca914a", null ],
+    [ "~WebSocketRouteSettings", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#ad26f73bbc8333edfc504edeb920d8614", null ],
+    [ "getAutoPingPongResponse", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#a14b9b654f53e6e49403616a98c99e7f3", null ],
+    [ "getBufferSize", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#a977404691ae2e8fa43de0052c8627d0c", null ],
+    [ "getKeepAlive", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#a74bc3774211a6cc6ce65bb6484125c9e", null ],
+    [ "getPollTimeout", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#a6f4a5acc776226dfef5837d0f6856ff1", null ],
+    [ "getReceiveTimeout", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#a8604261d256ec4eea1f5cbe60db8d247", null ],
+    [ "getSendTimeout", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#a4a164dc24cfe4a9b3e94b430449f60f1", null ],
+    [ "getValidOrigins", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#a71e47014b7f4d75654063eb721eef055", null ],
+    [ "getValidSubprotocols", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#a0a86b4a1384052b7f9f6fd1a4f101669", null ],
+    [ "setAutoPingPongResponse", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#ab3c8955d50183957fc74e4b5637eb1b7", null ],
+    [ "setBufferSize", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#a26397b93b3754aa2fbd896de6e80ecb7", null ],
+    [ "setKeepAlive", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#a1706d84510760f5ca1fdd236e44f16d7", null ],
+    [ "setPollTimeout", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#ac67d29b82b97af2dbbb75806ee9437ff", null ],
+    [ "setReceiveTimeout", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#a6c043afbb034d0591dca875bc94e3f97", null ],
+    [ "setSendTimeout", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#a2f695df838080de0ec1dcf81ad80821d", null ],
+    [ "setValidOrigins", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#aee94dbfa7f1a2e703370ff5fd9340054", null ],
+    [ "setValidSubprotcols", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#ac62caeb80c16747483bdf0268388badf", null ],
+    [ "DEFAULT_POLL_TIMEOUT", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#a28d551f4b400135c41a0357289f9a050", null ],
+    [ "DEFAULT_RECEIVE_TIMEOUT", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#a4d42dcccea863a61fc53c21d0dfe61f3", null ],
+    [ "DEFAULT_SEND_TIMEOUT", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#aaf43023e9b50802d02ef3143e788de40", null ],
+    [ "DEFAULT_WEBSOCKET_ROUTE_PATH_PATTERN", "classofx_1_1_h_t_t_p_1_1_web_socket_route_settings.html#a98194f59077cac67df88c7a8c232e62f", null ]
+];

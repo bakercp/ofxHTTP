@@ -1,0 +1,28 @@
+var classofx_1_1_h_t_t_p_1_1_response =
+[
+    [ "~Response", "classofx_1_1_h_t_t_p_1_1_response.html#a638f0821c859aeefd45ba099b2784ea3", null ],
+    [ "buffer", "classofx_1_1_h_t_t_p_1_1_response.html#a2e91953e91fcb59a88b5d58128ec5540", null ],
+    [ "byteBuffer", "classofx_1_1_h_t_t_p_1_1_response.html#aa95b45d8196aff7985b5a47082a32d05", null ],
+    [ "estimatedContentLength", "classofx_1_1_h_t_t_p_1_1_response.html#aa9087c10e19eae00d4e5307585474be4", null ],
+    [ "hasResponseStream", "classofx_1_1_h_t_t_p_1_1_response.html#ac56e8dfc02193550dc4c4524412bceb0", null ],
+    [ "isBufferable", "classofx_1_1_h_t_t_p_1_1_response.html#aaaa69d210c2ff537d132ca38dc3113dd", null ],
+    [ "isBuffered", "classofx_1_1_h_t_t_p_1_1_response.html#a0ea63fc42410f05fce2d5aea36471c51", null ],
+    [ "isClientError", "classofx_1_1_h_t_t_p_1_1_response.html#a48ffa133a41c12abfb9c36a67d22cf4c", null ],
+    [ "isInformational", "classofx_1_1_h_t_t_p_1_1_response.html#aa38689e53c0f3c6e94ff39f66fa2fdb6", null ],
+    [ "isJson", "classofx_1_1_h_t_t_p_1_1_response.html#aa30ab74e916ae989d18a170de6fe6177", null ],
+    [ "isPixels", "classofx_1_1_h_t_t_p_1_1_response.html#a049f3d03f92d2a4fa368a4f44c11266f", null ],
+    [ "isRedirection", "classofx_1_1_h_t_t_p_1_1_response.html#ac161cc9441c8158b1167447df76d9fec", null ],
+    [ "isServerError", "classofx_1_1_h_t_t_p_1_1_response.html#aa6dc809f9a914d99cdb8f5aaa1bd5056", null ],
+    [ "isSuccess", "classofx_1_1_h_t_t_p_1_1_response.html#a20fb4fcf92a8ef5db7d0ca083d0012c2", null ],
+    [ "isXml", "classofx_1_1_h_t_t_p_1_1_response.html#a6d48afce00090a9bfee16f8c90a71cf3", null ],
+    [ "json", "classofx_1_1_h_t_t_p_1_1_response.html#af079ced16d5f2158fa05dc012694fc8e", null ],
+    [ "pixels", "classofx_1_1_h_t_t_p_1_1_response.html#a049d4b9d6f2c672fbac12a596209b63c", null ],
+    [ "statusAndReason", "classofx_1_1_h_t_t_p_1_1_response.html#a79507daf6ed3ad4300f5a135ebf8825d", null ],
+    [ "stream", "classofx_1_1_h_t_t_p_1_1_response.html#a920759896464fff12fd356f179713147", null ],
+    [ "toFile", "classofx_1_1_h_t_t_p_1_1_response.html#a7658bb3c4593f17675dcd3a7ad439931", null ],
+    [ "xml", "classofx_1_1_h_t_t_p_1_1_response.html#ae88ec3997f628e2ebc944f9ece4f006a", null ],
+    [ "BaseClient", "classofx_1_1_h_t_t_p_1_1_response.html#a498ee2d3956063638f281708e5aff4af", null ],
+    [ "Client", "classofx_1_1_h_t_t_p_1_1_response.html#a5db1c99e2c94b26278f3838c85cdb618", null ],
+    [ "BYTES_UNIT", "classofx_1_1_h_t_t_p_1_1_response.html#a8aa0c23cbf2ab41cafce2555dbe077b9", null ],
+    [ "CONTENT_RANGE", "classofx_1_1_h_t_t_p_1_1_response.html#ab5a20a2df295a1b78f400fdcde099630", null ]
+];

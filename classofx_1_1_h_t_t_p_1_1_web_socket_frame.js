@@ -1,0 +1,27 @@
+var classofx_1_1_h_t_t_p_1_1_web_socket_frame =
+[
+    [ "WebSocketFrame", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#a4d9ac08d82eb93ba4b5c7097c96e87cc", null ],
+    [ "WebSocketFrame", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#ac3d15bb76e9e3248ae002bbe24257d8a", null ],
+    [ "WebSocketFrame", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#a3786cad56869e5c65967ed3d0f718791", null ],
+    [ "WebSocketFrame", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#aa29bbb476422e6eb279921d09bccb101", null ],
+    [ "WebSocketFrame", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#a758729a00d4f47e6a116dac03f2b46a3", null ],
+    [ "WebSocketFrame", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#aabc42b1ea8119d6d7b3f7fa806ba55b4", null ],
+    [ "~WebSocketFrame", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#a1cd7bcc403194f4ab51221d0d5588b69", null ],
+    [ "flags", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#ac4136ab57d7e65150df50dc638fb2512", null ],
+    [ "isBinary", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#a1578b0d973af1bf84a85cbf61ae6bff9", null ],
+    [ "isClose", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#a8fcf1ffd6f1c0f60a4f3cf89b7003e92", null ],
+    [ "isContinuation", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#a928bf1ea993dde54a8b4e114abeb5763", null ],
+    [ "isFinal", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#a60f53d8a002622a1dff09b4b9d62ac8c", null ],
+    [ "isPing", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#a5e0adb00abde4d5ada00ed8a64834509", null ],
+    [ "isPong", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#ae61d789cfff5461345668a17c3b99ac4", null ],
+    [ "isRSV1", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#aaff85d6540f6d5e7d8551d82c6020264", null ],
+    [ "isRSV2", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#a898b5a055f3d9bb7ca2da53847da6739", null ],
+    [ "isRSV3", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#afea706aa344d873e95625e0ce68487c5", null ],
+    [ "isText", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#a2af6d2225ff0382ed99ed16c5a729d39", null ],
+    [ "setFinal", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#a7e0aad0f6ba3c549cfbd9cf8badd65d6", null ],
+    [ "setRSV1", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#ad2d30698dc2437f15f957960ad38fb69", null ],
+    [ "setRSV2", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#a12faa6f5a8953b44213bb6b7226e6c3c", null ],
+    [ "setRSV3", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#aa03d2187a9fc01e57b43ae0fb78d31c0", null ],
+    [ "toString", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#a5c71847a31f186f31bb5e002215258e5", null ],
+    [ "_flags", "classofx_1_1_h_t_t_p_1_1_web_socket_frame.html#aad958d2b65074c66c11043de22ee9c75", null ]
+];
