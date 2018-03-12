@@ -99,6 +99,7 @@ void DefaultRedirectProcessor::responseFilter(Context& context,
             if (method == Poco::Net::HTTPRequest::HTTP_POST ||
                 method == Poco::Net::HTTPRequest::HTTP_PUT)
             {
+                ofLogVerbose("DefaultRedirectProcessor::requestFilter") << "Converting POST to GET during redirect.";
                 request.setMethod(Poco::Net::HTTPRequest::HTTP_GET);
             }
 

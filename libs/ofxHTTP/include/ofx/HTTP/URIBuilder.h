@@ -14,6 +14,7 @@
 #include <vector>
 #include "Poco/URI.h"
 #include "Poco/Net/HTMLForm.h"
+#include "ofUtils.h"
 
 
 namespace ofx {

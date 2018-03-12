@@ -63,6 +63,9 @@ build-example*/
 # Local folders, use for temporary storage, etc.
 __*/*
 
+# Temporary files.
+*.autosave
+
 # OSX
 .DS_Store
 .AppleDouble

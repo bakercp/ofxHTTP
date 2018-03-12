@@ -31,10 +31,10 @@ SSEConnection::SSEConnection(SSERoute& _route):
 
 SSEConnection::~SSEConnection()
 {
-    std::cout << "1. destroying connection ... " << std::endl;
+    // std::cout << "1. destroying connection ... " << std::endl;
     stop();
     route().unregisterConnection(this);
-    std::cout << "2. destroying connection ... " << std::endl;
+    // std::cout << "2. destroying connection ... " << std::endl;
 }
 
 

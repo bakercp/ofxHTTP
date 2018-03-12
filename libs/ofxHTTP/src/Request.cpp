@@ -102,10 +102,15 @@ void Request::prepareRequest()
     // Chunked Transfer Encoding uses the `Transfer-Encoding` HTTP header in
     // place of the Content-Length header.
 
+    // std::cout << "here " << getChunkedTransferEncoding() <<  std::endl;
+
     if (getChunkedTransferEncoding() == false && getContentLength64() == UNKNOWN_CONTENT_LENGTH)
     {
+        // std::cout << "yes" << std::endl;
+
         try
         {
+            // std::cout << _form.calculateContentLength() << std::endl;
             setContentLength(_form.calculateContentLength());
         }
         catch (const Poco::Net::HTMLFormException& exc)
@@ -114,6 +119,11 @@ void Request::prepareRequest()
             // attempting url-encoded submissions.
             setContentLength(0);
         }
+    }
+    else
+    {
+
+        // std::cout << "no " << getContentLength() << " ? " << getContentLength64() << std::endl;
     }
 }
 

@@ -74,7 +74,7 @@ bool SSERoute::canHandleRequest(const Poco::Net::HTTPServerRequest& request,
 
 Poco::Net::HTTPRequestHandler* SSERoute::createRequestHandler(const Poco::Net::HTTPServerRequest&)
 {
-    std::cout << "CREATING SSE CONNECTION ... " << std::endl;
+    // std::cout << "CREATING SSE CONNECTION ... " << std::endl;
     // The caller takes ownership of the SSEConnection's memory.
     return new SSEConnection(*this);
 }
