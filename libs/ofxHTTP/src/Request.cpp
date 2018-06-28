@@ -104,37 +104,43 @@ void Request::prepareRequest()
 
     // std::cout << "here " << getChunkedTransferEncoding() <<  std::endl;
 
-    if (getChunkedTransferEncoding() == false && getContentLength64() == UNKNOWN_CONTENT_LENGTH)
+    if (getMethod() != HTTP_GET)
     {
-        // std::cout << "yes" << std::endl;
-
-        try
+        if (getChunkedTransferEncoding() == false && getContentLength64() == UNKNOWN_CONTENT_LENGTH)
         {
-            // std::cout << _form.calculateContentLength() << std::endl;
-            setContentLength(_form.calculateContentLength());
+            try
+            {
+                setContentLength(_form.calculateContentLength());
+            }
+            catch (const Poco::Net::HTMLFormException& exc)
+            {
+                // This exception is called for some GET requests that are
+                // attempting url-encoded submissions.
+                setContentLength(0);
+            }
         }
-        catch (const Poco::Net::HTMLFormException& exc)
+        else
         {
-            // This exception is called for some GET requests that are
-            // attempting url-encoded submissions.
-            setContentLength(0);
         }
     }
     else
     {
-
-        // std::cout << "no " << getContentLength() << " ? " << getContentLength64() << std::endl;
+        erase("Content-Length");
     }
 }
 
 void Request::writeRequestBody(std::ostream& requestStream)
 {
-    _form.write(requestStream);
+    if (getMethod() != HTTP_GET)
+        _form.write(requestStream);
 }
 
 
 int64_t Request::estimatedContentLength() const
 {
+    if (getMethod() == HTTP_GET)
+        return 0;
+    
     int64_t contentLength = getContentLength64();
 
     // If needed, try to calculate it based on the form data.
