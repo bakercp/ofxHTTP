@@ -4,5 +4,4 @@ ofxMediaType
 ofxNetworkUtils
 ofxPoco
 ofxSSLManager
-ofxTaskQueue
 ofxUnitTests
