@@ -95,7 +95,7 @@ public:
     /// \param uri The URI to add.
     void addRedirect(const Poco::URI& uri);
 
-    /// \returns A list of all redurects followed by this client session.
+    /// \returns A list of all redirects followed by this client session.
     const std::vector<Poco::URI>& getRedirects() const;
 
     /// \brief Set the URI that should be used if a proxy is required.

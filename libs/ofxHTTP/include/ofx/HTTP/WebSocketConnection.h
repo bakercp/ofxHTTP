@@ -31,7 +31,7 @@ namespace HTTP {
 /// \brief A class representing a WebSocket connection with a single client.
 ///
 /// Frames can be sent across thread boundaries and are queued for sending
-/// during the WebSocketConnection's service loop.  All accessors are
+/// during the WebSocketConnection's service loop. All accessors are
 /// synchronized and thread-safe.
 class WebSocketConnection: public BaseRouteHandler_<WebSocketRoute>
 {

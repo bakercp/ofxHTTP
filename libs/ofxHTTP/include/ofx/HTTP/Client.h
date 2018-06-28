@@ -61,7 +61,8 @@ public:
     
 };
 
-/// \brief A base HTTP cient for executing HTTP client requests.
+    
+/// \brief A base HTTP client for executing HTTP client requests.
 class Client: public AbstractRequestResponseFilter
 {
 public:
@@ -132,8 +133,6 @@ public:
         return handler.handleResponse(*execute(context, request));
     }
 
-
-
     template<typename ReturnType>
     ReturnType execute(Context& context,
                        Request& request,
@@ -151,7 +150,7 @@ public:
     {
         return f(*execute(context, request));
     }
-
+  
 
 protected:
     virtual void requestFilter(Context& context,
