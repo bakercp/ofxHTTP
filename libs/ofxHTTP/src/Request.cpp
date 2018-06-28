@@ -15,8 +15,8 @@ namespace HTTP {
 
 
 Request::Request(const std::string& method,
-                         const std::string& uri,
-                         const std::string& httpVersion):
+                 const std::string& uri,
+                 const std::string& httpVersion):
     Poco::Net::HTTPRequest(method, uri, httpVersion),
     _requestId(generateId())
 {

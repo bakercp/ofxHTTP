@@ -340,7 +340,7 @@ public:
     /// \brief Create an AbstractWebSocketFilter based on the ServerEventArgs.
     ///
     /// This function will set the appropriate response headers in the
-    /// evt.getResponse() if applicable.
+    /// evt.response() if applicable.
     ///
     /// The function will return an AbstractWebSocketFilter or a nullptr if no
     /// matching AbstractWebSocketFilter can be configured.
