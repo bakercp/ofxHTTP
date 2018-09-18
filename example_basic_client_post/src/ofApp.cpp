@@ -68,6 +68,18 @@ void ofApp::setup()
             std::cout << responseJson.dump(4) << std::endl;
             
             ofLogNotice("ofApp::setup") << "Content End";
+            
+            // Here we get our echoed BASE64 encoded image and save it back to
+            // the disk after decoding it.
+            ofxIO::ByteBuffer encodedBuffer(responseJson["form"].value("base_64_encoded_image", ""));
+            ofxIO::ByteBuffer decodedBuffer;
+            ofxIO::Base64Encoding encoding;
+            encoding.decode(encodedBuffer, decodedBuffer);
+
+            // Now save the buffer back to disk.
+            ofxIO::ByteBufferUtils::saveToFile(decodedBuffer, "decoded_pixel.gif");
+            
+            
         }
         else
         {
