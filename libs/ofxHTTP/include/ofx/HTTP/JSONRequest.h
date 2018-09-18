@@ -25,7 +25,7 @@ public:
     /// \param uri the POST endpoint uri.
     /// \param httpVersion Either HTTP/1.0 or HTTP/1.1.
     JSONRequest(const std::string& uri,
-                const std::string& httpVersion);
+                const std::string& httpVersion = Poco::Net::HTTPMessage::HTTP_1_1);
 
     /// \brief Construct a JSONRequest with a given uri and http version.
     /// \param uri the Post endpoint uri.
