@@ -20,7 +20,7 @@ namespace HTTP {
 
 const std::string PostRouteSettings::DEFAULT_POST_ROUTE    = "/post";
 const std::string PostRouteSettings::DEFAULT_POST_FOLDER   = "uploads/";
-const std::string PostRouteSettings::DEFAULT_POST_REDIRECT = "uploaded.html";
+const std::string PostRouteSettings::DEFAULT_POST_REDIRECT = "";
 const std::string PostRouteSettings::DEFAULT_POST_HTTP_METHODS_ARRAY[] = { "POST" };
 const BaseRouteSettings::HTTPMethodSet PostRouteSettings::DEFAULT_POST_HTTP_METHODS(INIT_SET_WITH_ARRAY(DEFAULT_POST_HTTP_METHODS_ARRAY));
 
@@ -64,7 +64,7 @@ void PostRouteSettings::setUploadRedirect(const std::string& uploadRedirect)
 }
 
 
-const std::string& PostRouteSettings::getUploadRedirect() const
+std::string PostRouteSettings::getUploadRedirect() const
 {
     return _uploadRedirect;
 }
@@ -187,9 +187,11 @@ void PostRouteHandler::handleRequest(ServerEventArgs& evt)
 
             ofNotifyEvent(route().events.onHTTPFormEvent, args, &route());
 
-            if (form.has("destination") && !form.get("destination").empty())
+            std::string redirectDestination = form.get("destination", "");
+            
+            if (!redirectDestination.empty())
             {
-                response.redirect(form.get("destination"));
+                response.redirect(redirectDestination);
                 return;
             }
         }
@@ -221,7 +223,7 @@ void PostRouteHandler::handleRequest(ServerEventArgs& evt)
         }
         else
         {
-            // done
+            // Send a successful 200 and be done.
             response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_OK);
             response.setContentLength(0);
             response.send();
@@ -297,15 +299,24 @@ void PostRouteFileHandler::handlePart(const Poco::Net::MessageHeader& header,
         {
             try
             {
-                std::stringstream ss;
+//                std::stringstream ss;
 
-                ss << _route.settings().getUploadFolder();
-                ss << "/";
-                ss << Poco::UUIDGenerator::defaultGenerator().createOne().toString();
-                ss << ".";
-                ss << Poco::Path(formFileName).getExtension();
+                std::filesystem::path uploadFolder = _route.settings().getUploadFolder();
+                std::filesystem::path uniqueFilename = Poco::UUIDGenerator::defaultGenerator().createOne().toString();
+                std::filesystem::path originalFilename = formFileName;
+                //std::filesystem::extension(originalFilename)
+                
+                std::filesystem::path p = uploadFolder;
+                p /= uniqueFilename;
+                p += std::filesystem::extension(originalFilename);
+                
+//                ss << _route.settings().getUploadFolder();
+//                ss << "/";
+//                ss << Poco::UUIDGenerator::defaultGenerator().createOne().toString();
+//                ss << ".";
+//                ss << Poco::Path(formFileName).getExtension();
 
-                std::string newFilename = ofToDataPath(ss.str(), true);
+                std::string newFilename = ofToDataPath(p, true);
 
                 ofFile file(newFilename, ofFile::WriteOnly, true);
 

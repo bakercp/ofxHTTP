@@ -25,19 +25,12 @@ class BasePostEventArgs: public ServerEventArgs
 {
 public:
     /// \Create a BasePostEventArgs.
-    /// \param e The server event data associated with this post.
+    /// \param evt The server event data associated with this post.
     /// \param postId The post id associated with this post data.
-    BasePostEventArgs(ServerEventArgs& e,
-                      const std::string& postId):
-        ServerEventArgs(e),
-        _postId(postId)
-    {
-    }
+    BasePostEventArgs(ServerEventArgs& evt, const std::string& postId);
 
     /// \brief Destroy the BasePostEventArgs.
-    virtual ~BasePostEventArgs()
-    {
-    }
+    virtual ~BasePostEventArgs();
 
     /// \brief The post id.
     ///
@@ -45,14 +38,13 @@ public:
     /// This id allows us to track post progress updates and multi-part posts.
     ///
     /// \returns the session id or null UUID if not set.
-    const std::string& getPostId() const
-    {
-        return _postId;
-    }
+    std::string postId() const;
+
+    OF_DEPRECATED_MSG("Use postId().", std::string getPostId() const);
 
 protected:
     /// \brief The post id.
-    std::string _postId;
+    const std::string _postId;
 
 };
 
@@ -66,23 +58,16 @@ class PostEventArgs: public BasePostEventArgs
 public:
     PostEventArgs(ServerEventArgs& evt,
                   const std::string& postId,
-                  const IO::ByteBuffer& data):
-        BasePostEventArgs(evt, postId),
-        _data(data)
-    {
-    }
+                  const IO::ByteBuffer& data);
 
     /// \brief Destroy the PostEventArgs.
-    virtual ~PostEventArgs()
-    {
-    }
+    virtual ~PostEventArgs();
 
     /// \brief Get the raw POST form data.
     /// \returns the raw POST form data.
-    const IO::ByteBuffer& getBuffer() const
-    {
-        return _data;
-    }
+    const IO::ByteBuffer& buffer() const;
+
+    OF_DEPRECATED_MSG("Use buffer().", const IO::ByteBuffer& getBuffer() const);
 
 protected:
     /// \brief The raw form data sent with the POST.
@@ -97,21 +82,14 @@ class PostFormEventArgs: public BasePostEventArgs
 public:
     PostFormEventArgs(ServerEventArgs& evt,
                       const std::string& postId,
-                      const Poco::Net::NameValueCollection& form):
-        BasePostEventArgs(evt, postId),
-        _form(form)
-    {
-    }
+                      const Poco::Net::NameValueCollection& form);
 
-    virtual ~PostFormEventArgs()
-    {
-    }
+    virtual ~PostFormEventArgs();
 
     /// \returns the form data.
-    const Poco::Net::NameValueCollection& getForm() const
-    {
-        return _form;
-    }
+    const Poco::Net::NameValueCollection& form() const;
+
+    OF_DEPRECATED_MSG("Use form().", const Poco::Net::NameValueCollection& getForm() const);
 
 protected:
     /// \brief The form data.
@@ -137,63 +115,52 @@ public:
                         const std::string& filename,
                         const Poco::Net::MediaType& contentType,
                         uint64_t numBytesTransferred,
-                        UploadState state):
-        BasePostEventArgs(evt, postId),
-        _formFieldName(formFieldName),
-        _originalFilename(originalFilename),
-        _filename(filename),
-        _contentType(contentType),
-        _numBytesTransferred(numBytesTransferred),
-        _state(state)
-    {
-    }
+                        UploadState state);
 
 
-    virtual ~PostUploadEventArgs()
-    {
-    }
-
-
-    const std::string& getFormFieldName() const
-    {
-        return _formFieldName;
-    }
-
-
-    const std::string& getOriginalFilename() const
-    {
-        return _originalFilename;
-    }
-
-
-    const std::string& getFilename() const
-    {
-        return _filename;
-    }
-
-
-    const Poco::Net::MediaType& getFileType() const
-    {
-        return _contentType;
-    }
-
+    virtual ~PostUploadEventArgs();
     
-    uint64_t getNumBytesTransferred() const
-    {
-        return _numBytesTransferred;
-    }
+    /// \returns the form field name for the upload.
+    const std::string& formFieldName() const;
+    OF_DEPRECATED_MSG("Use formFieldName().", const std::string& getFormFieldName() const);
+    
+    /// \returns the original filename specified in the form.
+    const std::string& originalFilename() const;
+    OF_DEPRECATED_MSG("Use originalFilename().", const std::string& getOriginalFilename() const);
 
-    UploadState getState() const
-    {
-        return _state;
-    }
+    /// \returns the new filename generated for the upload.
+    const std::string& filename() const;
+    OF_DEPRECATED_MSG("Use filename().", const std::string& getFilename() const);
+
+    /// \returns the MIME type of the uploaded file.
+    const Poco::Net::MediaType& fileType() const;
+    OF_DEPRECATED_MSG("Use fileType().", const Poco::Net::MediaType& getFileType() const);
+
+    /// \returns the number of bytes transfered since the upload began.
+    uint64_t numBytesTransferred() const;
+    OF_DEPRECATED_MSG("Use numBytesTransferred().", uint64_t getNumBytesTransferred() const);
+
+    /// \returns the current upload state.
+    UploadState state() const;
+    OF_DEPRECATED_MSG("Use state().", UploadState getState() const);
 
 private:
+    /// \brief The form field for this upload.
     const std::string _formFieldName;
+    
+    /// \brief The original filename specified in the upload.
     const std::string _originalFilename;
+    
+    /// \brief The generated filename where the file is saved after upload.
     const std::string _filename;
+    
+    /// \brief The MIME type of the file upload.
     const Poco::Net::MediaType _contentType;
+    
+    /// \brief The number of bytes transferred since the upload began.
     uint64_t _numBytesTransferred;
+    
+    /// \brief The current state of the upload.
     UploadState _state;
 
 };
