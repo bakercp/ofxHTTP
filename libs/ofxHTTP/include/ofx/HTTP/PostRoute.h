@@ -36,11 +36,23 @@ public:
     /// \brief Destroy the PostRouteSetting.
     virtual ~PostRouteSettings();
 
+    /// \brief Set the upload folder for file uploads.
+    /// \param uploadFolder The path to the upload folder.
     void setUploadFolder(const std::string& uploadFolder);
+
+    /// \returns the current file upload folder.
     const std::string& getUploadFolder() const;
 
+    /// \brief Set the page to forward for upload.
+    ///
+    /// If set to an empty string, and 200 code will be returned with an empty
+    /// body when the POST completes.
+    ///
+    /// \param uploadRedirect The URI to the redirected page.
     void setUploadRedirect(const std::string& uploadRedirect);
-    const std::string& getUploadRedirect() const;
+
+    /// \returns the upload redirect URI.
+    std::string getUploadRedirect() const;
 
     void setWriteBufferSize(std::size_t writeBufferSize);
     std::size_t getWriteBufferSize() const;
@@ -96,14 +108,19 @@ public:
     /// \brief A typedef for the PostRouteSettings.
     typedef PostRouteSettings Settings;
 
+    /// \brief Create the PostRoute with the given settings.
+    /// \param settings The route settings.
     PostRoute(const Settings& settings = Settings());
     
+    /// \brief Destroy the PostRoute.
     virtual ~PostRoute();
 
     Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request) override;
 
+    /// \returns a reference to the PostRouteEvents.
     PostRouteEvents& getEvents();
 
+    /// \brief The PostRouteEvents.
     PostRouteEvents events;
 
     /// \brief Register event listeners for this route.
