@@ -11,6 +11,7 @@
 void ofApp::setup()
 {
     // Testing redirects and https.
+    // This server will echo back everything that you send to it.
     std::string uri = "https://httpbin.org/post";
     
     // Here we prepare form fields for the post request.

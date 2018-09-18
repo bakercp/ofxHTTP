@@ -10,6 +10,7 @@
 
 void ofApp::setup()
 {
+    // This server will echo back everything that you send to it.
     std::string uri = "http://httpbin.org/post";
 
     ofJson json = {
