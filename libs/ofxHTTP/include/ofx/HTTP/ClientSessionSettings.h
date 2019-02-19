@@ -116,21 +116,33 @@ public:
     Poco::Timespan getMaximumProgressUpdateInterval() const;
 
     /// \brief The default user agent sent with the client.
+    ///
+    /// Default: "Mozilla/5.0 (compatible; Client/1.0 +https://github.com/bakercp/ofxHTTP)".
     static const std::string DEFAULT_USER_AGENT;
 
     /// \brief The default max number of redirects to automatically follow.
+    ///
+    /// Default: 20.
     static const std::size_t DEFAULT_MAX_REDIRECTS;
 
     /// \brief The default keep alive timeout.
+    ///
+    /// Default: 8 Seconds.
     static const Poco::Timespan DEFAULT_KEEPALIVE_TIMEOUT;
 
-    /// \brief The default client timeout.
+    /// \brief The default client timeout
+    ///
+    /// Default: 60 Seconds.
     static const Poco::Timespan DEFAULT_TIMEOUT;
 
     /// \brief The default number of bytes to wait between progress update events.
+    ///
+    /// Default: 1024 Bytes.
     static const int64_t DEFAULT_MINIMUM_BYTES_PER_PROGRESS_UPDATE;
 
     /// \brief The default maximum interval between progress updates.
+    ///
+    /// Default: 1 Second.
     static const Poco::Timespan DEFAULT_MAXIMUM_PROGRESS_UPDATE_INTERVAL;
 
 private:
