@@ -23,6 +23,21 @@ void ofApp::setup()
     // Create a context.
     ofxHTTP::Context context;
 
+    // Set custom session settings.
+    //
+    // See the class documentation for many additional settings.
+    ofxHTTP::ClientSessionSettings sessionSettings;
+
+    // Use an iPhone X user agent string.
+    sessionSettings.setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1");
+
+    // Set a 60 second keep-alive timeout (default is 8 seconds).
+    sessionSettings.setTimeout(Poco::Timespan::SECONDS * 60);
+
+    // Save the session settings with the context.
+    context.setClientSessionSettings(sessionSettings);
+
+    // Do the query!
     try
     {
         // Execute the request within the given context.
