@@ -1,67 +1,278 @@
+################################################################################
 # A .gitignore for openFrameworks addons.
+################################################################################
+
+################################################################################
+# Intro
+################################################################################
+
+# We start by ignoring everything, then selectively make exceptions for items 
+# and structures that are part of the standard addon structure. Basically, if it
+# is not explicitly allowed or manually forced, it won't be tracked.
+# 
+# To do this, we we must first un-exclude parent directories
+#
+# !/docs
+#
+# then exclude their content
+#
+# /docs/*
+#
+# then unexclude specific items.
+# 
+# !/docs/Doxyfile
+# !/docs/*.md
+#
+# Items cannot be un-excluded using `!` unless the parent directory has been 
+# unexcluded.
+
+################################################################################
+# Basic
+################################################################################
+
+# Ignore everything by default.
+/*
+
+# Don't ignore the .git*.
+!.gitignore
+!.gitmodules
+
+!/.github
+/.github/*
+!/.github/ISSUE_TEMPLATE.md
+!/.github/PULL_REQUEST_TEMPLATE.md
+
 
 ################################################################################
 # Documentation
 ################################################################################
 
 # Doxygen-Related
-docs/html/*
-docs/*
-!docs/Doxyfile
+!/docs
+/docs/*
 
-# Instructions and other documentation files.
-!docs/*.md
-!docs/*.txt
+# Don't ignore Doxygen configurations.
+!/docs/Doxyfile
+
+# Don't ignore markdown documentation files. Any images, etc must be 
+# added manually by force. This keeps the repository size smaller by default.
+!/docs/*.md
+
+################################################################################
+# Addon Metadata
+################################################################################
+
+!addon_config.mk
+!ofxaddons_thumbnail.png
+
+!*.md
+
+################################################################################
+# Addon Libraries and Source
+################################################################################
+
+# Exclude 3rd party libs by default.
+# They should be force-added or downloaded or compiled via scripts.
+!/libs
+/libs/*
+
+# Don't exclude ofx* prefixed libs by default.
+!/libs/ofx*/
+
+# We only allow source files in the src/ directory.
+!/src
+/src/*
+
+# Allow C/C++/Objective-C source files.
+!/src/**/*.h
+!/src/**/*.hpp
+!/src/**/*.c
+!/src/**/*.cpp
+!/src/**/*.m
+!/src/**/*.mm
 
 ################################################################################
 # Examples
 ################################################################################
 
-# bin/data Folder
-example*/bin/data/*
-!example*/bin/data/data.txt
+!/example*
 
-# Project files
-example*/*
-!example*/src/
-!example*/addons.make
+# Old-Style examples.
+/example*/*
+
+!/example*/**/src
+/example*/src/**/*
+!/example*/src/**/*.h
+!/example*/src/**/*.hpp
+!/example*/src/**/*.c
+!/example*/src/**/*.cpp
+!/example*/src/**/*.m
+!/example*/src/**/*.mm
+
+!/example*/addons.make
+!/example*/*.md
+
+!/example*/bin
+/example*/bin/*
+
+!/example*/bin/data
+/example*/bin/data/*
+
+!/example*/bin/data/data.txt
+!/example*/bin/data/*.md
+
+# Examples with categories.
+
+!/examples
+
+/examples/*/*/*
+
+!/examples/*
+!/examples/*/*
+!/examples/*/*/src
+!/examples/*/*/src/*.h
+!/examples/*/*/src/**/*.hpp
+!/examples/*/*/src/**/*.c
+!/examples/*/*/src/**/*.cpp
+!/examples/*/*/src/**/*.m
+!/examples/*/*/src/**/*.mm
+
+!/examples/*/*/addons.make
+!/examples/*/*/*.md
+
+!/examples/*/*/bin
+/examples/*/*/bin/*
+
+!/examples/*/*/bin/data
+/examples/*/*/bin/data/*
+
+!/examples/*/*/bin/data/data.txt
+!/examples/*/*/bin/data/*.md
 
 ################################################################################
-# Libraries
+# Tests
 ################################################################################
 
-# Exclude 3rd party libs by default.
-libs/*
+# Tests with categories.
 
-# Don't exclude ofx libs by default.
-!libs/ofx*
+!/tests
+
+/tests/*/*/*
+!/tests/*/*/src
+!/tests/*/*/src/*.h
+!/tests/*/*/src/**/*.hpp
+!/tests/*/*/src/**/*.c
+!/tests/*/*/src/**/*.cpp
+!/tests/*/*/src/**/*.m
+!/tests/*/*/src/**/*.mm
+
+!/tests/*/*/addons.make
+!/tests/*/*/*.md
+
+!/tests/*/*/bin
+/tests/*/*/bin/*
+
+!/tests/*/*/bin/data
+/tests/*/*/bin/data/*
+
+!/tests/*/*/bin/data/data.txt
+!/tests/*/*/bin/data/*.md
+
+# ################################################################################
+# # Shared Data
+# ################################################################################
+
+!/shared
+/shared/*
+
+!/shared/data
+/shared/data/*
+
+!/shared/data/*.sh
+!/shared/data/*.md
+
+# ################################################################################
+# # Scripts
+# ################################################################################
+
+!/scripts
+/scripts/*
+
+# ofx submodule.
+!/scripts/ofx
+
+# Bootstrap script.
+!/scripts/bootstrap.sh
+
+# Continuous integration.
+!/scripts/ci
+/scripts/ci/*/*
+!/scripts/ci/**/*.sh
+!/scripts/ci/**/*.md
+
+!/scripts/formulas
+/scripts/forumulas/*
+!/scripts/formulas/*.sh
+!/scripts/formulas/*.md
+
+# Linux* scripts.
+!/scripts/linux*
+/scripts/linux*/*
+!/scripts/linux*/*.sh
+!/scripts/linux*/*.md
+
+# macOS scripts.
+!/scripts/osx
+/scripts/osx/*
+!/scripts/osx/*.sh
+!/scripts/osx/*.md
+
+# MSYS2 scripts.
+!/scripts/msys2
+/scripts/msys2/*
+!/scripts/msys2/*.sh
+!/scripts/msys2/*.md
+
+# Visual Studio scripts.
+!/scripts/vs
+/scripts/vs/*
+!/scripts/vs/*.sh
+!/scripts/vs/*.md
+
+# Android scripts.
+!/scripts/android
+/scripts/android/*
+!/scripts/android/*.sh
+!/scripts/android/*.md
+
+# iOS scripts.
+!/scripts/ios
+/scripts/ios/*
+!/scripts/ios/*.sh
+!/scripts/ios/*.md
+
+# tvOS scripts.
+!/scripts/tvos
+/scripts/tvos/*
+!/scripts/tvos/*.sh
+!/scripts/tvos/*.md
+
+# Emscripten scripts.
+!/scripts/emscripten
+/scripts/emscripten/*
+!/scripts/emscripten/*.sh
+!/scripts/emscripten/*.md
 
 ################################################################################
-# Shared Data
+# Continuous Integration
 ################################################################################
 
-shared/data/*
-!shared/data/*.sh
-
-################################################################################
-# Scripts
-################################################################################
-
-# Everything included by default.
-
-################################################################################
-# Build Artifacts
-################################################################################
-
-# Default Qt Creator Build Folders
-build-example*/
+!.appveyor.yml
+!.travis.yml
 
 ################################################################################
 # Utility Stuff
 ################################################################################
-
-# Local folders, use for temporary storage, etc.
-__*/*
 
 # Temporary files.
 *.autosave

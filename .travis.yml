@@ -16,27 +16,32 @@ matrix:
         sources:
           - ubuntu-toolchain-r-test
         packages:
+          - realpath
           - gcc-4.9
           - g++-4.9
           - gdb
 
 # OSX, OF master
   - os: osx
-    osx_image: xcode9
+    # osx_image: xcode10.1
     compiler: clang
     env: TARGET="osx" OF_BRANCH="master"
 
   # Exclude the default build that would otherwise be generated
   # see https://github.com/travis-ci/travis-ci/issues/1228
-  exclude:
-    - compiler: gcc
-before_install:
-  - curl -SLsO https://raw.githubusercontent.com/bakercp/ofxAddonScripts/${OF_BRANCH}/scripts/ci/tools/install.sh
-  - source install.sh
+  #exclude:
+  #  - compiler: gcc
+# before_install:
 install:
-  - do_install
+  - git clone --depth=1 --branch=master https://github.com/openFrameworks/openFrameworks.git ~/openFrameworks
+  - /usr/bin/env bash ~/openFrameworks/scripts/ci/addons/install.sh
+  - git clone https://github.com/bakercp/ofx.git ~/openFrameworks/scripts/ofx
 script:
-  - do_script
+  -  /usr/bin/env bash ~/openFrameworks/scripts/ofx/ofx ci script ${TRAVIS_REPO_SLUG#*/}
+# after_script:
+# after_success:
+# after_failure:
 
 git:
-  depth: 10
+  depth: 1
+  quiet: true

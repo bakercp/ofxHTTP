@@ -1,3 +1,0 @@
-[submodule "scripts/ofx"]
-	path = scripts/ofx
-	url = https://github.com/bakercp/ofx.git
