@@ -16,6 +16,7 @@ matrix:
         sources:
           - ubuntu-toolchain-r-test
         packages:
+          - doxygen
           - realpath
           - gcc-4.9
           - g++-4.9
@@ -26,11 +27,12 @@ matrix:
     # osx_image: xcode10.1
     compiler: clang
     env: TARGET="osx" OF_BRANCH="master"
-
-  # Exclude the default build that would otherwise be generated
-  # see https://github.com/travis-ci/travis-ci/issues/1228
-  #exclude:
-  #  - compiler: gcc
+    addons:
+      homebrew:
+        packages:
+          - doxygen
+        update: true
+        
 # before_install:
 install:
   - git clone --depth=1 --branch=master https://github.com/openFrameworks/openFrameworks.git ~/openFrameworks
