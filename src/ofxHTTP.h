@@ -20,6 +20,7 @@
 #include "ofx/HTTP/ClientEvents.h"
 #include "ofx/HTTP/ClientSessionProvider.h"
 #include "ofx/HTTP/ClientState.h"
+#include "ofx/HTTP/CredentialStore.h"
 #include "ofx/HTTP/Context.h"
 #include "ofx/HTTP/DefaultProxyProcessor.h"
 #include "ofx/HTTP/DefaultRedirectProcessor.h"

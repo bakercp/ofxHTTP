@@ -4,4 +4,3 @@ ofxMediaType
 ofxNetworkUtils
 ofxPoco
 ofxSSLManager
-ofxPoco
