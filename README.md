@@ -94,10 +94,6 @@ Some past openFrameworks releases are supported via [releases](../../releases/),
 -   [ofxSSLManager](https://github.com/bakercp/ofxSSLManager)
 -   [ofxNetworkUtils](https://github.com/bakercp/ofxNetworkUtils)
 
-Some examples may require:
-
--   [ofxJSON](https://github.com/bakercp/ofxJSON)
-
 ## Versioning
 
 This project uses [Semantic Versioning](http://semver.org/), although strict adherence will only come into effect at version 1.0.0.
