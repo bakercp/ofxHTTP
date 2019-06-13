@@ -92,7 +92,7 @@ class ClientCache
 //    // if an etag is present, then it must be chcked, but the server can return a 304 (not modified)
 //    // This means that the item can be cached, but it must be validated each time it is accessed.
 //
-//    // no-store is simpler.  simply, the data cannot be stored.  usually used for private information.
+//    // no-store is simpler. simply, the data cannot be stored. usually used for private information.
 //
 //
 //    // max-age - the maximum time in seconds that the fetched responses are allowed to be used again.

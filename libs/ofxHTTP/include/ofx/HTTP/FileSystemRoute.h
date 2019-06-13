@@ -52,7 +52,7 @@ public:
 
     /// \brief An unfortunate compromise until C++11.
     /// \note C++ is not able to initialize static collections until
-    ///        after C++11.  This is a compromise until then.
+    ///        after C++11. This is a compromise until then.
     static const std::string DEFAULT_GET_HTTP_METHODS_ARRAY[];
 
     /// \brief The default HTTP methods for this route.

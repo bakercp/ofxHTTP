@@ -40,7 +40,7 @@ public:
 
     /// \brief Set the list of valid subprotocols.
     ///
-    /// An empty set means that any requested subprotocol will be accepted.  A
+    /// An empty set means that any requested subprotocol will be accepted. A
     /// non-empty set means that the requested subprotocol MUST be in the set.
     ///
     /// \param subprotocols A set of valid subprotocols.

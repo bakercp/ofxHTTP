@@ -29,7 +29,7 @@ public:
     URIBuilder();
 
     /// \brief Construct a URI using a base URI.
-    /// \param uri A base URI.  Query parameters will be extracted.
+    /// \param uri A base URI. Query parameters will be extracted.
     URIBuilder(const Poco::URI& uri);
 
     /// \brief Destroy the URIBuilder.

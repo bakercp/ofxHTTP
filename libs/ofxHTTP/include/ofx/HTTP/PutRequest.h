@@ -36,7 +36,7 @@ public:
 
     /// \brief Set the start byte to include in the header of the PUT request.
     /// \param startByte The byte number representing the offset of the
-    ///        data included in the body.  End byte is assumed to be the end
+    ///        data included in the body. End byte is assumed to be the end
     ///        of the resource.
     void setContentRange(std::size_t startByte);
 

@@ -74,11 +74,11 @@ void DefaultRedirectProcessor::responseFilter(Context& context,
 
             // Clear the form fields for all redirects. Query parameters will
             // be kept in the URI after a redirect and are no longer available
-            // for manipulation during futher redirects.  Request signing
+            // for manipulation during futher redirects. Request signing
             // authorization standards such as OAuth do not allow redirects to
             // forward query parameters as the request would require a new
             // signature to be computed for the redirected domain / path.
-            // This is to avoid security holes.  For cusom redirect handling,
+            // This is to avoid security holes. For cusom redirect handling,
             // create a custom implementation of RequestResponseProcessor.
             //
             // Additionally, by clearing the form fields, we allows the client
@@ -91,7 +91,7 @@ void DefaultRedirectProcessor::responseFilter(Context& context,
             // If the method is entity containing method (e.g. POST or PUT), we
             // will not redirect with the entity or parameters (which might
             // contain sensitive information), but rather convert it to a GET
-            // request.  Some browsers redirect POST / PUT, while others do not.
+            // request. Some browsers redirect POST / PUT, while others do not.
             // Users desiring special behaviour should create a custom
             // implementation of RequestResponseProcessor.
             const std::string& method = request.getMethod();

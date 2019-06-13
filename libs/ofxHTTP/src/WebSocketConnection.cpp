@@ -417,7 +417,7 @@ void WebSocketConnection::handleSubprotocols(ServerEventArgs&)
 //    bool isValidProtocol = _manager.selectSubprotocol(proposedProtocols,selectedProtocol);
 //
 //    // if we don't support the protocol, we don't send a Sec-WebSocket-Protocol header with the response.
-//    // in doing so, we leave the decision up to the client.  most clients should terminate the connection.
+//    // in doing so, we leave the decision up to the client. Most clients should terminate the connection.
 //    // http://stackoverflow.com/questions/13545453/http-response-code-when-requested-websocket-subprotocol-isnt-supported-recogniz
 //    if(isValidProtocol && ! selectedProtocol.empty())
 //    {

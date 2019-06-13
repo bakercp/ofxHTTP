@@ -306,7 +306,7 @@ void IPVideoRoute::send(const ofPixels& pix) const
             }
             else
             {
-                ofLogError("IPVideoRoute::send") << "Found a NULL IPVideoRouteHandler*.  This should not happen.";
+                ofLogError("IPVideoRoute::send") << "Found a NULL IPVideoRouteHandler*. This should not happen.";
             }
 
             ++iter;

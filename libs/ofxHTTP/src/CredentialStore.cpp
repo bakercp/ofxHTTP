@@ -29,7 +29,7 @@ void DefaultCredentialStore::setCredentials(const AuthScope& scope,
 {
     if (!credentials.hasCredentials())
     {
-        ofLogWarning("DefaultCredentialStore::setCredentials") << "Credentials are empty.  Ignoring.";
+        ofLogWarning("DefaultCredentialStore::setCredentials") << "Credentials are empty. Ignoring.";
         return;
     }
 
@@ -168,7 +168,7 @@ void DefaultCredentialStore::requestFilter(Context&,
     // these could be added via default session headers
     if (request.has(Poco::Net::HTTPRequest::AUTHORIZATION))
     {
-        ofLogVerbose("DefaultCredentialStore::authenticate") << "HTTP Authorization headers already set.  Skipping authentication.";
+        ofLogVerbose("DefaultCredentialStore::authenticate") << "HTTP Authorization headers already set. Skipping authentication.";
         return;
     }
 
@@ -240,7 +240,7 @@ void DefaultCredentialStore::responseFilter(Context&,
             }
             else
             {
-                ofLogError("DefaultCredentialStore::authenticate") << "Incompatible or unknown WWW-Authenticate header.  Basic and digest supported: " << iter->second;
+                ofLogError("DefaultCredentialStore::authenticate") << "Incompatible or unknown WWW-Authenticate header. Basic and digest supported: " << iter->second;
                 return;
             }
 
@@ -259,7 +259,7 @@ void DefaultCredentialStore::responseFilter(Context&,
             }
             catch (const Poco::InvalidArgumentException& exc)
             {
-                ofLogError("DefaultCredentialStore::authenticate") << "Incompatible or unknown WWW-Authenticate header.  Basic and digest supported: " << iter->second << " : " << exc.displayText();
+                ofLogError("DefaultCredentialStore::authenticate") << "Incompatible or unknown WWW-Authenticate header. Basic and digest supported: " << iter->second << " : " << exc.displayText();
                 return;
             }
             catch (const Poco::SyntaxException& exc)
@@ -315,7 +315,7 @@ void DefaultCredentialStore::responseFilter(Context&,
     }
     else
     {
-        ofLogVerbose("DefaultCredentialStore::authenticate") << "Response was not unauthorized.  Nothing to be done.";
+        ofLogVerbose("DefaultCredentialStore::authenticate") << "Response was not unauthorized. Nothing to be done.";
         return;
     }
 

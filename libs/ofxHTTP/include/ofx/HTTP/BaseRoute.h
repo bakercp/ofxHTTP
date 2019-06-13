@@ -86,7 +86,7 @@ public:
     /// \brief Set the list of valid HTTPMethods.
     /// \param validHTTPMethods A set of valid HTTPMethods.
     /// \note  An empty set means that any requested HTTPMethod will be
-    ///        accepted.  A non-empty set means that the requested
+    ///        accepted. A non-empty set means that the requested
     ///        HTTPMethod MUST be in the set.
     void setValidHTTPMethods(const HTTPMethodSet& validHTTPMethods);
 
@@ -97,7 +97,7 @@ public:
     /// \brief Set the list of valid Content Types.
     /// \param validContentTypes A set of valid content types.
     /// \note  An empty set means that any requested Content-Type will be
-    ///        accepted.  A non-empty set means that the requested
+    ///        accepted. A non-empty set means that the requested
     ///        The Content-Type MUST be in the set.
     void setValidContentTypes(const MediaTypeSet& validContentTypes);
 

@@ -39,7 +39,7 @@ public:
     /// 1.0 signatures, which require validation of the query/form parameters).
     /// Any query parameters added later using the `FormRequest::addFormField()`
     /// methods will be treated as either form fields or URI query parameters
-    /// depending on the request's HTTP method.  Form fields added to POST and
+    /// depending on the request's HTTP method. Form fields added to POST and
     /// PUT requests will be submitted as requests POST and PUT (e.g. GET) will
     /// be URL-encoded and appended to the request URI before submission.
     ///
@@ -90,7 +90,7 @@ public:
     /// Internally this will read from the Content-Length header. If that header
     /// is not available due to transfer-chunking being true, etc, then it will
     /// query the form to calculate the length. Typically, it is not advised to
-    /// call this function until after any form preparation has been done.  If
+    /// call this function until after any form preparation has been done. If
     /// it is not possible to calculate the content length,
     /// UNKNOWN_CONTENT_LENGTH will be returned.
     ///
@@ -108,7 +108,7 @@ protected:
     /// \brief The original URI passed in during construction.
     ///
     /// During an HTTP session, the underlying HTTPRequest may modify or
-    /// otherwise edit the internal URI to meet specifications.  This raw URI
+    /// otherwise edit the internal URI to meet specifications. This raw URI
     /// is stored unmodified for later reference.
     /// Poco::URI _rawURI;
 

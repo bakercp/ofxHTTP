@@ -29,9 +29,9 @@ class HTTPUtils
 {
 public:
     /// \brief Extract name-value pairs from text/plain encoded posts.
-    /// \param textPlain The plain text post data.  This function assumes
-    ///        that each form field is on its own line.  It then splits the
-    ///        key / value pairs by finding the first '='.  All other '='
+    /// \param textPlain The plain text post data. This function assumes
+    ///        that each form field is on its own line. It then splits the
+    ///        key / value pairs by finding the first '='. All other '='
     ///        are ignored.
     /// \returns A map of the parameter names and their values.
     static Poco::Net::NameValueCollection splitTextPlainPost(const std::string& textPlain);
@@ -76,8 +76,8 @@ public:
                                         ofLogLevel logLevel = OF_LOG_VERBOSE);
 
     /// \brief Consume a stream.
-    /// \warning This function will read a stream to the end.  This method will
-    ///          block until the entire stream is consumed.  Thus the stream
+    /// \warning This function will read a stream to the end. This method will
+    ///          block until the entire stream is consumed. Thus the stream
     ///          must be of finite length or the this method will block
     ///          indefinitely.
     /// \param stream input stream.

@@ -198,7 +198,7 @@ void PostRouteHandler::handleRequest(ServerEventArgs& evt)
         else
         {
             // Poco::Net::HTMLForm, like php does not handle text/plain because
-            // it cannot be unambiguously encoded.  Here we simply return
+            // it cannot be unambiguously encoded. Here we simply return
             // the raw text with the event.
 
             std::string result;
@@ -349,7 +349,7 @@ void PostRouteFileHandler::handlePart(const Poco::Net::MessageHeader& header,
                 {
                     if (sz > _route.settings().getMaximumFileUploadSize())
                     {
-                        ofLogError("PostRouteFileHandler::handlePart") << "File upload size exceeded.  Removing file.";
+                        ofLogError("PostRouteFileHandler::handlePart") << "File upload size exceeded. Removing file.";
                         file.close();
                         ofFile::removeFile(newFilename, false);
 

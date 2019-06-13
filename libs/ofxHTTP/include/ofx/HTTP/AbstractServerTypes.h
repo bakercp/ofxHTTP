@@ -124,7 +124,7 @@ public:
 
 /// \brief An abstract class representing a session store.
 ///
-/// A session store is responsible for establishing browsing sessions.  This
+/// A session store is responsible for establishing browsing sessions. This
 /// includes but is not limited to sessions created using HTTP cookies.
 class AbstractSessionStore
 {

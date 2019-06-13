@@ -85,7 +85,7 @@ public:
 
     /// \brief An unfortunate compromise until C++11.
     /// \note C++ is not able to initialize static collections until
-    ///        after C++11.  This is a compromise until then.
+    ///        after C++11. This is a compromise until then.
     static const std::string DEFAULT_POST_HTTP_METHODS_ARRAY[];
 
     /// \brief The default HTTP methods for this route.
@@ -166,7 +166,7 @@ void PostRoute::unregisterPostEvents(ListenerClass* listener, int priority)
 /// \brief A flexible POST route handler.
 ///
 /// Form data must be encoded with "multipart/form-data" or
-/// "application/x-www-form-urlencoded".  "text/plain" form
+/// "application/x-www-form-urlencoded". "text/plain" form
 /// encoding is supported, but not parsed.
 class PostRouteHandler: public BaseRouteHandler_<PostRoute>
 {

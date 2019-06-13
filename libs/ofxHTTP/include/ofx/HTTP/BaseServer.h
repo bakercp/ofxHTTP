@@ -189,7 +189,7 @@ public:
     {
         if (isRunning())
         {
-            ofLogWarning("BaseServer_::start") << "Server is already running.  Call stop() to stop.";
+            ofLogWarning("BaseServer_::start") << "Server is already running. Call stop() to stop.";
             return;
         }
 
@@ -246,7 +246,7 @@ public:
     {
         if (!isRunning())
         {
-            ofLogVerbose("BaseServer_::stop") << "Server is not running.  Call start() to start.";
+            ofLogVerbose("BaseServer_::stop") << "Server is not running. Call start() to start.";
             return;
         }
 
@@ -472,7 +472,7 @@ private:
         // TODO: currently a bug (?) in void TCPServerParams::setMaxThreads(int count).
         // Poco::Net::HTTPServerParams::setMaxThreads() should be able to handle
         // a value of 0 (according to the documentation), but it is currently asserting
-        // that the value must be > 0.  This is fixed in Poco 1.6+.
+        // that the value must be > 0. This is fixed in Poco 1.6+.
         if (params.getMaxThreads() <= 0)
         {
             serverParams->setMaxThreads(getThreadPool().capacity());
