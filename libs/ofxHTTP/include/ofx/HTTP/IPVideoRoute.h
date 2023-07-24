@@ -19,10 +19,10 @@
 
 #include <algorithm>
 #include "ofImage.h"
+#include "ofPixels.h"
 #include "ofx/HTTP/BaseRoute.h"
 #include "ofx/HTTP/HTTPUtils.h"
 #include "ofx/HTTP/IPVideoFrame.h"
-
 
 namespace ofx {
 namespace HTTP {
