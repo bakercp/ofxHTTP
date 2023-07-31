@@ -24,6 +24,7 @@
 #include "ofx/IO/ByteBuffer.h"
 #include "ofx/IO/ByteBufferStream.h"
 #include "ofImage.h"
+#include "ofPixels.h"
 #include "ofTypes.h"
 #include "ofJson.h"
 #include "ofXml.h"
