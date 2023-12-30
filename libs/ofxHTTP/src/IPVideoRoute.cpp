@@ -358,7 +358,8 @@ void IPVideoRoute::removeConnection(IPVideoConnection* handler)
 
 IPVideoConnection::IPVideoConnection(IPVideoRoute& route):
     BaseRouteHandler_<IPVideoRoute>(route),
-    IPVideoFrameQueue(route.settings().getMaxClientQueueSize())
+    IPVideoFrameQueue(route.settings().getMaxClientQueueSize()),
+    _targetFrameDuration(1000 / route.settings().getMaxClientFrameRate())
 {
 }
 
@@ -495,10 +496,13 @@ void IPVideoConnection::handleRequest(ServerEventArgs& evt)
         
         while (_isRunning)
         {
+            uint64_t frameSendStart = ofGetElapsedTimeMillis();
+            
             if (outputStream.good() && !outputStream.fail() && !outputStream.bad())
             {
                 if (!empty())
                 {
+                    _nextScheduledFrame = frameSendStart + _targetFrameDuration;
                     std::shared_ptr<IPVideoFrame> frame = pop();
                     
                     if (frame != nullptr)
@@ -514,10 +518,8 @@ void IPVideoConnection::handleRequest(ServerEventArgs& evt)
                         ostr << "\r\n";
                         ostr << buffer;
                         
-                        uint64_t now = ofGetElapsedTimeMillis();
-                        _lastFrameDuration = now - _lastFrameSent;
-                        _lastFrameSent = now;
                         _bytesSent += static_cast<uint64_t>(ostr.chars()); // add the counts
+                        _framesSent ++;
                         ostr.reset();               // reset the counts
                         ostr.flush();
                     }
@@ -529,14 +531,18 @@ void IPVideoConnection::handleRequest(ServerEventArgs& evt)
                 else
                 {
                     // ofLogVerbose("IPVideoRouteHandler::handleRequest") << "Queue empty.";
+                    // Delay a little bit to wait for a next frame to come into the queue.
+                    _nextScheduledFrame = frameSendStart + 10;
                 }
             }
             else
             {
                 throw Poco::Exception("Response stream failed or went bad -- it was probably interrupted.");
             }
-            
-            Poco::Thread::sleep(30);  // TODO: smarter ways of doing for rate / fps limiting
+            uint64_t now = ofGetElapsedTimeMillis();
+            if (now < _nextScheduledFrame) {
+                Poco::Thread::sleep(_nextScheduledFrame - now);
+            }
         }
     }
     catch (const Poco::Exception& e)
